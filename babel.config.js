@@ -5,12 +5,13 @@ module.exports = {
       'module-resolver',
       {
         alias: {
+          '@assets': './src/assets',
           '@controleonline': './modules/controleonline',
+          '@controleonline-rn': './node_modules/@controleonline',
           '@env': './config/env.local.js',
           '@package': './package.json',
-          '@stores': './src/store/stores.js',
           '@store': './src/store',
-          '@controleonline-rn': './node_modules/@controleonline',
+          '@stores': './src/store/stores.js',
         },
       },
     ],
