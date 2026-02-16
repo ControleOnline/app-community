@@ -9,9 +9,9 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "icon": "./src/assets/logo.png",
+    "icon": "./src/assets/manager/logo.png",
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./src/assets/manager/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -29,7 +29,7 @@
       "package": "com.controleonline.manager",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/logo.png",
+        "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -39,7 +39,7 @@
       ]
     },
     "web": {
-      "favicon": "./src/assets/logo.png"
+      "favicon": "./src/assets/manager/logo.png"
     },
     "plugins": [
       "expo-build-properties",

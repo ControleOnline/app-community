@@ -5,7 +5,8 @@ const appJsonPath = path.join(__dirname, '../app.json');
 const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
 
 const appType = (process.env.APP_TYPE || 'MANAGER').toUpperCase();
-const assetSubdir = appType === 'MANAGER' ? '' : `${appType.toLowerCase()}/`;
+//const assetSubdir = appType === 'MANAGER' ? '' : `${appType.toLowerCase()}/`;
+const assetSubdir = `${appType.toLowerCase()}/`;
 const assetsBasePath = `./src/assets/${assetSubdir}`;
 
 // Função para atualizar caminhos de assets
