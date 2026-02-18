@@ -46,12 +46,12 @@ if (homeByType[env.APP_TYPE]) {
   allRoutes.push({
     name: 'HomePage',
     component: homeByType[env.APP_TYPE],
-    options: { headerShown: false, title: 'Menu' },
+    options: { headerShown: false, title: 'Menu', showToolBar: true, showCompanyFilter: true },
   })
 }
 
-const WrappedComponent = (Component) => ({ navigation, route }) => (
-  <DefaultLayout navigation={navigation} route={route}>
+const WrappedComponent = (options, Component) => ({ navigation, route }) => (
+  <DefaultLayout navigation={navigation} route={route} options={options}>
     <Component navigation={navigation} route={route} />
   </DefaultLayout>
 )
@@ -84,7 +84,7 @@ export default function Routes() {
         <Stack.Screen
           key={index}
           name={route.name}
-          component={WrappedComponent(route.component)}
+          component={WrappedComponent(route.options, route.component)}
           options={route.options}
           initialParams={route.initialParams}
         />
