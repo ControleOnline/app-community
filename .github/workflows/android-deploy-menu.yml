@@ -2,7 +2,7 @@ name: Deploy Menu Android
 
 on:
   push:
-    branches: [android]
+    branches: [production]
 
 jobs:
   build:

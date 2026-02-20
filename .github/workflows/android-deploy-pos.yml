@@ -2,7 +2,7 @@ name: Deploy POS Android
 
 on:
   push:
-    branches: [android]
+    branches: [production]
 
 jobs:
   build:

@@ -2,7 +2,7 @@ name: Deploy Delivery Android
 
 on:
   push:
-    branches: [android]
+    branches: [production]
 
 jobs:
   build:
