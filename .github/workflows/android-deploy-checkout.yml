@@ -38,8 +38,8 @@ jobs:
           APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
 
           echo "const env = {\
-          API_ENTRYPOINT: '://api.controleonline.com',\
-          DOMAIN: '://app.controleonline.com',\
+          API_ENTRYPOINT: '//api.controleonline.com',\
+          DOMAIN: 'https://app.controleonline.com',\
           APP_TYPE: '${{ env.APP_TYPE }}',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
