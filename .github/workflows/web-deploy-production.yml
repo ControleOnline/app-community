@@ -43,9 +43,9 @@ jobs:
       - name: Deploy
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.HOST }}
-          user: ${{ secrets.USER }}
-          password: ${{ secrets.PASS }}
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
           localDir: "./dist"
           remoteDir: "~/public_html"
           forceSsl: false

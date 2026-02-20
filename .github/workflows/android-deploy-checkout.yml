@@ -1,4 +1,4 @@
-name: Deploy Delivery Android
+name: Deploy Checkout Android
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_TYPE: Delivery
-      APP_DISPLAY_NAME: "Delivery"
+      APP_TYPE: Checkout
+      APP_DISPLAY_NAME: "Checkout"
       
     steps:
       - uses: actions/checkout@v3
@@ -78,8 +78,8 @@ jobs:
           echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
           echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.PASS }}" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.PASS }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
 
       - name: Build Android Bundle
         run: |
