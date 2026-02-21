@@ -1,4 +1,4 @@
-name: Deploy CRM Android
+name: Deploy Manager Android
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_TYPE: CRM
-      APP_DISPLAY_NAME: "CRM"
+      APP_TYPE: Manager
+      APP_DISPLAY_NAME: "Gestor"
       
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,6 @@ jobs:
         with:
           node-version: "20"
 
-      # ✅ Geração dinâmica correta
       - name: Generate Dynamic Configs
         run: |
           APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
@@ -98,4 +97,5 @@ jobs:
           package_name: ${{ env.PACKAGE_NAME }}
           aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
-          release_status: draft
+          release_status: completed
+          changes_not_sent_for_review: false

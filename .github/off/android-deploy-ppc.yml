@@ -1,0 +1,101 @@
+name: Deploy PPC Android
+
+on:
+  push:
+    branches: [production]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_TYPE: PPC
+      APP_DISPLAY_NAME: "PCP"
+      
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update Submodules
+        run: |
+          git submodule update --recursive --init
+          git submodule update --recursive --remote
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://api.controleonline.com',\
+          DOMAIN: 'https://app.controleonline.com',\
+          APP_TYPE: '${{ env.APP_TYPE }}',\
+          ZOOM: 0.80,\
+          OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
+          GMAPS_GOOGLE_CLIENT_ID:'${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}',\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Update app.json dynamically
+        run: |
+            APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+            sed -i "s/On Gestor/On ${{ env.APP_DISPLAY_NAME }}/g" app.json
+            sed -i "s/manager/${APP_LOWER}/g" app.json
+            
+      - name: Configure Assets by APP_TYPE
+        run: node scripts/configure-assets.js
+        env:
+          APP_TYPE: ${{ env.APP_TYPE }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+
+      - name: Build Android Bundle
+        run: |
+          cd android
+          ./gradlew bundleRelease --init-script ../signing.gradle
+
+      - name: Set Dynamic Package Name
+        run: |
+          APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+          echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
+
+      - name: Upload .aab to Production Track
+        uses: KevinRohn/github-action-upload-play-store@v1.0.0
+        with:
+          service_account_json: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+          package_name: ${{ env.PACKAGE_NAME }}
+          aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          release_status: draft
+          changes_not_sent_for_review: true

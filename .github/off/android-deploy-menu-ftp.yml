@@ -1,4 +1,4 @@
-name: Deploy PPC Android
+name: Deploy Menu Android
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_TYPE: PPC
-      APP_DISPLAY_NAME: "PCP"
+      APP_TYPE: Menu
+      APP_DISPLAY_NAME: "Menu"
       
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,6 @@ jobs:
         with:
           node-version: "20"
 
-      # ✅ Geração dinâmica correta
       - name: Generate Dynamic Configs
         run: |
           APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
@@ -57,9 +56,9 @@ jobs:
 
       - name: Update app.json dynamically
         run: |
-            APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
-            sed -i "s/On Gestor/On ${{ env.APP_DISPLAY_NAME }}/g" app.json
-            sed -i "s/manager/${APP_LOWER}/g" app.json
+          APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s/On Gestor/On ${{ env.APP_DISPLAY_NAME }}/g" app.json
+          sed -i "s/manager/${APP_LOWER}/g" app.json
             
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets.js
@@ -86,10 +85,28 @@ jobs:
           cd android
           ./gradlew bundleRelease --init-script ../signing.gradle
 
+      # ✅ Define PACKAGE_NAME
       - name: Set Dynamic Package Name
         run: |
           APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
+
+      # ✅ Extrai versão do app.json
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # ✅ Upload com PACKAGE_NAME + VERSION
+      - name: Upload AAB to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/bundle/release"
+          remoteDir: "~/public_html/${{ env.PACKAGE_NAME }}/${{ env.VERSION }}/aab"
+          forceSsl: false
 
       - name: Upload .aab to Production Track
         uses: KevinRohn/github-action-upload-play-store@v1.0.0
@@ -99,3 +116,4 @@ jobs:
           aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           release_status: draft
+          changes_not_sent_for_review: false

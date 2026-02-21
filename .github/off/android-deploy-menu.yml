@@ -1,4 +1,4 @@
-name: Deploy Delivery Android
+name: Deploy Menu Android
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_TYPE: Delivery
-      APP_DISPLAY_NAME: "Delivery"
+      APP_TYPE: Menu
+      APP_DISPLAY_NAME: "Menu"
       
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,6 @@ jobs:
         with:
           node-version: "20"
 
-      # ✅ Geração dinâmica correta
       - name: Generate Dynamic Configs
         run: |
           APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
@@ -99,3 +98,4 @@ jobs:
           aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           release_status: draft
+          changes_not_sent_for_review: false

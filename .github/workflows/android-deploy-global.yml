@@ -1,4 +1,4 @@
-name: Deploy Checkout Android
+name: Deploy Android Apps
 
 on:
   push:
@@ -8,10 +8,56 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_type: Checkout
+            display_name: "Checkout"
+            track: internal
+            release_status: draft
+            changes_not_sent_for_review: false
+
+          - app_type: CRM
+            display_name: "CRM"
+            track: internal
+            release_status: draft
+            changes_not_sent_for_review: true
+
+          - app_type: Delivery
+            display_name: "Delivery"
+            track: internal
+            release_status: draft
+            changes_not_sent_for_review: false
+
+          - app_type: Manager
+            display_name: "Gestor"
+            track: internal
+            release_status: completed
+            changes_not_sent_for_review: false
+
+          - app_type: Menu
+            display_name: "Menu"
+            track: internal
+            release_status: draft
+            changes_not_sent_for_review: false
+
+          - app_type: POS
+            display_name: "PDV"
+            track: internal
+            release_status: completed
+            changes_not_sent_for_review: false
+
+          - app_type: PPC
+            display_name: "PPC"
+            track: internal
+            release_status: draft
+            changes_not_sent_for_review: true
+
     env:
-      APP_TYPE: Checkout
-      APP_DISPLAY_NAME: "Checkout"
-      
+      APP_TYPE: ${{ matrix.app_type }}
+      APP_DISPLAY_NAME: ${{ matrix.display_name }}
+
     steps:
       - uses: actions/checkout@v3
 
@@ -32,15 +78,14 @@ jobs:
         with:
           node-version: "20"
 
-      # ✅ Geração dinâmica correta
       - name: Generate Dynamic Configs
         run: |
-          APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
 
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           DOMAIN: 'https://app.controleonline.com',\
-          APP_TYPE: '${{ env.APP_TYPE }}',\
+          APP_TYPE: '${APP_TYPE}',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
           GMAPS_GOOGLE_CLIENT_ID:'${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}',\
@@ -57,10 +102,10 @@ jobs:
 
       - name: Update app.json dynamically
         run: |
-            APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
-            sed -i "s/On Gestor/On ${{ env.APP_DISPLAY_NAME }}/g" app.json
-            sed -i "s/manager/${APP_LOWER}/g" app.json
-            
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
+          sed -i "s/manager/${APP_LOWER}/g" app.json
+
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets.js
         env:
@@ -88,14 +133,30 @@ jobs:
 
       - name: Set Dynamic Package Name
         run: |
-          APP_LOWER=$(echo "${{ env.APP_TYPE }}" | tr '[:upper:]' '[:lower:]')
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
 
-      - name: Upload .aab to Production Track
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Upload AAB to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/bundle/release"
+          remoteDir: "public_html/${{ env.PACKAGE_NAME }}/${{ env.VERSION }}/aab"
+          forceSsl: false
+
+      - name: Upload .aab to Play Store
         uses: KevinRohn/github-action-upload-play-store@v1.0.0
         with:
           service_account_json: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
           package_name: ${{ env.PACKAGE_NAME }}
           aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
-          track: internal
-          release_status: draft
+          track: ${{ matrix.track }}
+          release_status: ${{ matrix.release_status }}
+          changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review }}
