@@ -151,10 +151,13 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/aab"
           forceSsl: false
 
+      - name: Decode Service Account
+        run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
+
       - name: Upload .aab to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+          serviceAccountJson: /tmp/service_account.json
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: ${{ matrix.track }}
