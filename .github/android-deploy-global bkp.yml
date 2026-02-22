@@ -152,11 +152,11 @@ jobs:
           forceSsl: false
 
       - name: Upload .aab to Play Store
-        uses: r0adkll/upload-google-play@v1
+        uses: KevinRohn/github-action-upload-play-store@v1.0.0
         with:
-          serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
-          packageName: ${{ env.PACKAGE_NAME }}
-          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          service_account_json: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+          package_name: ${{ env.PACKAGE_NAME }}
+          aab_file_path: android/app/build/outputs/bundle/release/app-release.aab
           track: ${{ matrix.track }}
-          status: ${{ matrix.release_status }}
-          changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
+          release_status: ${{ matrix.release_status }}
+          changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review }}
