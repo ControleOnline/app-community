@@ -148,7 +148,7 @@ jobs:
           user: ${{ secrets.FTPUSER }}
           password: ${{ secrets.FTPPASS }}
           localDir: "./android/app/build/outputs/bundle/release"
-          remoteDir: "public_html/${{ env.PACKAGE_NAME }}/${{ env.VERSION }}/aab"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/aab"
           forceSsl: false
 
       - name: Upload .aab to Play Store
