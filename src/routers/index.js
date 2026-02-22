@@ -36,6 +36,7 @@ export const allRoutes = [
 
 const homeByType = {
   CRM: CRMHomePage,
+  DELIVERY: ShopHomePage,
   MANAGER: ManagerHomePage,
   MENU: ShopHomePage,
   POS: POSHomePage,
