@@ -1,35 +1,35 @@
 {
   "expo": {
-    "name": "On Gestor",
-    "displayName": "On Gestor",
-    "slug": "manager-controle-online",
+    "name": "CRM",
+    "displayName": "CRM Controle Online",
+    "slug": "crm-controle-online",
     "platforms": [
       "android",
       "ios",
       "web"
     ],
     "jsEngine": "hermes",
-    "icon": "./src/assets/manager/logo.png",
+    "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./src/assets/manager/splash.png",
+      "image": "./src/assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
       "jsEngine": "hermes",
-      "bundleIdentifier": "com.controleonline.manager",
+      "bundleIdentifier": "com.controleonline.crm",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
-        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros."
+        "NSMicrophoneUsageDescription": "Necessário para processamento de áudio no PDV.",
+        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros de venda."
       }
     },
     "android": {
       "jsEngine": "hermes",
-      "package": "com.controleonline.manager",
-      "versionCode": 1,
+      "package": "com.controleonline.crm",
+      "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/manager/logo.png",
+        "foregroundImage": "./src/assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -39,13 +39,15 @@
       ]
     },
     "web": {
-      "favicon": "./src/assets/manager/logo.png"
+      "favicon": "./src/assets/logo.png"
     },
     "plugins": [
       "expo-build-properties",
       "expo-asset",
       "expo-font",
-      "react-native-iap"
+      "react-native-iap",
+      "expo-audio",
+      "expo-video"
     ]
   }
 }
