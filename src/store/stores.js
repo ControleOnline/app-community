@@ -28,6 +28,7 @@ import print from '@controleonline/ui-common/src/store/print';
 import printer from '@controleonline/ui-common/src/store/printer';
 import products from '@controleonline/ui-products/src/store/products';
 import product_unit from '@controleonline/ui-products/src/store/products/product_unit';
+import inventories from '@controleonline/ui-products/src/store/inventories';
 import product_category from '@controleonline/ui-products/src/store/products/product_category';
 import product_group from '@controleonline/ui-products/src/store/products/product_group';
 import product_group_product from '@controleonline/ui-products/src/store/products/product_group_product';
@@ -77,6 +78,7 @@ export default {
   product_group_feedstock,
   product_group_product,
   product_unit,
+  inventories,
   queues,
   status,
   tasks,
