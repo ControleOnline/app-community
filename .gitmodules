@@ -37,14 +37,54 @@
 [submodule "modules/controleonline/ui-customers"]
 	path = modules/controleonline/ui-customers
 	url = https://github.com/ControleOnline/ui-customers.git
+[submodule "modules/controleonline/ui-ppc"]
+	path = modules/controleonline/ui-ppc
+	url = https://github.com/ControleOnline/ui-ppc.git
 [submodule "modules/controleonline/ui-contracts"]
 	path = modules/controleonline/ui-contracts
 	url = https://github.com/ControleOnline/ui-contracts.git
-
-
 [submodule "modules/controleonline/ui-users"]
 	path = modules/controleonline/ui-users
 	url = https://github.com/ControleOnline/ui-users.git
 [submodule "modules/controleonline/ui-tasks"]
 	path = modules/controleonline/ui-tasks
 	url = https://github.com/ControleOnline/ui-tasks.git
+[submodule "modules/controleonline/ui-providers"]
+	path = modules/controleonline/ui-providers
+	url = https://github.com/ControleOnline/ui-providers.git
+[submodule "modules/controleonline/ui-professionals"]
+	path = modules/controleonline/ui-professionals
+	url = https://github.com/ControleOnline/ui-professionals.git
+[submodule "modules/controleonline/ui-logistic"]
+	path = modules/controleonline/ui-logistic
+	url = https://github.com/ControleOnline/ui-logistic.git
+[submodule "modules/controleonline/ui-carrier"]
+	path = modules/controleonline/ui-carrier
+	url = https://github.com/ControleOnline/ui-carrier.git
+[submodule "modules/controleonline/ui-employee"]
+	path = modules/controleonline/ui-employee
+	url = https://github.com/ControleOnline/ui-employee.git
+[submodule "modules/controleonline/ui-legacy"]
+	path = modules/controleonline/ui-legacy
+	url = https://github.com/ControleOnline/ui-legacy.git
+[submodule "modules/controleonline/ui-accounting"]
+	path = modules/controleonline/ui-accounting
+	url = https://github.com/ControleOnline/ui-accounting.git
+[submodule "modules/controleonline/ui-dashboard"]
+	path = modules/controleonline/ui-dashboard
+	url = https://github.com/ControleOnline/ui-dashboard.git
+[submodule "modules/controleonline/ui-config"]
+	path = modules/controleonline/ui-config
+	url = https://github.com/ControleOnline/ui-config.git
+[submodule "modules/controleonline/ui-ead"]
+	path = modules/controleonline/ui-ead
+	url = https://github.com/ControleOnline/ui-ead.git
+[submodule "modules/controleonline/ui-pcp"]
+	path = modules/controleonline/ui-pcp
+	url = https://github.com/ControleOnline/ui-pcp.git
+[submodule "modules/controleonline/ui-support"]
+	path = modules/controleonline/ui-support
+	url = https://github.com/ControleOnline/ui-support.git
+[submodule "modules/modules/controleonline/ui-login"]
+	path = modules/modules/controleonline/ui-login
+	url = https://github.com/ControleOnline/ui-login.git
