@@ -47,7 +47,12 @@ if (homeByType[env.APP_TYPE]) {
   allRoutes.push({
     name: 'HomePage',
     component: homeByType[env.APP_TYPE],
-    options: { headerShown: false, title: 'Menu', showBottomToolBar: true, showCompanyFilter: true },
+    options: {
+      headerShown: false,
+      title: 'Menu',
+      showBottomToolBar: true,
+      showCompanyFilter: env.APP_TYPE === 'MANAGER',
+    },
   })
 }
 
