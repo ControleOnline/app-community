@@ -47,7 +47,12 @@ if (homeByType[env.APP_TYPE]) {
   allRoutes.push({
     name: 'HomePage',
     component: homeByType[env.APP_TYPE],
-    options: { headerShown: false, title: 'Menu', showToolBar: true, showCompanyFilter: true },
+    options: {
+      headerShown: false,
+      title: 'Menu',
+      showBottomToolBar: true,
+      showCompanyFilter: env.APP_TYPE === 'MANAGER',
+    },
   })
 }
 
@@ -78,9 +83,17 @@ export const linking = (() => {
   }
 })()
 
+const getInitialRouteName = () => {
+  const routeNames = allRoutes.map(route => route?.name).filter(Boolean)
+
+  if (routeNames.includes('HomePage')) return 'HomePage'
+  if (routeNames.includes('SignInPage')) return 'SignInPage'
+  return routeNames[0]
+}
+
 export default function Routes() {
   return (
-    <Stack.Navigator detachInactiveScreens>
+    <Stack.Navigator detachInactiveScreens initialRouteName={getInitialRouteName()}>
       {allRoutes.map((route, index) => (
         <Stack.Screen
           key={index}
