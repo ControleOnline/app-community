@@ -33,6 +33,8 @@ import product_category from '@controleonline/ui-products/src/store/products/pro
 import product_group from '@controleonline/ui-products/src/store/products/product_group';
 import product_group_product from '@controleonline/ui-products/src/store/products/product_group_product';
 import product_group_feedstock from '@controleonline/ui-products/src/store/products/product_group_feedstock';
+import product_file from '@controleonline/ui-products/src/store/products/product_file';
+import category_file from '@controleonline/ui-common/src/store/categories/category_file';
 import queues from '@controleonline/ui-ppc/src/store/modules/queues';
 import status from '@controleonline/ui-common/src/store/status';
 import tasks from '@controleonline/ui-tasks/src/store/tasks';
@@ -73,10 +75,12 @@ export default {
   print,
   printer,
   products,
+  product_file,
   product_category,
   product_group,
   product_group_feedstock,
   product_group_product,
+  category_file,
   product_unit,
   inventories,
   queues,
