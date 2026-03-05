@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
+//import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
@@ -35,6 +36,7 @@ export const allRoutes = [
 ]
 
 const homeByType = {
+//  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
   DELIVERY: ShopHomePage,
   MANAGER: ManagerHomePage,
