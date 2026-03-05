@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - app_type: Checkout
+          - app_type: CHECKOUT
             display_name: "Checkout"
             track: internal
             release_status: draft
@@ -22,21 +22,21 @@ jobs:
             display_name: "CRM"
             track: internal
             release_status: draft
-            changes_not_sent_for_review: true
+            changes_not_sent_for_review: false
 
-          - app_type: Delivery
+          - app_type: DELIVERY
             display_name: "Delivery"
             track: internal
             release_status: draft
             changes_not_sent_for_review: false
 
-          - app_type: Manager
+          - app_type: MANAGER
             display_name: "Gestor"
             track: internal
             release_status: completed
             changes_not_sent_for_review: false
 
-          - app_type: Menu
+          - app_type: MENU
             display_name: "Menu"
             track: internal
             release_status: draft
