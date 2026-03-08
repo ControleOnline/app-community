@@ -53,7 +53,7 @@ if (homeByType[env.APP_TYPE]) {
       headerShown: false,
       title: 'Menu',
       showBottomToolBar: true,
-      showCompanyFilter: env.APP_TYPE === 'MANAGER',
+      showCompanyFilter: true,
     },
   })
 }
