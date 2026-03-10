@@ -33,9 +33,10 @@ jobs:
         run: |
           git submodule update --recursive --init
           git submodule update --recursive --remote
-      - name: Install Modules
-        run: |
-          npx expo install
+      - name: Install Dependencies
+        run: npm install    
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
       - name: Build
         run: |
           npx expo export --platform web

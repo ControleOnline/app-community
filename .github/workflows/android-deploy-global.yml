@@ -113,7 +113,8 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
       - name: Prebuild
         run: npx expo prebuild --clean
 
