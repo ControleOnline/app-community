@@ -6,6 +6,7 @@ import categories from '@controleonline/ui-common/src/store/categories';
 import category_file from '@controleonline/ui-common/src/store/categories/category_file';
 import city from '@controleonline/ui-common/src/store/address/city';
 import configs from '@controleonline/ui-common/src/store/configs';
+import imports from '@controleonline/ui-common/src/store/imports';
 import contract from '@controleonline/ui-contracts/src/store/contract';
 import contract_peoples from '@controleonline/ui-contracts/src/store/contract/contract_people';
 import device from '@controleonline/ui-common/src/store/device';
@@ -67,6 +68,7 @@ export default {
   file,
   inventories,
   invoice,
+  imports,
   models,
   order_products,
   order_products_queue,
