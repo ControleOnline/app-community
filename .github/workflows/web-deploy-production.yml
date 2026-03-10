@@ -35,8 +35,7 @@ jobs:
           git submodule update --recursive --remote
       - name: Install Modules
         run: |
-          npm install --global yarn
-          yarn
+          npx expo install
       - name: Build
         run: |
           npx expo export --platform web
