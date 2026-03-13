@@ -21,7 +21,7 @@ jobs:
           - app_type: CRM
             display_name: "CRM"
             track: internal
-            release_status: draft
+            release_status: completed
             changes_not_sent_for_review: false
 
           - app_type: DELIVERY
@@ -51,7 +51,7 @@ jobs:
           - app_type: PPC
             display_name: "PPC"
             track: internal
-            release_status: draft
+            release_status: completed
             changes_not_sent_for_review: true
 
     env:
