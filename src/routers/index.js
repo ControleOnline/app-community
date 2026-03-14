@@ -1,11 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import {getStateFromPath as defaultGetStateFromPath} from '@react-navigation/native'
 
 //import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
-import ShopHomePage from '@controleonline/ui-shop/src/react/pages/home/index'
+import ShopHomePage from '@controleonline/ui-shop/src/react/pages/StorefrontHome'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
 
@@ -18,6 +19,7 @@ import managerRoutes from '@controleonline/ui-manager/src/react/router/routes'
 import ordersRoutes from '@controleonline/ui-orders/src/react/router/routes'
 import peopleRoutes from '@controleonline/ui-people/src/react/router/routes'
 import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
+import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
 
 import { env } from '@env'
 
@@ -32,7 +34,8 @@ export const allRoutes = [
   ...managerRoutes,
   ...ordersRoutes,
   ...peopleRoutes,
-  ...productsRoutes
+  ...productsRoutes,
+  ...shopRoutes
 ]
 
 const homeByType = {
@@ -76,12 +79,16 @@ export const linking = (() => {
     screens[route.name] =
       route.name === 'HomePage'
         ? ''
-        : route.name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+        : route.path || route.name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
   }
 
   return {
     prefixes: ['/', 'http://localhost:19006'],
     config: { screens },
+    getStateFromPath(path, options) {
+      const normalizedPath = String(path || '').replace(/^\/?shop\/q=/, 'shop/search/')
+      return defaultGetStateFromPath(normalizedPath, options)
+    },
   }
 })()
 
