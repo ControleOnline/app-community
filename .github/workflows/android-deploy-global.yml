@@ -36,12 +36,6 @@ jobs:
             release_status: completed
             changes_not_sent_for_review: false
 
-          - app_type: MENU
-            display_name: "Menu"
-            track: internal
-            release_status: draft
-            changes_not_sent_for_review: false
-
           - app_type: POS
             display_name: "PDV"
             track: internal

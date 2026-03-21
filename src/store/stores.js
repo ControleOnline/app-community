@@ -26,6 +26,7 @@ import order_products_queue from '@controleonline/ui-ppc/src/store/modules/order
 import orders from '@controleonline/ui-orders/src/store/orders';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import people from '@controleonline/ui-people/src/store/people';
+import people_link from '@controleonline/ui-people/src/store/people_link';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
 import printer from '@controleonline/ui-common/src/store/printer';
@@ -56,6 +57,7 @@ export default {
   city,
   configs,
   contract,
+  people_link,
   contract_peoples,
   device,
   device_config,
