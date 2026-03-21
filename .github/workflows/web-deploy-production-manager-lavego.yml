@@ -1,4 +1,4 @@
-name: Deploy Project
+name: Deploy Project Manager LaveGo
 on:
   push:
     branches: [production]
@@ -42,12 +42,12 @@ jobs:
         run: |
           npx expo export --platform web
       - name: Deploy
-        uses: locaweb/ftp-deploy@1.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           host: ${{ secrets.FTPHOSTLAVEGO }}
           user: ${{ secrets.FTPUSERLAVEGO }}
           password: ${{ secrets.FTPPASSLAVEGO }}
+          port: 2222
           localDir: "./dist"
           remoteDir: "~/public_html/admin"
           forceSsl: false
-          options: "--port=2222"
