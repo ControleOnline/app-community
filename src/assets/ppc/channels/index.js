@@ -85,3 +85,19 @@ export const getOrderChannelLabel = order => {
   if (key === 'whatsapp') return 'WhatsApp'
   return normalize(order?.app || order?.channel || order?.origin || 'Balcao') || 'Balcao'
 }
+
+const PLATFORM_CAPABILITIES = {
+  '99food': { canCancel: true, requiresCancelReasons: true, canReady: true, canDeliver: true },
+  ifood:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  whatsapp: { canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
+  instagram:{ canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
+  keeta:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  messenger:{ canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
+}
+
+const DEFAULT_CAPABILITIES = { canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false }
+
+export const getPlatformCapabilities = order => {
+  const key = getOrderChannelKey(order)
+  return PLATFORM_CAPABILITIES[key] ?? DEFAULT_CAPABILITIES
+}
