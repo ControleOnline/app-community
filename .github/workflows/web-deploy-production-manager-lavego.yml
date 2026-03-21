@@ -41,7 +41,7 @@ jobs:
       - name: Build
         run: |
           npx expo export --platform web
-      - name: Upload via SCP
+      - name: Upload via SCP using appleboy/scp-action
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.FTPHOSTLAVEGO }}
@@ -49,4 +49,5 @@ jobs:
           password: ${{ secrets.FTPPASSLAVEGO }}
           port: 2222
           source: "dist/*"
-          target: "/home/lavegoc1/public_html/admin"
+          target: "/home/lavegoc1/public_html/admin/"
+          strip_components: 1
