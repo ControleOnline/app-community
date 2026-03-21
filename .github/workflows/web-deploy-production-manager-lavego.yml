@@ -46,7 +46,7 @@ jobs:
           host: ${{ secrets.FTPHOSTLAVEGO }}
           user: ${{ secrets.FTPUSERLAVEGO }}
           password: ${{ secrets.FTPPASSLAVEGO }}
-          port: 2222
           localDir: "./dist"
           remoteDir: "~/public_html/admin"
           forceSsl: false
+          options: "--port=2222"
