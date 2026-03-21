@@ -44,7 +44,7 @@ jobs:
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.FTPHOSTLAVEGO }}
+          server: ${{ secrets.FTPHOSTLAVEGO }}
           user: ${{ secrets.FTPUSERLAVEGO }}
           password: ${{ secrets.FTPPASSLAVEGO }}
           port: 2222
