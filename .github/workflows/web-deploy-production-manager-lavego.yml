@@ -49,4 +49,4 @@ jobs:
           password: ${{ secrets.FTPPASSLAVEGO }}
           port: 2222
           local-dir: "./dist"
-          server-dir: "~/public_html/admin"
+          server-dir: "~/public_html/admin/"
