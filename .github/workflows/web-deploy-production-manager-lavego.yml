@@ -45,9 +45,8 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTPHOSTLAVEGO }}
-          user: ${{ secrets.FTPUSERLAVEGO }}
+          username: ${{ secrets.FTPUSERLAVEGO }}
           password: ${{ secrets.FTPPASSLAVEGO }}
           port: 2222
-          localDir: "./dist"
-          remoteDir: "~/public_html/admin"
-          forceSsl: false
+          local-dir: "./dist"
+          server-dir: "~/public_html/admin"
