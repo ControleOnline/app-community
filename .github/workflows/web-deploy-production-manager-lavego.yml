@@ -1,7 +1,8 @@
-name: Deploy Project
+name: Deploy Project Manager LaveGo
 on:
   push:
     branches: [production]
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +14,7 @@ jobs:
       - name: Creating Config
         run: |
           echo "const env = {\
-          API_ENTRYPOINT: 'https://api.controleonline.com',\
+          API_ENTRYPOINT: 'https://api.lave-go.com',\
           APP_TYPE: 'MANAGER',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
@@ -40,12 +41,13 @@ jobs:
       - name: Build
         run: |
           npx expo export --platform web
-      - name: Deploy
-        uses: locaweb/ftp-deploy@1.0.0
+      - name: Upload via SCP using appleboy/scp-action
+        uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
-          localDir: "./dist"
-          remoteDir: "~/public_html"
-          forceSsl: false
+          host: ${{ secrets.FTPHOSTLAVEGO }}
+          username: ${{ secrets.FTPUSERLAVEGO }}
+          password: ${{ secrets.FTPPASSLAVEGO }}
+          port: 2222
+          source: "dist/*"
+          target: "/home/lavegoc1/public_html/admin/"
+          strip_components: 1

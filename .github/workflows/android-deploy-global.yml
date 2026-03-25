@@ -16,7 +16,7 @@ jobs:
             display_name: "Checkout"
             track: internal
             release_status: draft
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: CRM
             display_name: "CRM"
@@ -46,7 +46,7 @@ jobs:
             display_name: "PPC"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: true
+            changes_not_sent_for_review: false
 
     env:
       APP_TYPE: ${{ matrix.app_type }}

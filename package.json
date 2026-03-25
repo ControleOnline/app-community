@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.2.14",
+  "version": "1.2.16",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -47,6 +47,7 @@
     "react-native-iap": "^14.7.8",
     "react-native-pager-view": "6.9.1",
     "react-native-paper": "^5.14.5",
+    "react-native-pdf": "^7.0.4",
     "react-native-qrcode-svg": "^6.3.21",
     "react-native-reanimated": "~4.1.1",
     "react-native-render-html": "^6.3.4",
