@@ -35,6 +35,7 @@ import product_file from '@controleonline/ui-products/src/store/products/product
 import product_group from '@controleonline/ui-products/src/store/products/product_group';
 import product_group_feedstock from '@controleonline/ui-products/src/store/products/product_group_feedstock';
 import product_group_product from '@controleonline/ui-products/src/store/products/product_group_product';
+import product_inventories from '@controleonline/ui-products/src/store/product_inventories';
 import product_unit from '@controleonline/ui-products/src/store/products/product_unit';
 import products from '@controleonline/ui-products/src/store/products';
 import queues from '@controleonline/ui-ppc/src/store/modules/queues';
@@ -85,6 +86,7 @@ export default {
   product_group,
   product_group_feedstock,
   product_group_product,
+  product_inventories,
   product_unit,
   products,
   queues,
