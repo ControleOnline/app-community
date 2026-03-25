@@ -43,7 +43,7 @@ const homeByType = {
   CRM: CRMHomePage,
   DELIVERY: ShopHomePage,
   MANAGER: ManagerHomePage,
-  MENU: ShopHomePage,
+  SHOP: ShopHomePage,
   POS: POSHomePage,
   PPC: PPCHomePage,
 }
