@@ -15,6 +15,7 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.lave-go.com',\
+          SOCKET: 'wss://api.lave-go.com',\
           APP_TYPE: 'MANAGER',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
