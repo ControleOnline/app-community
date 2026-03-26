@@ -3,11 +3,7 @@
     "name": "On Gestor",
     "displayName": "On Gestor",
     "slug": "manager-controle-online",
-    "platforms": [
-      "android",
-      "ios",
-      "web"
-    ],
+    "platforms": ["android", "ios", "web"],
     "jsEngine": "hermes",
     "icon": "./src/assets/manager/logo.png",
     "splash": {
@@ -21,7 +17,8 @@
       "bundleIdentifier": "com.controleonline.manager",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
-        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros."
+        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
@@ -35,7 +32,10 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "VIBRATE",
-        "INTERNET"
+        "INTERNET",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -45,7 +45,13 @@
       "expo-build-properties",
       "expo-asset",
       "expo-font",
-      "react-native-iap"
+      "react-native-iap",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true
+        }
+      ]
     ]
   }
 }
