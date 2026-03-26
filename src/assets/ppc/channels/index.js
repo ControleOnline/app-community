@@ -88,7 +88,7 @@ export const getOrderChannelLabel = order => {
 
 const PLATFORM_CAPABILITIES = {
   '99food': { canCancel: true, requiresCancelReasons: true, canReady: true, canDeliver: true },
-  ifood:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  ifood:    { canCancel: true, requiresCancelReasons: true, canReady: true, canDeliver: true },
   whatsapp: { canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
   instagram:{ canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
   keeta:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
