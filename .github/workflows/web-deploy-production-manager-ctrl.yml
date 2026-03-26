@@ -15,7 +15,6 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
-          SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'MANAGER',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
