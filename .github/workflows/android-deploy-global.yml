@@ -43,7 +43,7 @@ jobs:
             changes_not_sent_for_review: false
 
           - app_type: PPC
-            display_name: "PPC"
+            display_name: "PCP"
             track: internal
             release_status: completed
             changes_not_sent_for_review: false
