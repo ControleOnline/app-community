@@ -1,6 +1,8 @@
 import acl from '@controleonline/ui-common/src/store/acl';
+import asaas from '@controleonline/ui-financial/src/store/asaas';
 import address from '@controleonline/ui-people/src/store/address';
 import auth from '@controleonline/ui-login/src/store/modules/auth';
+import card from '@controleonline/ui-financial/src/store/card';
 import cart from '@controleonline/ui-orders/src/store/cart';
 import categories from '@controleonline/ui-common/src/store/categories';
 import category_file from '@controleonline/ui-common/src/store/categories/category_file';
@@ -50,8 +52,10 @@ import walletPaymentType from '@controleonline/ui-financial/src/store/walletPaym
 
 export default {
   acl,
+  asaas,
   address,
   auth,
+  card,
   cart,
   categories,
   category_file,

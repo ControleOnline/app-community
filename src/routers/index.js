@@ -48,14 +48,18 @@ const homeByType = {
   PPC: PPCHomePage,
 }
 
-if (homeByType[env.APP_TYPE]) {
+const normalizedAppType = String(env.APP_TYPE || '').toUpperCase()
+
+if (homeByType[normalizedAppType]) {
   allRoutes.push({
     name: 'HomePage',
-    component: homeByType[env.APP_TYPE],
+    component: homeByType[normalizedAppType],
     options: {
       headerShown: false,
       title: 'Menu',
       showBottomToolBar: true,
+      showBottomCart:
+        normalizedAppType === 'SHOP' || normalizedAppType === 'DELIVERY',
       showCompanyFilter: true,
     },
   })
@@ -86,7 +90,32 @@ export const linking = (() => {
     prefixes: ['/', 'http://localhost:19006'],
     config: { screens },
     getStateFromPath(path, options) {
-      const normalizedPath = String(path || '').replace(/^\/?shop\/q=/, 'shop/search/')
+      let normalizedPath = String(path || '').replace(/^\/?shop\/q=/, 'shop/search/')
+
+      const legacyMatch =
+        normalizedPath.match(/[?&]f=([^&]+)/i) ||
+        normalizedPath.match(/^\/?(?:shop\/)?f=([^/?&]+)/i)
+
+      if (legacyMatch?.[1]) {
+        const flag = decodeURIComponent(legacyMatch[1]).toLowerCase()
+        const legacyMap = {
+          perfil: 'orders/my-profile',
+          profile: 'orders/my-profile',
+          carrinho: 'cart',
+          cart: 'cart',
+          pedidos: 'orders/my',
+          pedido: 'orders/my',
+          checkout: 'shop/checkout',
+          pagamento: 'shop/checkout',
+          cartoes: 'shop/cards',
+          cartões: 'shop/cards',
+        }
+
+        if (legacyMap[flag]) {
+          normalizedPath = legacyMap[flag]
+        }
+      }
+
       return defaultGetStateFromPath(normalizedPath, options)
     },
   }

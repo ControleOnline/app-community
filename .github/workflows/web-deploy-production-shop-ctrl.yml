@@ -16,7 +16,7 @@ jobs:
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
-          APP_TYPE: 'MANAGER',\
+          APP_TYPE: 'SHOP',\
           ZOOM: 0.80,\
           OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
           GMAPS_GOOGLE_CLIENT_ID:'${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}',\
@@ -45,9 +45,9 @@ jobs:
       - name: Deploy
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
+          host: ${{ secrets.SHOP_HOST }}
+          user: ${{ secrets.SHOP_USER }}
+          password: ${{ secrets.SHOP_PASSWORD }}
           localDir: "./dist"
           remoteDir: "~/public_html"
           forceSsl: false
