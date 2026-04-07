@@ -17,6 +17,25 @@ module.exports = function withAndroidTV(config) {
 
     const app = manifest.manifest.application[0];
 
+    // ALEMAC // 06/04/2026 // Garante meta-data para integração com Cielo
+    app['meta-data'] = app['meta-data'] || [];
+
+    const hasCieloIntegrationType = app['meta-data'].some(
+      item => item?.$?.['android:name'] === 'cs_integration_type'
+    );
+
+    if (!hasCieloIntegrationType) {
+      app['meta-data'].push({
+        $: {
+          'android:name': 'cs_integration_type',
+          'android:value': 'uri'
+        }
+      });
+    }
+    // Fim ALEMAC // 06/04/2026
+
+
+
     if (!app.activity) return config;
 
     const mainActivity = app.activity.find(
