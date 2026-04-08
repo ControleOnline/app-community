@@ -49,6 +49,8 @@ import translate from '@controleonline/ui-translate/src/store/translate';
 import users from '@controleonline/ui-users/src/store/users';
 import wallet from '@controleonline/ui-financial/src/store/wallet';
 import walletPaymentType from '@controleonline/ui-financial/src/store/walletPaymentType';
+import websocket from '@controleonline/ui-common/src/store/websocket';
+import connections from '@controleonline/ui-common/src/store/connections';
 
 export default {
   acl,
@@ -60,6 +62,7 @@ export default {
   categories,
   category_file,
   city,
+  connections,
   configs,
   contract,
   people_link,
@@ -102,4 +105,5 @@ export default {
   users,
   wallet,
   walletPaymentType,
+  websocket,
 };
