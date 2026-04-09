@@ -6,25 +6,6 @@
     "platforms": ["android", "ios", "web"],
     "jsEngine": "hermes",
 
-    "icon": "./src/assets/manager/logo.png",
-
-    "splash": {
-      "image": "./src/assets/manager/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-
-    "ios": {
-      "supportsTablet": true,
-      "jsEngine": "hermes",
-      "bundleIdentifier": "com.controleonline.manager",
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
-        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
-        "UIBackgroundModes": ["audio"]
-      }
-    },
-
     "android": {
       "jsEngine": "hermes",
     "package": "com.controleonline.manager",
@@ -46,6 +27,25 @@
       ],
 
       "tvBanner": "./src/assets/tv.png"
+    },
+
+    "icon": "./src/assets/manager/logo.png",
+
+    "splash": {
+      "image": "./src/assets/manager/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "ios": {
+      "supportsTablet": true,
+      "jsEngine": "hermes",
+      "bundleIdentifier": "com.controleonline.manager",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
+        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
+        "UIBackgroundModes": ["audio"]
+      }
     },
 
     "web": {
