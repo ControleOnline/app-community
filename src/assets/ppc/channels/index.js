@@ -87,15 +87,15 @@ export const getOrderChannelLabel = order => {
 }
 
 const PLATFORM_CAPABILITIES = {
-  '99food': { canCancel: true, requiresCancelReasons: true, canReady: true, canDeliver: true },
-  ifood:    { canCancel: true, requiresCancelReasons: true, canReady: true, canDeliver: true },
-  whatsapp: { canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
-  instagram:{ canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
+  '99food': { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  ifood:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  whatsapp: { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
+  instagram:{ canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
   keeta:    { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
-  messenger:{ canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false },
+  messenger:{ canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true },
 }
 
-const DEFAULT_CAPABILITIES = { canCancel: true, requiresCancelReasons: false, canReady: false, canDeliver: false }
+const DEFAULT_CAPABILITIES = { canCancel: true, requiresCancelReasons: false, canReady: true, canDeliver: true }
 
 export const getPlatformCapabilities = order => {
   const key = getOrderChannelKey(order)
