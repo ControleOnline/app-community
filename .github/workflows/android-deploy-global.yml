@@ -1,4 +1,6 @@
-name: Deploy Android Apps
+name: Deploy Android Apps # NÃO MUDAR ESSE NOME!!!
+# caso precise mudar, tem que alterar também dentro do script da Cielo
+# cielo-deploy-pdv.yml
 
 on:
   push:
@@ -159,3 +161,12 @@ jobs:
           track: ${{ matrix.track }}
           status: ${{ matrix.release_status }}
           changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
+
+# para executar o script da CIELO, depois que terminar os outros
+      - name: Trigger Cielo Deploy
+        if: matrix.app_type == 'POS'
+        # NÃO ALTERAR O NOME DO YML
+        run: |
+          gh workflow run cielo-deploy-pdv.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
