@@ -1,6 +1,6 @@
 import acl from '@controleonline/ui-common/src/store/acl';
-import asaas from '@controleonline/ui-financial/src/store/asaas';
 import address from '@controleonline/ui-people/src/store/address';
+import asaas from '@controleonline/ui-financial/src/store/asaas';
 import auth from '@controleonline/ui-login/src/store/modules/auth';
 import card from '@controleonline/ui-financial/src/store/card';
 import cart from '@controleonline/ui-orders/src/store/cart';
@@ -54,8 +54,8 @@ import connections from '@controleonline/ui-common/src/store/connections';
 
 export default {
   acl,
-  asaas,
   address,
+  asaas,
   auth,
   card,
   cart,
