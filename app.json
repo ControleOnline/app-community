@@ -3,21 +3,21 @@
     "name": "On Gestor",
     "displayName": "On Gestor",
     "slug": "manager-controle-online",
-    "platforms": ["android", "ios", "web"],
+    "platforms": [
+      "android",
+      "ios",
+      "web"
+    ],
     "jsEngine": "hermes",
-
     "android": {
       "jsEngine": "hermes",
-    "package": "com.controleonline.manager",
-      "versionCode": 1256,
-
+      "package": "com.controleonline.manager",
+      "versionCode": 1257,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
       },
-
       "edgeToEdgeEnabled": true,
-
       "permissions": [
         "VIBRATE",
         "INTERNET",
@@ -25,18 +25,14 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-
       "tvBanner": "./src/assets/tv.png"
     },
-
     "icon": "./src/assets/manager/logo.png",
-
     "splash": {
       "image": "./src/assets/manager/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-
     "ios": {
       "supportsTablet": true,
       "jsEngine": "hermes",
@@ -44,14 +40,14 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
         "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
-
     "web": {
       "favicon": "./src/assets/manager/logo.png"
     },
-
     "plugins": [
       "./withAndroidTV",
       "expo-build-properties",
@@ -67,11 +63,3 @@
     ]
   }
 }
-
-
-
-
-
-
-
-
