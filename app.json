@@ -9,7 +9,7 @@
     "android": {
       "jsEngine": "hermes",
     "package": "com.controleonline.manager",
-      "versionCode": 1253,
+      "versionCode": 1256,
 
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
@@ -67,6 +67,7 @@
     ]
   }
 }
+
 
 
 
