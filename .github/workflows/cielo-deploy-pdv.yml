@@ -114,7 +114,7 @@ jobs:
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.plugins.find(p => Array.isArray(p) && p[0] === 'expo-build-properties')[1].android.versionCode = parseInt('$VERSION_CODE');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE');
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "
 
@@ -145,12 +145,12 @@ jobs:
 
       - name: Restore app.json (revert dynamic changes)
         run: |
-          VERSION_CODE=$(node -p "require('./app.json').expo.plugins.find(p => Array.isArray(p) && p[0] === 'expo-build-properties')[1].android.versionCode")
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
           cp app.json.backup app.json
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.plugins.find(p => Array.isArray(p) && p[0] === 'expo-build-properties')[1].android.versionCode = $VERSION_CODE;
+            app.expo.android.versionCode = $VERSION_CODE;
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "
 
