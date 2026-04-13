@@ -1,4 +1,4 @@
-name: Deploy Project Manager Ctrl
+name: Deploy Project Shop Ctrl
 on:
   push:
     branches: [production]
