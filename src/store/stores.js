@@ -32,6 +32,7 @@ import people_link from '@controleonline/ui-people/src/store/people_link';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
 import printer from '@controleonline/ui-common/src/store/printer';
+import runtime_debug from '@controleonline/ui-common/src/store/runtime_debug';
 import product_category from '@controleonline/ui-products/src/store/products/product_category';
 import product_file from '@controleonline/ui-products/src/store/products/product_file';
 import product_group from '@controleonline/ui-products/src/store/products/product_group';
@@ -89,6 +90,7 @@ export default {
   phones,
   print,
   printer,
+  runtime_debug,
   product_category,
   product_file,
   product_group,
