@@ -3,6 +3,11 @@
 - Rodar lint e testes antes de concluir.
 - Não introduzir breaking changes sem destacar.
 - Preferir mudanças pequenas e isoladas.
+- Tudo precisa ser reaproveitável, pequeno e organizado
+- Não misturar responsabilidades entre componentes
+- Componentes devem ser pequenos, o menor possível
+- O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
+- Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
 
 
 ## Estilo de implementação
@@ -12,6 +17,8 @@
 
 
 ## Convenções
+- O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
+O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.
 - Não criar novos getters sem perguntar antes dentro dos stores
