@@ -40,3 +40,4 @@ O front-end é composto por vários aplicativos que compartilham módulos. O par
 - Sempre utilize a tradução atravéz da função tt presente no global do front para qualquer coisa que o cliente terá acesso, isso inclui preenchimento de objetos com label utilizados em listas por exemplo. Se encontrar algo não traduzido, traduzir.
 - Tudo o que for comum, usar o módulo common em vez de criar helpers espalhados pelo sistema.
 - Se encontrar algo fora desse padrão, favor corrigir, inclusive movendo e renomeando arquivos para os módulos corretos
+- Tradução ausente nunca é problema, não use fallbacks pra isso.
