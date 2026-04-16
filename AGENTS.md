@@ -24,3 +24,9 @@
 - Separar CSS dos arquivos de JS.
 - Não passar objetos na URL. Na URL passamos tudo o que um refresh possa ler. Objetos passamos pelos stores e se ele tiver vazio, pega o ID da URL e preenche o objeto usando a store ou getItem.
 - Preferir trabalhar com store ao invés de mandar parâmetros para componentes filhos
+- Exemplo de módulo ideal: Orders.js que inclui orderHeader.js, orderInvoices.js, printOrder.js, orderPreparationQueue.js. Por sua vez um módulo chamado Invoice.js poderia incluir o orderInvoice.js e o módulo KDS poderia incluir orderHeader.js e printOrder.js, orderPreparationQueue.js. Sempre prefira modularizar assim.
+- Sempre começe as telas por listagens e dentro delas, coloque botões para adicionar e editar, também para cancelar, nunca deletar.
+- Atente-se que algumas ações não são pertinentes à aquela visão, como no CRM que é feito para vendedores, não haverá cadastros de categorias ou modelos de contratos, isso é função do admin (Manager). Sempre tenha em mente as visões de cada aplicativo q quem os usa.
+- Sempre verifique o backend pasa ser melhor direcionado em tudo.
+- Ao verificar o backend, preencha sempre os stores correspondentes com as colunas da entidade, formatando elas da melhor maneira possível
+- Comente todo o código
