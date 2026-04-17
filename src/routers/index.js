@@ -41,7 +41,7 @@ export const allRoutes = [
 const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
-  DELIVERY: ShopHomePage,
+  DELIVERY: POSHomePage,
   MANAGER: ManagerHomePage,
   SHOP: ShopHomePage,
   POS: POSHomePage,
@@ -58,8 +58,7 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       title: 'Menu',
       showBottomToolBar: true,
-      showBottomCart:
-        normalizedAppType === 'SHOP' || normalizedAppType === 'DELIVERY',
+      showBottomCart: normalizedAppType === 'SHOP',
       showCompanyFilter: true,
     },
   })
