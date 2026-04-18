@@ -6,7 +6,7 @@ import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
-import ShopHomePage from '@controleonline/ui-shop/src/react/pages/StorefrontHome'
+import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
 
@@ -41,7 +41,7 @@ export const allRoutes = [
 const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
-  DELIVERY: ShopHomePage,
+  DELIVERY: POSHomePage,
   MANAGER: ManagerHomePage,
   SHOP: ShopHomePage,
   POS: POSHomePage,
@@ -58,12 +58,15 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       title: 'Menu',
       showBottomToolBar: true,
-      showBottomCart:
-        normalizedAppType === 'SHOP' || normalizedAppType === 'DELIVERY',
+      showBottomCart: normalizedAppType === 'SHOP',
       showCompanyFilter: true,
     },
   })
 }
+
+const routeDefinitions = allRoutes.filter(
+  route => route?.name && route?.component,
+)
 
 const WrappedComponent = (options, Component) => ({ navigation, route }) => (
   <DefaultLayout navigation={navigation} route={route} options={options}>
@@ -75,7 +78,7 @@ export const linking = (() => {
   const screens = {}
   const seen = new Set()
 
-  for (const route of allRoutes) {
+  for (const route of routeDefinitions) {
     if (!route?.name) continue
     if (seen.has(route.name)) continue
 
@@ -122,7 +125,7 @@ export const linking = (() => {
 })()
 
 const getInitialRouteName = () => {
-  const routeNames = allRoutes.map(route => route?.name).filter(Boolean)
+  const routeNames = routeDefinitions.map(route => route?.name).filter(Boolean)
 
   if (routeNames.includes('HomePage')) return 'HomePage'
   if (routeNames.includes('SignInPage')) return 'SignInPage'
@@ -132,7 +135,7 @@ const getInitialRouteName = () => {
 export default function Routes() {
   return (
     <Stack.Navigator detachInactiveScreens initialRouteName={getInitialRouteName()}>
-      {allRoutes.map((route, index) => (
+      {routeDefinitions.map((route, index) => (
         <Stack.Screen
           key={index}
           name={route.name}

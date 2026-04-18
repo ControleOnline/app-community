@@ -41,3 +41,5 @@ O front-end é composto por vários aplicativos que compartilham módulos. O par
 - Tudo o que for comum, usar o módulo common em vez de criar helpers espalhados pelo sistema.
 - Se encontrar algo fora desse padrão, favor corrigir, inclusive movendo e renomeando arquivos para os módulos corretos
 - Tradução ausente nunca é problema, não use fallbacks pra isso.
+- Os formatos de colunas dos objetos estão no store, em columns. Várias formatações importantes passam por lá. Sempre que possível, faça os helpers do sistema receber essas configurações de colunas.
+- Diversas configurações que ligam o frontend aos dados do backend estão centralizadas nos stores. Use isso sempre que possível. E alimente o store com essas informações ao criar novas telas.
