@@ -58,7 +58,7 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       title: 'Menu',
       showBottomToolBar: true,
-      showBottomCart: normalizedAppType === 'SHOP',
+      showBottomCart: false,
       showCompanyFilter: true,
     },
   })
