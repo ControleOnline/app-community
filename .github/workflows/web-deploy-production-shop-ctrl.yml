@@ -18,7 +18,6 @@ jobs:
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'SHOP',\
           ZOOM: 0.80,\
-          OAUTH_GOOGLE_CLIENT_ID:'${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}',\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
