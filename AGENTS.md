@@ -1,3 +1,6 @@
+## Configuração local para testes
+- app-community\config\key.local.js tem a informação da chave de API de um usuário de testes. Esse usuário pode ser utilizado para realizar chamadas à API e confirmar informações sobre o funcionamento. Use quando precisar.
+
 
 ## Qualidade
 - Rodar lint e testes antes de concluir.
