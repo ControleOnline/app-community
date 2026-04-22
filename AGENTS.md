@@ -54,3 +54,4 @@ O front-end é composto por vários aplicativos que compartilham módulos. O par
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.
 - Toda lista deve ser paginada e ter carregamento infinito
 - Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
+- Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
