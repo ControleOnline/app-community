@@ -53,3 +53,4 @@ O front-end é composto por vários aplicativos que compartilham módulos. O par
 - Tenha bom senso. Avisos do que cada ação faz é bem-vindo, mas lembr-se que são clientes que usam o sistema, ele não sabe o que é uma tabela device_config, então use uma linguagem mais adequada.
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.
 - Toda lista deve ser paginada e ter carregamento infinito
+- Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
