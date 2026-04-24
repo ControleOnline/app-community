@@ -1,14 +1,16 @@
-# Modos de Operacao do App Community
+# Visoes e Modos de Operacao do App Community
 
 ## Objetivo
-- Este arquivo centraliza a leitura funcional do `APP_TYPE` e das visoes operacionais do aplicativo.
+- Este arquivo centraliza a leitura funcional do `APP_TYPE`, dos tipos operacionais de device e dos modos internos do `POS`.
 - O app muda de visao conforme o modo, mas continua sendo o mesmo sistema, compartilhando modulos, stores e regras de negocio.
 - Antes de criar tela, store, rota, filtro, permissao ou regra nova, primeiro identifique em qual modo ela pertence.
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- Modos com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP` e `DELIVERY`.
-- `DELIVERY` hoje reaproveita a mesma home de `POS`. Ainda nao e uma visao isolada com modulo proprio.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP` e `DELIVERY`.
+- `DELIVERY` e um `APP_TYPE`, no mesmo nivel de `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
+- `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
+- `DELIVERY` hoje reaproveita a mesma home de `POS`, mas isso e compartilhamento de implementacao, nao hierarquia funcional.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
@@ -94,13 +96,16 @@
 - Nao recebe responsabilidades administrativas nem operacionais internas.
 
 ### DELIVERY
-- Publico: operacao de entrega/retirada quando a empresa quiser abrir uma visao focada nisso.
+- Publico: operacao de entrega/retirada quando a empresa quiser abrir um app focado nisso.
+- Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
 - Hoje usa a mesma home do `POS`.
-- Ainda nao existe como dominio funcional separado no roteador principal.
+- Ainda nao existe modulo proprio; a home e reaproveitada por implementacao.
 - Leitura correta:
-- Deve ser tratado como variacao operacional do `POS`, com maior peso em expedicao, retirada, codigos de handover e acompanhamento de entrega.
-- Enquanto nao houver modulo proprio, as regras continuam pertencendo ao fluxo de `ui-orders`.
+- Nao deve ser tratado como modo operacional do `POS`.
+- Nao deve ser usado como tipo de device.
+- Fluxos de entrega, retirada, codigos de handover e acompanhamento podem reaproveitar `ui-orders`, mas o recorte `DELIVERY` continua sendo uma visao de app.
+- Quando o assunto for canal de venda, pagamento na entrega ou logistica, usar nomes especificos para evitar confusao com `APP_TYPE=DELIVERY`.
 
 ## Tipos operacionais de device
 - Estes tipos nao substituem o `APP_TYPE`; eles complementam a identidade operacional do runtime e dos devices.
@@ -156,18 +161,33 @@
 - Visao:
 - Autoatendimento cliente-facing usando o nucleo transacional do POS.
 - O usuario principal nao e um funcionario; portanto a experiencia precisa ser guiada, curta e sem opcoes administrativas.
+- A primeira especializacao a ser desenvolvida e o `TOTEM` para mercado autonomo.
+- Funcionalmente, o `TOTEM` pertence ao contexto operacional do `POS`; ele nao e uma area administrativa nem uma home livre do sistema.
 - Modulos base:
 - Nucleo de pedido do `ui-orders`.
 - Catalogo e filtros de categoria compartilhados.
 - Regras de canal do catalogo, ja que o sistema ja possui categorias por canal como `Balcao`, `Totem` e `Delivery`.
+- Nesse ponto, `Delivery` e canal de catalogo/pedido; nao e modo operacional do PDV nem substitui `APP_TYPE=DELIVERY`.
+- Configuracoes de modo, device e comportamento expostas no `MANAGER`.
 - Regras de negocio iniciais:
 - O fluxo deve expor apenas o necessario para o cliente montar e revisar o pedido.
-- O totem nao deve mostrar configuracoes administrativas, caixa, sangria, historico amplo nem detalhes tecnicos de device.
+- O totem nao deve mostrar configuracoes administrativas, caixa, sangria, abertura/fechamento de caixa, historico amplo nem detalhes tecnicos de device.
 - O catalogo do totem deve respeitar o recorte de canal proprio do autoatendimento.
 - O pedido precisa sair do totem pronto para pagamento e encaminhamento a producao, sem depender de navegacao administrativa.
 - Desconto manual, override de preco e qualquer decisao de excecao devem continuar fora do totem.
 - Quando houver retirada, o comprovante e o codigo de chamada precisam ser claros para o cliente e para a expedicao.
 - Por padrao, o totem deve ser pensado como jornada sem dinheiro local e sem conciliacao manual no proprio equipamento; qualquer excecao futura precisa ser tratada como regra explicita.
+- O totem de mercado autonomo deve ficar travado na tela de compra. Qualquer rota, menu, atalho, drawer, deep link ou navegacao que leve a outra tela do PDV ou do sistema precisa ser bloqueado nesse modo.
+- O cliente deve conseguir adicionar produtos por leitura de codigo de barras, digitacao de busca e navegacao por categorias.
+- A leitura de codigo de barras e requisito critico: o scanner deve adicionar produto mesmo quando nenhum campo de busca estiver em foco. A captura deve acontecer no nivel da tela/aplicacao do totem, sem depender de foco em input especifico.
+- A captura global do scanner deve valer somente na tela de compra do totem. Ela nao deve vazar para telas administrativas, telas de configuracao ou outros modos do POS.
+- Quando o codigo lido identificar um SKU valido, o item deve ser adicionado ao carrinho imediatamente, respeitando regras de estoque, preco, canal e disponibilidade.
+- Quando o produto for pack, multipack, fardo, caixa ou embalagem equivalente, o fluxo precisa preservar a quantidade/unidade do pack para que carrinho, backend, estoque e totalizacao leiam a venda corretamente.
+- O backend deve receber informacao suficiente para resolver o produto pelo SKU lido e para entender a quantidade vendida quando o SKU representar pack. O contrato do item nao deve depender apenas de nome do produto ou ids visuais da interface.
+- Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
+- O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
+- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV. O primeiro modo especializado dessa familia sera o `TOTEM` de mercado autonomo.
+- A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 
 ### PDV
 - Visao:
@@ -199,6 +219,12 @@
 - a visao `POS`,
 - o tipo operacional de device `PDV`,
 - ou a atividade de caixa dentro do POS.
+- Quando um prompt falar em `DELIVERY`, validar se ele quer dizer:
+- o `APP_TYPE=DELIVERY`,
+- o canal de venda/entrega de um pedido,
+- pagamento na entrega,
+- ou regras logisticas de entrega.
+- `DELIVERY` nao deve ser adicionado como opcao de modo operacional do PDV.
 - Toda nova regra de `BALCAO`, `GARCON`, `TOTEM` ou `PDV` deve ser atualizada neste arquivo e, quando pertinente, no `AGENTS.md` do modulo dono.
 
 ## Referencias atuais no codigo
