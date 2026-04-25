@@ -21,7 +21,8 @@
 
 ## Convenções
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
-O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
+- O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
+- Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.
 - Não criar novos getters sem perguntar antes dentro dos stores
@@ -29,6 +30,7 @@ O front-end é composto por vários aplicativos que compartilham módulos. O par
 - Trabalhar preferencialmente com filas do store em vez de loopings ou chamadas asyncronas em lote.
 - Preferir usar o getter reload no store em vez de criar funções de reload
 - Usar o loading único do sistema e melhorá-lo se precisar, assim como o módulo de exibição de erros (state store)
+- Todo erro visual do sistema deve usar o componente único de erro transitório centralizado no `MessageService` de `ui-common`, recebendo o erro, exibindo por alguns segundos e sumindo sozinho. Não criar banners/toasts/alerts paralelos para erro.
 - Em máscaras, calculos e todos os tipos de helpers, usar um repositório do sistema e mentê-lo sempre organizado e em arquivos pequenos
 - Manter as telas sempre componentizadas, reaproveitando tudo o que é possível, e mantendo tudo pequeno e organizado.
 - Separar CSS dos arquivos de JS.
