@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.2.90",
+  "version": "1.2.92",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -79,6 +79,7 @@
     "metro-config": "*",
     "metro-react-native-babel-preset": "*",
     "metro-transform-worker": "*",
+    "react-test-renderer": "^19.1.0",
     "typescript": "*"
   },
   "engines": {
