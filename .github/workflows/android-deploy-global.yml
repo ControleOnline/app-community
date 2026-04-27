@@ -6,6 +6,10 @@ on:
   push:
     branches: [production]
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -131,21 +135,12 @@ jobs:
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
+          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Upload AAB to Website (FTP)
-        uses: locaweb/ftp-deploy@1.0.0
-        with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
-          localDir: "./android/app/build/outputs/bundle/release"
-          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/aab"
-          forceSsl: false
 
       - name: Decode Service Account
         run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
@@ -166,5 +161,24 @@ jobs:
         # NÃO ALTERAR O NOME DO YML
         run: |
           gh workflow run cielo-deploy-pdv.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload AAB Artifact for FTP Task
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FTP_ARTIFACT_NAME }}
+          path: ./android/app/build/outputs/bundle/release
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Trigger FTP Upload Task
+        run: |
+          gh workflow run android-deploy-global-ftp.yml \
+            --ref "${GITHUB_REF_NAME}" \
+            -f source_run_id="${GITHUB_RUN_ID}" \
+            -f artifact_name="${FTP_ARTIFACT_NAME}" \
+            -f version="${VERSION}" \
+            -f package_name="${PACKAGE_NAME}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
