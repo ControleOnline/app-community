@@ -25,9 +25,9 @@ jobs:
 
       - name: Verificar segredos obrigatórios
         run: |
-          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
-            echo "ERRO: O segredo ANTHROPIC_API_KEY não está configurado neste repositório."
-            echo "Acesse Settings > Secrets and variables > Actions e adicione ANTHROPIC_API_KEY."
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "ERRO: O segredo OPENAI_API_KEY não está configurado neste repositório."
+            echo "Acesse Settings > Secrets and variables > Actions e adicione OPENAI_API_KEY."
             exit 1
           fi
 
@@ -39,7 +39,7 @@ jobs:
 
       - name: Gerar páginas do Wiki via IA
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           WIKI_DIR: ${{ github.workspace }}/wiki-repo
         run: node scripts/generate-wiki.js
 

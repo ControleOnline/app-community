@@ -4,10 +4,10 @@
  * generate-wiki.js
  *
  * Coleta a documentação do repositório (AGENTS.md, MODOS_OPERACAO.md, README.md)
- * e usa a API da Anthropic (Claude) para gerar/atualizar as páginas do GitHub Wiki.
+ * e usa a API da OpenAI (ChatGPT) para gerar/atualizar as páginas do GitHub Wiki.
  *
  * Variáveis de ambiente esperadas:
- *   ANTHROPIC_API_KEY  — chave da API Anthropic
+ *   OPENAI_API_KEY     — chave da API OpenAI
  *   WIKI_DIR           — caminho local para o repositório do wiki (clonado pelo workflow)
  *   GITHUB_REPOSITORY  — owner/repo (preenchido automaticamente pelo GitHub Actions)
  */
@@ -18,11 +18,11 @@ const path = require("path");
 // ---------------------------------------------------------------------------
 // Configuração
 // ---------------------------------------------------------------------------
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const WIKI_DIR = process.env.WIKI_DIR || path.join(__dirname, "..", "wiki-out");
 const REPO_ROOT = path.join(__dirname, "..");
 const MODULES_ROOT = path.join(REPO_ROOT, "modules", "controleonline");
-const ANTHROPIC_MODEL = "claude-opus-4-5";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1";
 /** Limite de tokens gerados por página do wiki. */
 const MAX_OUTPUT_TOKENS = 8192;
 /** Limite de caracteres de contexto passado para páginas de índice. */
@@ -30,8 +30,8 @@ const MAX_CONTEXT_CHARS = 2000;
 /** Tentativas máximas de chamada à API antes de desistir. */
 const MAX_RETRIES = 3;
 
-if (!ANTHROPIC_API_KEY) {
-  console.error("ERRO: variável ANTHROPIC_API_KEY não definida.");
+if (!OPENAI_API_KEY) {
+  console.error("ERRO: variável OPENAI_API_KEY não definida.");
   process.exit(1);
 }
 
@@ -69,44 +69,57 @@ function collectAgentsMd(dir) {
 }
 
 // ---------------------------------------------------------------------------
-// Chamada à API Anthropic
+// Chamada à API OpenAI
 // ---------------------------------------------------------------------------
 
 /**
- * Chama o Claude com um prompt e retorna o texto de resposta.
+ * Chama o ChatGPT com um prompt e retorna o texto de resposta.
  * Implementa retry com backoff exponencial para erros transitórios.
  * @param {string} prompt
  * @returns {Promise<string>}
  */
-async function callClaude(prompt) {
+async function callChatGPT(prompt) {
   let lastError;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          model: ANTHROPIC_MODEL,
+          model: OPENAI_MODEL,
           max_tokens: MAX_OUTPUT_TOKENS,
-          messages: [{ role: "user", content: prompt }],
+          messages: [
+            {
+              role: "system",
+              content:
+                "Você é um technical writer experiente. Responda sempre em português do Brasil e em Markdown limpo.",
+            },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.3,
         }),
       });
 
       if (!response.ok) {
         const body = await response.text();
         const err = new Error(
-          `Anthropic API error ${response.status} (model: ${ANTHROPIC_MODEL}, prompt length: ${prompt.length}): ${body}`
+          `OpenAI API error ${response.status} (model: ${OPENAI_MODEL}, prompt length: ${prompt.length}): ${body}`
         );
         // Não tenta novamente para erros 4xx (exceto 429 = rate limit)
         if (response.status !== 429 && response.status < 500) throw err;
         lastError = err;
       } else {
         const data = await response.json();
-        return data.content[0].text;
+        const content = data?.choices?.[0]?.message?.content;
+        if (!content) {
+          throw new Error(
+            `OpenAI API retornou resposta sem conteúdo (model: ${OPENAI_MODEL}).`
+          );
+        }
+        return content;
       }
     } catch (err) {
       lastError = err;
@@ -150,7 +163,7 @@ ${rootDocs.agents}
 ${rootDocs.modosOperacao}
 `;
 
-  return callClaude(prompt);
+  return callChatGPT(prompt);
 }
 
 /**
@@ -165,7 +178,7 @@ Mantenha toda a informação, mas torne a linguagem mais clara e acessível para
 ${modosOperacaoContent}
 `;
 
-  return callClaude(prompt);
+  return callChatGPT(prompt);
 }
 
 /**
@@ -189,7 +202,7 @@ Use Markdown limpo com seções bem definidas.
 ${agentsContent}
 `;
 
-  return callClaude(prompt);
+  return callChatGPT(prompt);
 }
 
 /**
@@ -223,7 +236,7 @@ Use Markdown limpo e linguagem técnica, mas acessível.
 ${contextSections.join("\n\n")}
 `;
 
-  return callClaude(prompt);
+  return callChatGPT(prompt);
 }
 
 // ---------------------------------------------------------------------------
@@ -344,7 +357,7 @@ Contexto geral do sistema:
 ${rootDocs.agents.slice(0, MAX_CONTEXT_CHARS)}
 `;
 
-  const content = await callClaude(prompt);
+  const content = await callChatGPT(prompt);
   writeWikiPage("Modulos.md", content);
 }
 
