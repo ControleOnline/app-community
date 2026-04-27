@@ -34,7 +34,7 @@ jobs:
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
       - name: Install Dependencies
-        run: npm install    
+        run: npm install --legacy-peer-deps   
       - name: Fix Expo Dependencies
         run: npx expo install --fix
       - name: Build
