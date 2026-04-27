@@ -11,6 +11,9 @@
 - Componentes devem ser pequenos, o menor possível
 - O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
+- Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
+- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-common` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
+- Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 
 ## Estilo de implementação
