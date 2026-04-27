@@ -29,6 +29,8 @@ const MAX_OUTPUT_TOKENS = 8192;
 const MAX_CONTEXT_CHARS = 2000;
 /** Tentativas máximas de chamada à API antes de desistir. */
 const MAX_RETRIES = 3;
+/** Limite de concorrência para geração de páginas de módulos. */
+const MODULE_CONCURRENCY = 4;
 
 if (!OPENAI_API_KEY) {
   console.error("ERRO: variável OPENAI_API_KEY não definida.");
@@ -86,7 +88,7 @@ async function callChatGPT(prompt) {
         method: "POST",
         headers: {
           Authorization: `Bearer ${OPENAI_API_KEY}`,
-          "content-type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: OPENAI_MODEL,
@@ -314,19 +316,24 @@ async function main() {
 
   // --- Gera página por módulo (em paralelo) ---
   const moduleNames = Object.keys(moduleMap).sort();
-  console.log(`📄 Gerando ${moduleNames.length} páginas de módulos em paralelo...`);
-  await Promise.all(
-    moduleNames.map(async (moduleName) => {
-      const { agents, readme } = moduleMap[moduleName];
-      if (!agents.trim() && !readme.trim()) return;
-
-      console.log(`  → ${moduleName}`);
-      const pageContent = await generateModulePage(moduleName, agents, readme);
-      if (pageContent) {
-        writeWikiPage(`${moduleName}.md`, pageContent);
-      }
-    })
+  console.log(
+    `📄 Gerando ${moduleNames.length} páginas de módulos com concorrência ${MODULE_CONCURRENCY}...`
   );
+  for (let i = 0; i < moduleNames.length; i += MODULE_CONCURRENCY) {
+    const batch = moduleNames.slice(i, i + MODULE_CONCURRENCY);
+    await Promise.all(
+      batch.map(async (moduleName) => {
+        const { agents, readme } = moduleMap[moduleName];
+        if (!agents.trim() && !readme.trim()) return;
+
+        console.log(`  → ${moduleName}`);
+        const pageContent = await generateModulePage(moduleName, agents, readme);
+        if (pageContent) {
+          writeWikiPage(`${moduleName}.md`, pageContent);
+        }
+      })
+    );
+  }
 
   // --- Gera índice de módulos ---
   console.log("📄 Gerando índice de módulos...");
