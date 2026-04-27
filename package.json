@@ -79,7 +79,6 @@
     "metro-config": "*",
     "metro-react-native-babel-preset": "*",
     "metro-transform-worker": "*",
-    "react-test-renderer": "*",
     "typescript": "*"
   },
   "engines": {
