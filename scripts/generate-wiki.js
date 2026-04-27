@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Requires Node.js 18+ (native fetch)
 /**
  * generate-wiki.js
  *
@@ -22,6 +23,12 @@ const WIKI_DIR = process.env.WIKI_DIR || path.join(__dirname, "..", "wiki-out");
 const REPO_ROOT = path.join(__dirname, "..");
 const MODULES_ROOT = path.join(REPO_ROOT, "modules", "controleonline");
 const ANTHROPIC_MODEL = "claude-opus-4-5";
+/** Limite de tokens gerados por página do wiki. */
+const MAX_OUTPUT_TOKENS = 8192;
+/** Limite de caracteres de contexto passado para páginas de índice. */
+const MAX_CONTEXT_CHARS = 2000;
+/** Tentativas máximas de chamada à API antes de desistir. */
+const MAX_RETRIES = 3;
 
 if (!ANTHROPIC_API_KEY) {
   console.error("ERRO: variável ANTHROPIC_API_KEY não definida.");
@@ -67,31 +74,51 @@ function collectAgentsMd(dir) {
 
 /**
  * Chama o Claude com um prompt e retorna o texto de resposta.
+ * Implementa retry com backoff exponencial para erros transitórios.
  * @param {string} prompt
  * @returns {Promise<string>}
  */
 async function callClaude(prompt) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
-      max_tokens: 4096,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
+  let lastError;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: ANTHROPIC_MODEL,
+          max_tokens: MAX_OUTPUT_TOKENS,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Anthropic API error ${response.status}: ${body}`);
+      if (!response.ok) {
+        const body = await response.text();
+        const err = new Error(
+          `Anthropic API error ${response.status} (model: ${ANTHROPIC_MODEL}, prompt length: ${prompt.length}): ${body}`
+        );
+        // Não tenta novamente para erros 4xx (exceto 429 = rate limit)
+        if (response.status !== 429 && response.status < 500) throw err;
+        lastError = err;
+      } else {
+        const data = await response.json();
+        return data.content[0].text;
+      }
+    } catch (err) {
+      lastError = err;
+    }
+
+    if (attempt < MAX_RETRIES) {
+      const delay = Math.pow(2, attempt) * 1000;
+      console.warn(`  ⚠ Tentativa ${attempt} falhou. Aguardando ${delay}ms...`);
+      await new Promise((r) => setTimeout(r, delay));
+    }
   }
-
-  const data = await response.json();
-  return data.content[0].text;
+  throw lastError;
 }
 
 // ---------------------------------------------------------------------------
@@ -272,18 +299,21 @@ async function main() {
     writeWikiPage("Convencoes-e-Arquitetura.md", convencoesContent);
   }
 
-  // --- Gera página por módulo ---
+  // --- Gera página por módulo (em paralelo) ---
   const moduleNames = Object.keys(moduleMap).sort();
-  for (const moduleName of moduleNames) {
-    const { agents, readme } = moduleMap[moduleName];
-    if (!agents.trim() && !readme.trim()) continue;
+  console.log(`📄 Gerando ${moduleNames.length} páginas de módulos em paralelo...`);
+  await Promise.all(
+    moduleNames.map(async (moduleName) => {
+      const { agents, readme } = moduleMap[moduleName];
+      if (!agents.trim() && !readme.trim()) return;
 
-    console.log(`📄 Gerando módulo: ${moduleName}...`);
-    const pageContent = await generateModulePage(moduleName, agents, readme);
-    if (pageContent) {
-      writeWikiPage(`${moduleName}.md`, pageContent);
-    }
-  }
+      console.log(`  → ${moduleName}`);
+      const pageContent = await generateModulePage(moduleName, agents, readme);
+      if (pageContent) {
+        writeWikiPage(`${moduleName}.md`, pageContent);
+      }
+    })
+  );
 
   // --- Gera índice de módulos ---
   console.log("📄 Gerando índice de módulos...");
@@ -311,7 +341,7 @@ Use Markdown limpo. Os módulos são:
 ${listItems}
 
 Contexto geral do sistema:
-${rootDocs.agents.slice(0, 2000)}
+${rootDocs.agents.slice(0, MAX_CONTEXT_CHARS)}
 `;
 
   const content = await callClaude(prompt);
