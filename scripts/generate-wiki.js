@@ -84,6 +84,10 @@ async function callChatGPT(prompt) {
   let lastError;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
+      const tokenLimitParam = OPENAI_MODEL.startsWith("gpt-5")
+        ? { max_completion_tokens: MAX_OUTPUT_TOKENS }
+        : { max_tokens: MAX_OUTPUT_TOKENS };
+
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -92,7 +96,7 @@ async function callChatGPT(prompt) {
         },
         body: JSON.stringify({
           model: OPENAI_MODEL,
-          max_tokens: MAX_OUTPUT_TOKENS,
+          ...tokenLimitParam,
           messages: [
             {
               role: "system",
@@ -110,15 +114,21 @@ async function callChatGPT(prompt) {
         const err = new Error(
           `OpenAI API error ${response.status} (model: ${OPENAI_MODEL}, prompt length: ${prompt.length}): ${body}`
         );
-        // Não tenta novamente para erros 4xx (exceto 429 = rate limit)
+        // Só tenta novamente para 429 e 5xx.
         if (response.status !== 429 && response.status < 500) throw err;
         lastError = err;
       } else {
         const data = await response.json();
+        const finishReason = data?.choices?.[0]?.finish_reason;
         const content = data?.choices?.[0]?.message?.content;
         if (!content) {
           throw new Error(
             `OpenAI API retornou resposta sem conteúdo (model: ${OPENAI_MODEL}).`
+          );
+        }
+        if (finishReason && finishReason !== "stop") {
+          throw new Error(
+            `OpenAI API retornou resposta incompleta (${finishReason}) para model: ${OPENAI_MODEL}.`
           );
         }
         return content;
