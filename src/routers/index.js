@@ -25,6 +25,24 @@ import { env } from '@env'
 
 const Stack = createNativeStackNavigator()
 
+const DEFAULT_ROUTE_OPTIONS = {
+  headerShown: true,
+  headerBackVisible: true,
+  showBottomToolBar: true,
+}
+
+const resolveRouteOptions = (screenOptions, args = {}) => {
+  const resolvedOptions =
+    typeof screenOptions === 'function'
+      ? screenOptions(args)
+      : (screenOptions || {})
+
+  return {
+    ...DEFAULT_ROUTE_OPTIONS,
+    ...resolvedOptions,
+  }
+}
+
 export const allRoutes = [
   ...commonRoutes,
   ...contractsRoutes,
@@ -56,8 +74,9 @@ if (homeByType[normalizedAppType]) {
     component: homeByType[normalizedAppType],
     options: {
       headerShown: false,
+      headerBackVisible: normalizedAppType !== 'PPC',
       title: 'Menu',
-      showBottomToolBar: true,
+      showBottomToolBar: normalizedAppType !== 'PPC',
       showBottomCart: false,
       showCompanyFilter: true,
     },
@@ -68,11 +87,15 @@ const routeDefinitions = allRoutes.filter(
   route => route?.name && route?.component,
 )
 
-const WrappedComponent = (options, Component) => ({ navigation, route }) => (
-  <DefaultLayout navigation={navigation} route={route} options={options}>
-    <Component navigation={navigation} route={route} />
-  </DefaultLayout>
-)
+const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
+  const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
+
+  return (
+    <DefaultLayout navigation={navigation} route={route} options={resolvedOptions}>
+      <Component navigation={navigation} route={route} />
+    </DefaultLayout>
+  )
+}
 
 export const linking = (() => {
   const screens = {}
@@ -140,7 +163,7 @@ export default function Routes() {
           key={index}
           name={route.name}
           component={WrappedComponent(route.options, route.component)}
-          options={route.options}
+          options={args => resolveRouteOptions(route.options, args)}
           initialParams={route.initialParams}
         />
       ))}
