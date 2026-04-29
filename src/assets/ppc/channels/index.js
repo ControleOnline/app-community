@@ -19,6 +19,7 @@ const matchChannel = rawValue => {
   if (!value) return null
 
   if (value.includes('ifood')) return 'ifood'
+  if (value === '99') return '99food'
   if (value.includes('food99')) return '99food'
   if (value.includes('99food') || value.includes('99 food')) return '99food'
   if (value.includes('insta')) return 'instagram'
