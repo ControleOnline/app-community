@@ -48,4 +48,4 @@ jobs:
             password: ${{ secrets.FTPPASSLAVEGO }}
             port: 22
             uploads: |
-                dist/* => /home/adminlavego/public_html/
+                dist/** => /home/adminlavego/public_html/
