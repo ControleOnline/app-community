@@ -40,13 +40,12 @@ jobs:
       - name: Build
         run: |
           npx expo export --platform web
-      - name: Upload via SCP using appleboy/scp-action
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy via SFTP
+        uses: Dylan700/sftp-upload-action@latest
         with:
-          host: ${{ secrets.FTPHOSTLAVEGO }}
-          username: ${{ secrets.FTPUSERLAVEGO }}
-          password: ${{ secrets.FTPPASSLAVEGO }}
-          port: 22
-          source: "dist/*"
-          target: "/home/adminlavego/public_html/"
-          strip_components: 1
+            server: ${{ secrets.FTPHOSTLAVEGO }}
+            username: ${{ secrets.FTPUSERLAVEGO }}
+            password: ${{ secrets.FTPPASSLAVEGO }}
+            port: 22
+            uploads: |
+                dist/* => /home/adminlavego/public_html/
