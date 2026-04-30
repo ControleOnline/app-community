@@ -47,6 +47,5 @@ jobs:
             username: ${{ secrets.FTPUSERLAVEGO }}
             password: ${{ secrets.FTPPASSLAVEGO }}
             port: 22
-            path: /home/adminlavego/public_html/
             uploads: |
-                dist/* => ./
+                dist/* => /home/adminlavego/public_html/
