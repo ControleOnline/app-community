@@ -46,7 +46,7 @@ jobs:
           host: ${{ secrets.FTPHOSTLAVEGO }}
           username: ${{ secrets.FTPUSERLAVEGO }}
           password: ${{ secrets.FTPPASSLAVEGO }}
-          port: 2222
+          port: 22
           source: "dist/*"
-          target: "/home/lavegoc1/public_html/admin/"
+          target: "home/adminlavego/public_html/"
           strip_components: 1
