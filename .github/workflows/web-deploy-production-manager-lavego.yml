@@ -48,5 +48,5 @@ jobs:
           password: ${{ secrets.FTPPASSLAVEGO }}
           port: 22
           source: "dist/*"
-          target: "home/adminlavego/public_html/"
+          target: "/home/adminlavego/public_html/"
           strip_components: 1
