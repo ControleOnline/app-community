@@ -55,10 +55,21 @@
 - Diversas configurações que ligam o frontend aos dados do backend estão centralizadas nos stores. Use isso sempre que possível. E alimente o store com essas informações ao criar novas telas.
 - Não há diversos nomes ou diversos jeitos de fazer alguma coisa. Se houver dois arquivos diferentes tratando a mesma coisa, pergunte qual deve manter e ejuste para que apenas um componente tenha a responsabilidade por aquela função.
 - Se houver erros de grafia, ou diversos nomes para encontrar algo como um array de palavras por conta de dúvidas do que é o correto, simplesmente pergunte qual o correto. Exemplo: [order, orders] num campo de tipos provavelmente haverá uma grafia correta e outra que age como um fallback, porém isso não deve existir de forma alguma.
-- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva. Não mexa em AGENTS.md da raiz, apenas de módulos.
+- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva. 
+- Quando a regra for transversal entre módulos, o `AGENTS.md` da raiz também deve ser atualizado.
 - Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests 
 - Tenha bom senso. Avisos do que cada ação faz é bem-vindo, mas lembr-se que são clientes que usam o sistema, ele não sabe o que é uma tabela device_config, então use uma linguagem mais adequada.
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.
 - Toda lista deve ser paginada e ter carregamento infinito
 - Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
 - Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
+
+## Regra transversal de seletor de empresa
+- O frontend deve tratar `/people/companies/my` como a fonte de verdade do seletor de empresas.
+- O seletor deve mostrar todas as empresas retornadas pela API; empresa fora do fluxo comercial do domínio atual deve aparecer desabilitada, nunca escondida.
+- `company.enabled` significa apenas que a empresa está ativa no cadastro.
+- `company.commercial_enabled` significa que a empresa tem cadeia comercial válida no domínio atual.
+- `company.panel_enabled` é a flag que define se a empresa pode ser selecionada no painel atual.
+- Componentes de troca de empresa, exploradores e escolhas de contexto devem usar `panel_enabled` para habilitar/desabilitar seleção.
+- A escolha automática de empresa atual deve priorizar a primeira empresa com `panel_enabled = true`.
+- `employee_enabled` e os demais `*_enabled` dentro de `company.user` representam o tipo de vínculo humano direto da pessoa com aquela empresa; eles não substituem `panel_enabled`.
