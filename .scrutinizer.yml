@@ -1,0 +1,21 @@
+checks:
+  javascript: true
+
+build:
+  nodes:
+    analysis:
+      environment:
+        node: v20
+      project_setup:
+        override: true
+      tests:
+        override:
+          - js-scrutinizer-run
+          - eslint-run .
+
+filter:
+  excluded_paths:
+    - "android/*"
+    - "dist/*"
+    - "dist-web-check/*"
+    - "node_modules/*"
