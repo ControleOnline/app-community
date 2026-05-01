@@ -41,11 +41,12 @@ jobs:
         run: |
           npx expo export --platform web
       - name: Deploy via FTP
-        uses: locaweb/ftp-deploy@1.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-            host: ${{ secrets.FTPHOSTLAVEGO }}
-            user: ${{ secrets.FTPUSERLAVEGO }}
+            server: ${{ secrets.FTPHOSTLAVEGO }}
+            username: ${{ secrets.FTPUSERLAVEGO }}
             password: ${{ secrets.FTPPASSLAVEGO }}
-            localDir: "./dist"
-            remoteDir: "/home/adminlavego/public_html/"
-            forceSsl: false
+            protocol: ftp
+            port: 21
+            local-dir: ./dist/
+            server-dir: /home/adminlavego/public_html/
