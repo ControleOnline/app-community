@@ -40,13 +40,17 @@ jobs:
       - name: Build
         run: |
           npx expo export --platform web
-      - name: Upload via SCP using appleboy/scp-action
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          host: ${{ secrets.FTPHOSTLAVEGO }}
-          username: ${{ secrets.FTPUSERLAVEGO }}
-          password: ${{ secrets.FTPPASSLAVEGO }}
-          port: 2222
-          source: "dist/*"
-          target: "/home/lavegoc1/public_html/admin/"
-          strip_components: 1
+            server: ${{ secrets.FTPHOSTLAVEGO }}
+            username: ${{ secrets.FTPUSERLAVEGO }}
+            password: ${{ secrets.FTPPASSLAVEGO }}
+            protocol: ftps
+            port: 21
+            security: loose
+            local-dir: ./dist/
+            server-dir: public_html/
+            exclude: |
+              **/.git*
+              **/.git*/**
