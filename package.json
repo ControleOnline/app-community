@@ -34,6 +34,7 @@
     "expo-location": "~19.0.8",
     "expo-modules-autolinking": "~3.0.22",
     "expo-modules-core": "~3.0.29",
+    "expo-notifications": "~0.32.17",
     "expo-sharing": "~14.0.8",
     "expo-video": "~3.0.15",
     "idb": "^8.0.3",
