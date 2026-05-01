@@ -41,12 +41,13 @@ jobs:
         run: |
           npx expo export --platform web
       - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
             server: ${{ secrets.FTPHOSTLAVEGO }}
             username: ${{ secrets.FTPUSERLAVEGO }}
             password: ${{ secrets.FTPPASSLAVEGO }}
-            protocol: ftp
+            protocol: ftps
             port: 21
+            security: loose
             local-dir: ./dist/
             server-dir: /home/adminlavego/public_html/
