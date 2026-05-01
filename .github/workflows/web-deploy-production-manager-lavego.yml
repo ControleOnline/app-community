@@ -51,3 +51,6 @@ jobs:
             security: loose
             local-dir: ./dist/
             server-dir: public_html/
+            exclude: |
+              **/.git*
+              **/.git*/**
