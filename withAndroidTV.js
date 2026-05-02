@@ -6,15 +6,19 @@ module.exports = function withAndroidTV(config) {
     const CALLBACK_HOST = 'POS';
     const manifest = config.modResults;
 
-    // Garante o uses-feature leanback
+    const existingUsesFeatures = manifest.manifest['uses-feature'] || [];
+
+    // Garante um unico uses-feature leanback no manifest gerado.
     manifest.manifest['uses-feature'] = [
-      ...(manifest.manifest['uses-feature'] || []),
+      ...existingUsesFeatures.filter(
+        item => item?.$?.['android:name'] !== 'android.software.leanback',
+      ),
       {
         $: {
           'android:name': 'android.software.leanback',
-          'android:required': 'false'
-        }
-      }
+          'android:required': 'false',
+        },
+      },
     ];
 
     const app = manifest.manifest.application[0];
@@ -70,9 +74,25 @@ module.exports = function withAndroidTV(config) {
       return hasViewAction && hasBrowsableCategory && hasDefaultCategory && hasCallbackData;
     });
 
-    // Garante intent para Android TV
+    const existingIntentFilters = mainActivity['intent-filter'] || [];
+    const nonLeanbackIntentFilters = existingIntentFilters.filter(filter => {
+      const actions = filter?.action || [];
+      const categories = filter?.category || [];
+      const hasMainAction = actions.some(
+        item => item?.$?.['android:name'] === 'android.intent.action.MAIN',
+      );
+      const hasLeanbackCategory = categories.some(
+        item =>
+          item?.$?.['android:name'] ===
+          'android.intent.category.LEANBACK_LAUNCHER',
+      );
+
+      return !(hasMainAction && hasLeanbackCategory);
+    });
+
+    // Garante intent para Android TV sem empilhar duplicados.
     mainActivity['intent-filter'] = [
-      ...(mainActivity['intent-filter'] || []),
+      ...nonLeanbackIntentFilters,
       ...(!hasCieloCallbackFilter
         ? [
             {
@@ -95,9 +115,13 @@ module.exports = function withAndroidTV(config) {
       {
         action: [{ $: { 'android:name': 'android.intent.action.MAIN' } }],
         category: [
-          { $: { 'android:name': 'android.intent.category.LEANBACK_LAUNCHER' } }
-        ]
-      }
+          {
+            $: {
+              'android:name': 'android.intent.category.LEANBACK_LAUNCHER',
+            },
+          },
+        ],
+      },
     ];
 
     return config;

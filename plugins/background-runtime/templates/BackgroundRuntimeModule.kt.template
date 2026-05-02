@@ -1,0 +1,76 @@
+package __PACKAGE__.background
+
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import org.json.JSONObject
+
+class BackgroundRuntimeModule(
+  private val reactApplicationContext: ReactApplicationContext,
+) : ReactContextBaseJavaModule(reactApplicationContext) {
+  override fun getName(): String = "BackgroundRuntime"
+
+  @ReactMethod
+  fun syncRegistration(json: String, promise: Promise) {
+    try {
+      val registration = RuntimeRegistration.fromJson(
+        JSONObject(json),
+        reactApplicationContext.packageName,
+      )
+
+      BackgroundRuntimeStore.upsertRegistration(
+        reactApplicationContext,
+        registration,
+      )
+
+      val delegated = BackgroundRuntimeLeaderBridge.sendRegistration(
+        registration,
+      )
+
+      if (!delegated && registration.backgroundEnabled) {
+        BackgroundRuntimeService.start(reactApplicationContext)
+      }
+
+      promise.resolve(
+        when {
+          delegated -> "delegated"
+          registration.backgroundEnabled -> "started"
+          else -> "stored"
+        },
+      )
+    } catch (error: Exception) {
+      promise.reject("BACKGROUND_RUNTIME_SYNC_FAILED", error)
+    }
+  }
+
+  @ReactMethod
+  fun clearRegistration(registrationId: String?, promise: Promise) {
+    try {
+      val normalizedRegistrationId = registrationId?.trim().orEmpty()
+
+      if (normalizedRegistrationId.isNotEmpty()) {
+        BackgroundRuntimeStore.removeRegistration(
+          reactApplicationContext,
+          normalizedRegistrationId,
+        )
+        BackgroundRuntimeLeaderBridge.sendRemove(
+          normalizedRegistrationId,
+          reactApplicationContext.packageName,
+        )
+      } else {
+        BackgroundRuntimeStore.removePackageRegistrations(
+          reactApplicationContext,
+          reactApplicationContext.packageName,
+        )
+        BackgroundRuntimeLeaderBridge.sendRemovePackage(
+          reactApplicationContext.packageName,
+        )
+      }
+
+      promise.resolve("removed")
+    } catch (error: Exception) {
+      promise.reject("BACKGROUND_RUNTIME_CLEAR_FAILED", error)
+    }
+  }
+}
