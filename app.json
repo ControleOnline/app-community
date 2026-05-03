@@ -13,7 +13,7 @@
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1295,
+      "versionCode": 136,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -52,6 +52,7 @@
     },
     "plugins": [
       "./withAndroidTV",
+      "./withBackgroundRuntime",
       "expo-build-properties",
       "expo-asset",
       "expo-font",

@@ -20,6 +20,8 @@
 - Seguir padrão dos módulos existentes.
 - Reaproveitar utilitários antes de criar novos.
 - Nomear arquivos e classes de forma consistente com os módulos atuais.
+- Em modais e popups operacionais que reaproveitam telas canônicas, o cabeçalho e a barra de ações também devem ser reaproveitados dos arquivos-fonte do fluxo principal. Impressão e ações irmãs ficam sempre na mesma barra padronizada, nunca em botões soltos paralelos.
+- Identificação visual de pedido não pode ser redesenhada por tela. Cards, modais e detalhes operacionais devem reaproveitar o componente canônico `OrderHeader`, normalizando o payload se preciso, mas sem recriar número, cliente, datas ou status manualmente.
 
 
 ## Convenções

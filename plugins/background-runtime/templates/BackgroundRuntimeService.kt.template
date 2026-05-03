@@ -1,0 +1,1388 @@
+package __PACKAGE__.background
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.IBinder
+import android.util.Base64
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.URI
+import java.nio.charset.Charset
+import java.text.NumberFormat
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import java.util.Locale
+import kotlin.math.min
+
+private const val SERVICE_CHANNEL_ID = "controleonline-background-runtime"
+private const val ORDER_CHANNEL_ID = "controleonline-background-orders"
+private const val SERVICE_NOTIFICATION_ID = 201501
+private const val SOCKET_CONNECT_TIMEOUT_MS = 5000L
+private const val SOCKET_FLUSH_DELAY_MS = 180L
+private const val SPOOL_POLL_INTERVAL_MS = 10000L
+private const val FAILED_SPOOL_RETRY_MS = 30000L
+private const val REGISTRATION_TTL_MS = 7L * 24L * 60L * 60L * 1000L
+private const val JSON_MIME_TYPE = "application/ld+json"
+private val EMPTY_REQUEST_BODY = ByteArray(0).toRequestBody(null, 0, 0)
+private val BASE64_REGEX =
+  Regex("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
+private val LATIN1_CHARSET = Charset.forName("ISO-8859-1")
+
+private fun safeTrim(value: Any?): String = value?.toString()?.trim().orEmpty()
+
+private fun normalizeDeviceId(value: Any?): String = safeTrim(value)
+
+private fun normalizeOrderId(value: Any?): String {
+  return when (value) {
+    is JSONObject ->
+      normalizeOrderId(
+        value.opt("@id").takeIf { it != null } ?: value.opt("id")
+          ?: value.opt("order"),
+      )
+
+    else -> safeTrim(value).replace(Regex("\\D+"), "")
+  }
+}
+
+private fun parseNumericValue(value: Any?): Double? {
+  if (value == null || value == JSONObject.NULL) {
+    return null
+  }
+
+  return when (value) {
+    is Number -> value.toDouble()
+    else -> {
+      val normalizedValue = safeTrim(value)
+      if (normalizedValue.isEmpty()) {
+        null
+      } else {
+        val sanitizedValue = normalizedValue
+          .replace(Regex("[^\\d,.-]"), "")
+          .replace(Regex("\\.(?=\\d{3}(?:\\D|$))"), "")
+          .replace(',', '.')
+        sanitizedValue.toDoubleOrNull()
+      }
+    }
+  }?.takeIf { !it.isNaN() && !it.isInfinite() }
+}
+
+private fun formatMoneyLabel(value: Any?): String {
+  val numericValue = parseNumericValue(value) ?: return ""
+  if (numericValue <= 0.0) {
+    return ""
+  }
+
+  return NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
+    .format(numericValue)
+}
+
+private fun resolveDisplayName(value: Any?): String {
+  if (value == null || value == JSONObject.NULL) {
+    return ""
+  }
+
+  return when (value) {
+    is JSONObject -> safeTrim(value.opt("alias"))
+      .ifEmpty { safeTrim(value.opt("name")) }
+    else -> {
+      val normalizedValue = safeTrim(value)
+      if (normalizedValue.startsWith("/")) {
+        ""
+      } else {
+        normalizedValue
+      }
+    }
+  }
+}
+
+private fun resolveOrderCustomerName(order: JSONObject?): String {
+  if (order == null) {
+    return ""
+  }
+
+  return resolveDisplayName(order.opt("client").takeIf { it != null })
+    .ifEmpty { resolveDisplayName(order.opt("customer").takeIf { it != null }) }
+    .ifEmpty { resolveDisplayName(order.opt("person").takeIf { it != null }) }
+}
+
+private fun parseStringArray(values: JSONArray?): List<String> {
+  if (values == null) {
+    return emptyList()
+  }
+
+  return buildList {
+    for (index in 0 until values.length()) {
+      val normalizedValue = safeTrim(values.opt(index))
+      if (normalizedValue.isNotEmpty()) {
+        add(normalizedValue)
+      }
+    }
+  }
+}
+
+internal data class RuntimeManagedPrinter(
+  val deviceId: String,
+  val host: String,
+  val port: String,
+) {
+  fun toJson(): JSONObject {
+    return JSONObject()
+      .put("deviceId", deviceId)
+      .put("host", host)
+      .put("port", port)
+  }
+
+  companion object {
+    fun fromJson(json: JSONObject?): RuntimeManagedPrinter? {
+      if (json == null) {
+        return null
+      }
+
+      val deviceId = normalizeDeviceId(json.opt("deviceId"))
+      val host = safeTrim(json.opt("host"))
+      val port = safeTrim(json.opt("port")).ifEmpty { "9100" }
+
+      if (deviceId.isEmpty() || host.isEmpty()) {
+        return null
+      }
+
+      return RuntimeManagedPrinter(
+        deviceId = deviceId,
+        host = host,
+        port = port,
+      )
+    }
+  }
+}
+
+internal data class RuntimeRegistration(
+  val registrationId: String,
+  val packageName: String,
+  val companyAlias: String,
+  val companyId: String,
+  val appDomain: String,
+  val appType: String,
+  val backgroundEnabled: Boolean,
+  val deviceId: String,
+  val deviceType: String,
+  val notificationEnabled: Boolean,
+  val printEnabled: Boolean,
+  val managedPrinters: List<RuntimeManagedPrinter>,
+  val socketUrl: String,
+  val spoolDeviceIds: List<String>,
+  val token: String,
+  val apiBaseUrl: String,
+  val updatedAt: Long,
+) {
+  fun toJson(): JSONObject {
+    val printerArray = JSONArray()
+    managedPrinters.forEach { printerArray.put(it.toJson()) }
+
+    val spoolDeviceArray = JSONArray()
+    spoolDeviceIds.forEach { spoolDeviceArray.put(it) }
+
+    return JSONObject()
+      .put("registrationId", registrationId)
+      .put("packageName", packageName)
+      .put("companyAlias", companyAlias)
+      .put("companyId", companyId)
+      .put("appDomain", appDomain)
+      .put("appType", appType)
+      .put("backgroundEnabled", backgroundEnabled)
+      .put("deviceId", deviceId)
+      .put("deviceType", deviceType)
+      .put("notificationEnabled", notificationEnabled)
+      .put("printEnabled", printEnabled)
+      .put("managedPrinters", printerArray)
+      .put("socketUrl", socketUrl)
+      .put("spoolDeviceIds", spoolDeviceArray)
+      .put("token", token)
+      .put("apiBaseUrl", apiBaseUrl)
+      .put("updatedAt", updatedAt)
+  }
+
+  fun isExpired(now: Long = System.currentTimeMillis()): Boolean {
+    return updatedAt <= 0L || now - updatedAt > REGISTRATION_TTL_MS
+  }
+
+  fun isSocketCapable(): Boolean {
+    return backgroundEnabled &&
+      socketUrl.isNotEmpty() &&
+      token.isNotEmpty() &&
+      deviceId.isNotEmpty() &&
+      !isExpired()
+  }
+
+  fun isPrintCapable(): Boolean {
+    return backgroundEnabled &&
+      printEnabled &&
+      apiBaseUrl.isNotEmpty() &&
+      token.isNotEmpty() &&
+      deviceId.isNotEmpty() &&
+      spoolDeviceIds.isNotEmpty() &&
+      managedPrinters.isNotEmpty() &&
+      !isExpired()
+  }
+
+  fun connectionSignature(): String {
+    return listOf(
+      registrationId,
+      deviceId,
+      token,
+      socketUrl,
+      appDomain,
+    ).joinToString("|")
+  }
+
+  companion object {
+    fun fromJson(
+      json: JSONObject,
+      fallbackPackageName: String = "",
+      fallbackUpdatedAt: Long = System.currentTimeMillis(),
+    ): RuntimeRegistration {
+      val printerArray = json.optJSONArray("managedPrinters")
+      val managedPrinters = buildList {
+        if (printerArray != null) {
+          for (index in 0 until printerArray.length()) {
+            RuntimeManagedPrinter.fromJson(printerArray.optJSONObject(index))
+              ?.let { add(it) }
+          }
+        }
+      }
+
+      val registrationId = safeTrim(json.opt("registrationId"))
+      if (registrationId.isEmpty()) {
+        throw IllegalArgumentException("registrationId is required")
+      }
+
+      return RuntimeRegistration(
+        registrationId = registrationId,
+        packageName = safeTrim(json.opt("packageName")).ifEmpty {
+          fallbackPackageName
+        },
+        companyAlias = safeTrim(json.opt("companyAlias")),
+        companyId = safeTrim(json.opt("companyId")),
+        appDomain = safeTrim(json.opt("appDomain")),
+        appType = safeTrim(json.opt("appType")),
+        backgroundEnabled = json.optBoolean("backgroundEnabled", false),
+        deviceId = normalizeDeviceId(json.opt("deviceId")),
+        deviceType = safeTrim(json.opt("deviceType")),
+        notificationEnabled = json.optBoolean("notificationEnabled", true),
+        printEnabled = json.optBoolean("printEnabled", false),
+        managedPrinters = managedPrinters,
+        socketUrl = safeTrim(json.opt("socketUrl")),
+        spoolDeviceIds = parseStringArray(json.optJSONArray("spoolDeviceIds")),
+        token = safeTrim(json.opt("token")),
+        apiBaseUrl = safeTrim(json.opt("apiBaseUrl")),
+        updatedAt = json.optLong("updatedAt", fallbackUpdatedAt),
+      )
+    }
+  }
+}
+
+internal object BackgroundRuntimeStore {
+  private const val PREFERENCES_NAME = "controleonline-background-runtime"
+  private const val REGISTRATIONS_KEY = "registrations"
+  private val storeLock = Any()
+
+  private fun preferences(context: Context) =
+    context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+
+  fun loadRegistrations(
+    context: Context,
+  ): Map<String, RuntimeRegistration> = synchronized(storeLock) {
+    val raw = preferences(context).getString(REGISTRATIONS_KEY, "{}").orEmpty()
+    val parsed = runCatching { JSONObject(raw) }.getOrNull() ?: JSONObject()
+    val now = System.currentTimeMillis()
+    val registrations = linkedMapOf<String, RuntimeRegistration>()
+
+    val keys = parsed.keys()
+    while (keys.hasNext()) {
+      val key = keys.next()
+      val registrationJson = parsed.optJSONObject(key) ?: continue
+      val registration = runCatching {
+        RuntimeRegistration.fromJson(registrationJson, fallbackUpdatedAt = now)
+      }.getOrNull() ?: continue
+
+      if (!registration.isExpired(now)) {
+        registrations[registration.registrationId] = registration
+      }
+    }
+
+    if (registrations.size != parsed.length()) {
+      saveRegistrationsLocked(context, registrations)
+    }
+
+    registrations
+  }
+
+  fun upsertRegistration(
+    context: Context,
+    registration: RuntimeRegistration,
+  ) = synchronized(storeLock) {
+    val registrations = loadRegistrationsLocked(context).toMutableMap()
+    registrations[registration.registrationId] = registration.copy(
+      updatedAt = System.currentTimeMillis(),
+    )
+    saveRegistrationsLocked(context, registrations)
+  }
+
+  fun removeRegistration(context: Context, registrationId: String) =
+    synchronized(storeLock) {
+      val registrations = loadRegistrationsLocked(context).toMutableMap()
+      registrations.remove(registrationId)
+      saveRegistrationsLocked(context, registrations)
+    }
+
+  fun removePackageRegistrations(context: Context, packageName: String) =
+    synchronized(storeLock) {
+      val registrations = loadRegistrationsLocked(context)
+        .filterValues { it.packageName != packageName }
+      saveRegistrationsLocked(context, registrations)
+    }
+
+  private fun loadRegistrationsLocked(
+    context: Context,
+  ): Map<String, RuntimeRegistration> {
+    val raw = preferences(context).getString(REGISTRATIONS_KEY, "{}").orEmpty()
+    val parsed = runCatching { JSONObject(raw) }.getOrNull() ?: JSONObject()
+    val registrations = linkedMapOf<String, RuntimeRegistration>()
+
+    val keys = parsed.keys()
+    while (keys.hasNext()) {
+      val key = keys.next()
+      val registrationJson = parsed.optJSONObject(key) ?: continue
+      val registration = runCatching {
+        RuntimeRegistration.fromJson(registrationJson)
+      }.getOrNull() ?: continue
+      registrations[registration.registrationId] = registration
+    }
+
+    return registrations
+  }
+
+  private fun saveRegistrationsLocked(
+    context: Context,
+    registrations: Map<String, RuntimeRegistration>,
+  ) {
+    val serialized = JSONObject()
+    registrations.values.forEach { registration ->
+      serialized.put(registration.registrationId, registration.toJson())
+    }
+
+    preferences(context)
+      .edit()
+      .putString(REGISTRATIONS_KEY, serialized.toString())
+      .apply()
+  }
+}
+
+internal object BackgroundRuntimeLeaderBridge {
+  internal const val PORT = 41571
+  private const val HOST = "127.0.0.1"
+  private const val TIMEOUT_MS = 800
+
+  fun sendRegistration(registration: RuntimeRegistration): Boolean {
+    return sendPayload(
+      JSONObject()
+        .put("type", "register")
+        .put("registration", registration.toJson()),
+    )
+  }
+
+  fun sendRemove(
+    registrationId: String,
+    packageName: String,
+  ): Boolean {
+    return sendPayload(
+      JSONObject()
+        .put("type", "remove")
+        .put("registrationId", registrationId)
+        .put("packageName", packageName),
+    )
+  }
+
+  fun sendRemovePackage(packageName: String): Boolean {
+    return sendPayload(
+      JSONObject()
+        .put("type", "remove-package")
+        .put("packageName", packageName),
+    )
+  }
+
+  private fun sendPayload(payload: JSONObject): Boolean {
+    return runCatching {
+      Socket().use { socket ->
+        socket.connect(
+          InetSocketAddress(HOST, PORT),
+          TIMEOUT_MS,
+        )
+        socket.soTimeout = TIMEOUT_MS
+
+        val writer = BufferedWriter(
+          OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8),
+        )
+        writer.write(payload.toString())
+        writer.newLine()
+        writer.flush()
+
+        val reader = BufferedReader(
+          InputStreamReader(socket.getInputStream(), Charsets.UTF_8),
+        )
+        reader.readLine()?.trim() == "ok"
+      }
+    }.getOrDefault(false)
+  }
+}
+
+class BackgroundRuntimeService : Service() {
+  companion object {
+    fun start(context: Context) {
+      val intent = Intent(context, BackgroundRuntimeService::class.java)
+      ContextCompat.startForegroundService(context, intent)
+    }
+  }
+
+  private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+  private val okHttpClient = OkHttpClient.Builder()
+    .connectTimeout(SOCKET_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+    .readTimeout(0L, TimeUnit.MILLISECONDS)
+    .build()
+  private val refreshMutex = Mutex()
+  private val activeRegistrations =
+    ConcurrentHashMap<String, RuntimeRegistration>()
+  private val activeSockets = ConcurrentHashMap<String, WebSocket>()
+  private val socketSignatures = ConcurrentHashMap<String, String>()
+  private val reconnectAttempts = ConcurrentHashMap<String, Int>()
+  private val reconnectJobs = ConcurrentHashMap<String, Job>()
+  private val failedSpoolAttempts = ConcurrentHashMap<String, Long>()
+  private var leaderSocket: ServerSocket? = null
+  private var leaderServerJob: Job? = null
+  private var spoolPollingJob: Job? = null
+
+  override fun onBind(intent: Intent?): IBinder? = null
+
+  override fun onCreate() {
+    super.onCreate()
+    ensureNotificationChannels()
+    startForeground(
+      SERVICE_NOTIFICATION_ID,
+      buildServiceNotification(0),
+    )
+  }
+
+  override fun onStartCommand(
+    intent: Intent?,
+    flags: Int,
+    startId: Int,
+  ): Int {
+    serviceScope.launch {
+      refreshRuntime()
+    }
+
+    return START_STICKY
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    shutdownRuntime()
+    serviceScope.cancel()
+  }
+
+  private suspend fun refreshRuntime() = refreshMutex.withLock {
+    val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
+    val nextActiveRegistrations = storedRegistrations.values
+      .filter { it.backgroundEnabled && !it.isExpired() }
+      .associateBy { it.registrationId }
+
+    if (nextActiveRegistrations.isEmpty()) {
+      activeRegistrations.clear()
+      shutdownRuntime()
+      stopSelfSafely()
+      return
+    }
+
+    if (!ensureLeaderServer()) {
+      nextActiveRegistrations.values.forEach { registration ->
+        BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+      }
+      stopSelfSafely()
+      return
+    }
+
+    activeRegistrations.clear()
+    activeRegistrations.putAll(nextActiveRegistrations)
+
+    syncSocketConnections()
+    syncSpoolPolling()
+    updateServiceNotification(nextActiveRegistrations.size)
+  }
+
+  private fun ensureLeaderServer(): Boolean {
+    if (leaderServerJob?.isActive == true && leaderSocket != null) {
+      return true
+    }
+
+    return try {
+      val serverSocket = ServerSocket()
+      serverSocket.reuseAddress = true
+      serverSocket.bind(
+        InetSocketAddress(InetAddress.getByName("127.0.0.1"), BackgroundRuntimeLeaderBridge.PORT),
+      )
+      leaderSocket = serverSocket
+      leaderServerJob = serviceScope.launch {
+        acceptLeaderConnections(serverSocket)
+      }
+      true
+    } catch (_: Exception) {
+      false
+    }
+  }
+
+  private suspend fun acceptLeaderConnections(serverSocket: ServerSocket) {
+    while (serviceScope.isActive) {
+      val client = try {
+        serverSocket.accept()
+      } catch (_: Exception) {
+        break
+      }
+
+      serviceScope.launch {
+        handleLeaderClient(client)
+      }
+    }
+  }
+
+  private suspend fun handleLeaderClient(client: Socket) {
+    client.use { socket ->
+      runCatching {
+        val reader = BufferedReader(
+          InputStreamReader(socket.getInputStream(), Charsets.UTF_8),
+        )
+        val writer = BufferedWriter(
+          OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8),
+        )
+        val line = reader.readLine().orEmpty()
+        if (line.isEmpty()) {
+          writer.write("ignored")
+          writer.newLine()
+          writer.flush()
+          return@runCatching
+        }
+
+        val payload = JSONObject(line)
+        when (safeTrim(payload.opt("type"))) {
+          "register" -> {
+            val registrationJson = payload.optJSONObject("registration")
+              ?: throw IllegalArgumentException("registration payload missing")
+            val registration = RuntimeRegistration.fromJson(registrationJson)
+            BackgroundRuntimeStore.upsertRegistration(this, registration)
+          }
+
+          "remove" -> {
+            val registrationId = safeTrim(payload.opt("registrationId"))
+            if (registrationId.isNotEmpty()) {
+              BackgroundRuntimeStore.removeRegistration(this, registrationId)
+            }
+          }
+
+          "remove-package" -> {
+            val packageName = safeTrim(payload.opt("packageName"))
+            if (packageName.isNotEmpty()) {
+              BackgroundRuntimeStore.removePackageRegistrations(this, packageName)
+            }
+          }
+        }
+
+        writer.write("ok")
+        writer.newLine()
+        writer.flush()
+      }
+    }
+
+    refreshRuntime()
+  }
+
+  private fun syncSocketConnections() {
+    val desiredSocketIds = activeRegistrations.values
+      .filter { it.isSocketCapable() }
+      .map { it.registrationId }
+      .toSet()
+
+    activeSockets.keys.toList().forEach { registrationId ->
+      if (!desiredSocketIds.contains(registrationId)) {
+        closeSocketConnection(registrationId)
+      }
+    }
+
+    activeRegistrations.values
+      .filter { it.isSocketCapable() }
+      .forEach { registration ->
+        val currentSignature = socketSignatures[registration.registrationId]
+        val nextSignature = registration.connectionSignature()
+
+        if (currentSignature != null && currentSignature != nextSignature) {
+          closeSocketConnection(registration.registrationId)
+        }
+
+        if (!activeSockets.containsKey(registration.registrationId)) {
+          connectSocket(registration)
+        }
+      }
+  }
+
+  private fun connectSocket(registration: RuntimeRegistration) {
+    reconnectJobs.remove(registration.registrationId)?.cancel()
+    socketSignatures[registration.registrationId] = registration.connectionSignature()
+
+    val request = Request.Builder()
+      .url(registration.socketUrl)
+      .build()
+
+    val webSocket = okHttpClient.newWebSocket(
+      request,
+      object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+          reconnectAttempts[registration.registrationId] = 0
+          val payload = JSONObject()
+            .put("command", "identify")
+            .put("device", registration.deviceId)
+          webSocket.send(payload.toString())
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+          handleSocketMessage(registration.registrationId, text)
+        }
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+          handleSocketDisconnect(registration.registrationId)
+        }
+
+        override fun onFailure(
+          webSocket: WebSocket,
+          t: Throwable,
+          response: Response?,
+        ) {
+          handleSocketDisconnect(registration.registrationId)
+        }
+      },
+    )
+
+    activeSockets[registration.registrationId] = webSocket
+  }
+
+  private fun handleSocketDisconnect(registrationId: String) {
+    activeSockets.remove(registrationId)
+
+    val registration = activeRegistrations[registrationId]
+      ?: run {
+        reconnectJobs.remove(registrationId)?.cancel()
+        return
+      }
+
+    if (!registration.isSocketCapable()) {
+      reconnectJobs.remove(registrationId)?.cancel()
+      return
+    }
+
+    if (reconnectJobs[registrationId]?.isActive == true) {
+      return
+    }
+
+    val nextAttempt = (reconnectAttempts[registrationId] ?: 0) + 1
+    reconnectAttempts[registrationId] = nextAttempt
+    val delayMs = min(12000L, 1500L * (1L shl min(nextAttempt, 4)))
+
+    reconnectJobs[registrationId] = serviceScope.launch {
+      delay(delayMs)
+      reconnectJobs.remove(registrationId)
+      activeRegistrations[registrationId]
+        ?.takeIf { it.isSocketCapable() }
+        ?.let { connectSocket(it) }
+    }
+  }
+
+  private fun closeSocketConnection(registrationId: String) {
+    reconnectJobs.remove(registrationId)?.cancel()
+    reconnectAttempts.remove(registrationId)
+    socketSignatures.remove(registrationId)
+
+    runCatching {
+      activeSockets.remove(registrationId)?.close(1000, "refresh")
+    }
+  }
+
+  private fun handleSocketMessage(registrationId: String, payload: String) {
+    val registration = activeRegistrations[registrationId] ?: return
+    val normalizedPayload = payload.trim()
+    if (normalizedPayload.isEmpty()) {
+      return
+    }
+
+    runCatching {
+      if (normalizedPayload.startsWith("[")) {
+        val events = JSONArray(normalizedPayload)
+        for (index in 0 until events.length()) {
+          processEvent(
+            registration,
+            events.optJSONObject(index) ?: continue,
+          )
+        }
+        return@runCatching
+      }
+
+      val json = JSONObject(normalizedPayload)
+      val status = safeTrim(json.opt("status")).lowercase()
+      if (status == "identified" || status == "ok") {
+        return@runCatching
+      }
+
+      if (status == "error") {
+        handleSocketDisconnect(registrationId)
+        return@runCatching
+      }
+
+      processEvent(registration, json)
+    }
+  }
+
+  private fun processEvent(
+    registration: RuntimeRegistration,
+    event: JSONObject,
+  ) {
+    val store = safeTrim(event.opt("store")).lowercase()
+    val action = safeTrim(event.opt("action")).lowercase()
+    val eventName = safeTrim(event.opt("event")).lowercase()
+    val realStatus = safeTrim(event.opt("realStatus")).lowercase()
+
+    if (
+      registration.notificationEnabled &&
+      store == "orders" &&
+      eventName == "order.created" &&
+      realStatus == "open"
+    ) {
+      serviceScope.launch {
+        showOrderNotification(
+          registration,
+          enrichOrderNotificationEvent(registration, event),
+        )
+      }
+    }
+
+    if (registration.isPrintCapable() && (store == "print" || action == "print")) {
+      serviceScope.launch {
+        pollRegistrationSpools(registration)
+      }
+    }
+  }
+
+  private fun syncSpoolPolling() {
+    val shouldPoll = activeRegistrations.values.any { it.isPrintCapable() }
+
+    if (!shouldPoll) {
+      spoolPollingJob?.cancel()
+      spoolPollingJob = null
+      return
+    }
+
+    if (spoolPollingJob?.isActive == true) {
+      return
+    }
+
+    spoolPollingJob = serviceScope.launch {
+      while (isActive) {
+        activeRegistrations.values
+          .filter { it.isPrintCapable() }
+          .forEach { registration ->
+            runCatching {
+              pollRegistrationSpools(registration)
+            }
+          }
+
+        delay(SPOOL_POLL_INTERVAL_MS)
+      }
+    }
+  }
+
+  private suspend fun pollRegistrationSpools(registration: RuntimeRegistration) {
+    if (!registration.isPrintCapable()) {
+      return
+    }
+
+    val openSpools = loadOpenSpools(registration)
+    val now = System.currentTimeMillis()
+
+    openSpools.forEach { spoolReference ->
+      val spoolId = resolveSpoolId(spoolReference)
+      if (spoolId.isEmpty()) {
+        return@forEach
+      }
+
+      val failureKey = "${registration.registrationId}::$spoolId"
+      val lastFailureAt = failedSpoolAttempts[failureKey] ?: 0L
+
+      if (lastFailureAt > 0L && now - lastFailureAt < FAILED_SPOOL_RETRY_MS) {
+        return@forEach
+      }
+
+      val spoolData = getSpoolDetails(registration, spoolId) ?: spoolReference
+      val printed = runCatching {
+        printSpool(registration, spoolData)
+      }.getOrDefault(false)
+
+      if (!printed) {
+        failedSpoolAttempts[failureKey] = System.currentTimeMillis()
+        return@forEach
+      }
+
+      runCatching {
+        markSpoolDone(registration, spoolId)
+      }
+
+      failedSpoolAttempts.remove(failureKey)
+    }
+  }
+
+  private suspend fun loadOpenSpools(
+    registration: RuntimeRegistration,
+  ): List<JSONObject> {
+    val spools = linkedMapOf<String, JSONObject>()
+
+    registration.spoolDeviceIds.distinct().forEach { deviceId ->
+      val responseBody = executeRequest(
+        registration = registration,
+        path = "spools",
+        query = mapOf(
+          "device.device" to deviceId,
+          "status.realStatus" to "open",
+        ),
+      ) ?: return@forEach
+
+      extractCollectionItems(responseBody).forEach { item ->
+        val spoolId = resolveSpoolId(item)
+        if (spoolId.isNotEmpty()) {
+          spools[spoolId] = item
+        }
+      }
+    }
+
+    return spools.values.toList()
+  }
+
+  private suspend fun getSpoolDetails(
+    registration: RuntimeRegistration,
+    spoolId: String,
+  ): JSONObject? {
+    val responseBody = executeRequest(
+      registration = registration,
+      path = "spools/$spoolId",
+    ) ?: return null
+
+    return parseJsonObject(responseBody)
+  }
+
+  private suspend fun getOrderDetails(
+    registration: RuntimeRegistration,
+    orderId: String,
+  ): JSONObject? {
+    val responseBody = executeRequest(
+      registration = registration,
+      path = "orders/$orderId",
+    ) ?: return null
+
+    return parseJsonObject(responseBody)
+  }
+
+  private suspend fun enrichOrderNotificationEvent(
+    registration: RuntimeRegistration,
+    event: JSONObject,
+  ): JSONObject {
+    val enrichedEvent = JSONObject(event.toString())
+    val orderId = normalizeOrderId(enrichedEvent.opt("order"))
+
+    if (orderId.isEmpty()) {
+      return enrichedEvent
+    }
+
+    val order = getOrderDetails(registration, orderId) ?: return enrichedEvent
+    val customerName = resolveOrderCustomerName(order)
+    val priceLabel = formatMoneyLabel(order.opt("price").takeIf { it != null })
+
+    if (
+      customerName.isNotEmpty() &&
+      safeTrim(enrichedEvent.opt("notificationCustomerName")).isEmpty()
+    ) {
+      enrichedEvent.put("notificationCustomerName", customerName)
+    }
+
+    if (
+      priceLabel.isNotEmpty() &&
+      safeTrim(enrichedEvent.opt("notificationPriceLabel")).isEmpty()
+    ) {
+      enrichedEvent.put("notificationPriceLabel", priceLabel)
+    }
+
+    return enrichedEvent
+  }
+
+  private suspend fun markSpoolDone(
+    registration: RuntimeRegistration,
+    spoolId: String,
+  ) {
+    executeRequest(
+      registration = registration,
+      path = "print/$spoolId/done",
+      method = "PUT",
+      body = EMPTY_REQUEST_BODY,
+    )
+  }
+
+  private suspend fun printSpool(
+    registration: RuntimeRegistration,
+    spoolData: JSONObject,
+  ): Boolean {
+    val targetPrinterDeviceId = resolveTargetPrinterDeviceId(spoolData)
+    if (targetPrinterDeviceId.isEmpty()) {
+      return false
+    }
+
+    val printer = registration.managedPrinters.firstOrNull {
+      normalizeDeviceId(it.deviceId) == targetPrinterDeviceId
+    } ?: return false
+
+    val fileObject = spoolData.optJSONObject("file") ?: return false
+    val payload = fileObject.opt("content")
+    val bytes = decodePrintPayload(payload)
+    if (bytes.isEmpty()) {
+      return false
+    }
+
+    return kotlinx.coroutines.withContext(Dispatchers.IO) {
+      runCatching {
+        val port = safeTrim(printer.port).toIntOrNull() ?: 9100
+        Socket().use { socket ->
+          socket.connect(
+            InetSocketAddress(printer.host, port),
+            SOCKET_CONNECT_TIMEOUT_MS.toInt(),
+          )
+          socket.tcpNoDelay = true
+          socket.soTimeout = SOCKET_CONNECT_TIMEOUT_MS.toInt()
+          socket.getOutputStream().use { output ->
+            output.write(bytes)
+            output.flush()
+          }
+          Thread.sleep(SOCKET_FLUSH_DELAY_MS)
+        }
+        true
+      }.getOrDefault(false)
+    }
+  }
+
+  private fun resolveTargetPrinterDeviceId(spoolData: JSONObject): String {
+    val directDevice = spoolData.opt("device")
+    if (directDevice is JSONObject) {
+      val nestedDevice = normalizeDeviceId(
+        directDevice.opt("device").takeIf { it != null } ?: directDevice.opt("id"),
+      )
+      if (nestedDevice.isNotEmpty()) {
+        return nestedDevice
+      }
+    }
+
+    return normalizeDeviceId(directDevice)
+  }
+
+  private suspend fun executeRequest(
+    registration: RuntimeRegistration,
+    path: String,
+    method: String = "GET",
+    query: Map<String, String> = emptyMap(),
+    body: okhttp3.RequestBody? = null,
+  ): String? {
+    val baseUrl = registration.apiBaseUrl
+      .let { if (it.endsWith("/")) it else "$it/" }
+    val resolvedUrl = URI(baseUrl).resolve(path.trimStart('/')).toString()
+    val urlBuilder = resolvedUrl.toHttpUrlOrNull()?.newBuilder() ?: return null
+
+    query.forEach { (key, value) ->
+      if (key.isNotBlank() && value.isNotBlank()) {
+        urlBuilder.addQueryParameter(key, value)
+      }
+    }
+
+    val requestBuilder = Request.Builder()
+      .url(urlBuilder.build())
+      .header("API-TOKEN", registration.token)
+      .header("DEVICE", registration.deviceId)
+      .header("Accept", JSON_MIME_TYPE)
+
+    if (registration.appDomain.isNotEmpty()) {
+      requestBuilder.header("App-Domain", registration.appDomain)
+    }
+
+    val normalizedMethod = method.uppercase()
+    if (normalizedMethod != "GET") {
+      requestBuilder.header("Content-Type", JSON_MIME_TYPE)
+    }
+
+    requestBuilder.method(
+      normalizedMethod,
+      when (normalizedMethod) {
+        "GET" -> null
+        else -> body ?: EMPTY_REQUEST_BODY
+      },
+    )
+
+    return kotlinx.coroutines.withContext(Dispatchers.IO) {
+      val request = requestBuilder.build()
+      val response = okHttpClient.newCall(request).execute()
+      response.use {
+        if (!it.isSuccessful) {
+          return@withContext null
+        }
+
+        it.body?.string()
+      }
+    }
+  }
+
+  private fun extractCollectionItems(responseBody: String): List<JSONObject> {
+    val normalizedBody = responseBody.trim()
+    if (normalizedBody.isEmpty()) {
+      return emptyList()
+    }
+
+    if (normalizedBody.startsWith("[")) {
+      val items = JSONArray(normalizedBody)
+      return buildList {
+        for (index in 0 until items.length()) {
+          items.optJSONObject(index)?.let { add(it) }
+        }
+      }
+    }
+
+    val responseObject = JSONObject(normalizedBody)
+    val memberArray = responseObject.optJSONArray("member")
+      ?: responseObject.optJSONArray("hydra:member")
+      ?: return listOf(responseObject)
+
+    return buildList {
+      for (index in 0 until memberArray.length()) {
+        memberArray.optJSONObject(index)?.let { add(it) }
+      }
+    }
+  }
+
+  private fun parseJsonObject(responseBody: String): JSONObject? {
+    val normalizedBody = responseBody.trim()
+    if (normalizedBody.isEmpty() || normalizedBody.startsWith("[")) {
+      return null
+    }
+
+    return runCatching { JSONObject(normalizedBody) }.getOrNull()
+  }
+
+  private fun resolveSpoolId(spool: JSONObject): String {
+    val directId = safeTrim(spool.opt("id"))
+    if (directId.isNotEmpty()) {
+      return directId.replace(Regex("\\D+"), "")
+    }
+
+    val iriId = safeTrim(spool.opt("@id"))
+    return iriId.replace(Regex("\\D+"), "")
+  }
+
+  private fun decodePrintPayload(payload: Any?): ByteArray {
+    if (payload == null || payload == JSONObject.NULL) {
+      return ByteArray(0)
+    }
+
+    if (payload is JSONObject) {
+      val printablePayload = extractPrintableTextPayload(payload)
+      if (printablePayload.isNotEmpty()) {
+        return printablePayload.toByteArray(LATIN1_CHARSET)
+      }
+
+      return payload.toString().toByteArray(Charsets.UTF_8)
+    }
+
+    if (payload is JSONArray) {
+      return payload.toString().toByteArray(Charsets.UTF_8)
+    }
+
+    val payloadString = payload.toString()
+    if (payloadString.isBlank()) {
+      return ByteArray(0)
+    }
+
+    if (payloadString.trim().startsWith("{") || payloadString.trim().startsWith("[")) {
+      val parsedPayload = runCatching { JSONObject(payloadString.trim()) }.getOrNull()
+      val printablePayload = extractPrintableTextPayload(parsedPayload)
+      if (printablePayload.isNotEmpty()) {
+        return printablePayload.toByteArray(LATIN1_CHARSET)
+      }
+    }
+
+    val compactPayload = payloadString.replace(Regex("\\s+"), "")
+    if (
+      compactPayload.isNotEmpty() &&
+      compactPayload.length % 4 == 0 &&
+      BASE64_REGEX.matches(compactPayload)
+    ) {
+      return runCatching {
+        Base64.decode(compactPayload, Base64.DEFAULT)
+      }.getOrDefault(ByteArray(0))
+    }
+
+    return payloadString.toByteArray(LATIN1_CHARSET)
+  }
+
+  private fun extractPrintableTextPayload(payload: JSONObject?): String {
+    if (payload == null) {
+      return ""
+    }
+
+    val operation = safeTrim(payload.opt("operation")).uppercase()
+    if (operation != "PRINT_TEXT") {
+      return ""
+    }
+
+    val values = payload.optJSONArray("value")
+    if (values != null) {
+      val builder = StringBuilder()
+      for (index in 0 until values.length()) {
+        builder.append(safeTrim(values.opt(index)))
+      }
+      return builder.toString()
+    }
+
+    return safeTrim(payload.opt("value"))
+  }
+
+  private fun ensureNotificationChannels() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return
+    }
+
+    val notificationManager =
+      getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    val serviceChannel = NotificationChannel(
+      SERVICE_CHANNEL_ID,
+      "Controle Online em segundo plano",
+      NotificationManager.IMPORTANCE_LOW,
+    ).apply {
+      description = "Mantem websocket e impressao em segundo plano."
+      setShowBadge(false)
+    }
+
+    val orderChannel = NotificationChannel(
+      ORDER_CHANNEL_ID,
+      "Pedidos recebidos",
+      NotificationManager.IMPORTANCE_HIGH,
+    ).apply {
+      description = "Avisos de novos pedidos recebidos em segundo plano."
+      enableVibration(true)
+    }
+
+    notificationManager.createNotificationChannel(serviceChannel)
+    notificationManager.createNotificationChannel(orderChannel)
+  }
+
+  private fun buildServiceNotification(activeCount: Int): Notification {
+    val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+      ?.apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+      }
+
+    val pendingIntent = if (launchIntent != null) {
+      PendingIntent.getActivity(
+        this,
+        0,
+        launchIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+      )
+    } else {
+      null
+    }
+
+    return NotificationCompat.Builder(this, SERVICE_CHANNEL_ID)
+      .setContentTitle("Controle Online em background")
+      .setContentText(
+        if (activeCount > 1) {
+          "$activeCount ambientes ativos com websocket e impressao."
+        } else {
+          "Websocket e impressao ativos em segundo plano."
+        },
+      )
+      .setSmallIcon(android.R.drawable.stat_notify_sync)
+      .setOngoing(true)
+      .setOnlyAlertOnce(true)
+      .setContentIntent(pendingIntent)
+      .build()
+  }
+
+  private fun updateServiceNotification(activeCount: Int) {
+    val notificationManager =
+      getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(
+      SERVICE_NOTIFICATION_ID,
+      buildServiceNotification(activeCount),
+    )
+  }
+
+  private fun showOrderNotification(
+    registration: RuntimeRegistration,
+    event: JSONObject,
+  ) {
+    val orderId = normalizeOrderId(event.opt("order"))
+    val statusLabel = safeTrim(
+      event.opt("notificationStatusLabel").takeIf { it != null }
+        ?: event.opt("statusLabel"),
+    ).ifEmpty { "Fila" }
+    val title = safeTrim(
+      event.opt("notificationHeader").takeIf { it != null }
+        ?: event.opt("headerTitle"),
+    ).ifEmpty {
+      if (orderId.isNotEmpty()) {
+        "Novo pedido #$orderId"
+      } else {
+        "Novo pedido"
+      }
+    }
+    val subtitle = safeTrim(
+      event.opt("notificationSubheader").takeIf { it != null }
+        ?: event.opt("headerSubtitle"),
+    )
+    val customerName = safeTrim(
+      event.opt("notificationCustomerName").takeIf { it != null }
+        ?: event.opt("customerName"),
+    )
+    val priceLabel = safeTrim(
+      event.opt("notificationPriceLabel").takeIf { it != null }
+        ?: event.opt("priceLabel"),
+    ).ifEmpty {
+      formatMoneyLabel(
+        event.opt("notificationPrice").takeIf { it != null } ?: event.opt("price"),
+      )
+    }
+    val body = listOf(
+      subtitle,
+      customerName.takeIf { it.isNotEmpty() }?.let { "Cliente: $it" },
+      priceLabel.takeIf { it.isNotEmpty() }?.let { "Valor: $it" },
+      registration.companyAlias.takeIf { it.isNotEmpty() },
+      "Status: $statusLabel",
+    ).filterNotNull().filter { it.isNotBlank() }.joinToString(" | ")
+      .ifEmpty {
+        if (orderId.isNotEmpty()) {
+          "Pedido #$orderId aguardando atendimento."
+        } else {
+          "Novo pedido aguardando atendimento."
+        }
+      }
+
+    val launchPackage = registration.packageName.ifEmpty { packageName }
+    val launchIntent = packageManager.getLaunchIntentForPackage(launchPackage)
+      ?.apply {
+        addFlags(
+          Intent.FLAG_ACTIVITY_NEW_TASK or
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+            Intent.FLAG_ACTIVITY_SINGLE_TOP,
+        )
+        putExtra("background-runtime-order-id", orderId)
+        putExtra("background-runtime-company-id", registration.companyId)
+      }
+
+    val pendingIntent = if (launchIntent != null) {
+      PendingIntent.getActivity(
+        this,
+        launchPackage.hashCode(),
+        launchIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+      )
+    } else {
+      null
+    }
+
+    val notification = NotificationCompat.Builder(this, ORDER_CHANNEL_ID)
+      .setContentTitle(title)
+      .setContentText(body)
+      .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+      .setSmallIcon(android.R.drawable.stat_notify_more)
+      .setAutoCancel(true)
+      .setContentIntent(pendingIntent)
+      .setPriority(NotificationCompat.PRIORITY_HIGH)
+      .build()
+
+    val notificationManager =
+      getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(
+      (registration.registrationId + orderId).hashCode(),
+      notification,
+    )
+  }
+
+  private fun shutdownRuntime() {
+    spoolPollingJob?.cancel()
+    spoolPollingJob = null
+
+    leaderServerJob?.cancel()
+    leaderServerJob = null
+
+    runCatching {
+      leaderSocket?.close()
+    }
+    leaderSocket = null
+
+    activeSockets.keys.toList().forEach { registrationId ->
+      closeSocketConnection(registrationId)
+    }
+  }
+
+  private fun stopSelfSafely() {
+    runCatching {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        stopForeground(STOP_FOREGROUND_REMOVE)
+      } else {
+        @Suppress("DEPRECATION")
+        stopForeground(true)
+      }
+    }
+    stopSelf()
+  }
+}
