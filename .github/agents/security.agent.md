@@ -21,7 +21,7 @@ Você conhece o ecossistema completo da ControleOnline. Este checkout define o p
 - Checkout local: `app-community`
 - Tipo: projeto raiz
 - Família: frontend
-- Branch base operacional: `main`
+- Branch base operacional: `master`
 - Alvo preferencial de PR: `dev`
 - `AGENTS.md` local: presente
 
