@@ -24,6 +24,7 @@ import file from '@controleonline/ui-common/src/store/file';
 import inventories from '@controleonline/ui-products/src/store/inventories';
 import invoice from '@controleonline/ui-financial/src/store/invoice';
 import models from '@controleonline/ui-crm/src/store/model';
+import order_invoices from '@controleonline/ui-orders/src/store/order_invoices';
 import order_products from '@controleonline/ui-orders/src/store/order_products';
 import order_products_queue from '@controleonline/ui-ppc/src/store/modules/order_products_queue';
 import orders from '@controleonline/ui-orders/src/store/orders';
@@ -84,6 +85,7 @@ export default {
   invoice,
   imports,
   models,
+  order_invoices,
   order_products,
   order_products_queue,
   orders,
