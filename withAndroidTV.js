@@ -4,6 +4,7 @@ module.exports = function withAndroidTV(config) {
   return withAndroidManifest(config, config => {
     const CALLBACK_SCHEME = 'ControleOnline';
     const CALLBACK_HOST = 'POS';
+    const APP_SCHEME = config.scheme || CALLBACK_SCHEME;
     const manifest = config.modResults;
 
     const existingUsesFeatures = manifest.manifest['uses-feature'] || [];
@@ -51,6 +52,29 @@ module.exports = function withAndroidTV(config) {
     if (!mainActivity) return config;
     mainActivity.$['android:launchMode'] = 'singleTask';
 
+    const hasGenericSchemeFilter = (mainActivity['intent-filter'] || []).some(filter => {
+      const actions = filter?.action || [];
+      const categories = filter?.category || [];
+      const data = filter?.data || [];
+
+      const hasViewAction = actions.some(
+        item => item?.$?.['android:name'] === 'android.intent.action.VIEW'
+      );
+      const hasBrowsableCategory = categories.some(
+        item => item?.$?.['android:name'] === 'android.intent.category.BROWSABLE'
+      );
+      const hasDefaultCategory = categories.some(
+        item => item?.$?.['android:name'] === 'android.intent.category.DEFAULT'
+      );
+      const hasGenericScheme = data.some(
+        item =>
+          item?.$?.['android:scheme'] === APP_SCHEME &&
+          !item?.$?.['android:host']
+      );
+
+      return hasViewAction && hasBrowsableCategory && hasDefaultCategory && hasGenericScheme;
+    });
+
     const hasCieloCallbackFilter = (mainActivity['intent-filter'] || []).some(filter => {
       const actions = filter?.action || [];
       const categories = filter?.category || [];
@@ -93,6 +117,24 @@ module.exports = function withAndroidTV(config) {
     // Garante intent para Android TV sem empilhar duplicados.
     mainActivity['intent-filter'] = [
       ...nonLeanbackIntentFilters,
+      ...(!hasGenericSchemeFilter
+        ? [
+            {
+              action: [{ $: { 'android:name': 'android.intent.action.VIEW' } }],
+              category: [
+                { $: { 'android:name': 'android.intent.category.DEFAULT' } },
+                { $: { 'android:name': 'android.intent.category.BROWSABLE' } }
+              ],
+              data: [
+                {
+                  $: {
+                    'android:scheme': APP_SCHEME
+                  }
+                }
+              ]
+            }
+          ]
+        : []),
       ...(!hasCieloCallbackFilter
         ? [
             {
