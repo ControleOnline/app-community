@@ -66,6 +66,11 @@
 - Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
 - Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
 
+## Regras de negócio CRM
+- A listagem de oportunidades no CRM deve abrir com o filtro `open` selecionado por padrão. Os demais status continuam disponíveis para troca manual.
+- O utilitário `resolveDefaultOpportunityStatusFilterKey` em `ui-crm/src/react/utils/opportunityStatusFilter.js` implementa essa lógica e deve ser reutilizado sempre que o filtro padrão for necessário nesse módulo.
+- Quando a API não retorna a opção `open` na lista de status, a tela exibe as oportunidades sem filtro ativo (comportamento de fallback seguro).
+
 ## Regra transversal de seletor de empresa
 - O frontend deve tratar `/people/companies/my` como a fonte de verdade do seletor de empresas.
 - O seletor deve mostrar todas as empresas retornadas pela API; empresa fora do fluxo comercial do domínio atual deve aparecer desabilitada, nunca escondida.
