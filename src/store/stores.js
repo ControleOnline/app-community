@@ -50,6 +50,7 @@ import status from '@controleonline/ui-common/src/store/status';
 import tasks from '@controleonline/ui-tasks/src/store/tasks';
 import tasksInterations from '@controleonline/ui-tasks/src/store/task_interations';
 import theme from '@controleonline/ui-layout/src/store/theme';
+import timezones from '@controleonline/ui-common/src/store/timezones';
 import translate from '@controleonline/ui-translate/src/store/translate';
 import users from '@controleonline/ui-users/src/store/users';
 import wallet from '@controleonline/ui-financial/src/store/wallet';
@@ -111,6 +112,7 @@ export default {
   tasks,
   tasksInterations,
   theme,
+  timezones,
   translate,
   users,
   wallet,
