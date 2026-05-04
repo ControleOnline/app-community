@@ -4,11 +4,14 @@ on:
   pull_request:
   push:
     branches:
-      - copilot/add-temporary-password-email-send
+      - master
+      - staging
 
 jobs:
   app-community-integrity:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
