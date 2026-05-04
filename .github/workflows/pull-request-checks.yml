@@ -1,0 +1,20 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - copilot/add-temporary-password-email-send
+
+jobs:
+  app-community-integrity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check diff formatting
+        run: git diff --check
+
+      - name: Verify ui-login submodule is present
+        run: git config --file .gitmodules --get submodule.modules/controleonline/ui-login.path
