@@ -75,3 +75,10 @@
 - Componentes de troca de empresa, exploradores e escolhas de contexto devem usar `panel_enabled` para habilitar/desabilitar seleção.
 - A escolha automática de empresa atual deve priorizar a primeira empresa com `panel_enabled = true`.
 - `employee_enabled` e os demais `*_enabled` dentro de `company.user` representam o tipo de vínculo humano direto da pessoa com aquela empresa; eles não substituem `panel_enabled`.
+
+## Regra transversal de idioma (tradução)
+- O idioma da aplicação deve sempre refletir o idioma configurado no **usuário logado**, não o idioma da empresa selecionada.
+- A troca de empresa **não altera** o idioma; o idioma permanece o do usuário logado durante toda a sessão.
+- A resolução de idioma fica centralizada em `ui-common/src/react/utils/runtimeLanguage.js`, na função `resolveConfiguredLanguage`.
+- Ordem de precedência: `sessionData.language` (usuário) > config persistida > empresa atual > empresa padrão > `pt-br`.
+- O campo de idioma do usuário está em `sessionData.language` (string direta ou objeto aninhado com `locale`/`code`).
