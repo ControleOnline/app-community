@@ -39,6 +39,7 @@ import product_category from '@controleonline/ui-products/src/store/products/pro
 import product_file from '@controleonline/ui-products/src/store/products/product_file';
 import product_group from '@controleonline/ui-products/src/store/products/product_group';
 import product_group_feedstock from '@controleonline/ui-products/src/store/products/product_group_feedstock';
+import product_group_parent from '@controleonline/ui-products/src/store/products/product_group_parent';
 import product_group_product from '@controleonline/ui-products/src/store/products/product_group_product';
 import product_people from '@controleonline/ui-products/src/store/products/product_people';
 import product_inventories from '@controleonline/ui-products/src/store/product_inventories';
@@ -99,6 +100,7 @@ export default {
   product_file,
   product_group,
   product_group_feedstock,
+  product_group_parent,
   product_group_product,
   product_people,
   product_inventories,
