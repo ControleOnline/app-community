@@ -85,6 +85,7 @@ jobs:
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           DOMAIN: 'https://app.controleonline.com',\
+          MANAGER_APP: 'https://app.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: '${APP_TYPE}',\
           ZOOM: 0.80,\
