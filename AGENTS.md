@@ -75,3 +75,5 @@
 - Componentes de troca de empresa, exploradores e escolhas de contexto devem usar `panel_enabled` para habilitar/desabilitar seleção.
 - A escolha automática de empresa atual deve priorizar a primeira empresa com `panel_enabled = true`.
 - `employee_enabled` e os demais `*_enabled` dentro de `company.user` representam o tipo de vínculo humano direto da pessoa com aquela empresa; eles não substituem `panel_enabled`.
+- Você deve manter o redme.md do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
+- Você deve manter o funding.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
