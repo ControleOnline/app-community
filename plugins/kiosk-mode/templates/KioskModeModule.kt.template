@@ -1,0 +1,153 @@
+package __PACKAGE__.kiosk
+
+import android.app.Activity
+import android.app.ActivityManager
+import android.app.admin.DevicePolicyManager
+import android.content.Context
+import android.os.Build
+import android.view.View
+import android.view.WindowManager
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.WritableMap
+
+class KioskModeModule(
+  private val reactApplicationContext: ReactApplicationContext,
+) : ReactContextBaseJavaModule(reactApplicationContext) {
+  override fun getName(): String = "KioskMode"
+
+  @ReactMethod
+  fun setKioskMode(enabled: Boolean, promise: Promise) {
+    val activity = currentActivity
+
+    if (activity == null) {
+      promise.resolve(buildStatus(false, "no_activity"))
+      return
+    }
+
+    activity.runOnUiThread {
+      try {
+        if (enabled) {
+          enableKioskMode(activity)
+        } else {
+          disableKioskMode(activity)
+        }
+
+        promise.resolve(buildStatus(enabled, "ok"))
+      } catch (error: Exception) {
+        promise.reject("KIOSK_MODE_UPDATE_FAILED", error)
+      }
+    }
+  }
+
+  @ReactMethod
+  fun getStatus(promise: Promise) {
+    try {
+      promise.resolve(buildStatus(null, "ok"))
+    } catch (error: Exception) {
+      promise.reject("KIOSK_MODE_STATUS_FAILED", error)
+    }
+  }
+
+  private fun enableKioskMode(activity: Activity) {
+    activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    applyImmersiveMode(activity)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      try {
+        activity.startLockTask()
+      } catch (_: Exception) {
+        // Non-allowlisted devices fall back to regular screen pinning/immersive behavior.
+      }
+    }
+  }
+
+  private fun disableKioskMode(activity: Activity) {
+    activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    activity.window.decorView.systemUiVisibility = 0
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isAnyLockTaskModeActive()) {
+      try {
+        activity.stopLockTask()
+      } catch (_: Exception) {
+      }
+    }
+  }
+
+  private fun applyImmersiveMode(activity: Activity) {
+    activity.window.decorView.systemUiVisibility =
+      View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+        View.SYSTEM_UI_FLAG_FULLSCREEN or
+        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+  }
+
+  private fun getLockTaskModeState(): Int {
+    val activityManager =
+      reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      activityManager.lockTaskModeState
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      @Suppress("DEPRECATION")
+      if (activityManager.isInLockTaskMode) {
+        ActivityManager.LOCK_TASK_MODE_LOCKED
+      } else {
+        ActivityManager.LOCK_TASK_MODE_NONE
+      }
+    } else {
+      ActivityManager.LOCK_TASK_MODE_NONE
+    }
+  }
+
+  private fun isAnyLockTaskModeActive(): Boolean =
+    getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE
+
+  private fun resolveLockTaskModeName(state: Int): String =
+    when (state) {
+      ActivityManager.LOCK_TASK_MODE_LOCKED -> "locked"
+      ActivityManager.LOCK_TASK_MODE_PINNED -> "pinned"
+      ActivityManager.LOCK_TASK_MODE_NONE -> "none"
+      else -> "unknown"
+    }
+
+  private fun isDeviceOwner(): Boolean {
+    return try {
+      val devicePolicyManager =
+        reactApplicationContext.getSystemService(Context.DEVICE_POLICY_SERVICE)
+          as DevicePolicyManager
+
+      devicePolicyManager.isDeviceOwnerApp(reactApplicationContext.packageName)
+    } catch (_: Exception) {
+      false
+    }
+  }
+
+  private fun buildStatus(requestedEnabled: Boolean?, reason: String): WritableMap {
+    val status = Arguments.createMap()
+    val lockTaskModeState = getLockTaskModeState()
+
+    if (requestedEnabled != null) {
+      status.putBoolean("requestedEnabled", requestedEnabled)
+    }
+
+    status.putString("reason", reason)
+    status.putBoolean("deviceOwner", isDeviceOwner())
+    status.putString("lockTaskMode", resolveLockTaskModeName(lockTaskModeState))
+    status.putBoolean(
+      "locked",
+      lockTaskModeState == ActivityManager.LOCK_TASK_MODE_LOCKED,
+    )
+    status.putBoolean(
+      "fallbackPinned",
+      lockTaskModeState == ActivityManager.LOCK_TASK_MODE_PINNED,
+    )
+
+    return status
+  }
+}
