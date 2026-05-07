@@ -3,18 +3,17 @@
     "name": "On Gestor",
     "displayName": "On Gestor",
     "slug": "manager-controle-online",
-    "scheme": "ControleOnline",
     "platforms": [
       "android",
       "ios",
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.12",
+    "version": "1.3.14",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1312,
+      "versionCode": 1314,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -24,7 +23,7 @@
         "VIBRATE",
         "INTERNET",
         "WAKE_LOCK",
-        "managerT_NOTIFICATIONS",
+        "POST_NOTIFICATIONS",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
@@ -68,6 +67,3 @@
     ]
   }
 }
-
-
-
