@@ -10,11 +10,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.10",
+    "version": "1.3.11",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1310,
+      "versionCode": 1311,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -28,7 +28,7 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-      "tvBanner": "./src/assets/tv.png"
+      "tvBanner": "./src/assets/manager/tv.png"
     },
     "icon": "./src/assets/manager/logo.png",
     "splash": {
@@ -68,4 +68,5 @@
     ]
   }
 }
+
 
