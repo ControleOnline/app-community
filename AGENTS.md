@@ -23,7 +23,8 @@
 
 ## Regra obrigatoria de componentes default
 - Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
-- Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile pode usar card desenhado para a tela, mas a edicao deve reaproveitar entradas default (`DefaultInput`, `DefaultSelect` e equivalentes React em `ui-default`) e aparecer somente quando o usuario clicar/editar, como no comportamento do `DefaultTable`.
+- Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile deve ser gerenciado pelo proprio `DefaultTable`, recebendo da tela apenas um renderer/componente de card customizado quando o visual precisar ser especifico. Nao criar uma listagem paralela com `FlatList`/cards na tela se ela ja usa `DefaultTable`.
+- Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
 - Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
 
