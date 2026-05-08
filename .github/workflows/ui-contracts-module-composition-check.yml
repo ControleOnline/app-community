@@ -1,0 +1,25 @@
+name: UI Contracts Module Composition Check
+
+on:
+  pull_request:
+    branches:
+      - master
+      - staging
+
+jobs:
+  verify-ui-contracts-pointer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify ui-contracts module pointer
+        run: node tools/verify-ui-contracts-module-pointer.cjs
