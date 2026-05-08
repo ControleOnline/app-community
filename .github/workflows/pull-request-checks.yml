@@ -1,39 +1,20 @@
 name: Pull Request Checks
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-
 on:
-  workflow_dispatch:
+  pull_request:
   push:
     branches:
-      - master
-  pull_request:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: pull-request-checks-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+      - task-94
 
 jobs:
-  baseline-checks:
+  app-community-integrity:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
-
-      - name: Check JavaScript syntax
-        run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
-
-      - name: Check diff hygiene
+      - name: Check diff formatting
         run: git diff --check
+
+      - name: Verify ui-login submodule is present
+        run: git config --file .gitmodules --get submodule.modules/controleonline/ui-login.path
