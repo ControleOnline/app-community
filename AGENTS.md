@@ -12,7 +12,7 @@
 - O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
-- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-common` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
+- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
 - Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
 - `configs.filters` habilita/desabilita filtros da listagem. `configs.externalFilters` controla o painel de filtros fora da tabela; quando for `false`, a tela nao deve renderizar esse painel.
 - No Vue legado, `DefaultTable` renderiza `DefaultExternalFilters` apenas quando `configs.filters`, `configs.externalFilters != false`, `configs.headers != false` e a tela e desktop. Esse painel mostra somente colunas incluidas por `shouldIncludeColumn(column)` e marcadas com `column.externalFilter == true`, alem de `configs.components.customFilters`.
@@ -20,6 +20,12 @@
 - Filtros React de periodo/data devem reaproveitar `DateShortcutFilter`; filtros de status e selecoes curtas devem reaproveitar `CompactFilterSelector`. Esses componentes pertencem a `ui-default`, devem receber `store` e `field` e resolver internamente a coluna/label a partir das `columns` do store; a tela deve passar apenas contexto, valor e opcoes quando necessario.
 - Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando o dado nao existir no `summary`, ajuste o backend usando `CollectionSummary` ou resolver especifico antes de exibir o total.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
+
+## Regra obrigatoria de componentes default
+- Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
+- Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile pode usar card desenhado para a tela, mas a edicao deve reaproveitar entradas default (`DefaultInput`, `DefaultSelect` e equivalentes React em `ui-default`) e aparecer somente quando o usuario clicar/editar, como no comportamento do `DefaultTable`.
+- A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
+- Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
 
 
 ## Estilo de implementação
