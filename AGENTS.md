@@ -13,6 +13,10 @@
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
 - Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-common` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
+- Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
+- `configs.filters` habilita/desabilita filtros da listagem. `configs.externalFilters` controla o painel de filtros fora da tabela; quando for `false`, a tela nao deve renderizar esse painel.
+- No Vue legado, `DefaultTable` renderiza `DefaultExternalFilters` apenas quando `configs.filters`, `configs.externalFilters != false`, `configs.headers != false` e a tela e desktop. Esse painel mostra somente colunas incluidas por `shouldIncludeColumn(column)` e marcadas com `column.externalFilter == true`, alem de `configs.components.customFilters`.
+- Filtros inline/de cabecalho no Vue aparecem por coluna quando `configs.filters` esta ativo e `column.filter != false`. Portanto, em React, nao criar filtros fixos por tela quando o store ja descreve as colunas: a tela deve derivar quais filtros aparecem a partir de `columns`, respeitando `visible`, `filter`, `externalFilter`, `filterClass`, `inputType`, `list` e `formatFilter`.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 
