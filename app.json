@@ -23,9 +23,7 @@
         "VIBRATE",
         "INTERNET",
         "WAKE_LOCK",
-        "POST_NOTIFICATIONS",
-        "FOREGROUND_SERVICE_OFF", // DESLIGADO PARA SUBIR NO GOOGLE
-        "FOREGROUND_SERVICE_MEDIA_PLAYBACK_OFF" // DESLIGADO PARA SUBIR NO GOOGLE
+        "POST_NOTIFICATIONS"
       ],
       "tvBanner": "./src/assets/manager/tv.png"
     },
@@ -62,7 +60,7 @@
       [
         "expo-audio",
         {
-          "enableBackgroundPlayback": false // DESLIGADO PARA SUBIR NO GOOGLE
+          "enableBackgroundPlayback": false
         }
       ]
     ]
