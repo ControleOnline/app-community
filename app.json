@@ -9,11 +9,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.15",
+    "version": "1.3.7",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1315,
+      "versionCode": 137,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -24,8 +24,8 @@
         "INTERNET",
         "WAKE_LOCK",
         "POST_NOTIFICATIONS",
-        "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "FOREGROUND_SERVICE_OFF", // DESLIGADO PARA SUBIR NO GOOGLE
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK_OFF" // DESLIGADO PARA SUBIR NO GOOGLE
       ],
       "tvBanner": "./src/assets/manager/tv.png"
     },
@@ -52,6 +52,7 @@
     },
     "plugins": [
       "./withAndroidTV",
+      "./withKioskMode",
       "./withBackgroundRuntime",
       "expo-build-properties",
       "expo-asset",
@@ -61,7 +62,7 @@
       [
         "expo-audio",
         {
-          "enableBackgroundPlayback": true
+          "enableBackgroundPlayback": false // DESLIGADO PARA SUBIR NO GOOGLE
         }
       ]
     ]

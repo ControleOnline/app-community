@@ -186,6 +186,7 @@
 - O backend deve receber informacao suficiente para resolver o produto pelo SKU lido e para entender a quantidade vendida quando o SKU representar pack. O contrato do item nao deve depender apenas de nome do produto ou ids visuais da interface.
 - Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
 - O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
+- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo, candidatura a launcher/Home e retomada no boot.
 - No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV. O primeiro modo especializado dessa familia sera o `TOTEM` de mercado autonomo.
 - A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 

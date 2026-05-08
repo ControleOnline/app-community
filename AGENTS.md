@@ -12,8 +12,21 @@
 - O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
-- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-common` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
+- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
+- Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
+- `configs.filters` habilita/desabilita filtros da listagem. `configs.externalFilters` controla o painel de filtros fora da tabela; quando for `false`, a tela nao deve renderizar esse painel.
+- No Vue legado, `DefaultTable` renderiza `DefaultExternalFilters` apenas quando `configs.filters`, `configs.externalFilters != false`, `configs.headers != false` e a tela e desktop. Esse painel mostra somente colunas incluidas por `shouldIncludeColumn(column)` e marcadas com `column.externalFilter == true`, alem de `configs.components.customFilters`.
+- Filtros inline/de cabecalho no Vue aparecem por coluna quando `configs.filters` esta ativo e `column.filter != false`. Portanto, em React, nao criar filtros fixos por tela quando o store ja descreve as colunas: a tela deve derivar quais filtros aparecem a partir de `columns`, respeitando `visible`, `filter`, `externalFilter`, `filterClass`, `inputType`, `list` e `formatFilter`.
+- Filtros React de periodo/data devem reaproveitar `DateShortcutFilter`; filtros de status e selecoes curtas devem reaproveitar `CompactFilterSelector`. Esses componentes pertencem a `ui-default`, devem receber `store` e `field` e resolver internamente a coluna/label a partir das `columns` do store; a tela deve passar apenas contexto, valor e opcoes quando necessario.
+- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando o dado nao existir no `summary`, ajuste o backend usando `CollectionSummary` ou resolver especifico antes de exibir o total.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
+
+## Regra obrigatoria de componentes default
+- Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
+- Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile deve ser gerenciado pelo proprio `DefaultTable`, recebendo da tela apenas um renderer/componente de card customizado quando o visual precisar ser especifico. Nao criar uma listagem paralela com `FlatList`/cards na tela se ela ja usa `DefaultTable`.
+- Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
+- A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
+- Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
 
 
 ## Estilo de implementação
@@ -29,6 +42,7 @@
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.
 - O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
+- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e so deve ativar quando `APP_TYPE=POS` e `pos-operation-mode=kiosk`.
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.
@@ -75,3 +89,6 @@
 - Componentes de troca de empresa, exploradores e escolhas de contexto devem usar `panel_enabled` para habilitar/desabilitar seleção.
 - A escolha automática de empresa atual deve priorizar a primeira empresa com `panel_enabled = true`.
 - `employee_enabled` e os demais `*_enabled` dentro de `company.user` representam o tipo de vínculo humano direto da pessoa com aquela empresa; eles não substituem `panel_enabled`.
+- Você deve manter o redme.md do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
+- Você deve manter o funding.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
+- Você deve manter o .scrutinizer.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
