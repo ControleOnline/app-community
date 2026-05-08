@@ -24,8 +24,8 @@
         "INTERNET",
         "WAKE_LOCK",
         "POST_NOTIFICATIONS",
-        "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "FOREGROUND_SERVICE_OFF", // para não barrar no google
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK_OFF" // para não barrar no google
       ],
       "tvBanner": "./src/assets/tv.png"
     },
@@ -61,7 +61,7 @@
       [
         "expo-audio",
         {
-          "enableBackgroundPlayback": true
+          "enableBackgroundPlayback": false  // para não barrar no google
         }
       ]
     ]
