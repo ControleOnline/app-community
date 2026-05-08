@@ -1,5 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {getStateFromPath as defaultGetStateFromPath} from '@react-navigation/native'
+import {MaterialCommunityIcons} from '@expo/vector-icons'
+import {Pressable, StyleSheet} from 'react-native'
 
 //import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
@@ -25,6 +27,16 @@ import { env } from '@env'
 
 const Stack = createNativeStackNavigator()
 
+const routerStyles = StyleSheet.create({
+  headerBackButton: {
+    alignItems: 'center',
+    height: 40,
+    justifyContent: 'center',
+    marginLeft: -8,
+    width: 40,
+  },
+})
+
 const DEFAULT_ROUTE_OPTIONS = {
   headerShown: true,
   headerBackVisible: true,
@@ -36,10 +48,50 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
     typeof screenOptions === 'function'
       ? screenOptions(args)
       : (screenOptions || {})
+  const {headerBackFallback, ...nativeOptions} = resolvedOptions
+
+  if (headerBackFallback && nativeOptions.headerShown !== false) {
+    nativeOptions.headerBackVisible = false
+    nativeOptions.headerLeft = () => (
+      <Pressable
+        accessibilityLabel="Voltar"
+        accessibilityRole="button"
+        hitSlop={8}
+        onPress={() => {
+          const {navigation, route} = args
+
+          if (navigation?.canGoBack?.()) {
+            navigation.goBack()
+            return
+          }
+
+          const fallback =
+            typeof headerBackFallback === 'function'
+              ? headerBackFallback({navigation, route})
+              : headerBackFallback
+
+          if (Array.isArray(fallback?.resetRoutes) && fallback.resetRoutes.length > 0) {
+            navigation?.reset?.({
+              index: fallback.resetRoutes.length - 1,
+              routes: fallback.resetRoutes,
+            })
+            return
+          }
+
+          if (fallback?.name) {
+            navigation?.navigate?.(fallback.name, fallback.params || {})
+          }
+        }}
+        style={routerStyles.headerBackButton}
+      >
+        <MaterialCommunityIcons name="arrow-left" size={24} color="#0F172A" />
+      </Pressable>
+    )
+  }
 
   return {
     ...DEFAULT_ROUTE_OPTIONS,
-    ...resolvedOptions,
+    ...nativeOptions,
   }
 }
 
@@ -87,6 +139,34 @@ const routeDefinitions = allRoutes.filter(
   route => route?.name && route?.component,
 )
 
+const PRODUCT_DETAILS_TAB_PATH_REGEX =
+  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque)([?#].*)?$/i
+
+const normalizeProductDetailsTabPath = path => {
+  const normalizedPath = String(path || '')
+  const productDetailsTabMatch = normalizedPath.match(PRODUCT_DETAILS_TAB_PATH_REGEX)
+
+  if (!productDetailsTabMatch?.[1]) {
+    return normalizedPath
+  }
+
+  return `product-details/${productDetailsTabMatch[1]}${productDetailsTabMatch[2] || ''}`
+}
+
+const normalizeInitialBrowserPath = () => {
+  if (typeof window === 'undefined') return
+
+  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
+  const normalizedPath = normalizeProductDetailsTabPath(currentPath)
+  const nextPath = normalizedPath.startsWith('/') ? normalizedPath : `/${normalizedPath}`
+
+  if (nextPath === currentPath) return
+
+  window.history.replaceState(window.history.state, '', nextPath)
+}
+
+normalizeInitialBrowserPath()
+
 const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
   const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
 
@@ -117,6 +197,7 @@ export const linking = (() => {
     config: { screens },
     getStateFromPath(path, options) {
       let normalizedPath = String(path || '').replace(/^\/?shop\/q=/, 'shop/search/')
+      normalizedPath = normalizeProductDetailsTabPath(normalizedPath)
 
       const legacyMatch =
         normalizedPath.match(/[?&]f=([^&]+)/i) ||
