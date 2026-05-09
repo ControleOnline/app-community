@@ -100,3 +100,4 @@
 - O menu da home deve vir do backend por `menus-people` com o `APP_TYPE` atual e ser salvo em `theme.menus`.
 - Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
+- A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
