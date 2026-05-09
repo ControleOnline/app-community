@@ -23,7 +23,9 @@
         "VIBRATE",
         "INTERNET",
         "WAKE_LOCK",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
       "tvBanner": "./src/assets/manager/tv.png"
     },
@@ -60,7 +62,7 @@
       [
         "expo-audio",
         {
-          "enableBackgroundPlayback": false
+          "enableBackgroundPlayback": true
         }
       ]
     ]
