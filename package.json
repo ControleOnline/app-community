@@ -9,7 +9,8 @@
     "start": "expo start",
     "start:clear": "expo start -c",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
