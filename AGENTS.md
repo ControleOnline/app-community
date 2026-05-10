@@ -21,7 +21,7 @@
 - Busca textual padrao de listagens React deve ser configurada via `searchProps` do `DefaultTable`, renderizada pequena na toolbar usando `DefaultSearch` de `ui-default`; telas consumidoras nao devem recriar `TextInput` de busca local nem posicionar busca fora da toolbar default.
 - Sempre que uma tela usar `DefaultTable`, o backend e o store tambem precisam sustentar o contrato completo da listagem: ordenacao, pesquisa, filtros e paginação. Ordenacao de campos data precisa respeitar o valor real da data no backend, e a pesquisa deve ser tratada no backend com `CustomOrFilter` ou um mecanismo equivalente para buscar nos campos corretos sem depender de filtro local no front.
 - Em React, `DefaultExternalFilters` deve detectar largura compacta e renderizar apenas um botao de filtros que abre modal com os campos. Telas consumidoras nao devem criar accordion/header mobile paralelo para os filtros default.
-- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando o dado nao existir no `summary`, ajuste o backend usando `CollectionSummary` ou resolver especifico antes de exibir o total.
+- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando a tela usa `DefaultTable`, `totalItems` e `summary` pertencem ao rodape sticky interno do componente; telas consumidoras nao devem criar rodapes ou pilulas paralelas, exceto quando o store registrar `summary: false`.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 ## Regra obrigatoria de componentes default
