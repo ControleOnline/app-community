@@ -10,7 +10,7 @@
     "start:clear": "expo start -c",
     "lint": "eslint .",
     "test": "jest",
-    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand"
+    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=modules/controleonline/ui-common/src/tests/react/utils/"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
