@@ -44,6 +44,7 @@
 ## Convenções
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.
+- O rodape tecnico compartilhado dos devices deve continuar mostrando identificacao local e versao do app no formato `nome (identificador) / versao`. Em runtime web, o identificador e o host/IP atual do browser; em runtime nativo, deve priorizar a versao persistida na metadata do device salvo no backend e usar como identificador o mesmo valor exibido na lista de devices (`device_config.device.device`), com fallback local quando necessario.
 - O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
 - Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e so deve ativar quando `APP_TYPE=POS` e `pos-operation-mode=kiosk`.
