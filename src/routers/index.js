@@ -177,11 +177,6 @@ const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) =
   )
 }
 
-const wrappedRouteDefinitions = routeDefinitions.map(route => ({
-  ...route,
-  wrappedComponent: WrappedComponent(route.options, route.component),
-}))
-
 export const linking = (() => {
   const screens = {}
   const seen = new Set()
@@ -244,11 +239,11 @@ const getInitialRouteName = () => {
 export default function Routes() {
   return (
     <Stack.Navigator detachInactiveScreens initialRouteName={getInitialRouteName()}>
-      {wrappedRouteDefinitions.map((route, index) => (
+      {routeDefinitions.map((route, index) => (
         <Stack.Screen
           key={index}
           name={route.name}
-          component={route.wrappedComponent}
+          component={WrappedComponent(route.options, route.component)}
           options={args => resolveRouteOptions(route.options, args)}
           initialParams={route.initialParams}
         />
