@@ -13,6 +13,7 @@ import contract from '@controleonline/ui-contracts/src/store/contract';
 import contract_peoples from '@controleonline/ui-contracts/src/store/contract/contract_people';
 import device from '@controleonline/ui-common/src/store/device';
 import device_config from '@controleonline/ui-common/src/store/device_config';
+import document_file from '@controleonline/ui-people/src/store/documents/document_file';
 import entity_log from '@controleonline/ui-common/src/store/entity_log';
 import display_queues from '@controleonline/ui-ppc/src/store/modules/display_queues';
 import displays from '@controleonline/ui-ppc/src/store/modules/displays';
@@ -75,6 +76,7 @@ export default {
   contract_peoples,
   device,
   device_config,
+  document_file,
   entity_log,
   display_queues,
   displays,
