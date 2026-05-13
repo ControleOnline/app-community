@@ -4,7 +4,7 @@ name: Deploy Android Apps # NÃO MUDAR ESSE NOME!!!
 
 on:
   push:
-    branches: [production]
+    branches: [master]
 
 permissions:
   contents: read
