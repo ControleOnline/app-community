@@ -1,5 +1,7 @@
 import {colors as defaultColors} from './colors';
 
+const CSS_VAR_FALLBACK_HEX_REGEX =
+  /^var\([^,]+,\s*(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})\s*\)$/;
 const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 const normalizeHex = value => {
@@ -7,16 +9,19 @@ const normalizeHex = value => {
     return null;
   }
 
-  const raw = value.trim().replace(';', '');
-  if (!HEX_COLOR_REGEX.test(raw)) {
+  const raw = value.trim().replace(/;$/, '');
+  const cssVarFallbackMatch = raw.match(CSS_VAR_FALLBACK_HEX_REGEX);
+  const color = cssVarFallbackMatch?.[1] || raw;
+
+  if (!HEX_COLOR_REGEX.test(color)) {
     return null;
   }
 
-  if (raw.length === 4) {
-    return `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`;
+  if (color.length === 4) {
+    return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
   }
 
-  return raw;
+  return color;
 };
 
 export const withOpacity = (hexColor, opacity = 1) => {
@@ -38,6 +43,14 @@ export const resolveThemePalette = (
   themeColors = {},
   fallback = defaultColors,
 ) => {
+  const normalizedFallback = Object.keys(fallback || {}).reduce(
+    (palette, key) => ({
+      ...palette,
+      [key]: normalizeHex(fallback[key]) || fallback[key],
+    }),
+    {},
+  );
+
   const firstThemeColor = (...keys) => {
     for (const key of keys) {
       const value = normalizeHex(themeColors[key]);
@@ -56,10 +69,10 @@ export const resolveThemePalette = (
       'q-btn-primary',
       'header-primary',
       'q-header-primary',
-    ) || fallback.primary;
+    ) || normalizedFallback.primary;
 
   const secondary =
-    firstThemeColor('secondary', 'q-secondary') || fallback.secondary;
+    firstThemeColor('secondary', 'q-secondary') || normalizedFallback.secondary;
 
   const background =
     firstThemeColor(
@@ -68,7 +81,7 @@ export const resolveThemePalette = (
       'q-bg-light',
       'bg-headers-light',
       'q-bg-headers-light',
-    ) || fallback.background;
+    ) || normalizedFallback.background;
 
   const text =
     firstThemeColor(
@@ -77,7 +90,7 @@ export const resolveThemePalette = (
       'q-text-headers-light',
       'text-primary',
       'q-text-primary',
-    ) || fallback.text;
+    ) || normalizedFallback.text;
 
   let textSecondary =
     firstThemeColor(
@@ -86,7 +99,7 @@ export const resolveThemePalette = (
       'q-text-headers-light',
       'text-secondary',
       'q-text-secondary',
-    ) || fallback.textSecondary;
+    ) || normalizedFallback.textSecondary;
 
   if (textSecondary.toLowerCase() === background.toLowerCase()) {
     textSecondary = text;
@@ -94,10 +107,10 @@ export const resolveThemePalette = (
 
   const border =
     firstThemeColor('border', 'bg-even-light', 'q-bg-even-light') ||
-    fallback.border;
+    normalizedFallback.border;
 
   return {
-    ...fallback,
+    ...normalizedFallback,
     primary,
     secondary,
     background,
