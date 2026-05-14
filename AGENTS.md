@@ -18,7 +18,10 @@
 - No Vue legado, `DefaultTable` renderiza `DefaultExternalFilters` apenas quando `configs.filters`, `configs.externalFilters != false`, `configs.headers != false` e a tela e desktop. Esse painel mostra somente colunas incluidas por `shouldIncludeColumn(column)` e marcadas com `column.externalFilter == true`, alem de `configs.components.customFilters`.
 - Filtros inline/de cabecalho no Vue aparecem por coluna quando `configs.filters` esta ativo e `column.filter != false`. Portanto, em React, nao criar filtros fixos por tela quando o store ja descreve as colunas: a tela deve derivar quais filtros aparecem a partir de `columns`, respeitando `visible`, `filter`, `externalFilter`, `filterClass`, `inputType`, `list` e `formatFilter`.
 - Filtros React de periodo/data devem reaproveitar `DateShortcutFilter`; filtros de status e selecoes curtas devem reaproveitar `CompactFilterSelector`. Esses componentes pertencem a `ui-default`, devem receber `store` e `field` e resolver internamente a coluna/label a partir das `columns` do store; a tela deve passar apenas contexto, valor e opcoes quando necessario.
-- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando o dado nao existir no `summary`, ajuste o backend usando `CollectionSummary` ou resolver especifico antes de exibir o total.
+- Busca textual padrao de listagens React deve ser configurada via `searchProps` do `DefaultTable`, renderizada pequena na toolbar usando `DefaultSearch` de `ui-default`; telas consumidoras nao devem recriar `TextInput` de busca local nem posicionar busca fora da toolbar default.
+- Sempre que uma tela usar `DefaultTable`, o backend e o store tambem precisam sustentar o contrato completo da listagem: ordenacao, pesquisa, filtros e paginação. Ordenacao de campos data precisa respeitar o valor real da data no backend, e a pesquisa deve ser tratada no backend com `CustomOrFilter` ou um mecanismo equivalente para buscar nos campos corretos sem depender de filtro local no front.
+- Em React, `DefaultExternalFilters` deve detectar largura compacta e renderizar apenas um botao de filtros que abre modal com os campos. Telas consumidoras nao devem criar accordion/header mobile paralelo para os filtros default.
+- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando a tela usa `DefaultTable`, `totalItems` e `summary` pertencem ao rodape sticky interno do componente; telas consumidoras nao devem criar rodapes ou pilulas paralelas, exceto quando o store registrar `summary: false`.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 ## Regra obrigatoria de componentes default
@@ -27,6 +30,7 @@
 - Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
 - Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
+- Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
 
 
 ## Estilo de implementação
@@ -92,3 +96,12 @@
 - Você deve manter o redme.md do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
 - Você deve manter o funding.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
 - Você deve manter o .scrutinizer.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
+
+## Regra transversal de menu
+- O menu da home deve vir do backend por `menus-people` com o `APP_TYPE` atual e ser salvo em `theme.menus`.
+- Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
+- A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
+- A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
+
+## Regra transversal de dock operacional
+- Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
