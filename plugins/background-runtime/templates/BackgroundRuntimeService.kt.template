@@ -12,7 +12,6 @@ import android.os.IBinder
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -56,6 +54,7 @@ private const val SOCKET_CONNECT_TIMEOUT_MS = 5000L
 private const val SOCKET_FLUSH_DELAY_MS = 180L
 private const val SPOOL_POLL_INTERVAL_MS = 10000L
 private const val FAILED_SPOOL_RETRY_MS = 30000L
+private const val LOCAL_EVENT_PORT = 41572
 private const val REGISTRATION_TTL_MS = 7L * 24L * 60L * 60L * 1000L
 private const val JSON_MIME_TYPE = "application/ld+json"
 private val EMPTY_REQUEST_BODY = ByteArray(0).toRequestBody(null, 0, 0)
@@ -315,6 +314,74 @@ internal data class RuntimeRegistration(
   }
 }
 
+internal data class RuntimeSocketState(
+  val connected: Boolean = false,
+  val identified: Boolean = false,
+  val status: String = "idle",
+  val attempts: Int = 0,
+  val updatedAt: Long = System.currentTimeMillis(),
+  val device: String = "",
+  val error: String = "",
+  val code: Int? = null,
+  val reason: String = "",
+  val ownerRegistrationId: String = "",
+  val ownerPackageName: String = "",
+  val ownerCompanyId: String = "",
+  val lastEventAt: Long? = null,
+  val lastEventCount: Int = 0,
+  val lastStores: List<String> = emptyList(),
+  val lastCompanies: List<String> = emptyList(),
+) {
+  fun toJson(): JSONObject {
+    val json = JSONObject()
+      .put("type", "socket-state")
+      .put("connected", connected)
+      .put("identified", identified)
+      .put("status", status)
+      .put("attempts", attempts)
+      .put("updatedAt", updatedAt)
+      .put("lastEventCount", lastEventCount)
+      .put("lastStores", JSONArray(lastStores))
+      .put("lastCompanies", JSONArray(lastCompanies))
+
+    if (device.isNotBlank()) {
+      json.put("device", device)
+    }
+
+    if (error.isNotBlank()) {
+      json.put("error", error)
+    }
+
+    code?.let { json.put("code", it) }
+
+    if (reason.isNotBlank()) {
+      json.put("reason", reason)
+    }
+
+    if (ownerRegistrationId.isNotBlank()) {
+      json.put("ownerRegistrationId", ownerRegistrationId)
+    }
+
+    if (ownerPackageName.isNotBlank()) {
+      json.put("ownerPackageName", ownerPackageName)
+    }
+
+    if (ownerCompanyId.isNotBlank()) {
+      json.put("ownerCompanyId", ownerCompanyId)
+    }
+
+    lastEventAt?.let { json.put("lastEventAt", it) }
+
+    return json
+  }
+}
+
+internal data class LocalEventClient(
+  val socket: Socket,
+  val writer: BufferedWriter,
+  val writeLock: Any = Any(),
+)
+
 internal object BackgroundRuntimeStore {
   private const val PREFERENCES_NAME = "controleonline-background-runtime"
   private const val REGISTRATIONS_KEY = "registrations"
@@ -491,8 +558,19 @@ class BackgroundRuntimeService : Service() {
   private val reconnectAttempts = ConcurrentHashMap<String, Int>()
   private val reconnectJobs = ConcurrentHashMap<String, Job>()
   private val failedSpoolAttempts = ConcurrentHashMap<String, Long>()
+  private val socketStateLock = Any()
+  private val localEventClients = ConcurrentHashMap<String, LocalEventClient>()
   private var leaderSocket: ServerSocket? = null
   private var leaderServerJob: Job? = null
+  private var localEventSocket: ServerSocket? = null
+  private var localEventServerJob: Job? = null
+  private var activeSocket: WebSocket? = null
+  private var activeSocketOwnerRegistrationId: String? = null
+  private var activeSocketOwnerSignature: String? = null
+  private var closingSocketRegistrationId: String? = null
+  private var reconnectAttempt = 0
+  private var reconnectJob: Job? = null
+  private var socketRuntimeState = RuntimeSocketState()
   private var spoolPollingJob: Job? = null
 
   override fun onBind(intent: Intent?): IBinder? = null
@@ -548,7 +626,8 @@ class BackgroundRuntimeService : Service() {
     activeRegistrations.clear()
     activeRegistrations.putAll(nextActiveRegistrations)
 
-    syncSocketConnections()
+    ensureLocalEventServer()
+    syncSocketConnection()
     syncSpoolPolling()
     updateServiceNotification(nextActiveRegistrations.size)
   }
@@ -778,6 +857,538 @@ class BackgroundRuntimeService : Service() {
       }
 
       processEvent(registration, json)
+    }
+  }
+
+  private fun ensureLocalEventServer(): Boolean {
+    if (localEventServerJob?.isActive == true && localEventSocket != null) {
+      return true
+    }
+
+    return try {
+      val serverSocket = ServerSocket()
+      serverSocket.reuseAddress = true
+      serverSocket.bind(
+        InetSocketAddress(
+          InetAddress.getByName("127.0.0.1"),
+          LOCAL_EVENT_PORT,
+        ),
+      )
+      localEventSocket = serverSocket
+      localEventServerJob = serviceScope.launch {
+        acceptLocalEventConnections(serverSocket)
+      }
+      true
+    } catch (_: Exception) {
+      false
+    }
+  }
+
+  private suspend fun acceptLocalEventConnections(serverSocket: ServerSocket) {
+    while (serviceScope.isActive) {
+      val client = try {
+        serverSocket.accept()
+      } catch (_: Exception) {
+        break
+      }
+
+      serviceScope.launch {
+        handleLocalEventClient(client)
+      }
+    }
+  }
+
+  private suspend fun handleLocalEventClient(client: Socket) {
+    val clientId =
+      "${client.inetAddress?.hostAddress ?: "127.0.0.1"}:${client.port}:${System.nanoTime()}"
+
+    try {
+      val writer = BufferedWriter(
+        OutputStreamWriter(client.getOutputStream(), Charsets.UTF_8),
+      )
+      localEventClients[clientId] = LocalEventClient(
+        socket = client,
+        writer = writer,
+      )
+
+      val currentState = snapshotSocketState()
+      val currentClient = localEventClients[clientId]
+      if (currentClient != null) {
+        runCatching {
+          synchronized(currentClient.writeLock) {
+            writer.write(currentState.toJson().toString())
+            writer.newLine()
+            writer.flush()
+          }
+        }
+      }
+
+      val reader = BufferedReader(
+        InputStreamReader(client.getInputStream(), Charsets.UTF_8),
+      )
+
+      while (serviceScope.isActive) {
+        val line = try {
+          reader.readLine()
+        } catch (_: Exception) {
+          break
+        }
+
+        if (line == null) {
+          break
+        }
+      }
+    } catch (_: Exception) {
+      // local clients reconnect automatically when the service restarts.
+    } finally {
+      closeLocalEventClient(clientId)
+    }
+  }
+
+  private fun closeLocalEventClient(clientId: String) {
+    val client = localEventClients.remove(clientId) ?: return
+
+    runCatching {
+      client.socket.close()
+    }
+  }
+
+  private fun broadcastLocalPayload(payload: String) {
+    val normalizedPayload = payload.trim()
+    if (normalizedPayload.isEmpty()) {
+      return
+    }
+
+    localEventClients.entries.toList().forEach { (clientId, client) ->
+      val written = runCatching {
+        synchronized(client.writeLock) {
+          client.writer.write(normalizedPayload)
+          client.writer.newLine()
+          client.writer.flush()
+        }
+        true
+      }.getOrDefault(false)
+
+      if (!written) {
+        closeLocalEventClient(clientId)
+      }
+    }
+  }
+
+  private fun snapshotSocketState(): RuntimeSocketState = synchronized(socketStateLock) {
+    socketRuntimeState
+  }
+
+  private fun updateSocketState(transform: (RuntimeSocketState) -> RuntimeSocketState) {
+    val nextState = synchronized(socketStateLock) {
+      val next = transform(socketRuntimeState).copy(updatedAt = System.currentTimeMillis())
+      socketRuntimeState = next
+      next
+    }
+
+    broadcastLocalPayload(nextState.toJson().toString())
+  }
+
+  private fun selectSocketOwnerRegistration(): RuntimeRegistration? {
+    return activeRegistrations.values
+      .filter { it.isSocketCapable() }
+      .sortedWith(
+        compareByDescending<RuntimeRegistration> { it.updatedAt }
+          .thenBy { it.packageName }
+          .thenBy { it.registrationId },
+      )
+      .firstOrNull()
+  }
+
+  private fun syncSocketConnection() {
+    val currentOwner = activeSocketOwnerRegistrationId
+      ?.let { activeRegistrations[it] }
+      ?.takeIf { it.isSocketCapable() }
+    val desiredOwner = currentOwner ?: selectSocketOwnerRegistration()
+
+    if (desiredOwner == null) {
+      closeCurrentSocketConnection(clearOwner = true)
+      updateSocketState { current ->
+        current.copy(
+          connected = false,
+          identified = false,
+          status = "idle",
+          attempts = 0,
+          device = "",
+          error = "",
+          code = null,
+          reason = "",
+          ownerRegistrationId = "",
+          ownerPackageName = "",
+          ownerCompanyId = "",
+        )
+      }
+      return
+    }
+
+    val currentOwnerId = activeSocketOwnerRegistrationId
+    val currentSignature = activeSocketOwnerSignature
+    val desiredSignature = desiredOwner.connectionSignature()
+
+    if (
+      currentOwnerId == desiredOwner.registrationId &&
+      currentSignature == desiredSignature &&
+      activeSocket != null
+    ) {
+      return
+    }
+
+    if (currentOwnerId != null) {
+      closeCurrentSocketConnection(clearOwner = true)
+    }
+
+    openSocketConnection(desiredOwner)
+  }
+
+  private fun openSocketConnection(registration: RuntimeRegistration) {
+    reconnectJob?.cancel()
+    reconnectJob = null
+    reconnectAttempt = 0
+    activeSocketOwnerRegistrationId = registration.registrationId
+    activeSocketOwnerSignature = registration.connectionSignature()
+
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = "connecting",
+        attempts = reconnectAttempt,
+        device = registration.deviceId,
+        error = "",
+        code = null,
+        reason = "",
+        ownerRegistrationId = registration.registrationId,
+        ownerPackageName = registration.packageName,
+        ownerCompanyId = registration.companyId,
+      )
+    }
+
+    val request = Request.Builder()
+      .url(registration.socketUrl)
+      .build()
+
+    val webSocket = okHttpClient.newWebSocket(
+      request,
+      object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          reconnectAttempt = 0
+          updateSocketState { current ->
+            current.copy(
+              connected = false,
+              identified = false,
+              status = "open",
+              attempts = reconnectAttempt,
+              device = registration.deviceId,
+              error = "",
+              code = null,
+              reason = "",
+              ownerRegistrationId = registration.registrationId,
+              ownerPackageName = registration.packageName,
+              ownerCompanyId = registration.companyId,
+            )
+          }
+
+          val payload = JSONObject()
+            .put("command", "identify")
+            .put("device", registration.deviceId)
+          webSocket.send(payload.toString())
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketMessage(registration, text)
+        }
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketDisconnect(
+            registrationId = registration.registrationId,
+            code = code,
+            reason = reason,
+            errorMessage = "",
+          )
+        }
+
+        override fun onFailure(
+          webSocket: WebSocket,
+          t: Throwable,
+          response: Response?,
+        ) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketDisconnect(
+            registrationId = registration.registrationId,
+            code = response?.code,
+            reason = response?.message().orEmpty(),
+            errorMessage = t.message.orEmpty(),
+          )
+        }
+      },
+    )
+
+    activeSocket = webSocket
+  }
+
+  private fun isCurrentSocketOwner(
+    registrationId: String,
+    webSocket: WebSocket,
+  ): Boolean {
+    return activeSocketOwnerRegistrationId == registrationId &&
+      activeSocket === webSocket
+  }
+
+  private fun handleActiveSocketDisconnect(
+    registrationId: String,
+    code: Int? = null,
+    reason: String = "",
+    errorMessage: String = "",
+  ) {
+    val registration = activeRegistrations[registrationId]
+    val isManualClose = closingSocketRegistrationId == registrationId
+
+    if (isManualClose) {
+      closingSocketRegistrationId = null
+      if (activeSocketOwnerRegistrationId == registrationId) {
+        activeSocket = null
+      }
+      return
+    }
+
+    if (activeSocketOwnerRegistrationId != registrationId) {
+      return
+    }
+
+    activeSocket = null
+
+    val nextStatus = if (errorMessage.isNotBlank()) "error" else "disconnected"
+
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = nextStatus,
+        attempts = reconnectAttempt,
+        device = registration?.deviceId ?: current.device,
+        error = errorMessage.ifBlank { current.error.ifBlank { reason } },
+        code = code,
+        reason = reason,
+        ownerRegistrationId = registration?.registrationId ?: current.ownerRegistrationId,
+        ownerPackageName = registration?.packageName ?: current.ownerPackageName,
+        ownerCompanyId = registration?.companyId ?: current.ownerCompanyId,
+      )
+    }
+
+    scheduleSocketReconnect()
+  }
+
+  private fun scheduleSocketReconnect() {
+    if (reconnectJob?.isActive == true) {
+      return
+    }
+
+    reconnectAttempt = (reconnectAttempt + 1).coerceAtMost(8)
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = "reconnecting",
+        attempts = reconnectAttempt,
+      )
+    }
+
+    val delayMs = min(12000L, 1500L * (1L shl min(reconnectAttempt, 4)))
+    reconnectJob = serviceScope.launch {
+      delay(delayMs)
+      reconnectJob = null
+      syncSocketConnection()
+    }
+  }
+
+  private fun closeCurrentSocketConnection(clearOwner: Boolean = true) {
+    reconnectJob?.cancel()
+    reconnectJob = null
+    reconnectAttempt = 0
+
+    val currentSocket = activeSocket
+    val closingRegistrationId = activeSocketOwnerRegistrationId
+    if (currentSocket != null && !closingRegistrationId.isNullOrEmpty()) {
+      closingSocketRegistrationId = closingRegistrationId
+    } else {
+      closingSocketRegistrationId = null
+    }
+
+    runCatching {
+      currentSocket?.close(1000, "refresh")
+    }
+    activeSocket = null
+
+    if (clearOwner) {
+      activeSocketOwnerRegistrationId = null
+      activeSocketOwnerSignature = null
+    }
+  }
+
+  private fun handleActiveSocketMessage(
+    registration: RuntimeRegistration,
+    payload: String,
+  ) {
+    val normalizedPayload = payload.trim()
+    if (normalizedPayload.isEmpty()) {
+      return
+    }
+
+    runCatching {
+      if (normalizedPayload.startsWith("[")) {
+        val events = JSONArray(normalizedPayload)
+        val stores = linkedSetOf<String>()
+        val companies = linkedSetOf<String>()
+
+        for (index in 0 until events.length()) {
+          val event = events.optJSONObject(index) ?: continue
+          processEvent(registration, event)
+          collectSocketEventSummary(event, stores, companies)
+        }
+
+        updateSocketState { current ->
+          current.copy(
+            connected = true,
+            identified = true,
+            status = "connected",
+            attempts = 0,
+            device = registration.deviceId,
+            error = "",
+            code = null,
+            reason = "",
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+            lastEventAt = System.currentTimeMillis(),
+            lastEventCount = events.length(),
+            lastStores = stores.toList(),
+            lastCompanies = companies.toList(),
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        return@runCatching
+      }
+
+      val json = JSONObject(normalizedPayload)
+      val status = safeTrim(json.opt("status")).lowercase()
+
+      if (status == "identified" || status == "ok") {
+        updateSocketState { current ->
+          current.copy(
+            connected = true,
+            identified = true,
+            status = "connected",
+            attempts = 0,
+            device = registration.deviceId,
+            error = "",
+            code = null,
+            reason = "",
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        return@runCatching
+      }
+
+      if (status == "error") {
+        val message = safeTrim(json.opt("message")).ifEmpty {
+          "WebSocket identify failed"
+        }
+
+        updateSocketState { current ->
+          current.copy(
+            connected = false,
+            identified = false,
+            status = "error",
+            attempts = reconnectAttempt,
+            device = registration.deviceId,
+            error = message,
+            code = null,
+            reason = message,
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        handleActiveSocketDisconnect(
+          registrationId = registration.registrationId,
+          errorMessage = message,
+        )
+        return@runCatching
+      }
+
+      processEvent(registration, json)
+      val stores = linkedSetOf<String>()
+      val companies = linkedSetOf<String>()
+      collectSocketEventSummary(json, stores, companies)
+
+      updateSocketState { current ->
+        current.copy(
+          connected = true,
+          identified = true,
+          status = "connected",
+          attempts = 0,
+          device = registration.deviceId,
+          error = "",
+          code = null,
+          reason = "",
+          ownerRegistrationId = registration.registrationId,
+          ownerPackageName = registration.packageName,
+          ownerCompanyId = registration.companyId,
+          lastEventAt = System.currentTimeMillis(),
+          lastEventCount = 1,
+          lastStores = stores.toList(),
+          lastCompanies = companies.toList(),
+        )
+      }
+
+      broadcastLocalPayload(normalizedPayload)
+    }
+  }
+
+  private fun collectSocketEventSummary(
+    event: JSONObject,
+    stores: MutableSet<String>,
+    companies: MutableSet<String>,
+  ) {
+    val store = safeTrim(event.opt("store")).lowercase()
+    if (store.isNotEmpty()) {
+      stores.add(store)
+    }
+
+    val companyId = safeTrim(
+      event.optJSONObject("company")?.opt("id")
+        ?: event.opt("companyId")
+        ?: event.opt("company"),
+    )
+    if (companyId.isNotEmpty()) {
+      companies.add(companyId)
     }
   }
 
@@ -1361,6 +1972,9 @@ class BackgroundRuntimeService : Service() {
     spoolPollingJob?.cancel()
     spoolPollingJob = null
 
+    reconnectJob?.cancel()
+    reconnectJob = null
+
     leaderServerJob?.cancel()
     leaderServerJob = null
 
@@ -1368,6 +1982,20 @@ class BackgroundRuntimeService : Service() {
       leaderSocket?.close()
     }
     leaderSocket = null
+
+    localEventServerJob?.cancel()
+    localEventServerJob = null
+
+    runCatching {
+      localEventSocket?.close()
+    }
+    localEventSocket = null
+
+    localEventClients.keys.toList().forEach { clientId ->
+      closeLocalEventClient(clientId)
+    }
+
+    closeCurrentSocketConnection(clearOwner = true)
 
     activeSockets.keys.toList().forEach { registrationId ->
       closeSocketConnection(registrationId)
