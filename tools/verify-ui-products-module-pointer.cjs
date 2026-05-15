@@ -7,7 +7,7 @@ if (!gitmodules.includes('modules/controleonline/ui-products')) {
   throw new Error('ui-products submodule is not registered in .gitmodules');
 }
 
-const expectedPointer = '0fccde47316c220d4bf4ebdc48a54c310e2abfba';
+const expectedPointer = 'df5d20a36408df2db43d3b5a1a4df5cce1b00567';
 const lsTreeOutput = execFileSync(
   'git',
   ['ls-tree', 'HEAD', 'modules/controleonline/ui-products'],
