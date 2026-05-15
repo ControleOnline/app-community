@@ -102,3 +102,13 @@
 - Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
 - A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
+
+## Regra transversal de dock operacional
+- Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
+
+## Regra transversal de runtime em background
+- Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.
+- O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
+- O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
+- Notificacoes de pedido recebidas pelo runtime de background pertencem ao servico nativo; o app aberto nao deve duplicar alerta para mensagens marcadas como vindas do background.
+- A versao web do manager continua usando websocket no browser. Compartilhamento de websocket entre abas web deve ser tratado separadamente por mecanismo de browser, sem depender do runtime Android.

@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.3.18",
+  "version": "1.3.26",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -10,7 +10,7 @@
     "start:clear": "expo start -c",
     "lint": "eslint .",
     "test": "jest",
-    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=modules/controleonline/ui-common/src/tests/react/utils/"
+    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
@@ -81,6 +81,7 @@
     "metro-config": "*",
     "metro-react-native-babel-preset": "*",
     "metro-transform-worker": "*",
+    "react-test-renderer": "19.1.0",
     "typescript": "*"
   },
   "engines": {
