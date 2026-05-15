@@ -24,6 +24,10 @@ import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
 import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
 
 import { env } from '@env'
+import {
+  normalizeInitialBrowserPath,
+  normalizeProductDetailsTabPath,
+} from './browserPath'
 
 const Stack = createNativeStackNavigator()
 
@@ -139,33 +143,7 @@ const routeDefinitions = allRoutes.filter(
   route => route?.name && route?.component,
 )
 
-const PRODUCT_DETAILS_TAB_PATH_REGEX =
-  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque)([?#].*)?$/i
-
-const normalizeProductDetailsTabPath = path => {
-  const normalizedPath = String(path || '')
-  const productDetailsTabMatch = normalizedPath.match(PRODUCT_DETAILS_TAB_PATH_REGEX)
-
-  if (!productDetailsTabMatch?.[1]) {
-    return normalizedPath
-  }
-
-  return `product-details/${productDetailsTabMatch[1]}${productDetailsTabMatch[2] || ''}`
-}
-
-const normalizeInitialBrowserPath = () => {
-  if (typeof window === 'undefined') return
-
-  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
-  const normalizedPath = normalizeProductDetailsTabPath(currentPath)
-  const nextPath = normalizedPath.startsWith('/') ? normalizedPath : `/${normalizedPath}`
-
-  if (nextPath === currentPath) return
-
-  window.history.replaceState(window.history.state, '', nextPath)
-}
-
-normalizeInitialBrowserPath()
+normalizeInitialBrowserPath(globalThis?.window)
 
 const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
   const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
