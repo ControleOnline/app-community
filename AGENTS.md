@@ -39,6 +39,7 @@
 - Nomear arquivos e classes de forma consistente com os módulos atuais.
 - Em modais e popups operacionais que reaproveitam telas canônicas, o cabeçalho e a barra de ações também devem ser reaproveitados dos arquivos-fonte do fluxo principal. Impressão e ações irmãs ficam sempre na mesma barra padronizada, nunca em botões soltos paralelos.
 - Identificação visual de pedido não pode ser redesenhada por tela. Cards, modais e detalhes operacionais devem reaproveitar o componente canônico `OrderHeader`, normalizando o payload se preciso, mas sem recriar número, cliente, datas ou status manualmente.
+- Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
 
 
 ## Convenções
@@ -110,5 +111,7 @@
 - Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.
 - O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
 - O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
-- Notificacoes de pedido recebidas pelo runtime de background pertencem ao servico nativo; o app aberto nao deve duplicar alerta para mensagens marcadas como vindas do background.
+- Notificacoes de pedido recebidas pelo runtime de background pertencem ao servico nativo, mas todos os apps com som configurado devem continuar tocando aviso sonoro para `order.created` mesmo que a notificacao do sistema tambem apareca.
+- Som de pedido configurado no device vale para qualquer `APP_TYPE`, incluindo KDS, Manager e PDV; deve ser enviado ao runtime nativo como configuracao de device para funcionar com o app Android fechado.
+- O Manager tambem possui configuracao de som por usuario; ela deve ser enviada separadamente ao runtime nativo como configuracao de usuario e nao deve alterar KDS, PDV ou outros apps.
 - A versao web do manager continua usando websocket no browser. Compartilhamento de websocket entre abas web deve ser tratado separadamente por mecanismo de browser, sem depender do runtime Android.
