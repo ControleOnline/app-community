@@ -5,6 +5,11 @@ on:
     branches:
       - master
       - staging
+    paths:
+      - .gitmodules
+      - modules/controleonline/ui-contracts
+      - .github/workflows/ui-contracts-module-composition-check.yml
+      - tools/verify-ui-contracts-module-pointer.cjs
 
 jobs:
   verify-ui-contracts-pointer:
@@ -12,12 +17,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: recursive
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
 
