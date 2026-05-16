@@ -7,6 +7,8 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.util.Base64
@@ -200,6 +202,12 @@ internal data class RuntimeRegistration(
   val deviceId: String,
   val deviceType: String,
   val notificationEnabled: Boolean,
+  val alertSoundEnabled: Boolean,
+  val alertSoundUrl: String,
+  val deviceAlertSoundEnabled: Boolean,
+  val deviceAlertSoundUrl: String,
+  val userAlertSoundEnabled: Boolean,
+  val userAlertSoundUrl: String,
   val printEnabled: Boolean,
   val managedPrinters: List<RuntimeManagedPrinter>,
   val socketUrl: String,
@@ -226,6 +234,12 @@ internal data class RuntimeRegistration(
       .put("deviceId", deviceId)
       .put("deviceType", deviceType)
       .put("notificationEnabled", notificationEnabled)
+      .put("alertSoundEnabled", alertSoundEnabled)
+      .put("alertSoundUrl", alertSoundUrl)
+      .put("deviceAlertSoundEnabled", deviceAlertSoundEnabled)
+      .put("deviceAlertSoundUrl", deviceAlertSoundUrl)
+      .put("userAlertSoundEnabled", userAlertSoundEnabled)
+      .put("userAlertSoundUrl", userAlertSoundUrl)
       .put("printEnabled", printEnabled)
       .put("managedPrinters", printerArray)
       .put("socketUrl", socketUrl)
@@ -265,7 +279,29 @@ internal data class RuntimeRegistration(
       token,
       socketUrl,
       appDomain,
+      alertSoundEnabled,
+      alertSoundUrl,
+      deviceAlertSoundEnabled,
+      deviceAlertSoundUrl,
+      userAlertSoundEnabled,
+      userAlertSoundUrl,
     ).joinToString("|")
+  }
+
+  fun resolveAlertSoundUrl(): String {
+    if (userAlertSoundEnabled && userAlertSoundUrl.isNotEmpty()) {
+      return userAlertSoundUrl
+    }
+
+    if (deviceAlertSoundEnabled && deviceAlertSoundUrl.isNotEmpty()) {
+      return deviceAlertSoundUrl
+    }
+
+    if (alertSoundEnabled && alertSoundUrl.isNotEmpty()) {
+      return alertSoundUrl
+    }
+
+    return ""
   }
 
   companion object {
@@ -302,6 +338,12 @@ internal data class RuntimeRegistration(
         deviceId = normalizeDeviceId(json.opt("deviceId")),
         deviceType = safeTrim(json.opt("deviceType")),
         notificationEnabled = json.optBoolean("notificationEnabled", true),
+        alertSoundEnabled = json.optBoolean("alertSoundEnabled", false),
+        alertSoundUrl = safeTrim(json.opt("alertSoundUrl")),
+        deviceAlertSoundEnabled = json.optBoolean("deviceAlertSoundEnabled", false),
+        deviceAlertSoundUrl = safeTrim(json.opt("deviceAlertSoundUrl")),
+        userAlertSoundEnabled = json.optBoolean("userAlertSoundEnabled", false),
+        userAlertSoundUrl = safeTrim(json.opt("userAlertSoundUrl")),
         printEnabled = json.optBoolean("printEnabled", false),
         managedPrinters = managedPrinters,
         socketUrl = safeTrim(json.opt("socketUrl")),
@@ -1408,6 +1450,7 @@ class BackgroundRuntimeService : Service() {
       realStatus == "open"
     ) {
       serviceScope.launch {
+        playAlertSound(registration)
         showOrderNotification(
           registration,
           enrichOrderNotificationEvent(registration, event),
@@ -1419,6 +1462,35 @@ class BackgroundRuntimeService : Service() {
       serviceScope.launch {
         pollRegistrationSpools(registration)
       }
+    }
+  }
+
+  private fun playAlertSound(registration: RuntimeRegistration) {
+    val alertSoundUrl = registration.resolveAlertSoundUrl()
+    if (alertSoundUrl.isBlank()) {
+      return
+    }
+
+    val player = MediaPlayer()
+    runCatching {
+      player.setOnPreparedListener { preparedPlayer ->
+        runCatching {
+          preparedPlayer.start()
+        }.onFailure {
+          preparedPlayer.release()
+        }
+      }
+      player.setOnCompletionListener { completedPlayer ->
+        completedPlayer.release()
+      }
+      player.setOnErrorListener { errorPlayer, _, _ ->
+        errorPlayer.release()
+        true
+      }
+      player.setDataSource(this, Uri.parse(alertSoundUrl))
+      player.prepareAsync()
+    }.onFailure {
+      player.release()
     }
   }
 
