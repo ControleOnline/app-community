@@ -20,6 +20,7 @@ import loginRoutes from '@controleonline/ui-login/src/react/router/routes'
 import managerRoutes from '@controleonline/ui-manager/src/react/router/routes'
 import ordersRoutes from '@controleonline/ui-orders/src/react/router/routes'
 import peopleRoutes from '@controleonline/ui-people/src/react/router/routes'
+import logisticRoutes from '@controleonline/ui-logistic/src/react/router/routes'
 import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
 import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
 
@@ -107,6 +108,7 @@ export const allRoutes = [
   ...loginRoutes,
   ...managerRoutes,
   ...ordersRoutes,
+  ...logisticRoutes,
   ...peopleRoutes,
   ...productsRoutes,
   ...shopRoutes
