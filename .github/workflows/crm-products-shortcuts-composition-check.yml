@@ -1,0 +1,23 @@
+name: CRM Products Shortcuts Composition Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - task-*
+
+jobs:
+  verify-crm-products-shortcuts-composition:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify CRM products shortcuts module pointers
+        run: node tools/verify-crm-products-shortcuts-module-pointers.cjs
