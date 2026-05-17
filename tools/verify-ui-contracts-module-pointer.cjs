@@ -2,34 +2,51 @@ const fs = require('fs');
 const { execFileSync } = require('child_process');
 
 const submodulePath = 'modules/controleonline/ui-contracts';
+const expectedPointer = 'f7422babca14d5ac5a6a8132206ba39a42d63490';
 const gitmodules = fs.readFileSync('.gitmodules', 'utf8');
 
 if (!gitmodules.includes(submodulePath)) {
   throw new Error('ui-contracts submodule is not registered in .gitmodules');
 }
 
-const gitlinkLine = execFileSync(
-  'git',
-  ['ls-tree', 'HEAD', submodulePath],
-  { encoding: 'utf8' }
-).trim();
+function readRecordedGitlinkPointer() {
+  let gitlinkLine = '';
 
-if (!gitlinkLine) {
-  throw new Error(`No gitlink found for ${submodulePath}`);
+  try {
+    gitlinkLine = execFileSync('git', ['ls-tree', 'HEAD', submodulePath], {
+      encoding: 'utf8',
+    }).trim();
+  } catch (error) {
+    throw new Error(
+      `Unable to read the recorded gitlink for ${submodulePath}: ${error.message}`
+    );
+  }
+
+  if (!gitlinkLine) {
+    throw new Error(`No gitlink found for ${submodulePath}`);
+  }
+
+  const match = gitlinkLine.match(/^(\d+)\s+(\w+)\s+([0-9a-f]{40})\t/);
+
+  if (!match) {
+    throw new Error(`Invalid gitlink entry for ${submodulePath}: ${gitlinkLine}`);
+  }
+
+  const [, mode, type, sha] = match;
+
+  if (mode !== '160000' || type !== 'commit') {
+    throw new Error(`Unexpected gitlink metadata for ${submodulePath}: ${gitlinkLine}`);
+  }
+
+  return sha;
 }
 
-const expectedPointer = gitlinkLine.split(/\s+/)[2];
+const recordedPointer = readRecordedGitlinkPointer();
 
-const actualPointer = execFileSync(
-  'git',
-  ['-C', submodulePath, 'rev-parse', 'HEAD'],
-  { encoding: 'utf8' }
-).trim();
-
-if (actualPointer !== expectedPointer) {
+if (recordedPointer !== expectedPointer) {
   throw new Error(
-    `ui-contracts submodule HEAD mismatch: expected ${expectedPointer}, got ${actualPointer}`
+    `ui-contracts pointer mismatch: expected ${expectedPointer}, got ${recordedPointer}`
   );
 }
 
-console.log(`ui-contracts submodule is pinned to ${expectedPointer}`);
+console.log(`ui-contracts module pointer matches ${expectedPointer}`);
