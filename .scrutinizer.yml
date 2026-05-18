@@ -5,7 +5,7 @@ build:
   nodes:
     analysis:
       environment:
-        node: v16
+        node: v20
       project_setup:
         override: true
       tests:
