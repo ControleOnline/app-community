@@ -1,0 +1,113 @@
+name: Cielo Deploy PDV / LAVE-GO
+
+# para executar sempre que subir um branch do tipo production    
+#on:
+#  push:
+#    branches: [master]
+
+# executa quando é chamado por outro workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_TYPE: POS
+      APP_DISPLAY_NAME: PDV
+      PACKAGE_NAME: com.lavego.app
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://api.lave-go.com',\
+          DOMAIN: 'https://app.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://api.lave-go.com',\
+          APP_TYPE: '${APP_TYPE}',\
+          ZOOM: 0.80,\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Configure Assets by APP_TYPE
+        run: node scripts/configure-assets.js
+        env:
+          APP_TYPE: ${{ env.APP_TYPE }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+
+      - name: Update versionCode in app.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo "$VERSION" | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleRelease --init-script ../signing.gradle
+
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Upload APK to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/apk/release"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          forceSsl: false
