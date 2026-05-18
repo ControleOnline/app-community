@@ -2,8 +2,8 @@ const { execSync } = require('node:child_process');
 const assert = require('node:assert/strict');
 
 const expectedPointers = {
-  'modules/controleonline/ui-crm': 'eb5bb8cc7eb9c40c71d3bfadb2b0397e35f6bcb5',
-  'modules/controleonline/ui-contracts': 'd193cdb7859c8b67b237a66c3bd7aa0be659981a',
+  'modules/controleonline/ui-crm': 'e3e7069e7d7518eaa592961d47179d2040a2e60b',
+  'modules/controleonline/ui-contracts': '21b6feee935d5b02717e6667db29fd6feffb0759',
 };
 
 function readGitlink(path) {
