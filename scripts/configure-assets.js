@@ -6,13 +6,29 @@ const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
 
 const appType = (process.env.APP_TYPE || 'MANAGER').toUpperCase();
 const appLower = appType.toLowerCase();
+
+// 18/05/2026 // se ASSETS_VARIANT existir, usa ela; senão, comportamento atual
+const assetsFolder = (process.env.ASSETS_VARIANT || appType).toLowerCase();
+
 const assetsBasePath = `./src/assets/${appLower}/`;
 
+/*
 const updateAssetPath = (currentPath) => {
   if (typeof currentPath === 'string' && currentPath.startsWith('./src/assets/')) {
     return currentPath.replace(
       /^\.\/src\/assets\/([^/]+)\//,
       `./src/assets/${appLower}/`
+    );
+  }
+  return currentPath;
+};
+*/
+// 18/05/2026 // para ler os ícones da lave-go
+const updateAssetPath = (currentPath) => {
+  if (typeof currentPath === 'string' && currentPath.startsWith('./src/assets/')) {
+    return currentPath.replace(
+      /^\.\/src\/assets\/([^/]+)\//,
+      `./src/assets/${assetsFolder}/`
     );
   }
   return currentPath;
