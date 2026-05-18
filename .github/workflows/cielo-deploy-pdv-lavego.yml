@@ -1,21 +1,20 @@
 name: Deploy Cielo PDV LAVEGO
 
-# para executar sempre que subir um branch do tipo production    
-#on:
-#  push:
-#    branches: [master]
+# para executar sempre que subir um branch do tipo production
+# on:
+#   push:
+#     branches: [master]
 
-# executa quando Ž chamado por outro workflow
+# executa quando Ã© chamado por outro workflow
 on:
   workflow_run:
-    workflows: ["Deploy Android Apps"] # NÌO MUDAR ESSE NOME
-# caso precise mudar, tem que alterar tambŽm dentro do script do Google
-# android-deploy-global.yml
-
+    workflows: ["Deploy Android Apps"] # NÃƒO MUDAR ESSE NOME
+    # caso precise mudar, tem que alterar tambÃ©m dentro do script do Google
+    # android-deploy-global.yml
     types: [completed]
     branches: [staging]
-  workflow_dispatch:
-  
+  workflow_dispatch: {}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -83,10 +82,12 @@ jobs:
         run: |
           mkdir -p ./config/android
           echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
-          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          } > ./config/android/env.properties
 
       - name: Update versionCode in app.json
         run: |
@@ -107,7 +108,7 @@ jobs:
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
