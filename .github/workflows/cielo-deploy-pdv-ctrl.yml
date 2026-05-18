@@ -1,4 +1,4 @@
-name: Deploy Cielo App
+name: Cielo Deploy PDV / CONTROLE ONLINE
 
 # para executar sempre que subir um branch do tipo production    
 #on:
