@@ -7,8 +7,15 @@ name: Cielo Deploy PDV / LAVE-GO
 
 # executa quando é chamado por outro workflow
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
+# caso precise mudar, tem que alterar também dentro do script do Google
+# android-deploy-global.yml
 
+    types: [completed]
+    branches: [staging]
+  workflow_dispatch: {}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
