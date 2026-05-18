@@ -1178,7 +1178,7 @@ class BackgroundRuntimeService : Service() {
           handleActiveSocketDisconnect(
             registrationId = registration.registrationId,
             code = response?.code,
-            reason = response?.message().orEmpty(),
+            reason = response?.message.orEmpty(),
             errorMessage = t.message.orEmpty(),
           )
         }
