@@ -1,4 +1,4 @@
-name: Cielo Deploy PDV LAVEGO
+name: Deploy Cielo PDV LAVEGO
 
 # para executar sempre que subir um branch do tipo production    
 #on:

@@ -1,4 +1,4 @@
-name: Cielo Deploy PDV CONTROLE ONLINE
+name: Deploy Cielo PDV CONTROLE ONLINE
 
 # para executar sempre que subir um branch do tipo production    
 #on:
