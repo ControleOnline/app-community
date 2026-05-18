@@ -1,38 +1,29 @@
-name: Cielo Deploy PDV / LAVE-GO TESTE
+name: Cielo Deploy PDV LAVEGO
 
 # para executar sempre que subir um branch do tipo production    
 #on:
 #  push:
 #    branches: [master]
 
-# executa quando Ã© chamado por outro workflow
+# executa quando Ž chamado por outro workflow
 on:
   workflow_run:
-    workflows: ["Deploy Android Apps"] # NÃƒO MUDAR ESSE NOME
-# caso precise mudar, tem que alterar tambÃ©m dentro do script do Google
+    workflows: ["Deploy Android Apps"] # NÌO MUDAR ESSE NOME
+# caso precise mudar, tem que alterar tambŽm dentro do script do Google
 # android-deploy-global.yml
 
     types: [completed]
-    branches: [master]
+    branches: [staging]
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - app_type: POS
-            display_name: "PDV"
-            track: internal
-            release_status: completed
-            changes_not_sent_for_review: false
-
     env:
-      APP_TYPE: ${{ matrix.app_type }}
-      APP_DISPLAY_NAME: ${{ matrix.display_name }}
+      APP_TYPE: POS
+      APP_DISPLAY_NAME: PDV
+      PACKAGE_NAME: com.lavego.app
 
     steps:
       - uses: actions/checkout@v5
@@ -50,19 +41,17 @@ jobs:
           build-tools-version: 36.0.0
           ndk-version: 27.1.12297006
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
 
       - name: Generate Dynamic Configs
         run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-
           echo "const env = {\
-          API_ENTRYPOINT: 'https://api.controleonline.com',\
-          DOMAIN: 'https://app.controleonline.com',\
-          MANAGER_APP: 'https://app.controleonline.com',\
-          SOCKET: 'wss://api.controleonline.com',\
+          API_ENTRYPOINT: 'https://api.lave-go.com',\
+          DOMAIN: 'https://app.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://api.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
@@ -76,15 +65,6 @@ jobs:
           };\
           module.exports = { env };" > ./config/env.local.js
 
-      - name: Backup app.json
-        run: cp app.json app.json.backup
-
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/manager/${APP_LOWER}/g" app.json
-
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets.js
         env:
@@ -92,8 +72,10 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+
       - name: Fix Expo Dependencies
         run: npx expo install --fix
+
       - name: Prebuild
         run: npx expo prebuild --clean
 
@@ -109,11 +91,11 @@ jobs:
       - name: Update versionCode in app.json
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          VERSION_CODE=$(echo $VERSION | tr -d '.')
+          VERSION_CODE=$(echo "$VERSION" | tr -d '.')
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.android.versionCode = parseInt('$VERSION_CODE');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "
 
@@ -121,11 +103,6 @@ jobs:
         run: |
           cd android
           ./gradlew assembleRelease --init-script ../signing.gradle
-
-      - name: Set Dynamic Package Name
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Extract App Version
         run: |
@@ -141,22 +118,3 @@ jobs:
           localDir: "./android/app/build/outputs/apk/release"
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
-
-      - name: Restore app.json (revert dynamic changes)
-        run: |
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          cp app.json.backup app.json
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            app.expo.android.versionCode = $VERSION_CODE;
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
-
-      - name: Commit app.json changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.json
-          git commit -m "chore: update versionCode to ${{ env.VERSION }}"
-          git push
