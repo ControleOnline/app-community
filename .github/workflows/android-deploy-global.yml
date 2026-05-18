@@ -59,7 +59,7 @@ jobs:
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Update Submodules
         run: |
@@ -74,7 +74,7 @@ jobs:
           build-tools-version: 36.0.0
           ndk-version: 27.1.12297006
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
 

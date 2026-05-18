@@ -35,7 +35,7 @@ jobs:
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Update Submodules
         run: |
