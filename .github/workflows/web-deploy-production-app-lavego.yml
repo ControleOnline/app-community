@@ -1,7 +1,7 @@
 name: Deploy Project app.lave-go.com
 on:
   push:
-    branches: [master]
+    branches: [staging]
   workflow_dispatch:
 jobs:
   build:
