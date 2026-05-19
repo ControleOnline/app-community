@@ -112,8 +112,8 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
-          ./gradlew assembleRelease --init-script ../signing.gradle --stacktrace --info
-
+          ./gradlew assembleRelease --init-script ../signing.gradle
+          
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
