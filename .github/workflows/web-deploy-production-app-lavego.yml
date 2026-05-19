@@ -1,4 +1,4 @@
-name: Deploy Project Manager LaveGo
+name: Deploy Project app.lave-go.com
 on:
   push:
     branches: [master]
@@ -7,8 +7,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
       - name: Creating Config
@@ -43,14 +43,14 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-            server: ${{ secrets.FTPHOSTLAVEGO }}
-            username: ${{ secrets.FTPUSERLAVEGO }}
-            password: ${{ secrets.FTPPASSLAVEGO }}
+            server: ${{ secrets.FTPHOST_APPLAVEGO }}
+            username: ${{ secrets.FTPUSER_APPLAVEGO }}
+            password: ${{ secrets.FTPPASS_APPLAVEGO }}
             protocol: ftps
             port: 21
             security: loose
             local-dir: ./dist/
-            server-dir: public_html/
+            server-dir: /
             exclude: |
               **/.git*
               **/.git*/**
