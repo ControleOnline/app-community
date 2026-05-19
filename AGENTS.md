@@ -58,6 +58,7 @@
 - Preferir usar o getter reload no store em vez de criar funções de reload
 - Usar o loading único do sistema e melhorá-lo se precisar, assim como o módulo de exibição de erros (state store)
 - Todo erro visual do sistema deve usar o componente único de erro transitório centralizado no `MessageService` de `ui-common`, recebendo o erro, exibindo por alguns segundos e sumindo sozinho. Não criar banners/toasts/alerts paralelos para erro.
+- O contrato canonico de erro HTTP do backend e o envelope do `HydratorService` com `@type: Error`, `hydra:title` e `hydra:description`; o frontend deve tratar esse formato como fonte principal de mensagem.
 - Em máscaras, calculos e todos os tipos de helpers, usar um repositório do sistema e mentê-lo sempre organizado e em arquivos pequenos
 - Manter as telas sempre componentizadas, reaproveitando tudo o que é possível, e mantendo tudo pequeno e organizado.
 - Separar CSS dos arquivos de JS.
