@@ -1,14 +1,20 @@
-name: Deploy Android Apps # NÃO MUDAR ESSE NOME!!!
-# caso precise mudar, tem que alterar também dentro do script da Cielo
-# cielo-deploy-pdv.yml
+name: Deploy Cielo PDV CONTROLE ONLINE
 
+# para executar sempre que subir um branch do tipo production    
+#on:
+#  push:
+#    branches: [master]
+
+# executa quando é chamado por outro workflow
 on:
-  push:
-    branches: [master]
+  workflow_run:
+    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
+# caso precise mudar, tem que alterar também dentro do script do Google
+# android-deploy-global.yml
 
-permissions:
-  contents: read
-  actions: write
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,38 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - app_type: CHECKOUT
-            display_name: "Checkout"
-            track: internal
-            release_status: draft
-            changes_not_sent_for_review: true
-
-          - app_type: CRM
-            display_name: "CRM"
-            track: internal
-            release_status: completed
-            changes_not_sent_for_review: false
-
-          - app_type: DELIVERY
-            display_name: "Delivery"
-            track: internal
-            release_status: draft
-            changes_not_sent_for_review: false
-
-          - app_type: MANAGER
-            display_name: "Gestor"
-            track: internal
-            release_status: completed
-            changes_not_sent_for_review: false
-
           - app_type: POS
             display_name: "PDV"
-            track: internal
-            release_status: completed
-            changes_not_sent_for_review: false
-
-          - app_type: PPC
-            display_name: "PCP"
             track: internal
             release_status: completed
             changes_not_sent_for_review: false
@@ -59,7 +35,7 @@ jobs:
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Update Submodules
         run: |
@@ -74,7 +50,7 @@ jobs:
           build-tools-version: 36.0.0
           ndk-version: 27.1.12297006
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
 
@@ -99,6 +75,9 @@ jobs:
           }\
           };\
           module.exports = { env };" > ./config/env.local.js
+
+      - name: Backup app.json
+        run: cp app.json app.json.backup
 
       - name: Update app.json dynamically
         run: |
@@ -127,59 +106,57 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
 
-      - name: Build Android Bundle
+      - name: Update versionCode in app.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo $VERSION | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE');
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Build Android APK
         run: |
           cd android
-          ./gradlew bundleRelease --init-script ../signing.gradle
+          ./gradlew assembleRelease --init-script ../signing.gradle
 
       - name: Set Dynamic Package Name
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
-          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Decode Service Account
-        run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
-
-      - name: Upload .aab to Play Store
-        uses: r0adkll/upload-google-play@v1
+      - name: Upload APK to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
         with:
-          serviceAccountJson: /tmp/service_account.json
-          packageName: ${{ env.PACKAGE_NAME }}
-          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: ${{ matrix.track }}
-          status: ${{ matrix.release_status }}
-          changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/apk/release"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          forceSsl: false
 
-# para executar o script da CIELO, depois que terminar os outros
-      - name: Trigger Cielo Deploy
-        if: matrix.app_type == 'POS'
-        # NÃO ALTERAR O NOME DO YML
+      - name: Restore app.json (revert dynamic changes)
         run: |
-          gh workflow run cielo-deploy-pdv.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          cp app.json.backup app.json
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = $VERSION_CODE;
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
 
-      - name: Upload AAB Artifact for FTP Task
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.FTP_ARTIFACT_NAME }}
-          path: ./android/app/build/outputs/bundle/release
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Trigger FTP Upload Task
+      - name: Commit app.json changes
         run: |
-          gh workflow run android-deploy-global-ftp.yml \
-            --ref "${GITHUB_REF_NAME}" \
-            -f source_run_id="${GITHUB_RUN_ID}" \
-            -f artifact_name="${FTP_ARTIFACT_NAME}" \
-            -f version="${VERSION}" \
-            -f package_name="${PACKAGE_NAME}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app.json
+          git commit -m "chore: update versionCode to ${{ env.VERSION }}"
+          git push

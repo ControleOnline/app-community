@@ -1,6 +1,7 @@
 name: Deploy Android Apps # NÃO MUDAR ESSE NOME!!!
 # caso precise mudar, tem que alterar também dentro do script da Cielo
-# cielo-deploy-pdv.yml
+# cielo-deploy-pdv-ctrl.yml
+# cielo-deploy-pdv-lavego.yml
 
 on:
   push:
@@ -59,7 +60,7 @@ jobs:
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Update Submodules
         run: |
@@ -74,7 +75,7 @@ jobs:
           build-tools-version: 36.0.0
           ndk-version: 27.1.12297006
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
 
@@ -205,11 +206,20 @@ jobs:
           status: ${{ matrix.release_status }}
           changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
 
-      # para executar o script da CIELO, depois que terminar os outros
-      - name: Trigger Cielo Deploy
+      # para executar o script da CIELO para CONTROLE ONLINE, depois que terminar os outros
+      - name: Trigger Cielo Deploy PDV / CONTROLE ONLINE
         if: matrix.app_type == 'POS'
         # NÃO ALTERAR O NOME DO YML
         run: |
-          gh workflow run cielo-deploy-pdv.yml
+          gh workflow run cielo-deploy-pdv-ctrl.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # para executar o script da CIELO para LAVE-GO, depois que terminar os outros
+      - name: Trigger Cielo Deploy PDV / LAVE-GO
+        if: matrix.app_type == 'POS'
+        # NÃO ALTERAR O NOME DO YML
+        run: |
+          gh workflow run cielo-deploy-pdv-lavego.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
