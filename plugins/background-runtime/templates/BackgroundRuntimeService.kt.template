@@ -156,6 +156,58 @@ private fun parseStringArray(values: JSONArray?): List<String> {
   }
 }
 
+internal data class RuntimeRegistrationScopeKey(
+  val packageName: String,
+  val deviceId: String,
+  val companyId: String,
+)
+
+private fun RuntimeRegistration.scopeKey(): RuntimeRegistrationScopeKey {
+  return RuntimeRegistrationScopeKey(
+    packageName = packageName,
+    deviceId = deviceId,
+    companyId = companyId,
+  )
+}
+
+internal fun pruneRuntimeRegistrations(
+  registrations: Collection<RuntimeRegistration>,
+  now: Long = System.currentTimeMillis(),
+): Map<String, RuntimeRegistration> {
+  val pruned = linkedMapOf<RuntimeRegistrationScopeKey, RuntimeRegistration>()
+
+  registrations
+    .filter { !it.isExpired(now) }
+    .sortedWith(
+      compareByDescending<RuntimeRegistration> { it.updatedAt }
+        .thenBy { it.registrationId },
+    )
+    .forEach { registration ->
+      val key = registration.scopeKey()
+      if (!pruned.containsKey(key)) {
+        pruned[key] = registration
+      }
+    }
+
+  return pruned.values.associateBy { it.registrationId }
+}
+
+internal fun selectSocketOwnerRegistrationCandidate(
+  registrations: Collection<RuntimeRegistration>,
+): RuntimeRegistration? {
+  return registrations
+    .filter { it.isSocketCapable() }
+    .sortedWith(
+      compareByDescending<RuntimeRegistration> {
+        it.appType.equals("MANAGER", ignoreCase = true)
+      }
+        .thenByDescending { it.updatedAt }
+        .thenBy { it.packageName }
+        .thenBy { it.registrationId },
+    )
+    .firstOrNull()
+}
+
 internal data class RuntimeManagedPrinter(
   val deviceId: String,
   val host: String,
@@ -453,36 +505,54 @@ internal object BackgroundRuntimeStore {
       }
     }
 
-    if (registrations.size != parsed.length()) {
-      saveRegistrationsLocked(context, registrations)
+    val prunedRegistrations = pruneRuntimeRegistrations(registrations.values, now)
+
+    if (prunedRegistrations.size != parsed.length()) {
+      saveRegistrationsLocked(context, prunedRegistrations)
     }
 
-    registrations
+    prunedRegistrations
   }
 
   fun upsertRegistration(
     context: Context,
     registration: RuntimeRegistration,
   ) = synchronized(storeLock) {
-    val registrations = loadRegistrationsLocked(context).toMutableMap()
-    registrations[registration.registrationId] = registration.copy(
-      updatedAt = System.currentTimeMillis(),
+    val registrations = loadRegistrationsLocked(context).values.toMutableList()
+    registrations.removeAll {
+      it.packageName == registration.packageName &&
+        it.deviceId == registration.deviceId &&
+        it.companyId == registration.companyId
+    }
+    registrations.add(
+      registration.copy(
+        updatedAt = System.currentTimeMillis(),
+      ),
     )
-    saveRegistrationsLocked(context, registrations)
+    saveRegistrationsLocked(
+      context,
+      pruneRuntimeRegistrations(registrations),
+    )
   }
 
   fun removeRegistration(context: Context, registrationId: String) =
     synchronized(storeLock) {
-      val registrations = loadRegistrationsLocked(context).toMutableMap()
-      registrations.remove(registrationId)
-      saveRegistrationsLocked(context, registrations)
+      val registrations = loadRegistrationsLocked(context).values
+        .filterNot { it.registrationId == registrationId }
+      saveRegistrationsLocked(
+        context,
+        pruneRuntimeRegistrations(registrations),
+      )
     }
 
   fun removePackageRegistrations(context: Context, packageName: String) =
     synchronized(storeLock) {
-      val registrations = loadRegistrationsLocked(context)
-        .filterValues { it.packageName != packageName }
-      saveRegistrationsLocked(context, registrations)
+      val registrations = loadRegistrationsLocked(context).values
+        .filterNot { it.packageName == packageName }
+      saveRegistrationsLocked(
+        context,
+        pruneRuntimeRegistrations(registrations),
+      )
     }
 
   private fun loadRegistrationsLocked(
@@ -1032,14 +1102,7 @@ class BackgroundRuntimeService : Service() {
   }
 
   private fun selectSocketOwnerRegistration(): RuntimeRegistration? {
-    return activeRegistrations.values
-      .filter { it.isSocketCapable() }
-      .sortedWith(
-        compareByDescending<RuntimeRegistration> { it.updatedAt }
-          .thenBy { it.packageName }
-          .thenBy { it.registrationId },
-      )
-      .firstOrNull()
+    return selectSocketOwnerRegistrationCandidate(activeRegistrations.values)
   }
 
   private fun syncSocketConnection() {
