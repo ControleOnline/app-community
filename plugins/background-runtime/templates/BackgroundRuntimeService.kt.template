@@ -587,7 +587,7 @@ internal object BackgroundRuntimeStore {
     preferences(context)
       .edit()
       .putString(REGISTRATIONS_KEY, serialized.toString())
-      .apply()
+      .commit()
   }
 }
 
@@ -660,6 +660,7 @@ class BackgroundRuntimeService : Service() {
   private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
   private val okHttpClient = OkHttpClient.Builder()
     .connectTimeout(SOCKET_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+    .pingInterval(30L, TimeUnit.SECONDS)
     .readTimeout(0L, TimeUnit.MILLISECONDS)
     .build()
   private val refreshMutex = Mutex()
