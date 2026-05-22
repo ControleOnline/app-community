@@ -2,6 +2,12 @@ const { withAndroidManifest } = require('@expo/config-plugins');
 
 const CALLBACK_SCHEME = 'ControleOnline';
 const CALLBACK_HOST = 'POS';
+const OPTIONAL_TV_FEATURES = [
+  'android.hardware.microphone',
+  'android.hardware.location',
+  'android.hardware.location.gps',
+  'android.hardware.location.network',
+];
 
 const ensureUsesFeature = (manifest, featureName, required) => {
   manifest.manifest['uses-feature'] = manifest.manifest['uses-feature'] || [];
@@ -57,6 +63,9 @@ const applyAndroidTVManifest = (manifest, appScheme) => {
 
   ensureUsesFeature(manifest, 'android.software.leanback', false);
   ensureUsesFeature(manifest, 'android.hardware.touchscreen', false);
+  OPTIONAL_TV_FEATURES.forEach(featureName => {
+    ensureUsesFeature(manifest, featureName, false);
+  });
 
   const app = manifest.manifest.application[0];
 
