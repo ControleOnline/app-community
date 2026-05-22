@@ -25,7 +25,7 @@
         "WAKE_LOCK",
         "POST_NOTIFICATIONS"
       ],
-      "tvBanner": "./src/assets/manager/tv.png"
+      "tvBanner": "./src/assets/tv.png"
     },
     "icon": "./src/assets/manager/logo.png",
     "splash": {
