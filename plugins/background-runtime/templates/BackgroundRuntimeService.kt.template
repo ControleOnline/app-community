@@ -1510,8 +1510,12 @@ class BackgroundRuntimeService : Service() {
     if (
       registration.notificationEnabled &&
       store == "orders" &&
-      eventName == "order.created" &&
-      realStatus == "open"
+      (
+        eventName == "order.created" && realStatus == "open" ||
+          eventName == "store.opened" && realStatus == "open" ||
+          eventName == "store.closed" && realStatus == "closed" ||
+          eventName == "cash.closed" && realStatus == "closed"
+        )
     ) {
       serviceScope.launch {
         playAlertSound(registration)
