@@ -42,50 +42,10 @@ module.exports = () => {
   const expo = appJson.expo || {};
   const googleMapsApiKey = resolveGoogleMapsApiKey();
   const plugins = Array.isArray(expo.plugins) ? [...expo.plugins] : [];
-  const nextPlugins = plugins.map(plugin => {
-    if (plugin === 'react-native-maps') {
-      return googleMapsApiKey
-        ? [
-            'react-native-maps',
-            {
-              androidGoogleMapsApiKey: googleMapsApiKey,
-            },
-          ]
-        : plugin;
-    }
-
-    if (!Array.isArray(plugin) || plugin[0] !== 'react-native-maps') {
-      return plugin;
-    }
-
-    if (!googleMapsApiKey) {
-      return plugin;
-    }
-
-    return [
-      'react-native-maps',
-      {
-        ...(plugin[1] || {}),
-        androidGoogleMapsApiKey: googleMapsApiKey,
-      },
-    ];
-  });
-
-  if (
-    googleMapsApiKey &&
-    !nextPlugins.some(
-      plugin =>
-        plugin === 'react-native-maps' ||
-        (Array.isArray(plugin) && plugin[0] === 'react-native-maps'),
-    )
-  ) {
-    nextPlugins.push([
-      'react-native-maps',
-      {
-        androidGoogleMapsApiKey: googleMapsApiKey,
-      },
-    ]);
-  }
+  const nextPlugins = plugins.filter(plugin =>
+    plugin !== 'react-native-maps' &&
+    (!Array.isArray(plugin) || plugin[0] !== 'react-native-maps'),
+  );
 
   return {
     ...expo,
