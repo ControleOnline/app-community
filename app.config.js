@@ -25,9 +25,30 @@ const readEnvValue = (filePath, key) => {
   return rawValue.replace(/^['"]|['"]$/g, '');
 };
 
+const normalizeConfigValue = value => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return value.trim();
+};
+
+const readJsEnvValue = (filePath, key) => {
+  if (!fs.existsSync(filePath)) {
+    return '';
+  }
+
+  try {
+    const fileModule = require(filePath);
+    return normalizeConfigValue(fileModule?.env?.[key]);
+  } catch {
+    return '';
+  }
+};
+
 const resolveEnvValue = (keys, filePath) => {
   for (const key of keys) {
-    const envValue = process.env[key];
+    const envValue = normalizeConfigValue(process.env[key]);
     if (envValue) {
       return envValue;
     }
@@ -43,16 +64,30 @@ const resolveEnvValue = (keys, filePath) => {
   return '';
 };
 
-const resolveGoogleMapsApiKey = () =>
-  resolveEnvValue(
-    [
-      'GMAPS_GOOGLE_CLIENT_ID',
-      'EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID',
-      'GMAPS_KEY',
-      'EXPO_PUBLIC_GMAPS_KEY',
-    ],
-    path.resolve(__dirname, '../api-community/.env.local'),
+const resolveGoogleMapsApiKey = () => {
+  const keys = [
+    'GMAPS_GOOGLE_CLIENT_ID',
+    'EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID',
+    'GMAPS_KEY',
+    'EXPO_PUBLIC_GMAPS_KEY',
+  ];
+
+  const appEnvPath = path.resolve(__dirname, './config/env.local.js');
+  const apiEnvLocalPath = path.resolve(__dirname, '../api-community/.env.local');
+  const apiEnvPath = path.resolve(__dirname, '../api-community/.env');
+
+  for (const key of keys) {
+    const jsEnvValue = readJsEnvValue(appEnvPath, key);
+    if (jsEnvValue) {
+      return jsEnvValue;
+    }
+  }
+
+  return (
+    resolveEnvValue(keys, apiEnvLocalPath) ||
+    resolveEnvValue(keys, apiEnvPath)
   );
+};
 
 module.exports = () => {
   const expo = appJson.expo || {};
