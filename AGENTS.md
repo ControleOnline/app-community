@@ -86,6 +86,7 @@
 - Displays do tipo `products` consomem `order_product_queues`.
 - Telas `tv` e `orders` consomem a arvore completa de `orderProducts`.
 - `showInParentQueue` e regra visual de hierarquia; nao deve virar fila sintética nem persistencia extra.
+- `ProductGroup.showInDisplay` controla apenas a visibilidade operacional do titulo do grupo. Quando falso, o grupo continua existindo para agrupamento e impressao dos itens, mas o titulo fica oculto em `orders`, `tv` e `products`.
 - Toda lista deve ser paginada e ter carregamento infinito
 - Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
 - Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
