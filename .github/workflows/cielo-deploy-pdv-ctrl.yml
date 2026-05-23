@@ -33,6 +33,8 @@ jobs:
     env:
       APP_TYPE: ${{ matrix.app_type }}
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
 
     steps:
       - uses: actions/checkout@v5

@@ -16,6 +16,8 @@ jobs:
       APP_DISPLAY_NAME: PDV
       PACKAGE_NAME: com.lavego.app
       ASSETS_VARIANT: pos_lavego
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
 
     steps:
       - uses: actions/checkout@v5
