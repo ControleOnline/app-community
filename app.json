@@ -9,11 +9,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.44",
+    "version": "1.3.45",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1344,
+      "versionCode": 1345,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -23,7 +23,8 @@
         "VIBRATE",
         "INTERNET",
         "WAKE_LOCK",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "CAMERA"
       ],
       "tvBanner": "./src/assets/tv.png"
     },
@@ -38,6 +39,7 @@
       "jsEngine": "hermes",
       "bundleIdentifier": "com.controleonline.manager",
       "infoPlist": {
+        "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
         "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
         "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
         "UIBackgroundModes": [
@@ -59,6 +61,14 @@
           "android": {
             "kotlinVersion": "2.2.0"
           }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Necessário para ler códigos de barras e QR Codes no PDV.",
+          "microphonePermission": "Necessário para processamento de áudio.",
+          "recordAudioAndroid": false
         }
       ],
       "expo-asset",
