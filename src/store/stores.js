@@ -46,6 +46,7 @@ import product_inventories from '@controleonline/ui-products/src/store/product_i
 import product_unit from '@controleonline/ui-products/src/store/products/product_unit';
 import products from '@controleonline/ui-products/src/store/products';
 import queues from '@controleonline/ui-ppc/src/store/modules/queues';
+import report from '@controleonline/ui-report/src/store/report';
 import status from '@controleonline/ui-common/src/store/status';
 import tasks from '@controleonline/ui-tasks/src/store/tasks';
 import tasksInterations from '@controleonline/ui-tasks/src/store/task_interations';
@@ -108,6 +109,7 @@ export default {
   product_unit,
   products,
   queues,
+  report,
   status,
   tasks,
   tasksInterations,
