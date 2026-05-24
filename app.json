@@ -24,7 +24,8 @@
         "INTERNET",
         "WAKE_LOCK",
         "POST_NOTIFICATIONS",
-        "CAMERA"
+        "CAMERA",
+        "NFC"
       ],
       "tvBanner": "./src/assets/tv.png"
     },
@@ -40,6 +41,7 @@
       "bundleIdentifier": "com.controleonline.manager",
       "infoPlist": {
         "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
+        "NFCReaderUsageDescription": "Necessário para ler tags NFC e RFID no PDV.",
         "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
         "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
         "UIBackgroundModes": [
@@ -69,6 +71,12 @@
           "cameraPermission": "Necessário para ler códigos de barras e QR Codes no PDV.",
           "microphonePermission": "Necessário para processamento de áudio.",
           "recordAudioAndroid": false
+        }
+      ],
+      [
+        "react-native-nfc-manager",
+        {
+          "nfcPermission": "Necessário para ler tags NFC e RFID no PDV."
         }
       ],
       "expo-asset",
