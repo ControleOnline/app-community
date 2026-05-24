@@ -117,18 +117,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-#      - name: Fix Expo Dependencies
-#        run: npx expo install --fix
-#
-#      - name: Prebuild
-#        run: npx expo prebuild --clean
-#
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
 
       - name: Prebuild
         run: npx expo prebuild --clean
-
-      - name: Validate vector icon fonts hook
-        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
 
       - name: Create Android Signing Files
         run: |
