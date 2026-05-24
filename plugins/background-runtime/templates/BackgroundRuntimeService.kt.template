@@ -883,46 +883,48 @@ class BackgroundRuntimeService : Service() {
     }
   }
 
-  private suspend fun refreshRuntime() = refreshMutex.withLock {
-    val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
-    val nextActiveRegistrations = storedRegistrations.values
-      .filter { it.backgroundEnabled && !it.isExpired() }
-      .associateBy { it.registrationId }
+  private suspend fun refreshRuntime() {
+    refreshMutex.withLock {
+      val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
+      val nextActiveRegistrations = storedRegistrations.values
+        .filter { it.backgroundEnabled && !it.isExpired() }
+        .associateBy { it.registrationId }
 
-    if (nextActiveRegistrations.isEmpty()) {
-      activeRegistrations.clear()
-      shutdownRuntime()
-      stopSelfSafely()
-      return
-    }
-
-    if (!ensureLeaderServer()) {
-      nextActiveRegistrations.values.forEach { registration ->
-        BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+      if (nextActiveRegistrations.isEmpty()) {
+        activeRegistrations.clear()
+        shutdownRuntime()
+        stopSelfSafely()
+        return
       }
-      stopSelfSafely()
-      return
-    }
 
-    activeRegistrations.clear()
-    activeRegistrations.putAll(nextActiveRegistrations)
+      if (!ensureLeaderServer()) {
+        nextActiveRegistrations.values.forEach { registration ->
+          BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+        }
+        stopSelfSafely()
+        return
+      }
 
-    ensureLocalEventServer()
-    syncSocketConnection()
-    syncSpoolPolling()
-    updateServiceNotification(nextActiveRegistrations.size)
+      activeRegistrations.clear()
+      activeRegistrations.putAll(nextActiveRegistrations)
 
-    selectSocketOwnerRegistration()?.let { socketOwner ->
-      logRuntimeDebugAsync(
-        registration = socketOwner,
-        message = "Background runtime synced",
-        context = mapOf(
-          "activeRegistrationCount" to nextActiveRegistrations.size,
-          "ownerRegistrationId" to socketOwner.registrationId,
-          "ownerPackageName" to socketOwner.packageName,
-        ),
-        entityClass = "BackgroundRuntime",
-      )
+      ensureLocalEventServer()
+      syncSocketConnection()
+      syncSpoolPolling()
+      updateServiceNotification(nextActiveRegistrations.size)
+
+      selectSocketOwnerRegistration()?.let { socketOwner ->
+        logRuntimeDebugAsync(
+          registration = socketOwner,
+          message = "Background runtime synced",
+          context = mapOf(
+            "activeRegistrationCount" to nextActiveRegistrations.size,
+            "ownerRegistrationId" to socketOwner.registrationId,
+            "ownerPackageName" to socketOwner.packageName,
+          ),
+          entityClass = "BackgroundRuntime",
+        )
+      }
     }
   }
 
