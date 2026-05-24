@@ -52,6 +52,7 @@
       "./withAndroidTV",
       "./withKioskMode",
       "./withBackgroundRuntime",
+      "./withVectorIconsFonts",
       [
         "expo-build-properties",
         {
