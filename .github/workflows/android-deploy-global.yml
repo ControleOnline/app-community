@@ -137,6 +137,9 @@ jobs:
           VERSION=$(node -p "require('./app.json').expo.version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Show Version (v.${{ env.VERSION }})
+        run: echo "Compilando versão ${{ env.VERSION }}"
+
       - name: Upload AAB Artifact for FTP Task
         uses: actions/upload-artifact@v4
         with:
