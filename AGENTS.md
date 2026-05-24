@@ -118,8 +118,10 @@
 - O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
 - O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
 - O runtime de background deve poder religar sozinho no Android por `BOOT_COMPLETED` e `MY_PACKAGE_REPLACED`, reaproveitando as inscricoes persistidas para notificar mesmo sem tela aberta.
-- Notificacoes de pedido recebidas pelo runtime de background pertencem ao servico nativo, mas todos os apps com som configurado devem continuar tocando aviso sonoro para `order.created` mesmo que a notificacao do sistema tambem apareca.
-- Som de pedido configurado no device vale para qualquer `APP_TYPE`, incluindo KDS, Manager e PDV; deve ser enviado ao runtime nativo como configuracao de device para funcionar com o app Android fechado.
-- O Manager tambem possui configuracao de som por usuario; ela deve ser enviada separadamente ao runtime nativo como configuracao de usuario e nao deve alterar KDS, PDV ou outros apps.
-- Quando a URL personalizada de audio estiver vazia, o runtime deve cair para `src/assets/sound/caixa.m4a` empacotado no app. A URL personalizada continua tendo prioridade sobre o fallback.
+- Notificacoes humanas de novos pedidos no `MANAGER` Android sao push nativo FCM direto, sem Expo Push Service, com token salvo em `device.metadata.pushTokens.manager.android.deviceToken`.
+- O click do push humano do `MANAGER` deve navegar para `OrderDetails` com `id` do pedido; nao enviar esse fluxo para KDS/LDS.
+- O runner local nao deve emitir notificacao escrita de novo pedido para `MANAGER` Android, para evitar duplicidade com FCM.
+- KDS, PDV e displays continuam usando websocket/runtime local para som operacional e refresh com o app aberto, sem mensagem humana escrita.
+- Som de pedido configurado no device vale para KDS, PDV e demais fluxos locais; quando a URL personalizada estiver vazia, o runtime deve cair para `src/assets/sound/caixa.m4a` empacotado no app.
+- O canal FCM humano do `MANAGER` usa som padrao do sistema; `caixa.m4a` nao participa desse canal.
 - A versao web do manager tambem usa um runtime compartilhado no browser para websocket, com owner unico por navegador/aba via BroadcastChannel e replicacao do stream para as demais abas. Nenhum componente web deve abrir websocket direto no backend.
