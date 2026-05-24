@@ -81,17 +81,6 @@ jobs:
       - name: Backup app.json
         run: cp app.json app.json.backup
 
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/manager/${APP_LOWER}/g" app.json
-
-      - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets.js
-        env:
-          APP_TYPE: ${{ env.APP_TYPE }}
-
       - name: Install Dependencies
         run: npm install
 #
@@ -154,7 +143,7 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
-      - name: Restore app.json (revert dynamic changes)
+      - name: Restore app.json (keep only versionCode)
         run: |
           VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
           cp app.json.backup app.json

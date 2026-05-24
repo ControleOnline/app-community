@@ -103,17 +103,6 @@ jobs:
           };\
           module.exports = { env };" > ./config/env.local.js
 
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/manager/${APP_LOWER}/g" app.json
-
-      - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets.js
-        env:
-          APP_TYPE: ${{ env.APP_TYPE }}
-
       - name: Install Dependencies
         run: npm install
 

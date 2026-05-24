@@ -14,6 +14,7 @@ jobs:
     env:
       APP_TYPE: POS
       APP_DISPLAY_NAME: PDV
+      APP_SLUG: pos
       PACKAGE_NAME: com.lavego.app
       ASSETS_VARIANT: pos_lavego
       GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
@@ -58,28 +59,6 @@ jobs:
           }\
           };\
           module.exports = { env };" > ./config/env.local.js
-
-      - name: Configure Assets
-        run: node scripts/configure-assets.js
-
-      - name: Update app.json (name + package + slug)
-        run: |
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            app.expo.name = 'On ${{ env.APP_DISPLAY_NAME }}';
-            app.expo.slug = '${{ env.APP_TYPE }}'.toLowerCase();
-            app.expo.android = app.expo.android || {};
-            app.expo.android.package = '${{ env.PACKAGE_NAME }}';
-            if (app.expo.ios) {
-              app.expo.ios.bundleIdentifier = '${{ env.PACKAGE_NAME }}';
-            }
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-            console.log('✓ name:', app.expo.name);
-            console.log('✓ slug:', app.expo.slug);
-            console.log('✓ package:', app.expo.android.package);
-          "
-
 
       - name: Install Dependencies
         run: npm install
