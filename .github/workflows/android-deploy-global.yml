@@ -64,6 +64,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Set Dynamic Package Name
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
+          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
+
       - name: Update Submodules
         run: |
           git submodule sync --recursive
@@ -140,12 +146,6 @@ jobs:
         run: |
           cd android
           ./gradlew bundleRelease --init-script ../signing.gradle
-
-      - name: Set Dynamic Package Name
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
-          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Extract App Version
         run: |

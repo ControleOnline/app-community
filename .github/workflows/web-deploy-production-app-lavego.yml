@@ -43,14 +43,14 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-            server: ${{ secrets.FTPHOST_APPLAVEGO }}
-            username: ${{ secrets.FTPUSER_APPLAVEGO }}
-            password: ${{ secrets.FTPPASS_APPLAVEGO }}
-            protocol: ftps
-            port: 21
-            security: loose
-            local-dir: ./dist/
-            server-dir: /
-            exclude: |
-              **/.git*
-              **/.git*/**
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist/
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
