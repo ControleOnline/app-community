@@ -109,6 +109,21 @@ jobs:
       - name: Fix Expo Dependencies
         run: npx expo install --fix
 
+      - name: Create Firebase Android Config
+        if: matrix.app_type == 'MANAGER'
+        env:
+          FIREBASE_MANAGER_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_MANAGER_GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "${FIREBASE_MANAGER_GOOGLE_SERVICES_JSON}" ]; then
+            echo "Secret FIREBASE_MANAGER_GOOGLE_SERVICES_JSON nao configurado." >&2
+            exit 1
+          fi
+
+          mkdir -p ./config/firebase
+          printf '%s' "${FIREBASE_MANAGER_GOOGLE_SERVICES_JSON}" > ./config/firebase/manager.local.json
+          python3 -m json.tool ./config/firebase/manager.local.json > /dev/null
+          echo "FIREBASE_ANDROID_GOOGLE_SERVICES_FILE=./config/firebase/manager.local.json" >> "$GITHUB_ENV"
+
       - name: Prebuild
         run: npx expo prebuild --clean
 

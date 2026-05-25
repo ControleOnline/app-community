@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
@@ -59,6 +60,7 @@ private const val SPOOL_POLL_INTERVAL_MS = 10000L
 private const val FAILED_SPOOL_RETRY_MS = 30000L
 private const val LOCAL_EVENT_PORT = 41572
 private const val REGISTRATION_TTL_MS = 7L * 24L * 60L * 60L * 1000L
+private const val DEFAULT_ALERT_SOUND_RESOURCE_NAME = "caixa"
 private const val JSON_MIME_TYPE = "application/ld+json"
 private const val FRONTEND_DEBUG_LOG_PATH = "logs/frontend-debug"
 private val EMPTY_REQUEST_BODY = ByteArray(0).toRequestBody(null, 0, 0)
@@ -80,6 +82,16 @@ private fun normalizeOrderId(value: Any?): String {
 
     else -> safeTrim(value).replace(Regex("\\D+"), "")
   }
+}
+
+private fun buildDefaultAlertSoundUri(packageName: String): String {
+  return Uri.Builder()
+    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+    .authority(packageName)
+    .appendPath("raw")
+    .appendPath(DEFAULT_ALERT_SOUND_RESOURCE_NAME)
+    .build()
+    .toString()
 }
 
 private fun parseNumericValue(value: Any?): Double? {
@@ -428,16 +440,29 @@ internal data class RuntimeRegistration(
   }
 
   fun resolveAlertSoundUrl(): String {
-    if (userAlertSoundEnabled && userAlertSoundUrl.isNotEmpty()) {
-      return userAlertSoundUrl
+    if (userAlertSoundEnabled) {
+      if (userAlertSoundUrl.isNotEmpty()) {
+        return userAlertSoundUrl
+      }
+
+      // A configuracao do usuario sempre vence e, vazia, usa o som embutido.
+      return buildDefaultAlertSoundUri(packageName)
     }
 
-    if (deviceAlertSoundEnabled && deviceAlertSoundUrl.isNotEmpty()) {
-      return deviceAlertSoundUrl
+    if (deviceAlertSoundEnabled) {
+      if (deviceAlertSoundUrl.isNotEmpty()) {
+        return deviceAlertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
     }
 
-    if (alertSoundEnabled && alertSoundUrl.isNotEmpty()) {
-      return alertSoundUrl
+    if (alertSoundEnabled) {
+      if (alertSoundUrl.isNotEmpty()) {
+        return alertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
     }
 
     return ""

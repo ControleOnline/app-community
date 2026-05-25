@@ -8,6 +8,14 @@ const DEFAULT_PACKAGE_PREFIX = 'com.controleonline';
 
 const clone = value => JSON.parse(JSON.stringify(value));
 
+const resolveLocalEnv = () => {
+  try {
+    return require('./config/env.local')?.env || {};
+  } catch {
+    return {};
+  }
+};
+
 const removeNamePrefix = value =>
   typeof value === 'string' ? value.replace(/^On\s+/, '') : value;
 
@@ -24,6 +32,7 @@ const updateAssetPath = (currentPath, assetsFolder) => {
 
 module.exports = () => {
   const expo = clone(appJson.expo || {});
+  const localEnv = resolveLocalEnv();
   const appType = (process.env.APP_TYPE || DEFAULT_APP_TYPE).toUpperCase();
   const appLower = appType.toLowerCase();
   const assetsFolder = (process.env.ASSETS_VARIANT || appType).toLowerCase();
@@ -49,6 +58,15 @@ module.exports = () => {
     ...(expo.android || {}),
     package: packageName,
   };
+
+  const firebaseAndroidGoogleServicesFile =
+    process.env.FIREBASE_ANDROID_GOOGLE_SERVICES_FILE ||
+    localEnv.FIREBASE_ANDROID_GOOGLE_SERVICES_FILE;
+
+  if (firebaseAndroidGoogleServicesFile) {
+    expo.android.googleServicesFile =
+      firebaseAndroidGoogleServicesFile;
+  }
 
   if (expo.android.adaptiveIcon?.foregroundImage) {
     expo.android.adaptiveIcon.foregroundImage = updateAssetPath(

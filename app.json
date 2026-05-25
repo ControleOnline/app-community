@@ -81,7 +81,14 @@
       ],
       "expo-asset",
       "expo-font",
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./src/assets/sound/caixa.m4a"
+          ]
+        }
+      ],
       "react-native-iap",
       [
         "expo-audio",
