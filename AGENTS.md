@@ -118,10 +118,10 @@
 - O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
 - O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
 - O runtime de background deve poder religar sozinho no Android por `BOOT_COMPLETED` e `MY_PACKAGE_REPLACED`, reaproveitando as inscricoes persistidas para notificar mesmo sem tela aberta.
-- Notificacoes humanas de novos pedidos no `MANAGER` Android sao push nativo FCM direto, sem Expo Push Service, com token salvo em `device.metadata.pushTokens.manager.android.deviceToken`.
+- Notificacoes humanas de novos pedidos e eventos financeiros (`store.opened`, `store.closed`, `cash.open`, `cash.closed`) no `MANAGER` Android sao push nativo FCM direto, sem Expo Push Service, com token salvo em `device.metadata.pushTokens.manager.android.deviceToken`.
 - O click do push humano do `MANAGER` deve navegar para `OrderDetails` com `id` do pedido; nao enviar esse fluxo para KDS/LDS.
-- O runner local nao deve emitir notificacao escrita de novo pedido para `MANAGER` Android, para evitar duplicidade com FCM.
+- O runner/local app nao deve emitir notificacao escrita desses eventos para `MANAGER` Android, para evitar duplicidade com FCM.
 - KDS, PDV e displays continuam usando websocket/runtime local para som operacional e refresh com o app aberto, sem mensagem humana escrita.
 - Som de pedido configurado no device vale para KDS, PDV e demais fluxos locais; quando a URL personalizada estiver vazia, o runtime deve cair para `src/assets/sound/caixa.m4a` empacotado no app.
-- O canal FCM humano do `MANAGER` usa som padrao do sistema; `caixa.m4a` nao participa desse canal.
+- O canal FCM humano do `MANAGER` usa o som nativo `caixa.m4a` empacotado pelo plugin do `expo-notifications`; URL personalizada nao toca em push recebido com app fechado.
 - A versao web do manager tambem usa um runtime compartilhado no browser para websocket, com owner unico por navegador/aba via BroadcastChannel e replicacao do stream para as demais abas. Nenhum componente web deve abrir websocket direto no backend.
