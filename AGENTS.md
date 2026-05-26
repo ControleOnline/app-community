@@ -24,6 +24,11 @@
 - Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando a tela usa `DefaultTable`, `totalItems` e `summary` pertencem ao rodape sticky interno do componente; telas consumidoras nao devem criar rodapes ou pilulas paralelas, exceto quando o store registrar `summary: false`.
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
+## Feedback visual centralizado
+- Loadings e erros do sistema devem sair apenas dos componentes centrais do front: `StateStore` para loading/saving e `MessageService`/`SystemErrorToast` para erro.
+- Esses componentes podem receber configuracoes de escopo, estilo e posicao, mas telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store.
+- `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores; os erros devem ser publicados pelo fluxo central ligado a `SET_ERROR`/`storeErrorBridge`, nunca por estado local duplicado.
+
 ## Regra obrigatoria de componentes default
 - Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
 - Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile deve ser gerenciado pelo proprio `DefaultTable`, recebendo da tela apenas um renderer/componente de card customizado quando o visual precisar ser especifico. Nao criar uma listagem paralela com `FlatList`/cards na tela se ela ja usa `DefaultTable`.
