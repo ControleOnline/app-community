@@ -39,6 +39,8 @@
 - Nomear arquivos e classes de forma consistente com os módulos atuais.
 - Em modais e popups operacionais que reaproveitam telas canônicas, o cabeçalho e a barra de ações também devem ser reaproveitados dos arquivos-fonte do fluxo principal. Impressão e ações irmãs ficam sempre na mesma barra padronizada, nunca em botões soltos paralelos.
 - Identificação visual de pedido não pode ser redesenhada por tela. Cards, modais e detalhes operacionais devem reaproveitar o componente canônico `OrderHeader`, normalizando o payload se preciso, mas sem recriar número, cliente, datas ou status manualmente.
+- Quando um pedido estiver em `app=POS` e `externalCode` vier preenchido, esse valor representa o numero da mesa e deve ocupar o destaque principal no `OrderHeader`, mantendo o id tecnico do pedido como secundario.
+- Quando o payload trouxer `mainOrder.external_code`, esse valor representa o numero da comanda e o `OrderHeader` deve escrever `Comanda: #...` antes do nome do cliente, sem depender de `otherInformations`.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
 
@@ -118,10 +120,10 @@
 - O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
 - O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
 - O runtime de background deve poder religar sozinho no Android por `BOOT_COMPLETED` e `MY_PACKAGE_REPLACED`, reaproveitando as inscricoes persistidas para notificar mesmo sem tela aberta.
-- Notificacoes humanas de novos pedidos no `MANAGER` Android sao push nativo FCM direto, sem Expo Push Service, com token salvo em `device.metadata.pushTokens.manager.android.deviceToken`.
+- Notificacoes humanas de novos pedidos e eventos financeiros (`store.opened`, `store.closed`, `cash.open`, `cash.closed`) no `MANAGER` Android sao push nativo FCM direto, sem Expo Push Service, com token salvo em `device.metadata.pushTokens.manager.android.deviceToken`.
 - O click do push humano do `MANAGER` deve navegar para `OrderDetails` com `id` do pedido; nao enviar esse fluxo para KDS/LDS.
-- O runner local nao deve emitir notificacao escrita de novo pedido para `MANAGER` Android, para evitar duplicidade com FCM.
+- O runner/local app nao deve emitir notificacao escrita desses eventos para `MANAGER` Android, para evitar duplicidade com FCM.
 - KDS, PDV e displays continuam usando websocket/runtime local para som operacional e refresh com o app aberto, sem mensagem humana escrita.
 - Som de pedido configurado no device vale para KDS, PDV e demais fluxos locais; quando a URL personalizada estiver vazia, o runtime deve cair para `src/assets/sound/caixa.m4a` empacotado no app.
-- O canal FCM humano do `MANAGER` usa som padrao do sistema; `caixa.m4a` nao participa desse canal.
+- O canal FCM humano do `MANAGER` usa o som nativo `caixa.m4a` empacotado pelo plugin do `expo-notifications`; URL personalizada nao toca em push recebido com app fechado.
 - A versao web do manager tambem usa um runtime compartilhado no browser para websocket, com owner unico por navegador/aba via BroadcastChannel e replicacao do stream para as demais abas. Nenhum componente web deve abrir websocket direto no backend.
