@@ -117,6 +117,11 @@
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
 - A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
 
+## Regra transversal de grupos compartilhados
+- A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
+- O front nao deve ler nem escrever `parentProduct` legado em `product_group`; esse dado nao faz parte do contrato atual.
+- Listagens e buscas de grupos compartilhados devem ser feitas por `company` e pelos vinculos de `product_group_parent`, sem fallback para o campo antigo.
+
 ## Regra transversal de dock operacional
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
 
