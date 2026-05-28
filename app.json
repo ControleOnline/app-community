@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "On Gestor",
-    "displayName": "On Gestor",
+    "name": "On Manager",
+    "displayName": "On Manager",
     "slug": "manager-controle-online",
     "platforms": [
       "android",
