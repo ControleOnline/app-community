@@ -62,12 +62,12 @@ jobs:
 
       - name: Update app.json dynamically
         run: |
-          sed -i "s/On Gestor/Lave-Go/g" app.json
+          sed -i "s/On Manager/Lave-Go/g" app.json
           sed -i "s/manager-controle-online/shop-lavego/g" app.json
           sed -i "s/com\.controleonline\.manager/com.lavego.shop/g" app.json
 
       - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets-lavego.js
+        run: node scripts/configure-assets-lavego2.js
 
       - name: Install Dependencies
         run: npm install
