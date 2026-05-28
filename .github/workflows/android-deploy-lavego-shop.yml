@@ -2,7 +2,7 @@ name: Deploy Android Lave-Go Shop
 
 on:
   push:
-    branches: [master]
+    branches: [staging]
   workflow_dispatch:
 
 permissions:
@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      APP_TYPE: SHOP
       APP_DISPLAY_NAME: "Shop"
       PACKAGE_NAME: com.lavego.shop
       FTP_ARTIFACT_NAME: android-aab-shop
@@ -45,10 +44,10 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://apinew.lave-go.com',\
-          DOMAIN: 'https://app.controleonline.com',\
-          MANAGER_APP: 'https://app.controleonline.com',\
-          SOCKET: 'wss://apinew.controleonline.com',\
-          APP_TYPE: '${APP_TYPE}',\
+          DOMAIN: 'https://shop.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          APP_TYPE: 'shop',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
@@ -73,12 +72,12 @@ jobs:
       - name: Create Android Signing Files
         run: |
           mkdir -p ./config/android
-          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
-          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
-
+          echo "${{ secrets.KEYSTORE_LAVEGO_SHOP_CERT }}" | base64 -d > ./config/android/lave-go.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/lave-go.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=lave-go" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTORE_LAVEGO_SHOP_PASS }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTORE_LAVEGO_SHOP_PASS }}" >> ./config/android/env.properties
+          
       - name: Build Android Bundle
         run: |
           cd android
