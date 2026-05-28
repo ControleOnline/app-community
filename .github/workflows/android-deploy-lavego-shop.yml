@@ -60,6 +60,15 @@ jobs:
           };\
           module.exports = { env };" > ./config/env.local.js
 
+      - name: Update app.json dynamically
+        run: |
+          sed -i "s/On Gestor/Lave-Go/g" app.json
+          sed -i "s/manager-controle-online/shop-lavego/g" app.json
+          sed -i "s/com\.controleonline\.manager/com.lavego.shop/g" app.json
+
+      - name: Configure Assets by APP_TYPE
+        run: node scripts/configure-assets-lavego.js
+
       - name: Install Dependencies
         run: npm install
 
@@ -77,7 +86,7 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=lave-go" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTORE_LAVEGO_SHOP_PASS }}" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTORE_LAVEGO_SHOP_PASS }}" >> ./config/android/env.properties
-          
+
       - name: Build Android Bundle
         run: |
           cd android
