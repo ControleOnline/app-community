@@ -21,37 +21,37 @@ jobs:
         include:
           - app_type: CHECKOUT
             display_name: "Checkout"
-            tracks: internal
+            track: internal
             release_status: draft
             changes_not_sent_for_review: true
 
           - app_type: CRM
             display_name: "CRM"
-            tracks: internal
+            track: internal
             release_status: completed
             changes_not_sent_for_review: false
 
           - app_type: DELIVERY
             display_name: "Delivery"
-            tracks: internal
+            track: internal
             release_status: draft
             changes_not_sent_for_review: false
 
           - app_type: MANAGER
             display_name: "Gestor"
-            tracks: internal
+            track: internal
             release_status: completed
             changes_not_sent_for_review: false
 
           - app_type: POS
             display_name: "PDV"
-            tracks: internal
+            track: internal
             release_status: completed
             changes_not_sent_for_review: false
 
           - app_type: PPC
             display_name: "PCP"
-            tracks: internal
+            track: internal
             release_status: completed
             changes_not_sent_for_review: false
 
@@ -223,7 +223,7 @@ jobs:
           serviceAccountJson: /tmp/service_account.json
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          tracks: ${{ matrix.track }}
+          track: ${{ matrix.track }}
           status: ${{ matrix.release_status }}
           changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
 
