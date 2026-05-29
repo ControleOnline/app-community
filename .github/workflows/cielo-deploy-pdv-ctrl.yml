@@ -26,7 +26,7 @@ jobs:
         include:
           - app_type: POS
             display_name: "PDV"
-            track: internal
+            tracks: internal
             release_status: completed
             changes_not_sent_for_review: false
 
