@@ -36,7 +36,6 @@ module.exports = () => {
 
   const companyName = localEnv.COMPANY_NAME || process.env.COMPANY_NAME;
   if (companyName !== 'CTRL') {
-    console.log('COMPANY_NAME:', companyName);
     return expo;
   }
 
