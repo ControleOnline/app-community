@@ -43,6 +43,12 @@ jobs:
             release_status: completed
             changes_not_sent_for_review: false
 
+          - app_type: SERVICE
+            display_name: "Service"
+            track: internal
+            release_status: completed
+            changes_not_sent_for_review: false
+
           - app_type: POS
             display_name: "PDV"
             track: internal

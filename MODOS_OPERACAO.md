@@ -7,8 +7,8 @@
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP` e `DELIVERY`.
-- `DELIVERY` e um `APP_TYPE`, no mesmo nivel de `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
+- `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
 - `DELIVERY` hoje reaproveita a mesma home de `POS`, mas isso e compartilhamento de implementacao, nao hierarquia funcional.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
@@ -35,6 +35,11 @@
 - Nao deve virar uma copia do `POS`.
 - Mesmo quando abrir a tela de PDV, em `APP_TYPE=MANAGER` o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
 - Nao deve concentrar responsabilidades de atendimento comercial do `CRM` nem fluxo cliente-facing do `SHOP`.
+
+### SERVICE
+- Publico: `employee` e `owner` da operacao.
+- Missao: app operacional separado com foco em etiquetas, insumos e apoio ao atendimento.
+- Regras: nao assumir comportamento do `MANAGER` e nao incluir checklist no escopo atual.
 
 ### CRM
 - Publico: vendedor, consultor comercial, pre-venda e pos-venda comercial.
