@@ -28,6 +28,7 @@ import order_invoices from '@controleonline/ui-orders/src/store/order_invoices';
 import order_products from '@controleonline/ui-orders/src/store/order_products';
 import order_products_queue from '@controleonline/ui-ppc/src/store/modules/order_products_queue';
 import orders from '@controleonline/ui-orders/src/store/orders';
+import delivery_orders from '@controleonline/ui-logistic/src/store/delivery_orders';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import people from '@controleonline/ui-people/src/store/people';
 import people_link from '@controleonline/ui-people/src/store/people_link';
@@ -92,6 +93,7 @@ export default {
   order_products,
   order_products_queue,
   orders,
+  delivery_orders,
   paymentType,
   people,
   phones,

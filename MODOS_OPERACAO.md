@@ -7,10 +7,10 @@
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP` e `DELIVERY`.
-- `DELIVERY` e um `APP_TYPE`, no mesmo nivel de `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
+- `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
-- `DELIVERY` hoje reaproveita a mesma home de `POS`, mas isso e compartilhamento de implementacao, nao hierarquia funcional.
+- `DELIVERY` usa `ui-logistic` como home: a lista sai da colecao padrao `/orders`, filtra `orderType=delivery` e `provider` do motoboy logado, e o campo `delivery_people_id` continua sendo o recebedor final, nao o entregador.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
@@ -35,6 +35,12 @@
 - Nao deve virar uma copia do `POS`.
 - Mesmo quando abrir a tela de PDV, em `APP_TYPE=MANAGER` o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
 - Nao deve concentrar responsabilidades de atendimento comercial do `CRM` nem fluxo cliente-facing do `SHOP`.
+
+### SERVICE
+- Publico: `employee` e `owner` da operacao.
+- Missao: app operacional separado com foco em etiquetas, insumos e apoio ao atendimento.
+- Regras: nao assumir comportamento do `MANAGER` e nao incluir checklist no escopo atual.
+- Implementacao React: `ui-support`.
 
 ### CRM
 - Publico: vendedor, consultor comercial, pre-venda e pos-venda comercial.
@@ -99,11 +105,12 @@
 - Publico: operacao de entrega/retirada quando a empresa quiser abrir um app focado nisso.
 - Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
-- Hoje usa a mesma home do `POS`.
-- Ainda nao existe modulo proprio; a home e reaproveitada por implementacao.
+- Usa `ui-logistic` como home dedicada.
+- A tela inicial deve listar pedidos `delivery` ja filtrados para o motoboy logado.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
 - Nao deve ser usado como tipo de device.
+- `provider_id`/`provider` identifica o motoboy da lista; `delivery_people_id` segue sendo a pessoa que recebe a entrega.
 - Fluxos de entrega, retirada, codigos de handover e acompanhamento podem reaproveitar `ui-orders`, mas o recorte `DELIVERY` continua sendo uma visao de app.
 - Quando o assunto for canal de venda, pagamento na entrega ou logistica, usar nomes especificos para evitar confusao com `APP_TYPE=DELIVERY`.
 

@@ -1,3 +1,4 @@
+import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {getStateFromPath as defaultGetStateFromPath} from '@react-navigation/native'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -7,8 +8,10 @@ import {Pressable, StyleSheet} from 'react-native'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
+import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
+import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
 
@@ -59,39 +62,45 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
   if (headerBackFallback && nativeOptions.headerShown !== false) {
     nativeOptions.headerBackVisible = false
     nativeOptions.headerLeft = () => (
-      <Pressable
-        accessibilityLabel="Voltar"
-        accessibilityRole="button"
-        hitSlop={8}
-        onPress={() => {
-          const {navigation, route} = args
+      React.createElement(
+        Pressable,
+        {
+          accessibilityLabel: 'Voltar',
+          accessibilityRole: 'button',
+          hitSlop: 8,
+          onPress: () => {
+            const {navigation, route} = args
 
-          if (navigation?.canGoBack?.()) {
-            navigation.goBack()
-            return
-          }
+            if (navigation?.canGoBack?.()) {
+              navigation.goBack()
+              return
+            }
 
-          const fallback =
-            typeof headerBackFallback === 'function'
-              ? headerBackFallback({navigation, route})
-              : headerBackFallback
+            const fallback =
+              typeof headerBackFallback === 'function'
+                ? headerBackFallback({navigation, route})
+                : headerBackFallback
 
-          if (Array.isArray(fallback?.resetRoutes) && fallback.resetRoutes.length > 0) {
-            navigation?.reset?.({
-              index: fallback.resetRoutes.length - 1,
-              routes: fallback.resetRoutes,
-            })
-            return
-          }
+            if (Array.isArray(fallback?.resetRoutes) && fallback.resetRoutes.length > 0) {
+              navigation?.reset?.({
+                index: fallback.resetRoutes.length - 1,
+                routes: fallback.resetRoutes,
+              })
+              return
+            }
 
-          if (fallback?.name) {
-            navigation?.navigate?.(fallback.name, fallback.params || {})
-          }
-        }}
-        style={routerStyles.headerBackButton}
-      >
-        <MaterialCommunityIcons name="arrow-left" size={24} color="#0F172A" />
-      </Pressable>
+            if (fallback?.name) {
+              navigation?.navigate?.(fallback.name, fallback.params || {})
+            }
+          },
+          style: routerStyles.headerBackButton,
+        },
+        React.createElement(MaterialCommunityIcons, {
+          color: '#0F172A',
+          name: 'arrow-left',
+          size: 24,
+        }),
+      )
     )
   }
 
@@ -119,8 +128,9 @@ export const allRoutes = [
 const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
-  DELIVERY: POSHomePage,
+  DELIVERY: DeliveryHomePage,
   MANAGER: ManagerHomePage,
+  SERVICE: ServiceHomePage,
   SHOP: ShopHomePage,
   POS: POSHomePage,
   PPC: PPCHomePage,
@@ -136,9 +146,9 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       headerBackVisible: normalizedAppType !== 'PPC',
       title: 'Menu',
-      showBottomToolBar: normalizedAppType !== 'PPC',
+      showBottomToolBar: normalizedAppType !== 'PPC' && normalizedAppType !== 'DELIVERY',
       showBottomCart: false,
-      showCompanyFilter: true,
+      showCompanyFilter: normalizedAppType !== 'DELIVERY',
     },
   })
 }
@@ -152,10 +162,10 @@ normalizeInitialBrowserPath(globalThis?.window)
 const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
   const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
 
-  return (
-    <DefaultLayout navigation={navigation} route={route} options={resolvedOptions}>
-      <Component navigation={navigation} route={route} />
-    </DefaultLayout>
+  return React.createElement(
+    DefaultLayout,
+    {navigation, options: resolvedOptions, route},
+    React.createElement(Component, {navigation, route}),
   )
 }
 
@@ -219,17 +229,20 @@ const getInitialRouteName = () => {
 }
 
 export default function Routes() {
-  return (
-    <Stack.Navigator detachInactiveScreens initialRouteName={getInitialRouteName()}>
-      {routeDefinitions.map((route, index) => (
-        <Stack.Screen
-          key={index}
-          name={route.name}
-          component={WrappedComponent(route.options, route.component)}
-          options={args => resolveRouteOptions(route.options, args)}
-          initialParams={route.initialParams}
-        />
-      ))}
-    </Stack.Navigator>
+  return React.createElement(
+    Stack.Navigator,
+    {
+      detachInactiveScreens: true,
+      initialRouteName: getInitialRouteName(),
+    },
+    routeDefinitions.map((route, index) =>
+      React.createElement(Stack.Screen, {
+        component: WrappedComponent(route.options, route.component),
+        initialParams: route.initialParams,
+        key: index,
+        name: route.name,
+        options: args => resolveRouteOptions(route.options, args),
+      }),
+    ),
   )
 }
