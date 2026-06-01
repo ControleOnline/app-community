@@ -1,21 +1,21 @@
 {
   "expo": {
-    "name": "On Manager",
-    "displayName": "On Manager",
-    "slug": "manager-controle-online",
+"name": "On Manager",
+"displayName": "On Manager",
+"slug": "manager-controle-online",
     "platforms": [
       "android",
       "ios",
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.57",
+    "version": "1.3.62",
     "android": {
       "jsEngine": "hermes",
-      "package": "com.controleonline.manager",
-      "versionCode": 1357,
+"package": "com.controleonline.manager",
+      "versionCode": 1362,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/manager/logo.png",
+"foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -27,18 +27,18 @@
         "CAMERA",
         "NFC"
       ],
-      "tvBanner": "./src/assets/tv.png"
+"tvBanner": "./src/assets/tv.png"
     },
-    "icon": "./src/assets/manager/logo.png",
+"icon": "./src/assets/manager/logo.png",
     "splash": {
-      "image": "./src/assets/manager/splash.png",
+"image": "./src/assets/manager/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
       "jsEngine": "hermes",
-      "bundleIdentifier": "com.controleonline.manager",
+"bundleIdentifier": "com.controleonline.manager",
       "infoPlist": {
         "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
         "NFCReaderUsageDescription": "Necessário para ler tags NFC e RFID no PDV.",
@@ -50,7 +50,7 @@
       }
     },
     "web": {
-      "favicon": "./src/assets/manager/logo.png"
+"favicon": "./src/assets/manager/logo.png"
     },
     "plugins": [
       "./withAndroidTV",
@@ -84,9 +84,7 @@
       [
         "expo-notifications",
         {
-          "sounds": [
-            "./src/assets/sound/caixa.m4a"
-          ]
+"sounds": ["./src/assets/sound/caixa.m4a"]
         }
       ],
       "react-native-iap",

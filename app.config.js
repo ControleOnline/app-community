@@ -33,6 +33,12 @@ const updateAssetPath = (currentPath, assetsFolder) => {
 module.exports = () => {
   const expo = clone(appJson.expo || {});
   const localEnv = resolveLocalEnv();
+
+  const companyName = localEnv.COMPANY_NAME || process.env.COMPANY_NAME;
+  if (companyName !== 'CTRL') {
+    return expo;
+  }
+
   const appType = (process.env.APP_TYPE || DEFAULT_APP_TYPE).toUpperCase();
   const appLower = appType.toLowerCase();
   const assetsFolder = (process.env.ASSETS_VARIANT || appType).toLowerCase();

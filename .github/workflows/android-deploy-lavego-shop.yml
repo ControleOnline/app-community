@@ -48,6 +48,7 @@ jobs:
           MANAGER_APP: 'https://app.lave-go.com',\
           SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: 'shop',\
+          COMPANY_NAME: 'lavego',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
