@@ -8,9 +8,10 @@ import {Pressable, StyleSheet} from 'react-native'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
+import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
-import ServiceHomePage from '@controleonline/ui-service/src/react/pages/home/index'
+import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
 
@@ -127,7 +128,7 @@ export const allRoutes = [
 const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
-  DELIVERY: POSHomePage,
+  DELIVERY: DeliveryHomePage,
   MANAGER: ManagerHomePage,
   SERVICE: ServiceHomePage,
   SHOP: ShopHomePage,
@@ -145,9 +146,9 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       headerBackVisible: normalizedAppType !== 'PPC',
       title: 'Menu',
-      showBottomToolBar: normalizedAppType !== 'PPC',
+      showBottomToolBar: normalizedAppType !== 'PPC' && normalizedAppType !== 'DELIVERY',
       showBottomCart: false,
-      showCompanyFilter: true,
+      showCompanyFilter: normalizedAppType !== 'DELIVERY',
     },
   })
 }
