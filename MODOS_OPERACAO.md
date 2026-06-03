@@ -10,7 +10,7 @@
 - `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
 - `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
-- `DELIVERY` usa `ui-logistic` como home: a lista sai da colecao padrao `/orders`, filtra `orderType=delivery` e `provider` do motoboy logado, e o campo `delivery_people_id` continua sendo o recebedor final, nao o entregador.
+- `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis e a listagem de empresas homologadas.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
@@ -105,8 +105,12 @@
 - Publico: operacao de entrega/retirada quando a empresa quiser abrir um app focado nisso.
 - Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
-- Usa `ui-logistic` como home dedicada.
-- A tela inicial deve listar pedidos `delivery` ja filtrados para o motoboy logado.
+- Usa `ui-logistic` como home dedicada, com menu operacional.
+- A home deve exibir menus para:
+- pedidos de entrega;
+- recebiveis do motoboy logado, considerando invoices em que ele e o `receiver`;
+- empresas homologadas do motoboy logado, derivadas de `people_link` com `link_type=courier`.
+- A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
 - Nao deve ser usado como tipo de device.
