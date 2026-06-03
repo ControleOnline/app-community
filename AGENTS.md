@@ -126,6 +126,35 @@
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
 - O front nao deve ler nem escrever `parentProduct` legado em `product_group`; esse dado nao faz parte do contrato atual.
 - Listagens e buscas de grupos compartilhados devem ser feitas por `company` e pelos vinculos de `product_group_parent`, sem fallback para o campo antigo.
+- Na `MenuCostsPage`, `products` e os `components` de produto sao somente leitura; a persistencia desta tela fica restrita a `feedstock` e `package`, com os vínculos de custo criados via `product_group_product` sem criar produto de venda novo.
+
+## Regra transversal de parâmetros da engenharia
+- A tela de parâmetros da engenharia tem rota própria em `/menu-costs-page/parametros`.
+- Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct` e `menu-costs-estimated-monthly-units`.
+- O carregamento desses dados deve acontecer ao exibir a rota; o botão `Parâmetros` da `MenuCostsPage` deve navegar para essa tela separada.
+
+## Regra transversal de anexos de pedidos
+- Anexos de pedido devem usar o mini gerenciador reaproveitado do upload de produtos, mas com escopo exclusivo de `order_file`.
+- A barra do pedido deve expor o atalho de anexos fora do fluxo de debug; o modal precisa permitir subir, vincular, abrir e remover arquivos sem tocar em `products` ou `components`.
+- O front nao deve criar nem editar produto de venda para resolver anexo de pedido; a biblioteca de arquivos fica separada da engenharia de produto.
+
+## Regra transversal de fornecedores da engenharia
+- A tela oficial de fornecedores da engenharia deve ficar em `/menu-costs-page/fornecedores`.
+- Essa tela deve carregar os dados do `people` do ERP com `link.linkType=provider` apenas quando estiver em foco, sem persistir mutacao em `products` ou `components`.
+- Telefone e e-mail de fornecedor devem viver dentro de `contacts`, nunca como campos diretos do cadastro principal.
+- Quando o seed trouxer fornecedor duplicado, a tela deve unificar o cadastro mais rico e enriquecer contatos, observacoes e movimentos, em vez de duplicar a listagem.
+
+## Regra transversal de ingredientes da engenharia
+- A tela oficial de ingredientes da engenharia deve ficar em `/menu-costs-page/ingredientes`.
+- Essa tela carrega o recorte apenas quando exibida e usa o fluxo de sincronizacao de insumos para criar `feedstock` no ERP.
+- O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
+- `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `feedstock`.
+
+## Regra transversal de embalagens da engenharia
+- A tela oficial de embalagens da engenharia deve ficar em `/menu-costs-page/embalagens`.
+- Essa tela carrega o recorte apenas quando exibida e usa o fluxo de sincronizacao de insumos para criar `package` no ERP.
+- O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
+- `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `package`.
 
 ## Regra transversal de dock operacional
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
