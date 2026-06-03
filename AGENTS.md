@@ -127,6 +127,7 @@
 - O front nao deve ler nem escrever `parentProduct` legado em `product_group`; esse dado nao faz parte do contrato atual.
 - Listagens e buscas de grupos compartilhados devem ser feitas por `company` e pelos vinculos de `product_group_parent`, sem fallback para o campo antigo.
 - Na `MenuCostsPage`, `products` e os `components` de produto sao somente leitura; a persistencia desta tela fica restrita a `feedstock` e `package`, com os vínculos de custo criados via `product_group_product` sem criar produto de venda novo.
+- As imagens exibidas pela `MenuCostsPage` devem vir apenas de `productFiles`, `categoryFiles` ou relacoes equivalentes do banco, resolvidas por `resolveFileImageUrl`; nao usar assets estaticos do `ui-manager` como fallback.
 
 ## Regra transversal de parâmetros da engenharia
 - A tela de parâmetros da engenharia tem rota própria em `/menu-costs-page/parametros`.
@@ -141,12 +142,14 @@
 ## Regra transversal de fornecedores da engenharia
 - A tela oficial de fornecedores da engenharia deve ficar em `/menu-costs-page/fornecedores`.
 - Essa tela deve carregar os dados do `people` do ERP com `link.linkType=provider` apenas quando estiver em foco, sem persistir mutacao em `products` ou `components`.
+- A normalizacao e unificacao de fornecedores deve ficar em `ui-people`; o lookup de ultimas compras deve ficar em `ui-products`; `ui-manager` deve apenas orquestrar a rota e a apresentacao.
+- Telefone e e-mail do fornecedor devem continuar dentro de `contacts`, nunca no cadastro principal.
 - Telefone e e-mail de fornecedor devem viver dentro de `contacts`, nunca como campos diretos do cadastro principal.
 - Quando o seed trouxer fornecedor duplicado, a tela deve unificar o cadastro mais rico e enriquecer contatos, observacoes e movimentos, em vez de duplicar a listagem.
 
 ## Regra transversal de ingredientes da engenharia
 - A tela oficial de ingredientes da engenharia deve ficar em `/menu-costs-page/ingredientes`.
-- Essa tela carrega o recorte apenas quando exibida e usa o fluxo de sincronizacao de insumos para criar `feedstock` no ERP.
+- Essa tela e a sua listagem real vivem em `ui-products`, que carrega o recorte de `products` do tipo `feedstock` quando a rota ganha foco.
 - O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
 - `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `feedstock`.
 
@@ -155,6 +158,20 @@
 - Essa tela carrega o recorte apenas quando exibida e usa o fluxo de sincronizacao de insumos para criar `package` no ERP.
 - O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
 - `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `package`.
+
+## Regra transversal de revenda da engenharia
+- A tela oficial de revenda da engenharia deve ficar em `/menu-costs-page/revenda`.
+- Essa tela carrega produtos reais do ERP do tipo `product` classificados como bebidas, sem consultar o seed JSON da engenharia.
+- A regra de classificacao de bebidas e a montagem da listagem devem ficar em `ui-products`; `ui-manager` deve apenas orquestrar a rota e a apresentacao.
+- `manufactured`, `component`, `feedstock` e `package` nao entram no recorte de revenda.
+- A listagem de revenda deve usar carregamento infinito e paginação, igual as demais telas operacionais.
+
+## Regra transversal de compras e evidencias da engenharia
+- A tela oficial de compras e evidencias da engenharia deve ficar em `/menu-costs-page/compras-e-evidencias`.
+- Essa tela carrega apenas pedidos do ERP com `orderType=purchase`, usando `orders` como fonte de verdade e `order_file`/`files` para as evidencias.
+- A listagem deve ser paginada com carregamento infinito e o detalhe do pedido deve reaproveitar `OrderHeader` e o mini gerenciador de anexos do fluxo de pedidos.
+- `ui-orders` deve concentrar a regra de negocio e o fluxo de anexos; `ui-manager` fica somente com a rota e a apresentacao.
+- O seed JSON nao deve ser usado como fonte dessa tela.
 
 ## Regra transversal de dock operacional
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
