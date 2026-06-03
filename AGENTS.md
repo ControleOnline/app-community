@@ -28,6 +28,7 @@
 - Loadings e erros do sistema devem sair apenas dos componentes centrais do front: `StateStore` para loading/saving e `MessageService`/`SystemErrorToast` para erro.
 - Esses componentes podem receber configuracoes de escopo, estilo e posicao, mas telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store.
 - `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores; os erros devem ser publicados pelo fluxo central ligado a `SET_ERROR`/`storeErrorBridge`, nunca por estado local duplicado.
+- O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
 
 ## Regra obrigatoria de componentes default
 - Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
@@ -53,6 +54,7 @@
 
 ## Convenções
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
+- Vue está em fase de remoção. Quando um trabalho tocar um fluxo já coberto em React, remova o equivalente Vue em vez de duplicar a mudança. Se o módulo ainda não tiver equivalente React, apague `src/vue` mesmo assim e mantenha o pacote com um entrypoint neutro fora de `src/vue`, salvo quando o usuario pedir explicitamente para manter o legado.
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.
 - O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
@@ -60,6 +62,7 @@
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.
+- A fila de traducoes faltantes vive no store `translate` e deve ser lida/escrita por esse estado. Nao usar `localStorage` como fila e nao sobrescrever traducoes fora da tela de traducoes ou de uma acao intencional.
 - Não criar novos getters sem perguntar antes dentro dos stores
 - Só usar a API em vez de stores em casos stritamente necessários
 - Trabalhar preferencialmente com filas do store em vez de loopings ou chamadas asyncronas em lote.
