@@ -59,6 +59,10 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
       : (screenOptions || {})
   const {headerBackFallback, ...nativeOptions} = resolvedOptions
 
+  if (typeof nativeOptions.title === 'function') {
+    nativeOptions.title = nativeOptions.title(args)
+  }
+
   if (headerBackFallback && nativeOptions.headerShown !== false) {
     nativeOptions.headerBackVisible = false
     nativeOptions.headerLeft = () => (
