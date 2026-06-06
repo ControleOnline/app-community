@@ -121,6 +121,15 @@
 - `DeliveryRateVersionPage` para a leitura detalhada da versao;
 - `DeliveryRateHistoryPage` para consultar o historico imutavel da tabela;
 - `DeliveryRateCompanyPage` para ativar ou desativar a tabela por empresa associada.
+- A camada de presenca do motoboy usa outro conjunto de telas:
+- `DeliveryCourierSchedulesPage` para horarios reutilizaveis;
+- `DeliveryCourierScheduleFormPage` para criar ou editar uma janela semanal;
+- `DeliveryCourierPresencePage` para ligar, desligar e associar horarios por empresa;
+- `DeliveryPresenceInboxPage` para o manager ler a presenca por empresa;
+- `DeliveryPresenceDetailPage` para o detalhe somente leitura no manager;
+- o historico de conexao e desconexao sempre aparece na tela de detalhe via `EntityLogPage`.
+- O modo manual exige motivo para conectar ou desconectar e cada evento gera log na tabela `log`.
+- As migrations desse slice precisam rodar no tenant `admin.controleonline.com` via `tenant:migrations:migrate`, nao no banco base direto.
 - O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.
 - A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
 - Leitura correta:
