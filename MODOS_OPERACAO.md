@@ -10,7 +10,7 @@
 - `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
 - `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
-- `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis e a listagem de empresas homologadas.
+- `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional com gate de onboarding do motoboy. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis, a listagem de empresas homologadas e as tabelas de entrega imutaveis.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
@@ -106,10 +106,22 @@
 - Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
 - Usa `ui-logistic` como home dedicada, com menu operacional.
+- A entrada do app fica travada ate existir pelo menos uma versao de tabela com `vehicleType` preenchido (`moto` ou `bike`).
 - A home deve exibir menus para:
 - pedidos de entrega;
 - recebiveis do motoboy logado, considerando invoices em que ele e o `receiver`;
-- empresas homologadas do motoboy logado, derivadas de `people_link` com `link_type=courier`.
+- empresas homologadas do motoboy logado, derivadas de `people_link` com `link_type=courier`;
+- tabelas de entrega do motoboy, que abrem a lista imutavel de versoes.
+- O fluxo de tabelas de entrega e composto por:
+- `DeliveryVehicleSetupPage` para o primeiro cadastro bloqueante;
+- `DeliveryRateTablesPage` para a lista de versoes do courier;
+- `DeliveryRateTableFormPage` para criar nova versao a partir de um snapshot;
+- `DeliveryRateTableCompaniesPage` para associar empresas a uma versao;
+- `DeliveryRatesInboxPage` para o manager revisar as versoes visiveis;
+- `DeliveryRateVersionPage` para a leitura detalhada da versao;
+- `DeliveryRateHistoryPage` para consultar o historico imutavel da tabela;
+- `DeliveryRateCompanyPage` para ativar ou desativar a tabela por empresa associada.
+- O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.
 - A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
