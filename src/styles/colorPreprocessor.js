@@ -60,23 +60,24 @@ if (!global.__coThemeColorPatched) {
       '#cccccc': 'border',
       '#ccc': 'border',
 
-      '#ef4444': 'error',
-      '#f44336': 'error',
-      '#e74c3c': 'error',
-      '#ff4444': 'error',
-      '#c10015': 'error',
-
-      '#22c55e': 'success',
+      // '#22c55e': 'success', // consolidado // 06/06/2026
       '#4caf50': 'success',
       '#27ae60': 'success',
       '#28a745': 'success',
-      '#10b981': 'success',
+      '#10b981': 'success', // usar essa cor
 
-      '#f59e0b': 'warning',
+      // '#f59e0b': 'warning', // consolidado // 06/06/2026
       '#f39c12': 'warning',
       '#f2c037': 'warning',
       '#ff9800': 'warning',
-      '#e67e22': 'warning',
+      '#e67e22': 'warning', // usar essa cor
+
+      // '#ef4444': 'error', // consolidado // 06/06/2026
+      '#f44336': 'error',
+      '#e74c3c': 'error',
+      '#ff4444': 'error',
+      '#c10015': 'error', // usar essa cor
+
     };
 
     const styleColorProps = [
