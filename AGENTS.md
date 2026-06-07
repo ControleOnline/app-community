@@ -178,6 +178,13 @@
 
 ## Regra transversal de runtime em background
 - Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.
+
+## Regra transversal de displays de pedidos
+- Os displays `orders` e `tv` devem carregar `/orders` com a arvore completa de `orderProducts`; o endpoint de fila nao e a fonte desses paines.
+- Quando o item tiver fila, o leitor de codigo de barras deve trabalhar com `order_product_queue.id`; quando nao tiver fila, o match deve cair para `SKU`.
+- O leitor de conferencia deve contar localmente a quantidade de bips por linha e so chamar `POST /order_products/{id}/check` quando a quantidade prevista for atingida.
+- `products` continua consumindo `order_product_queues`; `orders` e `tv` continuam consumindo `orderProducts` completos.
+- O display `orders` trabalha pedido a pedido: o pedido em foco nao troca ate ficar totalmente conferido, o rodape mostra `conferidos/total` e o proximo pedido so assume foco depois do atual ficar pronto.
 - O websocket do backend deve ser aberto pelo `BackgroundRuntimeService`; listeners nativos do React devem consumir o stream local do runtime em vez de abrir outro websocket direto.
 - O runtime de background deve conseguir registrar e atender todos os APKs instalados no aparelho via `registrationId` que inclua o package/app atual, device e empresa, evitando colisao entre builds.
 - O runtime de background deve poder religar sozinho no Android por `BOOT_COMPLETED` e `MY_PACKAGE_REPLACED`, reaproveitando as inscricoes persistidas para notificar mesmo sem tela aberta.
