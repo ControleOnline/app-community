@@ -93,6 +93,9 @@
 - Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva. 
 - Quando a regra for transversal entre módulos, o `AGENTS.md` da raiz também deve ser atualizado.
 - Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests 
+- Testes de browser do web ficam em `src/tests/browser` e usam Playwright.
+- Quando uma mudança tocar login, navegacao ou qualquer fluxo visivel no browser, atualize ou adicione um smoke test e valide com `npm run test:browser`.
+- Prefira seletores semanticos (`role`, `placeholder` e texto visivel) nos testes de browser; evite CSS/XPath fragil.
 - Tenha bom senso. Avisos do que cada ação faz é bem-vindo, mas lembr-se que são clientes que usam o sistema, ele não sabe o que é uma tabela device_config, então use uma linguagem mais adequada.
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.
 - Displays do tipo `products` consomem `order_product_queues`.
