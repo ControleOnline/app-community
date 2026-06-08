@@ -89,7 +89,7 @@ jobs:
       - name: Package IPK
         run: |
           mkdir -p ./webos-build
-          ares-package ./dist -o ./webos-build
+          ares-package --no-minify ./dist -o ./webos-build
           ls -la ./webos-build
 
       - name: Upload IPK artifact
