@@ -26,7 +26,7 @@ module.exports = defineConfig({
     },
   ],
   webServer: {
-    command: 'node scripts/playwright-web-server.cjs',
+    command: `${JSON.stringify(process.execPath)} ${JSON.stringify(path.join(__dirname, 'scripts/playwright-web-server.cjs'))}`,
     reuseExistingServer: !process.env.CI,
     timeout: 600000,
     url: baseURL,

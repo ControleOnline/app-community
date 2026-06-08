@@ -102,6 +102,20 @@ const buildScheduleRow = schedule => ({
   alterDate: schedule.alterDate || '2026-06-06T12:00:00.000Z',
 });
 
+const buildVehicleRow = vehicle => ({
+  '@id': `/delivery_courier_vehicles/${vehicle.id}`,
+  id: vehicle.id,
+  courier: vehicle.courier,
+  vehicleType: vehicle.vehicleType || 'moto',
+  brand: vehicle.brand || 'Honda',
+  model: vehicle.model || 'CG 160',
+  plate: String(vehicle.plate || 'ABC1D23').replace(/\s+/g, '').toUpperCase(),
+  year: Number(vehicle.year || 2024),
+  color: vehicle.color || 'Preta',
+  creationDate: vehicle.creationDate || '2026-06-06T12:00:00.000Z',
+  alterDate: vehicle.alterDate || '2026-06-06T12:00:00.000Z',
+});
+
 const buildPresenceRow = presence => ({
   '@id': `/delivery_courier_company_presences/${presence.id}`,
   id: presence.id,
@@ -202,19 +216,33 @@ const createCourier = (id = 7, overrides = {}) => ({
 });
 
 const createDeliveryApiMock = async (page, initialState = {}) => {
+  const defaultCourier = initialState.courier || createCourier();
   const state = {
-    courier: initialState.courier || createCourier(),
+    courier: defaultCourier,
     companies: initialState.companies || [
       createCompany(3, { name: 'Restaurante Centro', alias: 'Centro' }),
       createCompany(4, { name: 'Restaurante Noite', alias: 'Noite' }),
     ],
     defaultCompany: initialState.defaultCompany || createCompany(3, { name: 'Restaurante Centro', alias: 'Centro' }),
     groups: Array.isArray(initialState.groups) ? [...initialState.groups] : [],
+    vehicles: Array.isArray(initialState.vehicles) ? [...initialState.vehicles] : [
+      buildVehicleRow({
+        id: initialState.nextVehicleId || 151,
+        courier: defaultCourier,
+        vehicleType: 'moto',
+        brand: 'Honda',
+        model: 'CG 160',
+        plate: 'ABC1D23',
+        year: 2024,
+        color: 'Preta',
+      }),
+    ],
     schedules: Array.isArray(initialState.schedules) ? [...initialState.schedules] : [],
     presences: Array.isArray(initialState.presences) ? [...initialState.presences] : [],
     logs: Array.isArray(initialState.logs) ? [...initialState.logs] : [],
     deviceId: initialState.deviceId || 'web-7',
     nextGroupId: initialState.nextGroupId || 101,
+    nextVehicleId: initialState.nextVehicleId || 152,
     nextScheduleId: initialState.nextScheduleId || 201,
     nextPresenceId: initialState.nextPresenceId || 301,
   };
@@ -259,6 +287,19 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     }
 
     return normalizedSchedule;
+  };
+
+  const upsertVehicle = vehicle => {
+    const normalizedVehicle = buildVehicleRow(vehicle);
+    const existingIndex = state.vehicles.findIndex(item => String(item.id) === String(normalizedVehicle.id));
+
+    if (existingIndex >= 0) {
+      state.vehicles[existingIndex] = normalizedVehicle;
+    } else {
+      state.vehicles.push(normalizedVehicle);
+    }
+
+    return normalizedVehicle;
   };
 
   const upsertPresence = presence => {
@@ -431,6 +472,44 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
 
     if (pathname === 'people/7') {
       return fulfillJson(route, state.courier);
+    }
+
+    if (pathname === 'delivery_courier_vehicles' && method === 'GET') {
+      const courierId = String(url.searchParams.get('courier') || '').replace(/\D+/g, '');
+      const items = courierId
+        ? state.vehicles.filter(vehicle => String(vehicle.courier?.id || vehicle.courierId || '') === courierId)
+        : state.vehicles;
+
+      return fulfillJson(route, normalizeCollectionResponse(items));
+    }
+
+    if (pathname === 'delivery_courier_vehicles' && method === 'POST') {
+      const body = postBody();
+      const requiredFields = ['vehicleType', 'brand', 'model', 'plate', 'year'];
+      const hasMissingField = requiredFields.some(field => !String(body?.[field] ?? '').trim());
+
+      if (hasMissingField) {
+        return route.fulfill({
+          status: 400,
+          headers: jsonHeaders(),
+          body: JSON.stringify({
+            message: 'Informe marca, modelo, ano e placa do veículo.',
+          }),
+        });
+      }
+
+      const saved = upsertVehicle({
+        id: state.nextVehicleId++,
+        courier: state.courier,
+        vehicleType: body?.vehicleType || 'moto',
+        brand: body?.brand || 'Honda',
+        model: body?.model || 'CG 160',
+        plate: body?.plate || 'ABC1D23',
+        year: body?.year || 2024,
+        color: body?.color || 'Preta',
+      });
+
+      return fulfillJson(route, saved);
     }
 
     if (pathname === 'delivery_tax_groups' && method === 'GET') {
@@ -700,38 +779,29 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
 };
 
 test.describe('delivery browser smoke', () => {
-  test('opens the courier setup and lands on the company association screen after save', async ({
+  test('opens the courier vehicle setup and lands on the rate table list after save', async ({
     page,
   }) => {
     await createDeliveryApiMock(page, {
-      groups: [],
+      vehicles: [],
     });
 
-    await page.goto('/delivery/courier/rates/setup');
+    await page.goto('/delivery/courier/vehicle/setup');
 
     await expect(page.getByRole('heading', { name: 'Cadastro do veículo' })).toBeVisible();
-    await expect(page.getByText('Salvar e continuar', { exact: true })).toBeVisible();
+    await expect(page.getByText('Salvar veículo', { exact: true })).toBeVisible();
 
-    const setupNameInput = page.getByPlaceholder('Ex.: Entrega região central');
-    await setupNameInput.click();
-    await setupNameInput.pressSequentially('Entrega Centro');
-    await expect(page.getByPlaceholder('Ex.: Entrega região central')).toHaveValue('Entrega Centro');
-    await page.getByPlaceholder('Opcional').first().fill('CENTRO');
-    await page.getByText('Moto', { exact: true }).locator('xpath=..').click();
-    await expect(page.getByText('Veículo: moto', { exact: true })).toBeVisible();
+    await page.getByText('Bicicleta', { exact: true }).locator('xpath=..').click();
+    await page.getByPlaceholder('Ex.: Honda').fill('Shimano');
+    await page.getByPlaceholder('Ex.: CG 160').fill('Breeze');
+    await page.getByPlaceholder('Ex.: 2024').fill('2025');
+    await page.getByPlaceholder('Ex.: ABC1D23').fill('xyz9q12');
+    await page.getByPlaceholder('Ex.: Preta').fill('Vermelha');
 
-    await page.getByPlaceholder('Km inicial').fill('0');
-    await page.getByPlaceholder('Km final').fill('5');
-    await page.getByPlaceholder('Valor por km').fill('3.50');
-    await page.getByPlaceholder('Mínimo por viagem').fill('10.00');
-    await page.getByPlaceholder('Mínimo da diária').fill('25.00');
+    await page.getByText('Salvar veículo', { exact: true }).click();
 
-    await page.getByText('Salvar e continuar', { exact: true }).locator('xpath=..').click();
-
-    await expect(page).toHaveURL(/delivery\/courier\/rates\/companies/);
-    await expect(page.getByRole('heading', { name: 'Associar empresas' })).toBeVisible();
-    await expect(page.getByText('Restaurante Centro - Centro', { exact: true }).last()).toBeVisible();
-    await expect(page.getByText('Restaurante Noite - Noite', { exact: true }).last()).toBeVisible();
+    await expect(page).toHaveURL(/delivery\/courier\/rates/);
+    await expect(page.getByRole('heading', { name: 'Minhas tabelas' })).toBeVisible();
   });
 
   test('opens the courier rate list, version detail and company activation pages', async ({

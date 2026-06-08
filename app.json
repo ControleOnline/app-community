@@ -73,6 +73,7 @@
           "recordAudioAndroid": false
         }
       ],
+      "@react-native-community/datetimepicker",
       [
         "react-native-nfc-manager",
         {

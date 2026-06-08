@@ -1,5 +1,5 @@
 const PRODUCT_DETAILS_TAB_PATH_REGEX =
-  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque)([?#].*)?$/i
+  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque|Vendas)([?#].*)?$/i
 
 export const normalizeProductDetailsTabPath = path => {
   const normalizedPath = String(path || '')

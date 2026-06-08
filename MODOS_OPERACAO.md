@@ -106,14 +106,16 @@
 - Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
 - Usa `ui-logistic` como home dedicada, com menu operacional.
-- A entrada do app fica travada ate existir pelo menos uma versao de tabela com `vehicleType` preenchido (`moto` ou `bike`).
+- A entrada do app fica travada ate existir pelo menos um veiculo completo na tabela propria de veiculos do courier.
+- O cadastro de veiculo e separado do cadastro de tabela: `DeliveryVehicleSetupPage` cuida apenas do veiculo e `DeliveryRateTableFormPage` cuida das versoes de tabela de entrega.
+- O veiculo do courier precisa guardar um snapshot rico com `vehicleType`, `brand`, `model`, `year`, `plate` e `color` opcional.
 - A home deve exibir menus para:
 - pedidos de entrega;
 - recebiveis do motoboy logado, considerando invoices em que ele e o `receiver`;
 - empresas homologadas do motoboy logado, derivadas de `people_link` com `link_type=courier`;
 - tabelas de entrega do motoboy, que abrem a lista imutavel de versoes.
 - O fluxo de tabelas de entrega e composto por:
-- `DeliveryVehicleSetupPage` para o primeiro cadastro bloqueante;
+- `DeliveryVehicleSetupPage` para o primeiro cadastro bloqueante e completo do veiculo;
 - `DeliveryRateTablesPage` para a lista de versoes do courier;
 - `DeliveryRateTableFormPage` para criar nova versao a partir de um snapshot;
 - `DeliveryRateTableCompaniesPage` para associar empresas a uma versao;
@@ -128,6 +130,7 @@
 - `DeliveryPresenceInboxPage` para o manager ler a presenca por empresa;
 - `DeliveryPresenceDetailPage` para o detalhe somente leitura no manager;
 - o historico de conexao e desconexao sempre aparece na tela de detalhe via `EntityLogPage`.
+- A tabela de veiculos do courier e propria, com um unico registro principal por courier, e nao deve ser confundida com tabela de frete.
 - O modo manual exige motivo para conectar ou desconectar e cada evento gera log na tabela `log`.
 - As migrations desse slice precisam rodar no tenant `admin.controleonline.com` via `tenant:migrations:migrate`, nao no banco base direto.
 - O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.

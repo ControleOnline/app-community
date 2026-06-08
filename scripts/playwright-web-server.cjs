@@ -1,7 +1,6 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
-const { spawnSync } = require('child_process');
 
 const projectRoot = path.resolve(__dirname, '..');
 const outputDir = path.resolve(
@@ -10,8 +9,6 @@ const outputDir = path.resolve(
 );
 const host = process.env.PLAYWRIGHT_WEB_HOST || '127.0.0.1';
 const port = Number(process.env.PLAYWRIGHT_WEB_PORT || 4173);
-const envLocalFile = path.join(projectRoot, 'config/env.local.js');
-const envLocalSampleFile = path.join(projectRoot, 'config/env.local.sample.js');
 
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -34,45 +31,6 @@ const contentTypes = new Map([
   ['.woff2', 'font/woff2'],
 ]);
 
-const ensureEnvLocalFile = () => {
-  if (fs.existsSync(envLocalFile)) {
-    return;
-  }
-
-  if (!fs.existsSync(envLocalSampleFile)) {
-    throw new Error(
-      'config/env.local.js is missing and config/env.local.sample.js was not found.',
-    );
-  }
-
-  fs.copyFileSync(envLocalSampleFile, envLocalFile);
-};
-
-const buildWebExport = () => {
-  fs.rmSync(outputDir, { recursive: true, force: true });
-  ensureEnvLocalFile();
-
-  const command =
-    process.platform === 'win32' ? 'npx.cmd' : 'npx';
-
-  const result = spawnSync(
-    command,
-    ['expo', 'export', '--platform', 'web', '--output-dir', outputDir],
-    {
-      cwd: projectRoot,
-      env: {
-        ...process.env,
-        EXPO_NO_TELEMETRY: '1',
-      },
-      stdio: 'inherit',
-    },
-  );
-
-  if (result.status !== 0) {
-    process.exit(result.status || 1);
-  }
-};
-
 const isInsideOutputDir = candidate => {
   const relativePath = path.relative(outputDir, candidate);
   return !!relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
@@ -83,13 +41,21 @@ const resolveAssetPath = requestPath => {
   const normalizedPath = cleanPath === '/' ? '/index.html' : cleanPath;
   const candidatePath = path.resolve(outputDir, `.${normalizedPath}`);
 
-  if (isInsideOutputDir(candidatePath) && fs.existsSync(candidatePath) && fs.statSync(candidatePath).isFile()) {
+  if (
+    isInsideOutputDir(candidatePath) &&
+    fs.existsSync(candidatePath) &&
+    fs.statSync(candidatePath).isFile()
+  ) {
     return candidatePath;
   }
 
   if (!path.extname(normalizedPath)) {
     const htmlCandidate = path.resolve(outputDir, `.${normalizedPath}/index.html`);
-    if (isInsideOutputDir(htmlCandidate) && fs.existsSync(htmlCandidate) && fs.statSync(htmlCandidate).isFile()) {
+    if (
+      isInsideOutputDir(htmlCandidate) &&
+      fs.existsSync(htmlCandidate) &&
+      fs.statSync(htmlCandidate).isFile()
+    ) {
       return htmlCandidate;
     }
   }
@@ -110,6 +76,12 @@ const sendFile = (response, filePath) => {
   fs.createReadStream(filePath).pipe(response);
 };
 
+if (!fs.existsSync(path.join(outputDir, 'index.html'))) {
+  throw new Error(
+    `Playwright web output not found at ${outputDir}. Run \`npm run test:browser\` or \`node scripts/playwright-web-build.cjs\` first.`,
+  );
+}
+
 const server = http.createServer((request, response) => {
   const filePath = resolveAssetPath(request.url);
 
@@ -122,8 +94,6 @@ const server = http.createServer((request, response) => {
 
   sendFile(response, filePath);
 });
-
-buildWebExport();
 
 server.listen(port, host, () => {
   console.log(`Playwright web server ready at http://${host}:${port}`);
