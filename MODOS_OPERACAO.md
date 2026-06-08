@@ -109,6 +109,7 @@
 - A entrada do app fica travada ate existir pelo menos um veiculo completo na tabela propria de veiculos do courier.
 - O cadastro de veiculo e separado do cadastro de tabela: `DeliveryVehicleSetupPage` cuida apenas do veiculo e `DeliveryRateTableFormPage` cuida das versoes de tabela de entrega.
 - O veiculo do courier precisa guardar um snapshot rico com `vehicleType`, `brand`, `model`, `year`, `plate` e `color` opcional.
+- O cadastro do veiculo e permitido para pessoa fisica autenticada; contas juridicas nao registram nem alteram esse registro.
 - A home deve exibir menus para:
 - pedidos de entrega;
 - recebiveis do motoboy logado, considerando invoices em que ele e o `receiver`;
