@@ -152,6 +152,18 @@ const buildPresenceRow = presence => ({
   alterDate: presence.alterDate || '2026-06-06T12:00:00.000Z',
 });
 
+const buildLogRow = log => ({
+  '@id': `/logs/${log.id}`,
+  id: log.id,
+  rowId: log.rowId,
+  className: log.className || '',
+  entityIri: log.entityIri || '',
+  action: log.action || 'update',
+  createdAt: log.createdAt || '2026-06-06T12:30:00.000Z',
+  userDisplayName: log.userDisplayName || 'Sistema',
+  payload: log.payload || {},
+});
+
 const createFakeSession = ({
   userId = 7,
   companyId = 3,
@@ -200,6 +212,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     groups: Array.isArray(initialState.groups) ? [...initialState.groups] : [],
     schedules: Array.isArray(initialState.schedules) ? [...initialState.schedules] : [],
     presences: Array.isArray(initialState.presences) ? [...initialState.presences] : [],
+    logs: Array.isArray(initialState.logs) ? [...initialState.logs] : [],
     deviceId: initialState.deviceId || 'web-7',
     nextGroupId: initialState.nextGroupId || 101,
     nextScheduleId: initialState.nextScheduleId || 201,
@@ -565,6 +578,20 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, normalizeCollectionResponse(items));
     }
 
+    if (pathname === 'logs' && method === 'GET') {
+      const rowId = String(url.searchParams.get('row') || '').replace(/\D+/g, '');
+      const className = String(url.searchParams.get('class') || '').trim();
+      const entityIri = String(url.searchParams.get('entity') || '').trim();
+      const items = state.logs.filter(log => {
+        const matchesRow = !rowId || String(log.rowId || log.row || '').replace(/\D+/g, '') === rowId;
+        const matchesClass = !className || !log.className || String(log.className) === className;
+        const matchesEntity = !entityIri || !log.entityIri || String(log.entityIri) === entityIri;
+        return matchesRow && matchesClass && matchesEntity;
+      });
+
+      return fulfillJson(route, normalizeCollectionResponse(items));
+    }
+
     if (pathname === 'delivery_courier_company_presences' && method === 'POST') {
       const body = postBody();
       const companyId = String(body?.companyId || '').replace(/\D+/g, '');
@@ -770,6 +797,13 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Empresas', { exact: true }).last()).toBeVisible();
 
+    await page.getByText('Histórico', { exact: true }).last().click();
+
+    await expect(page.getByRole('heading', { name: 'Histórico da tabela' })).toBeVisible();
+    await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
+
+    await page.goto('/delivery/manager/rates/version?id=101');
+
     await page.getByText('Empresas', { exact: true }).last().click();
 
     await expect(page.getByRole('heading', { name: 'Ativação por empresa' })).toBeVisible();
@@ -872,5 +906,121 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Imprevisto na rota')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Ligar' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Desligar' })).toHaveCount(0);
+  });
+
+  test('opens the courier table form and saves a new version draft', async ({ page }) => {
+    await createDeliveryApiMock(page);
+
+    await page.goto('/delivery/courier/rates/form');
+
+    await expect(page.getByRole('heading', { name: 'Nova tabela' })).toBeVisible();
+    await expect(page.getByText('Salvar tabela', { exact: true })).toBeVisible();
+
+    await page.getByPlaceholder('Ex.: Entrega região central').fill('Entrega Centro');
+    await page.getByPlaceholder('Opcional').first().fill('CENTRO');
+    await page.getByText('Moto', { exact: true }).locator('xpath=..').click();
+
+    await page.getByPlaceholder('Km inicial').fill('0');
+    await page.getByPlaceholder('Km final').fill('5');
+    await page.getByPlaceholder('Valor por km').fill('3.50');
+    await page.getByPlaceholder('Mínimo por viagem').fill('10.00');
+    await page.getByPlaceholder('Mínimo da diária').fill('25.00');
+
+    await page.getByText('Salvar tabela', { exact: true }).locator('xpath=..').click();
+
+    await expect(page).toHaveURL(/delivery\/courier\/rates\/companies/);
+    await expect(page.getByRole('heading', { name: 'Associar empresas' })).toBeVisible();
+    await expect(page.getByText('Restaurante Centro - Centro', { exact: true }).last()).toBeVisible();
+  });
+
+  test('opens the courier presence history screen from the detail view', async ({ page }) => {
+    await createDeliveryApiMock(page, {
+      presences: [
+        buildPresenceRow({
+          id: 301,
+          company: createCompany(3, { name: 'Restaurante Centro', alias: 'Centro' }),
+          courier: createCourier(),
+          availabilityMode: 'manual',
+          isOnline: true,
+          manualReason: 'Imprevisto na rota',
+          schedules: [
+            buildScheduleRow({
+              id: 201,
+              courier: createCourier(),
+              label: 'Segunda - manha',
+              weekday: 1,
+              startTime: '10:00',
+              endTime: '12:00',
+              active: true,
+              usageCount: 2,
+            }),
+          ],
+          schedulesSummary: 'Segunda - manha',
+        }),
+      ],
+      logs: [
+        buildLogRow({
+          id: 9001,
+          rowId: 301,
+          className: 'ControleOnline\\Entity\\DeliveryCourierCompanyPresence',
+          entityIri: '/delivery_courier_company_presences/301',
+          action: 'update',
+          payload: {
+            message: 'Imprevisto na rota',
+            availabilityMode: 'manual',
+            isOnline: true,
+            manualReason: 'Imprevisto na rota',
+          },
+        }),
+      ],
+    });
+
+    await page.goto('/delivery/courier/presence/detail?companyId=3');
+
+    await expect(page.getByText('Restaurante Centro - Centro', { exact: true }).first()).toBeVisible();
+    await page.getByText('Historico', { exact: true }).click();
+
+    await expect(page).toHaveURL(/delivery\/courier\/presence\/history/);
+    await expect(page.getByText('Timeline')).toBeVisible();
+    await expect(page.getByText('Imprevisto na rota').last()).toBeVisible();
+  });
+
+  test('opens the manager presence history screen in read only mode', async ({ page }) => {
+    await createDeliveryApiMock(page, {
+      presences: [
+        buildPresenceRow({
+          id: 301,
+          company: createCompany(3, { name: 'Restaurante Centro', alias: 'Centro' }),
+          courier: createCourier(),
+          availabilityMode: 'manual',
+          isOnline: true,
+          manualReason: 'Imprevisto na rota',
+          schedulesSummary: 'Segunda - manha',
+        }),
+      ],
+      logs: [
+        buildLogRow({
+          id: 9001,
+          rowId: 301,
+          className: 'ControleOnline\\Entity\\DeliveryCourierCompanyPresence',
+          entityIri: '/delivery_courier_company_presences/301',
+          action: 'update',
+          payload: {
+            message: 'Imprevisto na rota',
+            availabilityMode: 'manual',
+            isOnline: true,
+            manualReason: 'Imprevisto na rota',
+          },
+        }),
+      ],
+    });
+
+    await page.goto(
+      '/delivery/manager/presence/history?id=301&store=delivery_courier_company_presences&entityClass=ControleOnline%5CEntity%5CDeliveryCourierCompanyPresence&entityLabel=Restaurante%20Centro%20-%20Centro',
+    );
+
+    await expect(page.getByText('Timeline')).toBeVisible();
+    await expect(page.getByText('Restaurante Centro - Centro', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Imprevisto na rota').last()).toBeVisible();
   });
 });

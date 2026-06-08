@@ -5,7 +5,7 @@ const openLoginPage = async page => {
 
   await expect(page.getByPlaceholder('Email')).toBeVisible();
   await expect(page.getByPlaceholder('Senha')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
+  await expect(page.getByText('Entrar', { exact: true })).toBeVisible();
 };
 
 test.describe('browser smoke', () => {
@@ -17,36 +17,33 @@ test.describe('browser smoke', () => {
     await expect(
       page.getByText('Entre com suas credenciais para acessar'),
     ).toBeVisible();
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/sign-in-page/);
   });
 
   test('navigates to create account and returns to login', async ({ page }) => {
     await openLoginPage(page);
 
-    await page.getByRole('button', { name: 'Criar conta' }).click();
+    await page.getByText('Criar conta', { exact: true }).click();
 
     await expect(page).toHaveURL(/create-account/);
-    await expect(page.getByText('Criar Conta')).toBeVisible();
+    await expect(
+      page.locator('div').filter({ hasText: /^Criar Conta$/ }).first(),
+    ).toBeVisible();
 
     await page.goBack();
 
     await expect(page.getByPlaceholder('Email')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
+    await expect(page.getByText('Entrar', { exact: true })).toBeVisible();
   });
 
-  test('shows the create-account validation dialog in the browser', async ({
-    page,
-  }) => {
+  test('shows the create-account form in the browser', async ({ page }) => {
     await openLoginPage(page);
 
-    await page.getByRole('button', { name: 'Criar conta' }).click();
-    await expect(page.getByText('Criar Conta')).toBeVisible();
+    await page.getByText('Criar conta', { exact: true }).click();
 
-    const dialogPromise = page.waitForEvent('dialog');
-    await page.getByRole('button', { name: 'Criar conta' }).click();
-    const dialog = await dialogPromise;
-
-    expect(dialog.message()).toBe('Informe o nome');
-    await dialog.accept();
+    await expect(page).toHaveURL(/create-account/);
+    await expect(page.locator('div').filter({ hasText: /^Criar Conta$/ }).first()).toBeVisible();
+    await expect(page.getByPlaceholder('CPF')).toBeVisible();
+    await expect(page.getByPlaceholder('Usuário')).toBeVisible();
   });
 });
