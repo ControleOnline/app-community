@@ -60,6 +60,11 @@ jobs:
         run: |
           EXPO_OS=web npx expo export --platform web
 
+      - name: Prepare webOS icon
+        run: |
+          ASSET_TYPE=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          cp ./src/assets/${ASSET_TYPE}/favicon.png ./dist/favicon.png
+          
       - name: Create webOS appinfo.json
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
