@@ -93,41 +93,12 @@ module.exports = () => {
     expo.web.favicon = updateAssetPath(expo.web.favicon, assetsFolder);
   }
 
-  // ===== INÍCIO DA MODIFICAÇÃO =====
-  // Quando for export web/LG, removemos plugins nativos.
-  // Esses plugins são usados apenas em Android/iOS e podem quebrar o `expo export --platform web`.
-
-  const isWeb = process.env.EXPO_OS === 'web';
-
-  const getPluginName = plugin => Array.isArray(plugin) ? plugin[0] : plugin;
-
-  const nativeOnlyPlugins = [
-    'react-native-maps',
-    'react-native-nfc-manager',
-    'react-native-iap',
-    'expo-notifications',
-    'expo-camera',
-    'expo-audio',
-    'expo-build-properties',
-    './withAndroidTV',
-    './withKioskMode',
-    './withBackgroundRuntime',
-    './withVectorIconsFonts',
-  ];
-
   const plugins = Array.isArray(expo.plugins) ? [...expo.plugins] : [];
-
-  expo.plugins = plugins.filter(plugin => {
-    const pluginName = getPluginName(plugin);
-
-    if (isWeb) {
-      return !nativeOnlyPlugins.includes(pluginName);
-    }
-
-    return pluginName !== 'react-native-maps';
-  });
-
-  // ===== FIM DA MODIFICAÇÃO =====
+  expo.plugins = plugins.filter(
+    plugin =>
+      plugin !== 'react-native-maps' &&
+      (!Array.isArray(plugin) || plugin[0] !== 'react-native-maps'),
+  );
 
   return expo;
 };
