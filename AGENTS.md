@@ -170,9 +170,9 @@
 
 ## Regra transversal de revenda da engenharia
 - A tela oficial de revenda da engenharia deve ficar em `/menu-costs-page/revenda`.
-- Essa tela carrega produtos reais do ERP do tipo `product` classificados como bebidas, sem consultar o seed JSON da engenharia.
-- A regra de classificacao de bebidas e a montagem da listagem devem ficar em `ui-products`; `ui-manager` deve apenas orquestrar a rota e a apresentacao.
-- `manufactured`, `component`, `feedstock` e `package` nao entram no recorte de revenda.
+- Essa tela usa uma classificacao operacional local da `MenuCostsPage`: bebidas prontas compradas e revendidas podem entrar no recorte de revenda mesmo quando o ERP ainda as traz como `feedstock`.
+- A classificacao local da engenharia deve ficar em `ui-manager/src/react/pages/MenuCostsPage/domain`, sem alterar o tipo gravado no banco nem virar regra global do ERP.
+- `manufactured`, `component`, `package`, `preparation`, `custom` e `service` nao entram no recorte de revenda.
 - A listagem de revenda deve usar carregamento infinito e paginação, igual as demais telas operacionais.
 
 ## Regra transversal de compras e evidencias da engenharia
