@@ -50,6 +50,22 @@ export const resolveThemePalette = (
     }),
     {},
   );
+  const extraThemeTokens = Object.keys(themeColors || {}).reduce(
+    (palette, key) => {
+      if (Object.prototype.hasOwnProperty.call(normalizedFallback, key)) {
+        return palette;
+      }
+
+      const normalized = normalizeHex(themeColors[key]);
+      const value = normalized || themeColors[key];
+      if (value) {
+        palette[key] = value;
+      }
+
+      return palette;
+    },
+    {},
+  );
 
   const firstThemeColor = (...keys) => {
     for (const key of keys) {
@@ -111,6 +127,7 @@ export const resolveThemePalette = (
 
   return {
     ...normalizedFallback,
+    ...extraThemeTokens,
     primary,
     secondary,
     background,

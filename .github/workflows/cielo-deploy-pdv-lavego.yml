@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
     types: [completed]
-    branches: [staging]
+    branches: [master]
   workflow_dispatch: {}
 
 jobs:

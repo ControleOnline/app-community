@@ -13,6 +13,10 @@ describe('browserPath', () => {
     expect(
       normalizeProductDetailsTabPath('/product-details/123/Dados?foo=1#bar'),
     ).toBe('product-details/123?foo=1#bar')
+
+    expect(
+      normalizeProductDetailsTabPath('/product-details/123/Vendas?foo=1#bar'),
+    ).toBe('product-details/123?foo=1#bar')
   })
 
   it('does not touch history when browser location is unavailable', () => {

@@ -1,0 +1,51 @@
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const projectRoot = path.resolve(__dirname, '..');
+const outputDir = path.resolve(
+  projectRoot,
+  process.env.PLAYWRIGHT_WEB_OUTPUT_DIR || '.playwright-web',
+);
+const envLocalFile = path.join(projectRoot, 'config/env.local.js');
+const envLocalSampleFile = path.join(projectRoot, 'config/env.local.sample.js');
+
+const ensureEnvLocalFile = () => {
+  if (fs.existsSync(envLocalFile)) {
+    return;
+  }
+
+  if (!fs.existsSync(envLocalSampleFile)) {
+    throw new Error(
+      'config/env.local.js is missing and config/env.local.sample.js was not found.',
+    );
+  }
+
+  fs.copyFileSync(envLocalSampleFile, envLocalFile);
+};
+
+const buildWebExport = () => {
+  fs.rmSync(outputDir, { recursive: true, force: true });
+  ensureEnvLocalFile();
+
+  const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+
+  const result = spawnSync(
+    command,
+    ['expo', 'export', '--platform', 'web', '--output-dir', outputDir],
+    {
+      cwd: projectRoot,
+      env: {
+        ...process.env,
+        EXPO_NO_TELEMETRY: '1',
+      },
+      stdio: 'inherit',
+    },
+  );
+
+  if (result.status !== 0) {
+    process.exit(result.status || 1);
+  }
+};
+
+buildWebExport();

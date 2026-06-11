@@ -26,6 +26,14 @@ cd android
 ./gradlew bundleRelease --init-script ../signing.gradle
 ```
 
+### Browser smoke tests
+```bash
+npm run test:browser:install
+npm run test:browser
+```
+
+The browser suite exports the web app locally, serves it with a tiny static server, and runs Playwright smoke tests against the login and navigation flows.
+
 
 
 ### Comercial Contacts

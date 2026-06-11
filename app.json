@@ -73,6 +73,7 @@
           "recordAudioAndroid": false
         }
       ],
+      "@react-native-community/datetimepicker",
       [
         "react-native-nfc-manager",
         {
@@ -84,9 +85,7 @@
       [
         "expo-notifications",
         {
-          "sounds": [
-            "./src/assets/sound/caixa.m4a"
-          ]
+          "sounds": ["./src/assets/sound/caixa.m4a"]
         }
       ],
       "react-native-iap",

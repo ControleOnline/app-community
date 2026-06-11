@@ -93,6 +93,9 @@
 - Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva. 
 - Quando a regra for transversal entre módulos, o `AGENTS.md` da raiz também deve ser atualizado.
 - Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests 
+- Testes de browser do web ficam em `src/tests/browser` e usam Playwright.
+- Quando uma mudança tocar login, navegacao ou qualquer fluxo visivel no browser, atualize ou adicione um smoke test e valide com `npm run test:browser`.
+- Prefira seletores semanticos (`role`, `placeholder` e texto visivel) nos testes de browser; evite CSS/XPath fragil.
 - Tenha bom senso. Avisos do que cada ação faz é bem-vindo, mas lembr-se que são clientes que usam o sistema, ele não sabe o que é uma tabela device_config, então use uma linguagem mais adequada.
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.
 - Displays do tipo `products` consomem `order_product_queues`.
@@ -121,6 +124,12 @@
 - Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
 - A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
+
+## Regra transversal de tema
+- A fonte de verdade de cores e estilos de cliente e o tema salvo no banco e exposto em `themeStore.getters.colors` e `currentCompany.theme.colors`.
+- Nao introduzir novas cores fixas no codigo-fonte de telas; qualquer ajuste visual por cliente deve nascer de `theme` no banco.
+- Listagens e tabelas devem usar os tokens do tema para cabecalho, borda e zebra striping, com `bg-headers-light` e `bg-even-light` quando existirem.
+- O financeiro legado da empresa 21 deve ser definido por tema no banco, sem hardcode de preto, amarelo ou cinza dentro da tela.
 
 ## Regra transversal de grupos compartilhados
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
@@ -161,9 +170,9 @@
 
 ## Regra transversal de revenda da engenharia
 - A tela oficial de revenda da engenharia deve ficar em `/menu-costs-page/revenda`.
-- Essa tela carrega produtos reais do ERP do tipo `product` classificados como bebidas, sem consultar o seed JSON da engenharia.
-- A regra de classificacao de bebidas e a montagem da listagem devem ficar em `ui-products`; `ui-manager` deve apenas orquestrar a rota e a apresentacao.
-- `manufactured`, `component`, `feedstock` e `package` nao entram no recorte de revenda.
+- Essa tela usa uma classificacao operacional local da `MenuCostsPage`: bebidas prontas compradas e revendidas podem entrar no recorte de revenda mesmo quando o ERP ainda as traz como `feedstock`.
+- A classificacao local da engenharia deve ficar em `ui-manager/src/react/pages/MenuCostsPage/domain`, sem alterar o tipo gravado no banco nem virar regra global do ERP.
+- `manufactured`, `component`, `package`, `preparation`, `custom` e `service` nao entram no recorte de revenda.
 - A listagem de revenda deve usar carregamento infinito e paginação, igual as demais telas operacionais.
 
 ## Regra transversal de compras e evidencias da engenharia
@@ -175,6 +184,11 @@
 
 ## Regra transversal de dock operacional
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
+- O modo `single-item` segue o mesmo contrato de `PDV` para a dock, mas usa catalogo sem categoria, carrinho com um item principal por vez e volta para `OrderHistoryPage` ao concluir a venda.
+
+## Regra transversal de checkout Cielo
+- No browser/web, pagamento `Cielo` nunca pode acionar plugin nativo local. Nesse ambiente, a cobranca deve seguir pelo fluxo remoto via websocket para uma maquina Cielo configurada e o retorno vem por callback no store de `invoice`.
+- O caminho local de `Cielo` continua permitido apenas em device nativo compatível com o gateway local.
 
 ## Regra transversal de runtime em background
 - Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.

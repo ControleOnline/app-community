@@ -26,6 +26,9 @@ ios/.xcode.env.local
 android/
 ios/
 dist/
+.playwright-web/
+playwright-report/
+test-results/
 
 # Android/IntelliJ
 #
