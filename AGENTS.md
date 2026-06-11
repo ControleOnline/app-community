@@ -184,6 +184,7 @@
 
 ## Regra transversal de dock operacional
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
+- O modo `single-item` segue o mesmo contrato de `PDV` para a dock, mas usa catalogo sem categoria, carrinho com um item principal por vez e volta para `OrderHistoryPage` ao concluir a venda.
 
 ## Regra transversal de runtime em background
 - Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.

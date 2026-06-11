@@ -240,6 +240,20 @@
 - Em web/manager, o mesmo fluxo nao pode burlar a restricao de cobranca local do `MANAGER`.
 - Quando o pedido vier de outra atividade, o PDV nao deve perder o contexto operacional original; ele apenas assume a etapa de caixa e conclusao.
 
+### VENDA UNITARIA
+- Visao:
+- Variante de `POS` para venda unitária, ao lado de totem, garcom, mesa e balcao.
+- Nao e um novo `APP_TYPE`; e apenas um modo operacional do `PDV`.
+- Modulos base:
+- `ui-orders` para pedido, checkout e retorno para a lista de pedidos.
+- `ui-products` para o catalogo direto, sem tela de categoria intermediaria.
+- Regras de negocio iniciais:
+- O catalogo abre em lista de produtos e servicos sem categoria.
+- O carrinho aceita apenas um produto principal por vez; ao selecionar outro item, o anterior e substituido.
+- O endpoint de persistencia do pedido deve trocar os produtos do pedido em vez de acumular itens.
+- Ao finalizar a venda, o fluxo volta para `OrderHistoryPage`.
+- O checkout precisa exibir as carteiras de dinheiro e, quando o gateway local for Cielo, manter as opcoes de pagamento da Cielo e o redirecionamento nativo para o app Cielo.
+
 ## Regras transversais do POS
 - Todo tipo de atividade do POS deve continuar usando o mesmo fluxo unificado de pedido e checkout.
 - Nao criar um checkout diferente para cada atividade.
