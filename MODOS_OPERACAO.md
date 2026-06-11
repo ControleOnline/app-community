@@ -252,7 +252,7 @@
 - O carrinho aceita apenas um produto principal por vez; ao selecionar outro item, o anterior e substituido.
 - O endpoint de persistencia do pedido deve trocar os produtos do pedido em vez de acumular itens.
 - Ao finalizar a venda, o fluxo volta para `OrderHistoryPage`.
-- O checkout precisa exibir as carteiras de dinheiro e, quando o gateway local for Cielo, manter as opcoes de pagamento da Cielo e o redirecionamento nativo para o app Cielo.
+- O checkout precisa exibir as carteiras de dinheiro e, no browser/web, tratar Cielo como cobranca remota para uma maquina Cielo via websocket; somente em device nativo Cielo a cobranca local pode redirecionar para o app Cielo.
 
 ## Regras transversais do POS
 - Todo tipo de atividade do POS deve continuar usando o mesmo fluxo unificado de pedido e checkout.

@@ -124,6 +124,41 @@ const createPaymentOption = ({
   paymentCode,
 });
 
+const buildRemotePaymentResultMessage = ({
+  invoiceId,
+  orderId,
+  paidAmount,
+  payment,
+  requestKey,
+  targetDeviceId,
+  targetDeviceLabel,
+  targetGateway,
+}) => ({
+  destination: 'web-7',
+  store: 'invoice',
+  action: 'pay-result',
+  requestKey,
+  status: 'success',
+  order: String(orderId || '').replace(/\D/g, ''),
+  total: Number(paidAmount || 0),
+  paidAmount: Number(paidAmount || 0),
+  paymentLabel: payment?.paymentType?.paymentType || 'Pagamento',
+  targetDeviceId,
+  targetDeviceLabel,
+  targetGateway,
+  invoice: {
+    '@id': `/invoices/${invoiceId}`,
+    id: invoiceId,
+    dueDate: '2026-06-11T00:00:00.000Z',
+    status: '/statuses/902',
+    destinationWallet: payment?.wallet?.['@id'] || '/wallets/102',
+    paymentType: payment?.paymentType?.['@id'] || '/payment_types/2',
+    price: Number(paidAmount || 0),
+    receiver: '/people/3',
+    order: `/orders/${String(orderId || '').replace(/\D/g, '')}`,
+  },
+});
+
 const createPosApiMock = async (page, initialState = {}) => {
   const productOne = initialState.productOne || createProduct(101, {
     product: 'Coxinha',
@@ -186,6 +221,25 @@ const createPosApiMock = async (page, initialState = {}) => {
         'pos-paid-status': 902,
       }),
     },
+    remoteDeviceConfig:
+      initialState.remoteDeviceConfig || {
+        id: 2,
+        device: {
+          id: 2,
+          device: 'cielo-1',
+          alias: 'Cielo Principal',
+        },
+        people: {
+          id: 3,
+        },
+        type: 'PDV',
+        configs: JSON.stringify({
+          'config-version': APP_VERSION,
+          'pos-gateway': 'cielo',
+          'pos-type': 'simple',
+          'cash-wallet-closed-id': 0,
+        }),
+      },
     runtimeConfigs: initialState.runtimeConfigs || {
       'pos-cash-wallet': 101,
       'pos-cielo-wallet': 102,
@@ -235,6 +289,10 @@ const createPosApiMock = async (page, initialState = {}) => {
     lastReplaceProductsPayload: null,
     lastInvoicePayload: null,
   };
+
+  state.deviceConfigs = Array.isArray(initialState.deviceConfigs)
+    ? initialState.deviceConfigs
+    : [state.deviceConfig, state.remoteDeviceConfig];
 
   state.orders = state.orders.length > 0 ? state.orders : [state.order];
 
@@ -377,7 +435,7 @@ const createPosApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'device_configs' && method === 'GET') {
-      return fulfillJson(route, collection([state.deviceConfig]));
+      return fulfillJson(route, collection(state.deviceConfigs));
     }
 
     if (pathname === 'device_configs/add-configs' && method === 'POST') {
@@ -397,6 +455,24 @@ const createPosApiMock = async (page, initialState = {}) => {
         type: body?.type || state.deviceConfig.type || 'PDV',
         configs: nextConfigs,
       };
+
+      state.deviceConfigs = (Array.isArray(state.deviceConfigs) ? state.deviceConfigs : [])
+        .map(deviceConfig =>
+          String(deviceConfig?.device?.device || deviceConfig?.device || '') ===
+          String(body?.device || state.deviceId || 'web-7')
+            ? state.deviceConfig
+            : deviceConfig,
+        );
+
+      if (
+        !state.deviceConfigs.some(
+          deviceConfig =>
+            String(deviceConfig?.device?.device || deviceConfig?.device || '') ===
+            String(body?.device || state.deviceId || 'web-7'),
+        )
+      ) {
+        state.deviceConfigs.unshift(state.deviceConfig);
+      }
 
       return fulfillJson(route, state.deviceConfig);
     }
@@ -436,7 +512,22 @@ const createPosApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'wallet_payment_types' && method === 'GET') {
-      return fulfillJson(route, collection(state.paymentOptions));
+      const walletIds = [
+        ...url.searchParams.getAll('wallet[]'),
+        ...url.searchParams.getAll('wallet'),
+        url.searchParams.get('wallet'),
+      ]
+        .map(value => String(value || '').trim())
+        .filter(Boolean);
+
+      const requestedWalletIds = new Set(walletIds);
+      const filteredPaymentOptions = requestedWalletIds.size
+        ? state.paymentOptions.filter(payment =>
+            requestedWalletIds.has(String(payment?.wallet?.id || '').trim()),
+          )
+        : state.paymentOptions;
+
+      return fulfillJson(route, collection(filteredPaymentOptions));
     }
 
     if (pathname === 'statuses' && method === 'GET') {
@@ -639,6 +730,53 @@ test.describe('single-item browser smoke', () => {
     const invoiceRequest = await invoiceRequestPromise;
     expect(invoiceRequest.postDataJSON().price).toBe(12.5);
     expect(state.lastInvoicePayload.price).toBe(12.5);
+
+    await expect(page).toHaveURL(/order-history-page/);
+  });
+
+  test('sends the Cielo payment to the remote machine and returns after the websocket callback', async ({
+    page,
+  }) => {
+    bindBrowserDiagnostics(page);
+    const state = await createPosApiMock(page);
+
+    await bootstrapPosBrowser(page);
+
+    await page.goto('/checkout?id=123');
+
+    await expect(page.getByText('Dinheiro', { exact: true })).toBeVisible();
+    await expect(page.getByText('Crédito Cielo', { exact: true })).toBeVisible();
+
+    const websocketRequestPromise = page.waitForRequest(request =>
+      request.url().endsWith('/websocket') &&
+      request.method() === 'POST',
+    );
+
+    await page.getByText('Crédito Cielo', { exact: true }).click();
+    await expect(page.getByText('Enviar para Cielo Principal', { exact: true })).toBeVisible();
+    await page.getByText('Enviar para Cielo Principal', { exact: true }).click();
+    await page.getByText('Continuar', { exact: true }).click();
+
+    const websocketRequest = await websocketRequestPromise;
+    const websocketPayload = websocketRequest.postDataJSON();
+
+    await page.waitForFunction(
+      () => typeof window.__codexInjectInvoiceMessage === 'function',
+    );
+
+    await page.evaluate(
+      message => window.__codexInjectInvoiceMessage(message),
+      buildRemotePaymentResultMessage({
+        invoiceId: state.nextInvoiceId,
+        orderId: 123,
+        paidAmount: 12.5,
+        payment: state.paymentOptions[1],
+        requestKey: websocketPayload.requestKey,
+        targetDeviceId: 'cielo-1',
+        targetDeviceLabel: 'Cielo Principal',
+        targetGateway: 'cielo',
+      }),
+    );
 
     await expect(page).toHaveURL(/order-history-page/);
   });
