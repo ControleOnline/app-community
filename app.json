@@ -13,7 +13,7 @@
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.manager",
-      "versionCode": 1371,
+      "versionCode": 1373,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
@@ -85,7 +85,9 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./src/assets/sound/caixa.m4a"]
+          "sounds": [
+            "./src/assets/sound/caixa.m4a"
+          ]
         }
       ],
       "react-native-iap",
