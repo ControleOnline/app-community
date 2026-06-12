@@ -140,7 +140,8 @@
 
 ## Regra transversal de parâmetros da engenharia
 - A tela de parâmetros da engenharia tem rota própria em `/menu-costs-page/parametros`.
-- Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct` e `menu-costs-estimated-monthly-units`.
+- Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct`, `menu-costs-estimated-monthly-units` e `menu-costs-cost-engine-rules`.
+- A chave `menu-costs-cost-engine-rules` é o contrato oficial inicial do Motor de custo da engenharia para regras por canal, margem, taxa, comissão, repasse e arredondamento.
 - O carregamento desses dados deve acontecer ao exibir a rota; o botão `Parâmetros` da `MenuCostsPage` deve navegar para essa tela separada.
 
 ## Regra transversal de anexos de pedidos
