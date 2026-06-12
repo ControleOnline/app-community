@@ -486,6 +486,23 @@ const createPosApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, state.order);
     }
 
+    if (pathname === 'orders' && method === 'POST') {
+      const body = postBody(request);
+
+      state.order = {
+        ...state.order,
+        ...body,
+        id: state.order.id,
+        '@id': state.order['@id'],
+        orderProducts: Array.isArray(body?.orderProducts)
+          ? body.orderProducts
+          : state.order.orderProducts,
+      };
+      state.orders = [state.order];
+
+      return fulfillJson(route, state.order);
+    }
+
     const replaceProductsMatch = pathname.match(/^orders\/(\d+)\/replace-products$/);
     if (replaceProductsMatch && method === 'PUT') {
       const body = postBody(request);
@@ -672,7 +689,7 @@ const bindBrowserDiagnostics = page => {
 };
 
 test.describe('single-item browser smoke', () => {
-  test('opens the single-item catalog and replaces the selected product', async ({ page }) => {
+  test('opens checkout after selecting the single-item product', async ({ page }) => {
     bindBrowserDiagnostics(page);
     const state = await createPosApiMock(page);
 
@@ -696,8 +713,9 @@ test.describe('single-item browser smoke', () => {
     const replaceRequest = await replaceRequestPromise;
     expect(replaceRequest.postDataJSON()).toEqual([{ product: 102, quantity: 1 }]);
 
-    await expect(page.getByText('Selecionado', { exact: true })).toHaveCount(1);
-    await expect(page.getByText('Suco', { exact: true })).toBeVisible();
+    await expect(page).toHaveURL(/checkout/);
+    await expect(page.getByText('Dinheiro', { exact: true })).toBeVisible();
+    await expect(page.getByText('Crédito Cielo', { exact: true })).toBeVisible();
     expect(state.lastReplaceProductsPayload).toEqual([{ product: 102, quantity: 1 }]);
   });
 
