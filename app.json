@@ -85,9 +85,7 @@
       [
         "expo-notifications",
         {
-          "sounds": [
-            "./src/assets/sound/caixa.m4a"
-          ]
+          "sounds": ["./src/assets/sound/caixa.m4a" ]
         }
       ],
       "react-native-iap",
