@@ -67,13 +67,14 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-#
-#      - name: Fix Expo Dependencies
-#        run: npx expo install --fix
-#
-#      - name: Prebuild
-#        run: npx expo prebuild --clean
-#
+      - name: Update app.json package name
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.package        = 'com.lavego.app';
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
 
       - name: Prebuild
         run: npx expo prebuild --clean
