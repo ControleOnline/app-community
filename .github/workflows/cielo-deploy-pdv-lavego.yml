@@ -1,3 +1,6 @@
+# aplicativo PDV para loja da Cielo
+# usando APINEW
+
 name: Deploy Cielo PDV LAVEGO
 
 on:
@@ -43,10 +46,10 @@ jobs:
       - name: Generate Dynamic Configs
         run: |
           echo "const env = {\
-          API_ENTRYPOINT: 'https://api.lave-go.com',\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
-          SOCKET: 'wss://api.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
           COMPANY_NAME: 'lavego',\
           ZOOM: 0.80,\
