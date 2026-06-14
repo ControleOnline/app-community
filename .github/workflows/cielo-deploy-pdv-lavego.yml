@@ -67,14 +67,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Update app.json package name
+      - name: Update app.json dynamically
         run: |
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.android.package        = 'com.lavego.app';
+            app.expo.name                = 'Lave-Go';
+            app.expo.android.package     = 'com.lavego.app';
+            app.expo.slug                = 'pos-controle-online';
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
+          "           
 
       - name: Prebuild
         run: npx expo prebuild --clean

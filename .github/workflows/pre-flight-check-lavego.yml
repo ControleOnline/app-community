@@ -1,0 +1,347 @@
+# pre-flight-check-lavego.yml
+# Valida TUDO sem compilar — roda manualmente antes do deploy
+
+name: Pre-flight Check — Cielo PDV LAVEGO
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_TYPE: POS
+      PACKAGE_NAME: com.lavego.app
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      # ── 1. Versões das ferramentas ───────────────────────────────────
+      - name: "[CHECK] Versões das ferramentas"
+        run: |
+          echo "=== Node    ===" && node --version
+          echo "=== npm     ===" && npm --version
+          echo "=== Java    ===" && java -version 2>&1
+          echo "=== keytool ===" && keytool 2>&1 | head -1
+          echo "=== Expo    ===" && npx expo --version
+
+      # ── 2. Secrets ───────────────────────────────────────────────────
+      - name: "[CHECK] Secrets definidos"
+        run: |
+          ERRORS=0
+          check() {
+            local name="$1"
+            local value="$2"
+            if [ -z "$value" ]; then
+              echo "❌  AUSENTE  : $name"
+              ERRORS=$((ERRORS+1))
+            else
+              echo "✅  OK       : $name"
+            fi
+          }
+          check "CERT"                      "${{ secrets.CERT }}"
+          check "ANDROID_KEYSTORE_PASSWORD" "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          check "FTPHOST"                   "${{ secrets.FTPHOST }}"
+          check "FTPUSER"                   "${{ secrets.FTPUSER }}"
+          check "FTPPASS"                   "${{ secrets.FTPPASS }}"
+          check "NEW_RELIC_LICENSE_KEY"     "${{ secrets.NEW_RELIC_LICENSE_KEY }}"
+          check "NEW_RELIC_APPLICATION_ID"  "${{ secrets.NEW_RELIC_APPLICATION_ID }}"
+          check "NEW_RELIC_ACCOUNT_ID"      "${{ secrets.NEW_RELIC_ACCOUNT_ID }}"
+          check "NEW_RELIC_TRUST_KEY"       "${{ secrets.NEW_RELIC_TRUST_KEY }}"
+          check "NEW_RELIC_BEACON"          "${{ secrets.NEW_RELIC_BEACON }}"
+          check "NEW_RELIC_ERROR_BEACON"    "${{ secrets.NEW_RELIC_ERROR_BEACON }}"
+          check "GMAPS_GOOGLE_CLIENT_ID"    "${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}"
+
+          if [ $ERRORS -gt 0 ]; then
+            echo ""
+            echo "💥 $ERRORS secret(s) ausente(s). Abortando."
+            exit 1
+          fi
+          echo ""
+          echo "✅  Todos os secrets OK"
+
+      # ── 3. env.local.js ──────────────────────────────────────────────
+      - name: Generate Dynamic Configs
+        run: |
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          DOMAIN: 'https://app.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          APP_TYPE: '${APP_TYPE}',\
+          COMPANY_NAME: 'lavego',\
+          ZOOM: 0.80,\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: "[CHECK] env.local.js gerado"
+        run: |
+          if [ -f "./config/env.local.js" ]; then
+            echo "✅  env.local.js existe"
+            echo ""
+            echo "--- conteúdo (omitindo valores de secrets) ---"
+            grep -v "LICENSE_KEY\|APPLICATION_ID\|ACCOUNT_ID\|TRUST_KEY\|BEACON\|ERROR_BEACON" \
+              ./config/env.local.js
+          else
+            echo "❌  env.local.js NÃO encontrado"
+            exit 1
+          fi
+
+      # ── 4. Dependências ──────────────────────────────────────────────
+      - name: Install Dependencies
+        run: npm install
+
+      - name: "[CHECK] node_modules"
+        run: |
+          if [ -d "node_modules" ]; then
+            COUNT=$(ls node_modules | wc -l)
+            echo "✅  node_modules existe — $COUNT pacotes instalados"
+          else
+            echo "❌  node_modules NÃO encontrado"
+            exit 1
+          fi
+
+      # ── 5. app.json ──────────────────────────────────────────────────
+      - name: Update app.json dynamically
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.name            = 'Lave-Go';
+            app.expo.android.package = 'com.lavego.app';
+            app.expo.slug            = 'pos-controle-online';
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Update versionCode in app.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo "$VERSION" | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: "[CHECK] app.json campos"
+        run: |
+          node -e "
+            const app = require('./app.json');
+            const checks = [
+              ['expo.name',                app.expo.name,                'Lave-Go'],
+              ['expo.android.package',     app.expo.android.package,     'com.lavego.app'],
+              ['expo.slug',                app.expo.slug,                'pos-controle-online'],
+              ['expo.version',             app.expo.version,             null],
+              ['expo.android.versionCode', app.expo.android.versionCode, null],
+            ];
+            let errors = 0;
+            checks.forEach(([field, value, expected]) => {
+              if (expected && value !== expected) {
+                console.log('❌  ERRADO  : ' + field + ' = ' + value + '  (esperado: ' + expected + ')');
+                errors++;
+              } else if (value === undefined || value === null || value === '') {
+                console.log('❌  VAZIO   : ' + field);
+                errors++;
+              } else {
+                console.log('✅  OK      : ' + field + ' = ' + value);
+              }
+            });
+            if (errors > 0) { console.log(''); console.log('💥 app.json com erros'); process.exit(1); }
+            console.log('');
+            console.log('✅  app.json OK');
+          "
+
+      # ── 6. Prebuild (gera pasta android — não é compilação) ──────────
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      # ── 7. Estrutura Android ─────────────────────────────────────────
+      - name: "[CHECK] Estrutura Android pós-prebuild"
+        run: |
+          ERRORS=0
+          check_path() {
+            if [ -e "$1" ]; then
+              echo "✅  OK      : $1"
+            else
+              echo "❌  AUSENTE : $1"
+              ERRORS=$((ERRORS+1))
+            fi
+          }
+          check_path "android/app/build.gradle"
+          check_path "android/build.gradle"
+          check_path "android/settings.gradle"
+          check_path "android/gradlew"
+          check_path "android/gradle/wrapper/gradle-wrapper.properties"
+          check_path "android/app/src/main/AndroidManifest.xml"
+          check_path "android/app/src/main/res"
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "💥 $ERRORS arquivo(s)/pasta(s) ausente(s)"
+            exit 1
+          fi
+          echo ""
+          echo "✅  Estrutura Android OK"
+
+      - name: "[CHECK] vector-icons hook no build.gradle"
+        run: |
+          if grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle; then
+            echo "✅  vector-icons hook presente"
+          else
+            echo "❌  vector-icons hook AUSENTE em android/app/build.gradle"
+            exit 1
+          fi
+
+      - name: "[CHECK] applicationId no build.gradle"
+        run: |
+          APP_ID=$(grep 'applicationId' android/app/build.gradle | tr -d ' "' | cut -d'=' -f2)
+          echo "   applicationId encontrado: $APP_ID"
+          if echo "$APP_ID" | grep -q "com.lavego.app"; then
+            echo "✅  applicationId correto"
+          else
+            echo "❌  applicationId incorreto — esperado: com.lavego.app"
+            exit 1
+          fi
+
+      # ── 8. Keystore e signing ────────────────────────────────────────
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=${{ github.workspace }}/config/android/controle-online.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          } > ./config/android/env.properties
+
+      - name: "[CHECK] Keystore — tamanho mínimo"
+        run: |
+          KS="./config/android/controle-online.keystore"
+          SIZE=$(wc -c < "$KS")
+          echo "   Tamanho do arquivo: $SIZE bytes"
+          if [ "$SIZE" -lt 100 ]; then
+            echo "❌  Keystore muito pequeno — secret CERT provavelmente inválido"
+            exit 1
+          fi
+          echo "✅  Keystore existe ($SIZE bytes)"
+
+      - name: "[CHECK] Keystore — senha e alias válidos"
+        run: |
+          keytool -list \
+            -keystore ./config/android/controle-online.keystore \
+            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            -alias controle-online \
+            -v 2>&1 | tee /tmp/keytool_out.txt
+
+          if grep -q "Certificate fingerprints" /tmp/keytool_out.txt; then
+            echo ""
+            echo "✅  Keystore OK — alias e senha válidos"
+          else
+            echo ""
+            echo "❌  Falha ao validar keystore — senha ou alias incorretos"
+            exit 1
+          fi
+
+      - name: "[CHECK] signing.gradle existe"
+        run: |
+          if [ -f "signing.gradle" ]; then
+            echo "✅  signing.gradle existe"
+            echo ""
+            echo "--- conteúdo ---"
+            cat signing.gradle
+          else
+            echo "❌  signing.gradle NÃO encontrado na raiz do projeto"
+            exit 1
+          fi
+
+      - name: "[CHECK] env.properties campos"
+        run: |
+          EP="./config/android/env.properties"
+          ERRORS=0
+          for key in MYAPP_UPLOAD_STORE_FILE MYAPP_UPLOAD_KEY_ALIAS \
+                     MYAPP_UPLOAD_STORE_PASSWORD MYAPP_UPLOAD_KEY_PASSWORD; do
+            if grep -q "^${key}=" "$EP"; then
+              echo "✅  OK      : $key"
+            else
+              echo "❌  AUSENTE : $key"
+              ERRORS=$((ERRORS+1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then exit 1; fi
+          echo ""
+          echo "✅  env.properties OK"
+
+      # ── 9. Gradle dry-run (lista tarefas sem executar) ───────────────
+      - name: "[CHECK] Gradle wrapper version"
+        run: |
+          cd android
+          echo "--- gradle-wrapper.properties ---"
+          cat gradle/wrapper/gradle-wrapper.properties | grep distributionUrl
+          echo ""
+          ./gradlew --version
+
+      - name: "[CHECK] Gradle dry-run — assembleRelease"
+        run: |
+          cd android
+          ./gradlew assembleRelease \
+            --init-script ../signing.gradle \
+            --dry-run \
+            --warning-mode all \
+            2>&1 | tee /tmp/gradle_dryrun.txt
+
+          echo ""
+          echo "--- Tarefas que seriam executadas ---"
+          grep "SKIPPED\|:app:" /tmp/gradle_dryrun.txt | tail -30 || true
+          echo ""
+          echo "✅  Gradle dry-run OK — nenhum erro de configuração"
+
+      # ── 10. Resumo final ─────────────────────────────────────────────
+      - name: "📋 RESUMO FINAL"
+        if: always()
+        run: |
+          echo "========================================================"
+          echo "   PRE-FLIGHT CHECK — Cielo PDV LAVEGO"
+          echo "========================================================"
+          node -e "
+            try {
+              const app = require('./app.json');
+              console.log('  app name    : ' + app.expo.name);
+              console.log('  package     : ' + app.expo.android.package);
+              console.log('  slug        : ' + app.expo.slug);
+              console.log('  version     : ' + app.expo.version);
+              console.log('  versionCode : ' + app.expo.android.versionCode);
+            } catch(e) { console.log('  app.json    : não disponível'); }
+          " 2>/dev/null || true
+          echo "========================================================"
+          echo "  Se todos os passos acima estão ✅,"
+          echo "  o build de produção deve compilar sem erros."
+          echo "========================================================"
