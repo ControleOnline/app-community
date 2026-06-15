@@ -1,3 +1,6 @@
+# esse é o aplicativo para lave-go, de localização de franquias, 
+# é publicado na loja google -> lave-go
+
 name: Deploy Android Lave-Go Shop
 
 on:

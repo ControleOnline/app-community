@@ -1,3 +1,6 @@
+# aplicativo PDV para loja da Cielo
+# usando APINEW
+
 name: Deploy Cielo PDV LAVEGO
 
 on:
@@ -43,10 +46,10 @@ jobs:
       - name: Generate Dynamic Configs
         run: |
           echo "const env = {\
-          API_ENTRYPOINT: 'https://api.lave-go.com',\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
-          SOCKET: 'wss://api.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
           COMPANY_NAME: 'lavego',\
           ZOOM: 0.80,\
@@ -64,13 +67,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-#
-#      - name: Fix Expo Dependencies
-#        run: npx expo install --fix
-#
-#      - name: Prebuild
-#        run: npx expo prebuild --clean
-#
+      - name: Update app.json dynamically
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.name                = 'Lave-Go';
+            app.expo.android.package     = 'com.lavego.app';
+            app.expo.slug                = 'pos-controle-online';
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "           
 
       - name: Prebuild
         run: npx expo prebuild --clean

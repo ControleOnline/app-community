@@ -47,6 +47,9 @@
 - Identificação visual de pedido não pode ser redesenhada por tela. Cards, modais e detalhes operacionais devem reaproveitar o componente canônico `OrderHeader`, normalizando o payload se preciso, mas sem recriar número, cliente, datas ou status manualmente.
 - Quando um pedido estiver em `app=POS` e `externalCode` vier preenchido, esse valor representa o numero da mesa e deve ocupar o destaque principal no `OrderHeader`, mantendo o id tecnico do pedido como secundario.
 - Quando o payload trouxer `mainOrder.external_code`, esse valor representa o numero da comanda e o `OrderHeader` deve escrever `Comanda: #...` antes do nome do cliente, sem depender de `otherInformations`.
+- No POS, quando o pedido ja estiver pago e nao houver entrega nem fila de producao, ele deve ir direto para `closed` e nao permanecer em `paid`.
+- Se o pedido ja estiver pago e ainda houver entrega ou fila de producao, o proximo estado operacional deve ser `preparando`, nunca `paid`.
+- Itens so podem entrar na fila de producao quando o pedido ja estiver `paid` ou, em entrega, quando `order-charge-on-delivery-enabled` estiver ativo.
 - No front React, os dados operacionais devem vir somente de campos materializados do payload. Em logistica, motorista, telefone, rastreio e status devem sair de `deliveryPeople`, `deliveryPeopleId`, `delivery`, `currentIntegration` e campos equivalentes ja retornados pela API; `otherInformations` nao deve ser origem de exibicao.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
@@ -140,7 +143,8 @@
 
 ## Regra transversal de parâmetros da engenharia
 - A tela de parâmetros da engenharia tem rota própria em `/menu-costs-page/parametros`.
-- Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct` e `menu-costs-estimated-monthly-units`.
+- Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct`, `menu-costs-estimated-monthly-units` e `menu-costs-cost-engine-rules`.
+- A chave `menu-costs-cost-engine-rules` é o contrato oficial inicial do Motor de custo da engenharia para regras por canal, margem, taxa, comissão, repasse e arredondamento.
 - O carregamento desses dados deve acontecer ao exibir a rota; o botão `Parâmetros` da `MenuCostsPage` deve navegar para essa tela separada.
 
 ## Regra transversal de anexos de pedidos
