@@ -60,6 +60,8 @@
 - Vue está em fase de remoção. Quando um trabalho tocar um fluxo já coberto em React, remova o equivalente Vue em vez de duplicar a mudança. Se o módulo ainda não tiver equivalente React, apague `src/vue` mesmo assim e mantenha o pacote com um entrypoint neutro fora de `src/vue`, salvo quando o usuario pedir explicitamente para manter o legado.
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.
 - O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
+- O front deve ser `store-first`: use estado e ações de store como fonte de verdade sempre que existir contrato viável; `api.fetch` direto só em caso excepcionalíssimo e devidamente justificado no módulo.
+- Evite passar objetos entre telas, rotas e componentes quando o mesmo dado puder ser resolvido por store; passe apenas IDs, IRIs ou chaves mínimas e hidrate o restante no destino.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
 - Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e so deve ativar quando `APP_TYPE=POS` e `pos-operation-mode=kiosk`.
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
@@ -105,7 +107,8 @@
 - Telas `tv` e `orders` consomem a arvore completa de `orderProducts`.
 - `showInParentQueue` e regra visual de hierarquia; nao deve virar fila sintética nem persistencia extra.
 - `ProductGroup.showInDisplay` controla apenas a visibilidade operacional do titulo do grupo. Quando falso, o grupo continua existindo para agrupamento e impressao dos itens, mas o titulo fica oculto em `orders`, `tv` e `products`.
-- Toda lista deve ser paginada e ter carregamento infinito
+- Toda lista deve ser paginada e ter carregamento infinito; `itemsPerPage` so deve ser usado quando o contrato externo exigir e com justificativa clara no modulo.
+- Chamadas HTTP novas ou alteradas no front devem ser espelhadas na colecao Postman correspondente para documentacao e reproducao.
 - Não usar caminhos relativos (../../../). Ao invés de caminhos relativos, use alias configurados no babel, como @controleonline por exemplo
 - Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
 
