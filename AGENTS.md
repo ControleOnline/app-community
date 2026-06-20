@@ -50,6 +50,8 @@
 - No POS, quando o pedido ja estiver pago e nao houver entrega nem fila de producao, ele deve ir direto para `closed` e nao permanecer em `paid`.
 - Se o pedido ja estiver pago e ainda houver entrega ou fila de producao, o proximo estado operacional deve ser `preparando`, nunca `paid`.
 - Itens so podem entrar na fila de producao quando o pedido ja estiver `paid` ou, em entrega, quando `order-charge-on-delivery-enabled` estiver ativo.
+- `order.created` so deve ser anunciado por pedidos `sale`; `cart` continua sendo apenas rascunho.
+- Acoes de adicionar produto, alterar quantidade e remover item ficam liberadas apenas enquanto o pedido ainda for `cart`; depois da promocao para `sale` ou em qualquer estado terminal, a area de itens vira somente leitura.
 - No front React, os dados operacionais devem vir somente de campos materializados do payload. Em logistica, motorista, telefone, rastreio e status devem sair de `deliveryPeople`, `deliveryPeopleId`, `delivery`, `currentIntegration` e campos equivalentes ja retornados pela API; `otherInformations` nao deve ser origem de exibicao.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
