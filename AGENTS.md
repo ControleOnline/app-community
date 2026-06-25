@@ -65,7 +65,7 @@
 - O front deve ser `store-first`: use estado e ações de store como fonte de verdade sempre que existir contrato viável; `api.fetch` direto só em caso excepcionalíssimo e devidamente justificado no módulo.
 - Evite passar objetos entre telas, rotas e componentes quando o mesmo dado puder ser resolvido por store; passe apenas IDs, IRIs ou chaves mínimas e hidrate o restante no destino.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
-- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e so deve ativar quando `APP_TYPE=POS` e `pos-operation-mode=kiosk`.
+- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e deve ser controlada pela chave de device `android-kiosk-enabled`; na ausencia dessa chave, o runtime ainda respeita o fallback historico de `pos-operation-mode=kiosk`.
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.

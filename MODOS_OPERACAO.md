@@ -223,7 +223,9 @@
 - Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
 - O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
 - Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo, candidatura a launcher/Home e retomada no boot.
-- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV. O primeiro modo especializado dessa familia sera o `TOTEM` de mercado autonomo.
+- A ativacao do kiosk deve ser controlada por uma configuracao separada do device, como `android-kiosk-enabled`, independente do `pos-operation-mode`.
+- Devices antigos sem essa chave continuam aceitando o fallback historico do modo `kiosk` ate a migracao explicita.
+- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV e outra configuracao separada para ligar ou desligar o kiosk do Android.
 - A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 
 ### PDV
