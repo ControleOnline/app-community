@@ -256,6 +256,6 @@ jobs:
       - name: Trigger LG webOS Deploy PPC
         if: matrix.app_type == 'PPC'
         run: |
-          gh workflow run lg-webos-deploy-ppc-off.yml --ref "${GITHUB_REF_NAME}"
+          gh workflow run lg-webos-deploy-ppc.yml --ref "${GITHUB_REF_NAME}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
