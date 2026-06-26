@@ -144,21 +144,5 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
-      - name: Restore app.json (keep only versionCode)
-        run: |
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          cp app.json.backup app.json
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            app.expo.android.versionCode = $VERSION_CODE;
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
-
-      - name: Commit app.json changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.json
-          git commit -m "chore: update versionCode to ${{ env.VERSION }}"
-          git push
+      - name: Restore app.json
+        run: cp app.json.backup app.json
