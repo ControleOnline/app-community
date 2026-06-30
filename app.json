@@ -9,11 +9,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.87",
+    "version": "1.3.88",
     "android": {
       "jsEngine": "hermes",
 "package": "com.lavego.shop",
-      "versionCode": 1387,
+      "versionCode": 1388,
       "adaptiveIcon": {
 "foregroundImage": "./src/assets/shop_lavego/logo.png",
         "backgroundColor": "#ffffff"
