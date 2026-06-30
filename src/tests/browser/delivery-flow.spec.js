@@ -215,6 +215,276 @@ const createCourier = (id = 7, overrides = {}) => ({
   active: overrides.active !== undefined ? overrides.active : 1,
 });
 
+
+
+const createAddress = (id, overrides = {}) => ({
+  '@id': '/addresses/' + id,
+  id,
+  nickname: overrides.nickname || overrides.label || '',
+  number: overrides.number || '100',
+  complement: overrides.complement || '',
+  street: {
+    street: overrides.street || overrides.label || '',
+    district: {
+      district: overrides.district || 'Centro',
+      city: {
+        city: overrides.city || 'Sao Paulo',
+        state: {
+          uf: overrides.uf || 'SP',
+        },
+      },
+    },
+    cep: {
+      cep: overrides.cep || '01000-000',
+    },
+  },
+  latitude: overrides.latitude,
+  longitude: overrides.longitude,
+});
+
+const createCustomer = (id = 81, overrides = {}) => ({
+  '@id': '/people/' + id,
+  id,
+  name: overrides.name || 'Cliente Teste',
+  alias: overrides.alias || 'Cliente Teste',
+  phone: overrides.phone || [
+    {
+      id: 1,
+      ddi: '55',
+      ddd: '11',
+      phone: '99999-0000',
+    },
+  ],
+  email: overrides.email || [],
+});
+
+const createMainOrder = (id = 1200, overrides = {}) => ({
+  '@id': '/orders/' + id,
+  id,
+  externalCode: overrides.externalCode || ('CM-' + id),
+});
+const buildDeliveryOrderRow = (overrides = {}) => {
+  const courier = overrides.provider || createCourier();
+  const customer = overrides.client || createCustomer();
+  const mainOrder = overrides.mainOrder || createMainOrder();
+  const originAddress =
+    overrides.addressOrigin ||
+    createAddress('origin-1', {
+      label: 'Origem da viagem',
+      street: 'Rua das Flores',
+      number: '123',
+      district: 'Centro',
+      city: 'Sao Paulo',
+      uf: 'SP',
+      cep: '01000-010',
+      latitude: -23.55052,
+      longitude: -46.633308,
+    });
+  const destinationAddress =
+    overrides.addressDestination ||
+    createAddress('destination-1', {
+      label: 'Destino da viagem',
+      street: 'Avenida Paulista',
+      number: '1500',
+      district: 'Bela Vista',
+      city: 'Sao Paulo',
+      uf: 'SP',
+      cep: '01310-100',
+      latitude: -23.563987,
+      longitude: -46.654321,
+    });
+
+  return {
+    '@id': '/orders/' + (overrides.id || 991),
+    id: overrides.id || 991,
+    app: overrides.app || 'DELIVERY',
+    orderType: overrides.orderType || 'delivery',
+    provider: courier,
+    client: customer,
+    deliveryContact: overrides.deliveryContact || customer,
+    retrieveContact: overrides.retrieveContact || createCompany(3, { name: 'Restaurante Centro', alias: 'Centro' }),
+    addressOrigin: originAddress,
+    addressDestination: destinationAddress,
+    mainOrderId: overrides.mainOrderId ?? mainOrder.id,
+    main_order_id: overrides.main_order_id ?? mainOrder.id,
+    mainOrder,
+    price: overrides.price ?? 18.5,
+    status:
+      overrides.status ||
+      {
+        '@id': '/statuses/accept',
+        id: 999,
+        status: 'accept',
+        realStatus: 'accept',
+        color: '#16A34A',
+      },
+    deliveryPeopleId: overrides.deliveryPeopleId ?? courier.id,
+    deliveryPeople: overrides.deliveryPeople || courier,
+    comments: overrides.comments || 'Viagem aceita pelo motoboy teste.',
+    orderDate: overrides.orderDate || '2026-06-10T12:00:00.000Z',
+    alterDate: overrides.alterDate || '2026-06-10T12:05:00.000Z',
+    otherInformations: overrides.otherInformations || {},
+  };
+};
+
+const buildDeliveryLogisticsPayload = order => {
+  const courier = order?.deliveryPeople || order?.provider || createCourier();
+  const deliveryValue = Number(order?.price || 0) || 18.5;
+  const mainOrderId = order?.mainOrderId ?? order?.main_order_id ?? order?.mainOrder?.id ?? null;
+  const selectedQuoteId = Number(order?.id || 991) + 5000;
+  const trackingUrl = 'https://tracking.example.com/delivery/' + (order?.id || 991);
+
+  return {
+    order,
+    route: {
+      pickupAddress: order?.addressOrigin || null,
+      dropoffAddress: order?.addressDestination || null,
+      pickupContact: order?.retrieveContact || order?.provider || null,
+      dropoffContact: order?.deliveryContact || order?.client || null,
+      courierContact: courier,
+    },
+    management: {
+      mode: 'integration',
+      managedByStore: false,
+      label: 'Entrega aceita',
+      source: 'delivery',
+      mainOrderId,
+    },
+    providers: [
+      {
+        key: 'delivery',
+        label: 'Entrega aceita',
+        connected: true,
+        online: true,
+      },
+    ],
+    quotes: [
+      {
+        id: selectedQuoteId,
+        mainOrderId,
+        main_order_id: mainOrderId,
+        orderType: 'delivery',
+        app: 'delivery',
+        providerKey: 'delivery',
+        providerLabel: 'Entrega aceita',
+        price: deliveryValue,
+        eta: '35 min',
+        status: {
+          status: 'accept',
+          realStatus: 'accept',
+          name: 'accept',
+        },
+        quoteState: 'selected',
+        quoteMessage: 'Viagem aceita pelo motoboy teste.',
+        trackingUrl,
+        selected: true,
+        available: true,
+        requestable: false,
+        deliveryPeople: courier,
+      },
+    ],
+    selection: {
+      quoteOrderId: selectedQuoteId,
+      providerKey: 'delivery',
+      price: deliveryValue,
+      trackingUrl,
+      selectedAt: '2026-06-10T12:30:00.000Z',
+    },
+    quoteStatus: {
+      providers: 1,
+      quotes: 1,
+      ready: 0,
+      pending: 0,
+      selected: 1,
+      unavailable: 0,
+      error: 0,
+    },
+    delivery: {
+      deliveryPeopleId: courier?.id || null,
+      deliveryPeople: courier,
+      trackingUrl,
+      requestedAt: '2026-06-10T12:25:00.000Z',
+      status: 'accept',
+      currentIntegrationKey: 'delivery',
+    },
+  };
+};
+
+
+const createDeliveryHomeMenus = () => ({
+  modules: {
+    delivery: {
+      id: 'delivery-home',
+      label: 'Operacao',
+      icon: 'truck',
+      menus: [
+        {
+          id: 'delivery-orders',
+          menuKey: 'delivery_orders',
+          label: 'Pedidos de entrega',
+          route: 'DeliveryOrdersPage',
+          icon: 'shopping-bag',
+          color: '#0EA5E9',
+          sortOrder: 10,
+        },
+        {
+          id: 'delivery-receivables',
+          menuKey: 'delivery_receivables',
+          label: 'Recebiveis',
+          route: 'DeliveryReceivablesPage',
+          icon: 'dollar-sign',
+          color: '#16A34A',
+          sortOrder: 20,
+        },
+        {
+          id: 'delivery-companies',
+          menuKey: 'delivery_companies',
+          label: 'Empresas homologadas',
+          route: 'DeliveryCompaniesPage',
+          icon: 'home',
+          color: '#F97316',
+          sortOrder: 30,
+        },
+        {
+          id: 'delivery-rates',
+          menuKey: 'delivery_rates',
+          label: 'Minhas tabelas',
+          route: 'DeliveryRateTablesPage',
+          icon: 'list',
+          color: '#8B5CF6',
+          sortOrder: 40,
+        },
+      ],
+    },
+  },
+});
+
+const createRequestCounter = page => {
+  const counts = new Map();
+
+  const handler = request => {
+    if (request.method().toUpperCase() !== 'GET') {
+      return;
+    }
+
+    const url = request.url();
+    if (!url.startsWith(API_ORIGIN)) {
+      return;
+    }
+
+    const pathname = new URL(url).pathname.replace(/^\/+/, '');
+    counts.set(pathname, (counts.get(pathname) || 0) + 1);
+  };
+
+  page.on('request', handler);
+
+  return {
+    counts,
+    reset: () => counts.clear(),
+    stop: () => page.off('request', handler),
+  };
+};
+
 const createDeliveryApiMock = async (page, initialState = {}) => {
   const defaultCourier = initialState.courier || createCourier();
   const state = {
@@ -240,7 +510,10 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     schedules: Array.isArray(initialState.schedules) ? [...initialState.schedules] : [],
     presences: Array.isArray(initialState.presences) ? [...initialState.presences] : [],
     logs: Array.isArray(initialState.logs) ? [...initialState.logs] : [],
+    orders: Array.isArray(initialState.orders) ? [...initialState.orders] : [],
+    logisticsOrders: initialState.logisticsOrders || {},
     deviceId: initialState.deviceId || 'web-7',
+    menus: initialState.menus || { modules: {} },
     nextGroupId: initialState.nextGroupId || 101,
     nextVehicleId: initialState.nextVehicleId || 152,
     nextScheduleId: initialState.nextScheduleId || 201,
@@ -324,6 +597,32 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
   const findPresence = id =>
     state.presences.find(presence => String(presence.id) === String(id)) || null;
 
+
+  const findOrder = id =>
+    state.orders.find(order => String(order.id) === String(id)) || null;
+
+  const upsertOrder = order => {
+    const existingIndex = state.orders.findIndex(item => String(item.id) === String(order.id));
+
+    if (existingIndex >= 0) {
+      state.orders[existingIndex] = order;
+    } else {
+      state.orders.push(order);
+    }
+
+    return order;
+  };
+
+  const findLogisticsPayload = id => {
+    const existing = state.logisticsOrders[String(id)] || null;
+
+    if (existing) {
+      return existing;
+    }
+
+    const order = findOrder(id);
+    return order ? buildDeliveryLogisticsPayload(order) : null;
+  };
   await page.route(`${API_ORIGIN}/**`, async route => {
     const request = route.request();
     const url = new URL(request.url());
@@ -373,7 +672,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'menus-people') {
-      return fulfillJson(route, collection([]));
+      return fulfillJson(route, state.menus);
     }
 
     if (pathname.startsWith('translates')) {
@@ -474,6 +773,67 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, state.courier);
     }
 
+    if (pathname === 'orders' && method === 'GET') {
+      const providerId = String(url.searchParams.get('provider') || '').replace(/\D+/g, '');
+      const orderType = String(url.searchParams.get('orderType') || '').trim().toLowerCase();
+      const search = String(url.searchParams.get('search') || '').trim().toLowerCase();
+
+      const items = state.orders.filter(order => {
+        const matchesProvider =
+          !providerId ||
+          String(order?.provider?.id || order?.providerId || order?.provider || '')
+            .replace(/\D+/g, '') === providerId;
+        const matchesOrderType =
+          !orderType || String(order?.orderType || order?.order_type || '').trim().toLowerCase() === orderType;
+        const matchesSearch =
+          !search ||
+          [
+            order?.id,
+            order?.mainOrder?.externalCode,
+            order?.client?.name,
+            order?.client?.alias,
+            order?.deliveryContact?.name,
+            order?.deliveryContact?.alias,
+          ]
+            .map(value => String(value || '').toLowerCase())
+            .some(value => value.includes(search));
+
+        return matchesProvider && matchesOrderType && matchesSearch;
+      });
+
+      return fulfillJson(route, collection(items));
+    }
+
+    const orderItemMatch = pathname.match(/^orders\/(\d+)$/);
+    if (orderItemMatch && method === 'GET') {
+      return fulfillJson(route, findOrder(orderItemMatch[1]) || null);
+    }
+
+    if (orderItemMatch && ['POST', 'PUT', 'PATCH'].includes(method)) {
+      const body = postBody();
+      const orderId = Number(orderItemMatch[1]);
+      const currentOrder = findOrder(orderItemMatch[1]) || buildDeliveryOrderRow({ id: orderId });
+      const savedOrder = upsertOrder({
+        ...currentOrder,
+        ...body,
+        id: orderId,
+        "@id": '/orders/' + orderId,
+        mainOrderId:
+          body?.mainOrderId ?? body?.main_order_id ?? currentOrder.mainOrderId ?? currentOrder.main_order_id ?? currentOrder.mainOrder?.id ?? null,
+        main_order_id:
+          body?.main_order_id ?? body?.mainOrderId ?? currentOrder.main_order_id ?? currentOrder.mainOrderId ?? currentOrder.mainOrder?.id ?? null,
+        mainOrder: body?.mainOrder || currentOrder.mainOrder || null,
+        orderType: body?.orderType || body?.order_type || currentOrder.orderType || 'delivery',
+      });
+
+      return fulfillJson(route, savedOrder);
+    }
+
+    const logisticsOrderMatch = pathname.match(/^marketplace\/logistics\/orders\/(\d+)$/);
+    if (logisticsOrderMatch && method === 'GET') {
+      const payload = findLogisticsPayload(logisticsOrderMatch[1]);
+      return fulfillJson(route, payload || null);
+    }
     if (pathname === 'delivery_courier_vehicles' && method === 'GET') {
       const courierId = String(url.searchParams.get('courier') || '').replace(/\D+/g, '');
       const items = courierId
@@ -777,6 +1137,54 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
 
   return state;
 };
+
+
+test('opens the delivery home menu and routes without looping backend calls', async ({ page }) => {
+  await createDeliveryApiMock(page, {
+    menus: createDeliveryHomeMenus(),
+  });
+
+  const requestCounter = createRequestCounter(page);
+
+  const openDeliveryHome = async () => {
+    await page.goto('/');
+    await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
+    requestCounter.reset();
+  };
+
+  await openDeliveryHome();
+  await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
+  await expect(page).toHaveURL(/delivery\/orders/);
+  await expect(page.getByText('Pedidos atribuidos')).toBeVisible();
+  await page.waitForTimeout(250);
+  expect(requestCounter.counts.get('orders') || 0).toBeLessThanOrEqual(2);
+
+  await openDeliveryHome();
+  await page.getByText(/Delivery receivables|Recebiveis/).first().click();
+  await expect(page).toHaveURL(/delivery\/receivables/);
+  await expect(page.getByPlaceholder('Buscar recebivel')).toBeVisible();
+  await page.waitForTimeout(250);
+  expect(requestCounter.counts.get('invoices') || 0).toBeLessThanOrEqual(2);
+
+  await openDeliveryHome();
+  await page.getByText(/Delivery companies|Empresas homologadas/).first().click();
+  await expect(page).toHaveURL(/delivery\/companies/);
+  await expect(page.getByText('Empresas homologadas').first()).toBeVisible();
+  await expect(page.getByText('Lista de empresas')).toBeVisible();
+  await page.waitForTimeout(250);
+  expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
+  expect(requestCounter.counts.get('delivery_courier_company_presences') || 0).toBeLessThanOrEqual(2);
+
+  await openDeliveryHome();
+  await page.getByText(/Delivery rates|Minhas tabelas/).first().click();
+  await expect(page).toHaveURL(/delivery\/courier\/rates/);
+  await expect(page.getByRole('heading', { name: 'Minhas tabelas' })).toBeVisible();
+  await page.waitForTimeout(750);
+  expect(requestCounter.counts.get('delivery_courier_vehicles') || 0).toBeLessThanOrEqual(2);
+  expect(requestCounter.counts.get('delivery_tax_groups') || 0).toBeLessThanOrEqual(2);
+
+  requestCounter.stop();
+});
 
 test.describe('delivery browser smoke', () => {
   test('opens the courier vehicle setup and lands on the rate table list after save', async ({
@@ -1092,5 +1500,33 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Timeline')).toBeVisible();
     await expect(page.getByText('Restaurante Centro - Centro', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Imprevisto na rota').last()).toBeVisible();
+  });
+
+  test('opens an accepted delivery trip with route and order details', async ({ page }) => {
+    const deliveryOrder = buildDeliveryOrderRow();
+
+    await createDeliveryApiMock(page, {
+      orders: [deliveryOrder],
+      logisticsOrders: {
+        [deliveryOrder.id]: buildDeliveryLogisticsPayload(deliveryOrder),
+      },
+    });
+
+
+    await page.goto('/delivery/orders');
+
+    await expect(page.getByText('Cliente Teste').first()).toBeVisible();
+    await expect(page.getByText('accept').first()).toBeVisible();
+
+    await page.goto('/order-logistics-page?id=' + deliveryOrder.id);
+
+    await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
+    await expect(page.getByText('Valor da entrega', { exact: true })).toBeVisible();
+    await expect(page.getByText('Pedido principal', { exact: true })).toBeVisible();
+    await expect(page.getByText('#CM-1200', { exact: true })).toBeVisible();
+    await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
+    await expect(page.getByText('Origem', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Destino', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('accept').first()).toBeVisible();
   });
 });

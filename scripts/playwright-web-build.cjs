@@ -24,28 +24,64 @@ const ensureEnvLocalFile = () => {
   fs.copyFileSync(envLocalSampleFile, envLocalFile);
 };
 
+const overrideEnvLocalAppType = appType => {
+  const normalizedAppType = String(appType || '').trim().toUpperCase();
+
+  if (!normalizedAppType) {
+    return null;
+  }
+
+  const originalEnvLocal = fs.readFileSync(envLocalFile, 'utf8');
+  const nextEnvLocal = originalEnvLocal.replace(
+    /APP_TYPE:\s*['"][^'"]+['"]/,
+    `APP_TYPE: '${normalizedAppType}'`,
+  );
+
+  if (nextEnvLocal === originalEnvLocal) {
+    throw new Error(
+      'Unable to override APP_TYPE in ' + envLocalFile + '. The file format may have changed.',
+    );
+  }
+
+  fs.writeFileSync(envLocalFile, nextEnvLocal);
+
+  return () => {
+    fs.writeFileSync(envLocalFile, originalEnvLocal);
+  };
+};
+
 const buildWebExport = () => {
   fs.rmSync(outputDir, { recursive: true, force: true });
   ensureEnvLocalFile();
 
-  const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const restoreEnvLocal = overrideEnvLocalAppType(process.env.PLAYWRIGHT_APP_TYPE);
 
-  const result = spawnSync(
-    command,
-    ['expo', 'export', '--platform', 'web', '--output-dir', outputDir],
-    {
-      cwd: projectRoot,
-      env: {
-        ...process.env,
-        EXPO_NO_TELEMETRY: '1',
+  try {
+    const command = 'npx';
+
+    const result = spawnSync(
+      command,
+      ['expo', 'export', '--platform', 'web', '--output-dir', outputDir],
+      {
+        cwd: projectRoot,
+        env: {
+          ...process.env,
+          EXPO_NO_TELEMETRY: '1',
+        },
+        stdio: 'inherit',
+        shell: process.platform === 'win32',
       },
-      stdio: 'inherit',
-    },
-  );
+    );
 
-  if (result.status !== 0) {
-    process.exit(result.status || 1);
+    if (result.status !== 0) {
+      throw new Error(
+        'Expo web export failed with exit code ' + (result.status || 1) + '.',
+      );
+    }
+  } finally {
+    if (restoreEnvLocal) {
+      restoreEnvLocal();
+    }
   }
 };
-
 buildWebExport();
