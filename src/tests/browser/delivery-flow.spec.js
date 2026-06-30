@@ -1163,15 +1163,15 @@ test('opens the delivery home menu and routes without looping backend calls', as
   await page.getByText(/Delivery receivables|Recebiveis/).first().click();
   await expect(page).toHaveURL(/delivery\/receivables/);
   await expect(page.getByPlaceholder('Buscar recebivel')).toBeVisible();
-  await page.waitForTimeout(250);
-  expect(requestCounter.counts.get('invoices') || 0).toBeLessThanOrEqual(2);
+  await page.waitForTimeout(1500);
+  expect(requestCounter.counts.get('invoices') || 0).toBeLessThanOrEqual(1);
 
   await openDeliveryHome();
   await page.getByText(/Delivery companies|Empresas homologadas/).first().click();
   await expect(page).toHaveURL(/delivery\/companies/);
   await expect(page.getByText('Empresas homologadas').first()).toBeVisible();
   await expect(page.getByText('Lista de empresas')).toBeVisible();
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(1500);
   expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
   expect(requestCounter.counts.get('delivery_courier_company_presences') || 0).toBeLessThanOrEqual(2);
 
