@@ -1529,4 +1529,41 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Destino', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('accept').first()).toBeVisible();
   });
+
+  test('opens order details for a delivery order without reloading it in a loop', async ({
+    page,
+  }) => {
+    const deliveryOrder = buildDeliveryOrderRow({
+      id: 72532,
+      price: 47.47,
+      orderDate: '2026-06-10T12:00:00.000Z',
+      alterDate: '2026-06-10T12:05:00.000Z',
+    });
+
+    const orderRequests = [];
+    page.on('request', request => {
+      if (
+        request.method() === 'GET' &&
+        request.url().includes('/orders/72532')
+      ) {
+        orderRequests.push(request);
+      }
+    });
+
+    await createDeliveryApiMock(page, {
+      orders: [deliveryOrder],
+      logisticsOrders: {
+        [deliveryOrder.id]: buildDeliveryLogisticsPayload(deliveryOrder),
+      },
+    });
+
+    await page.goto('/order-details?store=orders&id=72532');
+
+    await expect(page.getByText('Logística', { exact: true })).toBeVisible();
+    await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
+
+    await page.waitForTimeout(1200);
+
+    expect(orderRequests.length).toBeLessThanOrEqual(2);
+  });
 });
