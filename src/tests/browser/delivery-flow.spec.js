@@ -1551,6 +1551,28 @@ test.describe('delivery browser smoke', () => {
       price: 47.47,
       orderDate: '2026-06-10T12:00:00.000Z',
       alterDate: '2026-06-10T12:05:00.000Z',
+      addressOrigin: createAddress('origin-72532', {
+        label: 'Origem da viagem',
+        street: 'Rua das Flores',
+        number: '123',
+        district: 'Centro',
+        city: 'Sao Paulo',
+        uf: 'SP',
+        cep: '01000-010',
+        latitude: -23.55052,
+        longitude: -46.633308,
+      }),
+      addressDestination: createAddress('destination-72532', {
+        label: 'Destino fake do teste',
+        street: 'Rua Falsa do Teste',
+        number: '200',
+        district: 'Centro',
+        city: 'Sao Paulo',
+        uf: 'SP',
+        cep: '01000-000',
+        latitude: -23.563987,
+        longitude: -46.654321,
+      }),
     });
 
     const orderRequests = [];
@@ -1574,7 +1596,8 @@ test.describe('delivery browser smoke', () => {
 
     await page.waitForTimeout(1200);
 
-    await expect(page.getByText('Logística', { exact: true })).toBeVisible();
+    await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
 
     expect(orderRequests.length).toBeLessThanOrEqual(2);
