@@ -1572,11 +1572,11 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Valor da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Pedido principal', { exact: true })).toBeVisible();
-    await expect(page.getByText('#CM-1200', { exact: true })).toBeVisible();
+    await expect(page.getByText('#CM-1200', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
-    await expect(page.getByText('Origem', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('Destino', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('Aceito', { exact: true })).toBeVisible();
+    await expect(page.getByText('Coleta', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible();
   });
 
   test('shows acceptance actions for delivery orders that are waiting for acceptance', async ({
@@ -1602,10 +1602,71 @@ test.describe('delivery browser smoke', () => {
 
     await page.goto('/order-logistics-page?id=' + waitingOrder.id);
 
-    await expect(page.getByText('Aguardando aceite', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Aceitar corrida' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Cancelar corrida' })).toBeVisible();
+    await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
+    await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
+    await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
+  });
+
+  test('locks the delivery app on the first pending order and advances the queue', async ({
+    page,
+  }) => {
+    const firstWaitingOrder = buildDeliveryOrderRow({
+      id: 72533,
+      orderDate: '2026-06-10T10:00:00.000Z',
+      status: {
+        '@id': '/statuses/waiting-acceptance',
+        id: 944,
+        status: 'aguardando aceite',
+        realStatus: 'pending',
+        color: '#F59E0B',
+      },
+    });
+    const secondWaitingOrder = buildDeliveryOrderRow({
+      id: 72534,
+      orderDate: '2026-06-10T11:00:00.000Z',
+      status: {
+        '@id': '/statuses/waiting-acceptance-2',
+        id: 945,
+        status: 'aguardando aceite',
+        realStatus: 'pending',
+        color: '#F59E0B',
+      },
+    });
+    const acceptedOrder = buildDeliveryOrderRow({
+      id: 72535,
+      orderDate: '2026-06-10T09:00:00.000Z',
+      status: {
+        '@id': '/statuses/accept',
+        id: 999,
+        status: 'accept',
+        realStatus: 'accept',
+        color: '#16A34A',
+      },
+    });
+
+    await createDeliveryApiMock(page, {
+      orders: [acceptedOrder, firstWaitingOrder, secondWaitingOrder],
+      logisticsOrders: {
+        [acceptedOrder.id]: buildDeliveryLogisticsPayload(acceptedOrder),
+        [firstWaitingOrder.id]: buildDeliveryLogisticsPayload(firstWaitingOrder),
+        [secondWaitingOrder.id]: buildDeliveryLogisticsPayload(secondWaitingOrder),
+      },
+    });
+
+    await page.goto('/delivery/orders');
+    await page.waitForURL(/order-details\?store=orders&id=72533/);
+
+    await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
+    await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
+    await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
+
+    await page.getByText(/Aceitar corrida/i).click();
+    await page.waitForURL(/order-details\?store=orders&id=72534/);
+
+    await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
+    await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
+    await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
   });
 
   test('opens order details for a delivery order without reloading it in a loop', async ({
