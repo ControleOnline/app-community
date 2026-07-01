@@ -61,6 +61,7 @@
 
 
 ## Convenções
+- Não esqueça que as colunas dos stores representam as entidades da API. Isso vai ajudar muito no desenvolvimento.
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
 - Vue está em fase de remoção. Quando um trabalho tocar um fluxo já coberto em React, remova o equivalente Vue em vez de duplicar a mudança. Se o módulo ainda não tiver equivalente React, apague `src/vue` mesmo assim e mantenha o pacote com um entrypoint neutro fora de `src/vue`, salvo quando o usuario pedir explicitamente para manter o legado.
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.

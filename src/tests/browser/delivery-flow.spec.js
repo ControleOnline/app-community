@@ -1572,10 +1572,10 @@ test.describe('delivery browser smoke', () => {
 
     await page.goto('/order-details?store=orders&id=72532');
 
+    await page.waitForTimeout(1200);
+
     await expect(page.getByText('Logística', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
-
-    await page.waitForTimeout(1200);
 
     expect(orderRequests.length).toBeLessThanOrEqual(2);
   });
