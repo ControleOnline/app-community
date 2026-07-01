@@ -333,6 +333,9 @@ const buildDeliveryLogisticsPayload = order => {
   const mainOrderId = order?.mainOrderId ?? order?.main_order_id ?? order?.mainOrder?.id ?? null;
   const selectedQuoteId = Number(order?.id || 991) + 5000;
   const trackingUrl = 'https://tracking.example.com/delivery/' + (order?.id || 991);
+  const deliveryStatus = String(
+    order?.status?.status || order?.status?.realStatus || 'accept',
+  ).trim() || 'accept';
 
   return {
     order,
@@ -370,9 +373,9 @@ const buildDeliveryLogisticsPayload = order => {
         price: deliveryValue,
         eta: '35 min',
         status: {
-          status: 'accept',
-          realStatus: 'accept',
-          name: 'accept',
+          status: deliveryStatus,
+          realStatus: deliveryStatus,
+          name: deliveryStatus,
         },
         quoteState: 'selected',
         quoteMessage: 'Viagem aceita pelo motoboy teste.',
@@ -404,7 +407,7 @@ const buildDeliveryLogisticsPayload = order => {
       deliveryPeople: courier,
       trackingUrl,
       requestedAt: '2026-06-10T12:25:00.000Z',
-      status: 'accept',
+      status: deliveryStatus,
       currentIntegrationKey: 'delivery',
     },
   };
@@ -829,6 +832,40 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, savedOrder);
     }
 
+    const orderActionMatch = pathname.match(/^orders\/(\d+)\/(confirm|cancel)$/);
+    if (orderActionMatch && method === 'POST') {
+      const orderId = orderActionMatch[1];
+      const action = orderActionMatch[2];
+      const currentOrder = findOrder(orderId) || buildDeliveryOrderRow({ id: Number(orderId) });
+      const nextStatus =
+        action === 'confirm'
+          ? {
+              ...(currentOrder.status || {}),
+              status: 'accept',
+              realStatus: 'accept',
+            }
+          : {
+              ...(currentOrder.status || {}),
+              status: 'canceled',
+              realStatus: 'canceled',
+            };
+
+      const savedOrder = upsertOrder({
+        ...currentOrder,
+        status: nextStatus,
+      });
+
+      state.logisticsOrders[orderId] = buildDeliveryLogisticsPayload(savedOrder);
+
+      return fulfillJson(route, {
+        action,
+        result: {
+          errno: 0,
+          errmsg: 'ok',
+        },
+      });
+    }
+
     const logisticsOrderMatch = pathname.match(/^marketplace\/logistics\/orders\/(\d+)$/);
     if (logisticsOrderMatch && method === 'GET') {
       const payload = findLogisticsPayload(logisticsOrderMatch[1]);
@@ -1160,6 +1197,7 @@ test('opens the delivery home menu and routes without looping backend calls', as
   const openDeliveryHome = async () => {
     await page.goto('/');
     await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
     requestCounter.reset();
   };
 
@@ -1538,7 +1576,36 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Origem', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Destino', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('accept').first()).toBeVisible();
+    await expect(page.getByText('Aceito', { exact: true })).toBeVisible();
+  });
+
+  test('shows acceptance actions for delivery orders that are waiting for acceptance', async ({
+    page,
+  }) => {
+    const waitingOrder = buildDeliveryOrderRow({
+      id: 72533,
+      status: {
+        '@id': '/statuses/waiting-acceptance',
+        id: 944,
+        status: 'aguardando aceite',
+        realStatus: 'pending',
+        color: '#F59E0B',
+      },
+    });
+
+    await createDeliveryApiMock(page, {
+      orders: [waitingOrder],
+      logisticsOrders: {
+        [waitingOrder.id]: buildDeliveryLogisticsPayload(waitingOrder),
+      },
+    });
+
+    await page.goto('/order-logistics-page?id=' + waitingOrder.id);
+
+    await expect(page.getByText('Aguardando aceite', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Aceitar corrida' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancelar corrida' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
   });
 
   test('opens order details for a delivery order without reloading it in a loop', async ({
@@ -1597,6 +1664,7 @@ test.describe('delivery browser smoke', () => {
     await page.waitForTimeout(1200);
 
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
 
