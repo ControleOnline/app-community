@@ -1138,6 +1138,17 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
   return state;
 };
 
+const bindBrowserDiagnostics = page => {
+  page.on('console', message => {
+    if (message.type() === 'error') {
+      console.log('[browser console error]', message.text());
+    }
+  });
+  page.on('pageerror', error => {
+    console.log('[browser pageerror]', error?.stack || error?.message || String(error));
+  });
+};
+
 
 test('opens the delivery home menu and routes without looping backend calls', async ({ page }) => {
   await createDeliveryApiMock(page, {
@@ -1533,6 +1544,8 @@ test.describe('delivery browser smoke', () => {
   test('opens order details for a delivery order without reloading it in a loop', async ({
     page,
   }) => {
+    bindBrowserDiagnostics(page);
+
     const deliveryOrder = buildDeliveryOrderRow({
       id: 72532,
       price: 47.47,
