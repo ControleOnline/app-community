@@ -150,7 +150,7 @@ if (homeByType[normalizedAppType]) {
       headerShown: false,
       headerBackVisible: normalizedAppType !== 'PPC',
       title: 'Menu',
-      showBottomToolBar: normalizedAppType !== 'PPC' && normalizedAppType !== 'DELIVERY',
+      showBottomToolBar: normalizedAppType !== 'PPC',
       showBottomCart: false,
       showCompanyFilter: normalizedAppType !== 'DELIVERY',
     },

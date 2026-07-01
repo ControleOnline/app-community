@@ -36,6 +36,8 @@
 - Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
 - Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
+- O contrato completo do `DefaultTable` vive em `modules/controleonline/ui-default/AGENTS.md`. Telas antigas devem migrar para esse contrato e parar de manter paginacao, busca, ordenacao, filtros, resumo ou contagem duplicados fora do componente.
+- O `DefaultTable` pode receber componentes de composicao, como cards customizados, add customizado, toolbar extra e modais auxiliares, mas sem devolver para a tela a responsabilidade pela paginação, busca, ordenação ou carregamento da lista.
 - Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
 
 
@@ -55,9 +57,11 @@
 - No front React, os dados operacionais devem vir somente de campos materializados do payload. Em logistica, motorista, telefone, rastreio e status devem sair de `deliveryPeople`, `deliveryPeopleId`, `delivery`, `currentIntegration` e campos equivalentes ja retornados pela API; `otherInformations` nao deve ser origem de exibicao.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
+- O `RuntimeInfoFooter` deve manter o device/identificador visivel e acrescentar o modo de operacao traduzido quando existir; nunca substituir o device por um label de fallback.
 
 
 ## Convenções
+- Não esqueça que as colunas dos stores representam as entidades da API. Isso vai ajudar muito no desenvolvimento.
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
 - Vue está em fase de remoção. Quando um trabalho tocar um fluxo já coberto em React, remova o equivalente Vue em vez de duplicar a mudança. Se o módulo ainda não tiver equivalente React, apague `src/vue` mesmo assim e mantenha o pacote com um entrypoint neutro fora de `src/vue`, salvo quando o usuario pedir explicitamente para manter o legado.
 - O projeto é misto: a mesma base atende Web e apps nativos. Toda mudança de UI, assets, navegação, fontes, gestos e comportamento visual precisa ser pensada e validada considerando browser e dispositivos nativos.
@@ -65,8 +69,9 @@
 - O front deve ser `store-first`: use estado e ações de store como fonte de verdade sempre que existir contrato viável; `api.fetch` direto só em caso excepcionalíssimo e devidamente justificado no módulo.
 - Evite passar objetos entre telas, rotas e componentes quando o mesmo dado puder ser resolvido por store; passe apenas IDs, IRIs ou chaves mínimas e hidrate o restante no destino.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
-- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e deve ser controlada pela chave de device `android-kiosk-enabled`; na ausencia dessa chave, o runtime ainda respeita o fallback historico de `pos-operation-mode=kiosk`.
+- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e deve ser controlada pela chave de device `android-kiosk-enabled`; o modo operacional salvo do device usa `pos-operation-mode=totem` e nao herda essa chave.
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
+- Quando o store de tradução não estiver claro, use `common` como store padrão para a chave traduzida, mantendo o tipo correto (`label`, `option`, etc.) e sem inventar texto de fallback.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
 - Preferir estados de store a estados locais.
 - A fila de traducoes faltantes vive no store `translate` e deve ser lida/escrita por esse estado. Nao usar `localStorage` como fila e nao sobrescrever traducoes fora da tela de traducoes ou de uma acao intencional.
@@ -102,6 +107,7 @@
 - Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests 
 - Testes de browser do web ficam em `src/tests/browser` e usam Playwright.
 - Quando uma mudança tocar login, navegacao ou qualquer fluxo visivel no browser, atualize ou adicione um smoke test e valide com `npm run test:browser`.
+- Toda mudança com efeito visivel no browser deve ganhar cobertura em `src/tests/browser`; teste unitario sozinho nao fecha o contrato visual.
 - Prefira seletores semanticos (`role`, `placeholder` e texto visivel) nos testes de browser; evite CSS/XPath fragil.
 - Tenha bom senso. Avisos do que cada ação faz é bem-vindo, mas lembr-se que são clientes que usam o sistema, ele não sabe o que é uma tabela device_config, então use uma linguagem mais adequada.
 - Evite pai orquestrando filhos. Prefira que cada filho seja independente e o pai apenas organiza.

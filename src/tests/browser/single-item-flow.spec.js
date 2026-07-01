@@ -689,6 +689,17 @@ const bindBrowserDiagnostics = page => {
 };
 
 test.describe('single-item browser smoke', () => {
+  test('shows the runtime footer on the POS shell', async ({ page }) => {
+    bindBrowserDiagnostics(page);
+    await createPosApiMock(page);
+
+    await bootstrapPosBrowser(page);
+
+    await expect(
+      page.getByText(new RegExp(`web \\(127\\.0\\.0\\.1\\).*v${APP_VERSION}`, 'i')),
+    ).toBeVisible();
+  });
+
   test('opens checkout after selecting the single-item product', async ({ page }) => {
     bindBrowserDiagnostics(page);
     const state = await createPosApiMock(page);
@@ -797,5 +808,18 @@ test.describe('single-item browser smoke', () => {
     );
 
     await expect(page).toHaveURL(/order-history-page/);
+  });
+
+  test('opens the order history list and renders the existing order row', async ({ page }) => {
+    bindBrowserDiagnostics(page);
+    await createPosApiMock(page);
+
+    await bootstrapPosBrowser(page);
+    await page.goto('/order-history-page');
+
+    await expect(page).toHaveURL(/order-history-page/);
+    await expect(page.getByText(/Historico de pedidos/i)).toBeVisible();
+    await expect(page.getByText('#123', { exact: true })).toBeVisible();
+    await expect(page.getByText('cart', { exact: true })).toBeVisible();
   });
 });
