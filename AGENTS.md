@@ -37,6 +37,7 @@
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
 - Acoes gerais de listagem, filtros compactos, atalhos de contexto, cadastros auxiliares e botoes como categorias/carteiras devem ficar no toolbar da listagem/default, na mesma linha sempre que houver espaco, em vez de ocupar linhas extras no corpo da tela.
 - O contrato completo do `DefaultTable` vive em `modules/controleonline/ui-default/AGENTS.md`. Telas antigas devem migrar para esse contrato e parar de manter paginacao, busca, ordenacao, filtros, resumo ou contagem duplicados fora do componente.
+- O `DefaultTable` pode receber componentes de composicao, como cards customizados, add customizado, toolbar extra e modais auxiliares, mas sem devolver para a tela a responsabilidade pela paginação, busca, ordenação ou carregamento da lista.
 - Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
 
 
