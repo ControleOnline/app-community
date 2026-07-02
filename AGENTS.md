@@ -56,8 +56,11 @@
 - Acoes de adicionar produto, alterar quantidade e remover item ficam liberadas apenas enquanto o pedido ainda for `cart`; depois da promocao para `sale` ou em qualquer estado terminal, a area de itens vira somente leitura.
 - No front React, os dados operacionais devem vir somente de campos materializados do payload. Em logistica, motorista, telefone, rastreio e status devem sair de `deliveryPeople`, `deliveryPeopleId`, `delivery`, `currentIntegration` e campos equivalentes ja retornados pela API; `otherInformations` nao deve ser origem de exibicao.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
-- Em `OrderLogisticsPage`, o pedido e os dados visiveis da entrega devem vir do pedido corrente materializado (`id`, `displayId`, `addressOrigin`, `addressDestination`, `price`, `status`, `deliveryPeople`), sem fallback para `mainOrder` na UI.
+- `OrderLogisticsPage` e uma tela compartilhada com dois modos. Sem `route.params.order` ela opera como manager/overview e monta o bloco de lista abaixo do mapa; com `route.params.order` ela vira o detalhe da delivery e nao monta a lista.
+- O bloco de lista e o bloco de aceite devem ser componentes separados e desacoplaveis; a tela principal decide apenas se monta ou nao cada um.
+- Em ambos os modos, os dados visiveis da entrega devem vir do pedido corrente materializado (`id`, `displayId`, `addressOrigin`, `addressDestination`, `price`, `status`, `deliveryPeople`), sem fallback para `mainOrder` na UI.
 - Enquanto a entrega estiver em `aguardando aceite`, a visao do motoboy deve esconder troca de cliente/endereco, esconder a barra inferior e manter aceite/recusa em card flutuante.
+- CEP e complemento devem aparecer na linha de endereco visivel sempre que existirem no pedido corrente.
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
 - O `RuntimeInfoFooter` deve manter o device/identificador visivel e acrescentar o modo de operacao traduzido quando existir; nunca substituir o device por um label de fallback.
 
