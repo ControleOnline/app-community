@@ -1553,6 +1553,21 @@ test.describe('delivery browser smoke', () => {
 
   test('opens an accepted delivery trip with route and order details', async ({ page }) => {
     const deliveryOrder = buildDeliveryOrderRow();
+    const routeRequests = [];
+
+    await page.context().grantPermissions(['geolocation'], {
+      origin: 'http://localhost:8081',
+    });
+    await page.context().setGeolocation({
+      latitude: -23.55052,
+      longitude: -46.633308,
+    });
+
+    page.on('request', request => {
+      if (request.url().includes('router.project-osrm.org/route/v1/driving')) {
+        routeRequests.push(request);
+      }
+    });
 
     await createDeliveryApiMock(page, {
       orders: [deliveryOrder],
@@ -1577,6 +1592,7 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Coleta', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible();
+    expect(routeRequests.length).toBeGreaterThan(0);
   });
 
   test('shows acceptance actions for delivery orders that are waiting for acceptance', async ({
