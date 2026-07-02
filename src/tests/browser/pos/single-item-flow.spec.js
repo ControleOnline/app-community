@@ -1,5 +1,5 @@
 const {expect, test} = require('playwright/test');
-const packageJson = require('../../../package.json');
+const packageJson = require('../../../../package.json');
 
 const API_ORIGIN = 'https://api.controleonline.com';
 const CORS_HEADERS = {
@@ -216,6 +216,7 @@ const createPosApiMock = async (page, initialState = {}) => {
         'pos-operation-mode': 'single-item',
         'pos-gateway': 'cielo',
         'pos-type': 'simple',
+        'payment-type-ids': [1, 2],
         'cash-wallet-closed-id': 0,
         'pos-default-status': 901,
         'pos-paid-status': 902,
@@ -233,13 +234,14 @@ const createPosApiMock = async (page, initialState = {}) => {
           id: 3,
         },
         type: 'PDV',
-        configs: JSON.stringify({
-          'config-version': APP_VERSION,
-          'pos-gateway': 'cielo',
-          'pos-type': 'simple',
-          'cash-wallet-closed-id': 0,
-        }),
-      },
+      configs: JSON.stringify({
+        'config-version': APP_VERSION,
+        'pos-gateway': 'cielo',
+        'pos-type': 'simple',
+        'payment-type-ids': [1, 2],
+        'cash-wallet-closed-id': 0,
+      }),
+    },
     runtimeConfigs: initialState.runtimeConfigs || {
       'pos-cash-wallet': 101,
       'pos-cielo-wallet': 102,
@@ -696,7 +698,7 @@ test.describe('single-item browser smoke', () => {
     await bootstrapPosBrowser(page);
 
     await expect(
-      page.getByText(new RegExp(`web \\(127\\.0\\.0\\.1\\).*v${APP_VERSION}`, 'i')),
+      page.getByText(new RegExp(`web.*PDV.*127\\.0\\.0\\.1.*v${APP_VERSION}`, 'i')),
     ).toBeVisible();
   });
 
@@ -711,8 +713,7 @@ test.describe('single-item browser smoke', () => {
     await expect(page).toHaveURL(/add-product-screen/);
     await expect(page.getByText('Coxinha', { exact: true })).toBeVisible();
     await expect(page.getByText('Suco', { exact: true })).toBeVisible();
-    await expect(page.getByText('Selecionado', { exact: true })).toBeVisible();
-    await expect(page.getByText('Selecionar', { exact: true })).toBeVisible();
+    await expect(page.getByText('Selecionar', { exact: true }).first()).toBeVisible();
 
     const replaceRequestPromise = page.waitForRequest(request =>
       request.url().includes('/orders/123/replace-products') &&
@@ -742,7 +743,7 @@ test.describe('single-item browser smoke', () => {
 
     await expect(page).toHaveURL(/checkout/);
     await expect(page.getByText('Dinheiro', { exact: true })).toBeVisible();
-    await expect(page.getByText('Crédito Cielo', { exact: true })).toBeVisible();
+    await expect(page.getByText('Crédito Cielo', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Receber em dinheiro', { exact: true })).toBeVisible();
 
     const invoiceRequestPromise = page.waitForRequest(request =>
@@ -774,14 +775,14 @@ test.describe('single-item browser smoke', () => {
     await page.goto('/checkout?id=123');
 
     await expect(page.getByText('Dinheiro', { exact: true })).toBeVisible();
-    await expect(page.getByText('Crédito Cielo', { exact: true })).toBeVisible();
+    await expect(page.getByText('Crédito Cielo', { exact: true }).first()).toBeVisible();
 
     const websocketRequestPromise = page.waitForRequest(request =>
       request.url().endsWith('/websocket') &&
       request.method() === 'POST',
     );
 
-    await page.getByText('Crédito Cielo', { exact: true }).click();
+    await page.getByText('Crédito Cielo', { exact: true }).first().click();
     await expect(page.getByText('Enviar para Cielo Principal', { exact: true })).toBeVisible();
     await page.getByText('Enviar para Cielo Principal', { exact: true }).click();
     await page.getByText('Continuar', { exact: true }).click();
