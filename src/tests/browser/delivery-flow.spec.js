@@ -1586,8 +1586,8 @@ test.describe('delivery browser smoke', () => {
 
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Valor da entrega', { exact: true })).toBeVisible();
-    await expect(page.getByText('Pedido principal', { exact: true })).toBeVisible();
-    await expect(page.getByText('#CM-1200', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Pedido atual', { exact: true })).toBeVisible();
+    await expect(page.getByText('#991', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Coleta', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
