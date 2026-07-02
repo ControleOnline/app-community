@@ -1,27 +1,10 @@
 const path = require('path');
 const {spawnSync} = require('child_process');
+const groups = require('./browser-smoke-groups.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const playwrightConfig = path.join(projectRoot, 'playwright.config.cjs');
 const buildScript = path.join(projectRoot, 'scripts/playwright-web-build.cjs');
-
-const groups = [
-  {
-    name: 'manager',
-    appType: 'MANAGER',
-    testDir: path.join('src/tests/browser/manager'),
-  },
-  {
-    name: 'delivery',
-    appType: 'DELIVERY',
-    testDir: path.join('src/tests/browser/delivery'),
-  },
-  {
-    name: 'pos',
-    appType: 'POS',
-    testDir: path.join('src/tests/browser/pos'),
-  },
-];
 
 const groupByName = new Map(
   groups.flatMap(group => [
@@ -84,11 +67,11 @@ for (const group of resolvedGroups) {
     PLAYWRIGHT_WEB_OUTPUT_DIR: outputDir,
   };
 
-  console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
-  runCommand(process.execPath, [buildScript], env);
+    console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
+    runCommand(process.execPath, [buildScript], env);
 
-  console.log(`=== Running ${group.name} browser smoke tests ===`);
-  runCommand('npx', [
+    console.log(`=== Running ${group.name} browser smoke tests ===`);
+    runCommand('npx', [
     'playwright',
     'test',
     '--config',

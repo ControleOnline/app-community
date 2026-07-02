@@ -342,6 +342,23 @@ test.describe('menu costs dashboard smoke', () => {
     await expect(page.getByText('Entender motor de custo')).toBeVisible();
     await expect(page.getByText('Revisar compras')).toBeVisible();
 
+    const bottomNavigation = page.getByTestId('bottom-navigation');
+    await expect(bottomNavigation).toBeVisible();
+    const bottomNavigationBox = await bottomNavigation.boundingBox();
+    expect(bottomNavigationBox).toBeTruthy();
+    const viewport = page.viewportSize();
+    expect(viewport).toBeTruthy();
+    const bottomGap = viewport.height - (bottomNavigationBox.y + bottomNavigationBox.height);
+    expect(bottomGap).toBeLessThanOrEqual(64);
+    const leftGap = bottomNavigationBox.x;
+    const rightGap = viewport.width - (bottomNavigationBox.x + bottomNavigationBox.width);
+    expect(leftGap).toBeLessThanOrEqual(4);
+    expect(rightGap).toBeLessThanOrEqual(4);
+    const paddingBottom = await bottomNavigation.evaluate(node =>
+      Number.parseFloat(window.getComputedStyle(node).paddingBottom || '0'),
+    );
+    expect(paddingBottom).toBeGreaterThan(0);
+
     await page.getByText('Entender motor de custo').click();
 
     await expect(page.getByText('Motor de custo atual')).toBeVisible();

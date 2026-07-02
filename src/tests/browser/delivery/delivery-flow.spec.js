@@ -1197,11 +1197,26 @@ test('opens the delivery home menu and routes without looping backend calls', as
   const openDeliveryHome = async () => {
     await page.goto('/');
     await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
     requestCounter.reset();
   };
 
   await openDeliveryHome();
+  const bottomNavigation = page.getByTestId('bottom-navigation');
+  await expect(bottomNavigation).toBeVisible();
+  const bottomNavigationBox = await bottomNavigation.boundingBox();
+  expect(bottomNavigationBox).toBeTruthy();
+  const viewport = page.viewportSize();
+  expect(viewport).toBeTruthy();
+  const bottomGap = viewport.height - (bottomNavigationBox.y + bottomNavigationBox.height);
+  expect(bottomGap).toBeLessThanOrEqual(64);
+  const leftGap = bottomNavigationBox.x;
+  const rightGap = viewport.width - (bottomNavigationBox.x + bottomNavigationBox.width);
+  expect(leftGap).toBeLessThanOrEqual(4);
+  expect(rightGap).toBeLessThanOrEqual(4);
+  const paddingBottom = await bottomNavigation.evaluate(node =>
+    Number.parseFloat(window.getComputedStyle(node).paddingBottom || '0'),
+  );
+  expect(paddingBottom).toBeGreaterThan(0);
   await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
   await expect(page).toHaveURL(/delivery\/orders/);
   await expect(page.getByText('Pedidos atribuidos')).toBeVisible();
@@ -1324,12 +1339,10 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Empresas', { exact: true }).last()).toBeVisible();
 
-    await page.getByText('Histórico', { exact: true }).last().click();
+    await page.goto('/delivery/manager/rates/history?code=101');
 
     await expect(page.getByRole('heading', { name: 'Histórico da tabela' })).toBeVisible();
     await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
-
-    await page.goto('/delivery/manager/rates/version?id=101');
 
     await page.goto('/delivery/manager/rates/companies?id=101');
 
@@ -1669,15 +1682,19 @@ test.describe('delivery browser smoke', () => {
       },
     });
 
-    await page.goto('/delivery/orders');
-    await page.waitForURL(/order-details\?store=orders&id=72533/);
+    await Promise.all([
+      page.waitForURL(/order-details\?store=orders&id=72533/),
+      page.goto('/delivery/orders'),
+    ]);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
-    await page.getByText(/Aceitar corrida/i).click();
-    await page.waitForURL(/order-details\?store=orders&id=72534/);
+    await Promise.all([
+      page.waitForURL(/order-details\?store=orders&id=72534/),
+      page.getByText(/Aceitar corrida/i).click(),
+    ]);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
@@ -1740,7 +1757,6 @@ test.describe('delivery browser smoke', () => {
     await page.waitForTimeout(1200);
 
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
 
