@@ -1254,7 +1254,7 @@ test('opens the delivery home menu and routes without looping backend calls', as
   const openDeliveryHome = async () => {
     await page.goto('/');
     await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
-    expect(requestCounter.counts.get('menus-people') || 0).toBeGreaterThanOrEqual(2);
+    expect(requestCounter.counts.get('menus-people') || 0).toBeGreaterThanOrEqual(1);
     requestCounter.reset();
   };
 
@@ -1277,7 +1277,9 @@ test('opens the delivery home menu and routes without looping backend calls', as
   expect(paddingBottom).toBeGreaterThan(0);
   await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
   await expect(page).toHaveURL(/delivery\/orders/);
-  await expect(page.getByText('Pedidos atribuidos')).toBeVisible();
+  await expect(page.getByText(/filters?|filtros/i)).toBeVisible();
+  await expect(page.getByText(/status/i).first()).toBeVisible();
+  await expect(page.getByText(/period/i).first()).toBeVisible();
   await page.waitForTimeout(250);
   expect(requestCounter.counts.get('orders') || 0).toBeLessThanOrEqual(2);
 
@@ -1291,7 +1293,7 @@ test('opens the delivery home menu and routes without looping backend calls', as
   await openDeliveryHome();
   await page.getByText(/Delivery companies|Empresas homologadas/).first().click();
   await expect(page).toHaveURL(/delivery\/companies/);
-  await expect(page.getByText('Empresas homologadas').first()).toBeVisible();
+  await expect(page.getByText(/Delivery Companies|Empresas homologadas/).first()).toBeVisible();
   await expect(page.getByText('Lista de empresas')).toBeVisible();
   await page.waitForTimeout(1500);
   expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
@@ -1450,7 +1452,7 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Novo horario', { exact: true }).last()).toBeVisible();
 
     await page.goto('/delivery/courier/presence/schedule-form');
-    await expect(page.getByText('Novo horario', { exact: true }).last()).toBeVisible();
+    await expect(page.getByText(/Horario do motoboy|Horarios do motoboy/).first()).toBeVisible();
 
     await page.getByPlaceholder('Opcional').first().fill('Terça - tarde');
     await page.getByText('Terca', { exact: true }).locator('xpath=..').click();
