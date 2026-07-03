@@ -37,6 +37,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 - `appBackground`
 - `containerBackground`
+- `containerTransparentBackground`
 - `containerBorder`
 - `pageBackground`
 - `pageBorder`
@@ -78,15 +79,20 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 ### button
 
 - `buttonBackground`
+- `buttonBackgroundSecondary`
 - `buttonBorder`
+- `buttonBorderSecondary`
 - `buttonDisabledBackground`
+- `buttonDisabledOpacity`
 - `buttonDisabledText`
 - `buttonFocusBorder`
 - `buttonHoverBackground`
 - `buttonIcon`
+- `buttonIconSecondary`
 - `buttonPressedBackground`
 - `buttonShadow`
 - `buttonText`
+- `buttonTextSecondary`
 
 ### card
 
@@ -132,6 +138,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 - `dividerBackground`
 - `dividerBorder`
+- `dividerText`
 
 ### footer
 
@@ -151,6 +158,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 ### icon
 
+- `iconColor`
 - `iconActive`
 - `iconDanger`
 - `iconDisabled`
@@ -158,12 +166,14 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `iconInverse`
 - `iconMuted`
 - `iconSuccess`
+- `iconText`
 - `iconWarning`
 
 ### input
 
 - `inputBackground`
 - `inputBorder`
+- `inputFilledBorder`
 - `inputDisabledBackground`
 - `inputDisabledBorder`
 - `inputDisabledText`
@@ -235,6 +245,19 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `modalOverlay`
 - `modalShadow`
 - `modalText`
+
+### select
+
+- `dropdown` no uso do dia a dia deve ser tratado como `select`
+- `selectBackground`
+- `selectBorder`
+- `selectIcon`
+- `selectOptionBackground`
+- `selectOptionBorder`
+- `selectOptionSelectedBackground`
+- `selectOptionSelectedText`
+- `selectPlaceholderText`
+- `selectText`
 
 ### navigation
 

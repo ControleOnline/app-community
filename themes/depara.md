@@ -2,5 +2,206 @@
 
 Formato:
 - `módulo / arquivo / linha`
-- `antigo: variável, conteúdo, cor`
-- `novo: variável, conteúdo, cor`
+- `antigo: variável, cor`
+- `novo: variável, cor`
+
+- `ui-login / src/react/pages/sign-in/index.styles.js / 9`
+- `antigo: container.backgroundColor, colors.background`
+- `novo: container.backgroundColor, #fff`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 25`
+- `antigo: backgroundOverlay.backgroundColor, rgba(248, 250, 252, 0.45)`
+- `novo: backgroundOverlay.backgroundColor, rgba(248, 250, 252, 0.45)`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 28`
+- `antigo: containerTransparent.backgroundColor, transparent`
+- `novo: containerTransparent.backgroundColor, transparent`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 46`
+- `antigo: subtitle.color, colors.textSecondary`
+- `novo: subtitle.color, #022736`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 55`
+- `antigo: inputContainer.backgroundColor, #F1F5F9`
+- `novo: inputContainer.backgroundColor, #F1F5F9`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 61`
+- `antigo: inputContainer.borderColor, transparent`
+- `novo: inputContainer.borderColor, transparent`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 64`
+- `antigo: inputError.borderColor, colors.error`
+- `novo: inputError.borderColor, #C10015`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 65`
+- `antigo: inputError.backgroundColor, #FEF2F2`
+- `novo: inputError.backgroundColor, #FEF2F2`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 73`
+- `antigo: input.color, #0F172A`
+- `novo: input.color, #0F172A`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 82`
+- `antigo: forgotPasswordText.color, colors.primary`
+- `novo: forgotPasswordText.color, #1C8FBD`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 85`
+- `antigo: loginButton.backgroundColor, colors.primary`
+- `novo: loginButton.backgroundColor, #1C8FBD`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 93 e 102`
+- `antigo: loginButton.shadowColor e boxShadow, colors.primary / rgba(99, 102, 241, 0.3)`
+- `novo: loginButton.shadowColor e boxShadow, #6366F1 / rgba(99, 102, 241, 0.3)`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 107`
+- `antigo: loginButtonText.color, #fff`
+- `novo: loginButtonText.color, #fff`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 120`
+- `antigo: oauthDividerLine.backgroundColor, #CBD5E1`
+- `novo: oauthDividerLine.backgroundColor, #CBD5E1`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 126`
+- `antigo: oauthDividerText.color, #64748B`
+- `novo: oauthDividerText.color, #64748B`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 133 e 134`
+- `antigo: googleButton.borderColor e backgroundColor, #CBD5E1 / #FFFFFF`
+- `novo: googleButton.borderColor e backgroundColor, #CBD5E1 / #FFFFFF`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 141`
+- `antigo: googleButtonDisabled.opacity, 0.7`
+- `novo: googleButtonDisabled.opacity, 0.7`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 147 e 149`
+- `antigo: googleButtonBadge.backgroundColor e borderColor, #FFFFFF / #E2E8F0`
+- `novo: googleButtonBadge.backgroundColor e borderColor, #FFFFFF / #CBD5E1`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 157`
+- `antigo: googleButtonBadgeText.color, #EA4335`
+- `novo: googleButtonBadgeText.color, #EA4335`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 162`
+- `antigo: googleButtonText.color, #0F172A`
+- `novo: googleButtonText.color, #0F172A`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 171`
+- `antigo: createAccountText.color, colors.primary`
+- `novo: createAccountText.color, #1C8FBD`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 175`
+- `antigo: modalOverlay.backgroundColor, rgba(15, 23, 42, 0.45)`
+- `novo: modalOverlay.backgroundColor, rgba(15, 23, 42, 0.45)`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 183`
+- `antigo: recoveryModalContent.backgroundColor, #fff`
+- `novo: recoveryModalContent.backgroundColor, #fff`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 195`
+- `antigo: recoveryModalTitle.color, #0F172A`
+- `novo: recoveryModalTitle.color, #0F172A`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 211`
+- `antigo: recoveryInput.borderColor, #E2E8F0`
+- `novo: recoveryInput.borderColor, #E2E8F0`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 216`
+- `antigo: recoveryInput.color, #0F172A`
+- `novo: recoveryInput.color, #0F172A`
+- `ui-login / src/react/pages/sign-in/index.styles.js / 217`
+- `antigo: recoveryInput.backgroundColor, #F8FAFC`
+- `novo: recoveryInput.backgroundColor, #F1F5F9`
+
+- `ui-login / src/react/pages/sign-in/index.js / 380`
+- `antigo: StatusBar.backgroundColor, colors.background`
+- `novo: StatusBar.backgroundColor, #fff`
+- `ui-login / src/react/pages/sign-in/index.js / 407, 420, 430`
+- `antigo: Icon.color, colors.textSecondary`
+- `novo: Icon.color, #64748B`
+- `ui-login / src/react/pages/sign-in/index.js / 410, 423, 525`
+- `antigo: TextInput.placeholderTextColor, #94A3B8`
+- `novo: TextInput.placeholderTextColor, #94A3B8`
+- `ui-login / src/react/pages/sign-in/index.js / 439, 539`
+- `antigo: ActivityIndicator.color, colors.white`
+- `novo: ActivityIndicator.color, #fff`
+- `ui-login / src/react/pages/sign-in/index.js / 465`
+- `antigo: ActivityIndicator.color, #0F172A`
+- `novo: ActivityIndicator.color, #0F172A`
+- `ui-login / src/react/pages/sign-in/index.js / 519`
+- `antigo: Icon.color, #64748B`
+- `novo: Icon.color, #64748B`
+
+- `ui-login / src/react/pages/reset-password/index.js / 151`
+- `antigo: StatusBar.backgroundColor, colors.background`
+- `novo: StatusBar.backgroundColor, #fff`
+- `ui-login / src/react/pages/reset-password/index.js / 198, 213, 226, 242`
+- `antigo: Icon.color, colors.textSecondary`
+- `novo: Icon.color, #64748B`
+- `ui-login / src/react/pages/reset-password/index.js / 203, 231`
+- `antigo: TextInput.placeholderTextColor, #94A3B8`
+- `novo: TextInput.placeholderTextColor, #94A3B8`
+- `ui-login / src/react/pages/reset-password/index.js / 258`
+- `antigo: ActivityIndicator.color, colors.white`
+- `novo: ActivityIndicator.color, #fff`
+- `ui-login / src/react/pages/reset-password/index.js / 293`
+- `antigo: title.color, #0F172A`
+- `novo: title.color, #0F172A`
+- `ui-login / src/react/pages/reset-password/index.js / 298`
+- `antigo: errorText.color, colors.error`
+- `novo: errorText.color, #C10015`
+
+- `ui-login / src/react/pages/confirm-account/index.js / 151`
+- `antigo: StatusBar.backgroundColor, colors.background`
+- `novo: StatusBar.backgroundColor, #fff`
+- `ui-login / src/react/pages/confirm-account/index.js / 185`
+- `antigo: ActivityIndicator.color, colors.primary`
+- `novo: ActivityIndicator.color, #1C8FBD`
+- `ui-login / src/react/pages/confirm-account/index.js / 225`
+- `antigo: title.color, colors.textPrimary`
+- `novo: title.color, #0F172A`
+- `ui-login / src/react/pages/confirm-account/index.js / 234`
+- `antigo: helperText.color, colors.textSecondary`
+- `novo: helperText.color, #022736`
+
+- `ui-login / src/react/pages/create-account/index.styles.js / 36`
+- `antigo: input.backgroundColor, #F1F5F9`
+- `novo: input.backgroundColor, #F1F5F9`
+- `ui-login / src/react/pages/create-account/index.styles.js / 51`
+- `antigo: typeButton.backgroundColor, #E2E8F0`
+- `novo: typeButton.backgroundColor, #E2E8F0`
+- `ui-login / src/react/pages/create-account/index.styles.js / 58`
+- `antigo: typeButtonActive.backgroundColor, colors.primary`
+- `novo: typeButtonActive.backgroundColor, #1C8FBD`
+- `ui-login / src/react/pages/create-account/index.styles.js / 62`
+- `antigo: typeText.color, #000`
+- `novo: typeText.color, #000`
+- `ui-login / src/react/pages/create-account/index.styles.js / 86`
+- `antigo: button.backgroundColor, colors.primary`
+- `novo: button.backgroundColor, #1C8FBD`
+- `ui-login / src/react/pages/create-account/index.styles.js / 94`
+- `antigo: buttonText.color, #fff`
+- `novo: buttonText.color, #fff`
+
+- `ui-login / src/react/pages/create-account/index.js / 381`
+- `antigo: ActivityIndicator.color, #fff`
+- `novo: ActivityIndicator.color, #fff`
+
+- `ui-shop / src/react/pages/ProfilePage.styles.js / 74, 104, 134, 164, 194`
+- `antigo: actionButton.backgroundColor, #1C8FBD`
+- `novo: actionButton.backgroundColor, #1C8FBD`
+- `ui-shop / src/react/pages/ProfilePage.styles.js / 75, 105, 135, 165, 195`
+- `antigo: actionButton.borderColor, #1C8FBD`
+- `novo: actionButton.borderColor, #1C8FBD`
+- `ui-shop / src/react/pages/ProfilePage.styles.js / 90, 120, 150, 180, 210`
+- `antigo: actionText.color, #fff`
+- `novo: actionText.color, #fff`
+- `ui-shop / src/react/pages/ProfilePage.js / 137`
+- `antigo: emailIcon.color, sem icone`
+- `novo: emailIcon.color, #1C8FBD`
+
+- `ui-shop / src/react/components/storefront/ShopQuantityControl.js / 50, 253, 261, 266, 292`
+- `antigo: quantityControl.iconColor, #1C8FBD`
+- `novo: quantityControl.iconColor, #1C8FBD`
+- `ui-shop / src/react/components/storefront/ShopQuantityControl.js / 51, 253, 275, 282, 292`
+- `antigo: quantityControl.activeColor, #FFFFFF`
+- `novo: quantityControl.activeColor, #fff`
+- `ui-shop / src/react/components/storefront/ShopQuantityControl.js / 52, 266`
+- `antigo: quantityControl.backgroundColor, #fff`
+- `novo: quantityControl.backgroundColor, #FFFFFF`
+- `ui-shop / src/react/components/storefront/ShopSalesCompanySelector.js / 107`
+- `antigo: phoneIcon.color, #1C8FBD`
+- `novo: phoneIcon.color, #1C8FBD`
+
+- `ui-people / src/react/css/people.js / 149`
+- `antigo: addButton.backgroundColor, #FACC15`
+- `novo: addButton.backgroundColor, #FACC15`
+- `ui-people / src/react/pages/Profile.js / 1200`
+- `antigo: phoneEmailIcon.color, #1C8FBD`
+- `novo: phoneEmailIcon.color, #FACC15`
+- `ui-people / src/react/pages/Profile.js / 1227`
+- `antigo: deleteIcon.color, #C10015`
+- `novo: deleteIcon.backgroundColor, #FACC15`
+- `ui-people / src/react/pages/Profile.js / 1237`
+- `antigo: deleteIcon.color, #C10015`
+- `novo: deleteIcon.color, #000`
+- `ui-people / src/react/pages/Profile.js / 1324`
+- `antigo: editIcon.color, #1C8FBD`
+- `novo: editIcon.color, #FACC15`
+- `ui-people / src/react/pages/Profile.js / 1154, 1159`
+- `antigo: addIcon.color, #fff`
+- `novo: addIcon.color, #fff`

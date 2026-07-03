@@ -7,6 +7,7 @@ No `app-community`, cor hardcoded é qualquer cor ou transparência definida dir
 Isso inclui:
 - `#HEX`, `rgb(...)`, `rgba(...)`
 - `'white'`, `'black'`, `'transparent'`
+- qualquer uso de `colors.*`, incluindo `colors.white`, `colors.black`, `colors.primary`, `colors.background` e similares
 - opacidades e transparências visuais fixas no componente
 - qualquer variação visual decidida localmente no arquivo
 
@@ -20,6 +21,7 @@ E a restrição mais importante:
 - Não usar `defaultCompany.theme`
 - Não usar `currentCompany.theme`
 - Não usar `colors.js` como atalho de tema, inclusive aliases como `colors.white`, `colors.black` ou semelhantes
+- Todo uso de `colors.*` deve ser tratado como hardcoded neste fluxo, mesmo quando o nome parecer equivalente a um token do tema
 - Se a cor vier de um arquivo local de cores e não do tema do `DOMAIN`, ela continua sendo hardcoded para este fluxo
 - Mesmo que existam no código hoje, eles não devem ser tratados como fonte correta de cor
 - Nunca mexer no layout
@@ -100,6 +102,7 @@ exemplo:
 - não registramos essa nova variável no `themes-actual.md` antes de ela existir no tema oficial
 - essa nova variável precisa ser um token semântico do tema, não um apelido técnico de arquivo local
 - e depois usamos essa variável no código
+- a partir do momento em que o token entrar em `themes-new.md`, ele passa a ser a referência operacional correta para aquele papel visual neste fluxo
 
 6. O `themes-todo.md` vira o rastreador operacional:
 - o que está hardcoded
