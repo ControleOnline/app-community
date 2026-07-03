@@ -136,7 +136,7 @@
 - As migrations desse slice precisam rodar no tenant `admin.controleonline.com` via `tenant:migrations:migrate`, nao no banco base direto.
 - O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.
 - A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
-- No fluxo de delivery o contexto de status e `delivery`: o aceite materializa `aceito`, a corrida usa `way`/`away`, a conclusao usa `closed` e o cancelamento usa `canceled`. `preparando` nao pertence a esse contexto e nao deve aparecer como opcao, filtro ou transicao operacional.
+- No fluxo de delivery o contexto de status e `delivery`: o aceite materializa `aceito`, a corrida usa `way`/`away`, a conclusao usa `closed` e o cancelamento usa `canceled`; `rejected` e a recusa de aceite e nao pode ser usado como sinônimo de cancelamento. `preparando` nao pertence a esse contexto e nao deve aparecer como opcao, filtro ou transicao operacional.
 - Depois de aceitar todas as corridas, o app deve ficar preso na corrida ativa, mostrar o botao `Marcar como entregue` em cada parada aceita e so liberar a tela quando a fila terminar.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
