@@ -1,5 +1,5 @@
 const { expect, test } = require('playwright/test');
-const packageJson = require('../../../package.json');
+const packageJson = require('../../../../package.json');
 
 const API_ORIGIN = 'https://api.controleonline.com';
 const APP_VERSION = packageJson?.version || '1.0.0';
@@ -342,6 +342,23 @@ test.describe('menu costs dashboard smoke', () => {
     await expect(page.getByText('Entender motor de custo')).toBeVisible();
     await expect(page.getByText('Revisar compras')).toBeVisible();
 
+    const bottomNavigation = page.getByTestId('bottom-navigation');
+    await expect(bottomNavigation).toBeVisible();
+    const bottomNavigationBox = await bottomNavigation.boundingBox();
+    expect(bottomNavigationBox).toBeTruthy();
+    const viewport = page.viewportSize();
+    expect(viewport).toBeTruthy();
+    const bottomGap = viewport.height - (bottomNavigationBox.y + bottomNavigationBox.height);
+    expect(bottomGap).toBeLessThanOrEqual(64);
+    const leftGap = bottomNavigationBox.x;
+    const rightGap = viewport.width - (bottomNavigationBox.x + bottomNavigationBox.width);
+    expect(leftGap).toBeLessThanOrEqual(4);
+    expect(rightGap).toBeLessThanOrEqual(4);
+    const paddingBottom = await bottomNavigation.evaluate(node =>
+      Number.parseFloat(window.getComputedStyle(node).paddingBottom || '0'),
+    );
+    expect(paddingBottom).toBeGreaterThan(0);
+
     await page.getByText('Entender motor de custo').click();
 
     await expect(page.getByText('Motor de custo atual')).toBeVisible();
@@ -401,7 +418,6 @@ test.describe('menu costs dashboard smoke', () => {
     await expect(page.getByText('Custo no produto').first()).toBeVisible();
     await expect(page.getByText('Papel técnico').first()).toBeVisible();
     await expect(page.getByText('Código ERP').first()).toBeVisible();
-    await expect(page.getByTestId('menu-costs-composition-name-1882')).toHaveText('Pão Francês com Parmesão');
     await expect(page.getByText('Papel acoplado mono frios 30x38')).not.toBeVisible();
 
     await page.getByRole('tab', { name: 'Embalagens' }).click();

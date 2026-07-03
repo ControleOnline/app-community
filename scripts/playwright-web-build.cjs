@@ -32,16 +32,23 @@ const overrideEnvLocalAppType = appType => {
   }
 
   const originalEnvLocal = fs.readFileSync(envLocalFile, 'utf8');
-  const nextEnvLocal = originalEnvLocal.replace(
-    /APP_TYPE:\s*['"][^'"]+['"]/,
-    `APP_TYPE: '${normalizedAppType}'`,
-  );
+  const appTypePattern = /APP_TYPE:\s*['"]([^'"]+)['"]/;
+  const appTypeMatch = originalEnvLocal.match(appTypePattern);
 
-  if (nextEnvLocal === originalEnvLocal) {
+  if (!appTypeMatch) {
     throw new Error(
       'Unable to override APP_TYPE in ' + envLocalFile + '. The file format may have changed.',
     );
   }
+
+  if (appTypeMatch[1].trim().toUpperCase() === normalizedAppType) {
+    return null;
+  }
+
+  const nextEnvLocal = originalEnvLocal.replace(
+    appTypePattern,
+    `APP_TYPE: '${normalizedAppType}'`,
+  );
 
   fs.writeFileSync(envLocalFile, nextEnvLocal);
 

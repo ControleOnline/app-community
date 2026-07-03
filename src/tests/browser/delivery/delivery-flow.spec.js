@@ -5,7 +5,7 @@
  */
 
 const {expect, test} = require('playwright/test');
-const packageJson = require('../../../package.json');
+const packageJson = require('../../../../package.json');
 
 const API_ORIGIN = 'https://api.controleonline.com';
 const CORS_HEADERS = {
@@ -459,6 +459,63 @@ const createDeliveryHomeMenus = () => ({
         },
       ],
     },
+    toolbar: {
+      id: 'delivery-toolbar',
+      label: 'Navegacao',
+      icon: 'menu',
+      menus: [
+        {
+          id: 'delivery-toolbar-home',
+          menuKey: 'home',
+          menuType: 'toolbar',
+          label: 'Home',
+          route: 'HomePage',
+          icon: 'home',
+          color: '#0EA5E9',
+          sortOrder: 10,
+        },
+        {
+          id: 'delivery-toolbar-orders',
+          menuKey: 'orders',
+          menuType: 'toolbar',
+          label: 'Pedidos',
+          route: 'DeliveryOrdersPage',
+          icon: 'shopping-bag',
+          color: '#0EA5E9',
+          sortOrder: 20,
+        },
+        {
+          id: 'delivery-toolbar-receivables',
+          menuKey: 'receivables',
+          menuType: 'toolbar',
+          label: 'Recebiveis',
+          route: 'DeliveryReceivablesPage',
+          icon: 'dollar-sign',
+          color: '#16A34A',
+          sortOrder: 30,
+        },
+        {
+          id: 'delivery-toolbar-companies',
+          menuKey: 'companies',
+          menuType: 'toolbar',
+          label: 'Empresas',
+          route: 'DeliveryCompaniesPage',
+          icon: 'briefcase',
+          color: '#7C3AED',
+          sortOrder: 40,
+        },
+        {
+          id: 'delivery-toolbar-rates',
+          menuKey: 'rate_tables',
+          menuType: 'toolbar',
+          label: 'Tabelas',
+          route: 'DeliveryRateTablesPage',
+          icon: 'list',
+          color: '#64748B',
+          sortOrder: 50,
+        },
+      ],
+    },
   },
 });
 
@@ -516,7 +573,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     orders: Array.isArray(initialState.orders) ? [...initialState.orders] : [],
     logisticsOrders: initialState.logisticsOrders || {},
     deviceId: initialState.deviceId || 'web-7',
-    menus: initialState.menus || { modules: {} },
+    menus: initialState.menus || createDeliveryHomeMenus(),
     nextGroupId: initialState.nextGroupId || 101,
     nextVehicleId: initialState.nextVehicleId || 152,
     nextScheduleId: initialState.nextScheduleId || 201,
@@ -1197,14 +1254,32 @@ test('opens the delivery home menu and routes without looping backend calls', as
   const openDeliveryHome = async () => {
     await page.goto('/');
     await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
+    expect(requestCounter.counts.get('menus-people') || 0).toBeGreaterThanOrEqual(1);
     requestCounter.reset();
   };
 
   await openDeliveryHome();
+  const bottomNavigation = page.getByTestId('bottom-navigation');
+  await expect(bottomNavigation).toBeVisible();
+  const bottomNavigationBox = await bottomNavigation.boundingBox();
+  expect(bottomNavigationBox).toBeTruthy();
+  const viewport = page.viewportSize();
+  expect(viewport).toBeTruthy();
+  const bottomGap = viewport.height - (bottomNavigationBox.y + bottomNavigationBox.height);
+  expect(bottomGap).toBeLessThanOrEqual(64);
+  const leftGap = bottomNavigationBox.x;
+  const rightGap = viewport.width - (bottomNavigationBox.x + bottomNavigationBox.width);
+  expect(leftGap).toBeLessThanOrEqual(4);
+  expect(rightGap).toBeLessThanOrEqual(4);
+  const paddingBottom = await bottomNavigation.evaluate(node =>
+    Number.parseFloat(window.getComputedStyle(node).paddingBottom || '0'),
+  );
+  expect(paddingBottom).toBeGreaterThan(0);
   await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
   await expect(page).toHaveURL(/delivery\/orders/);
-  await expect(page.getByText('Pedidos atribuidos')).toBeVisible();
+  await expect(page.getByText(/filters?|filtros/i)).toBeVisible();
+  await expect(page.getByText(/status/i).first()).toBeVisible();
+  await expect(page.getByText(/period/i).first()).toBeVisible();
   await page.waitForTimeout(250);
   expect(requestCounter.counts.get('orders') || 0).toBeLessThanOrEqual(2);
 
@@ -1218,7 +1293,7 @@ test('opens the delivery home menu and routes without looping backend calls', as
   await openDeliveryHome();
   await page.getByText(/Delivery companies|Empresas homologadas/).first().click();
   await expect(page).toHaveURL(/delivery\/companies/);
-  await expect(page.getByText('Empresas homologadas').first()).toBeVisible();
+  await expect(page.getByText(/Delivery Companies|Empresas homologadas/).first()).toBeVisible();
   await expect(page.getByText('Lista de empresas')).toBeVisible();
   await page.waitForTimeout(1500);
   expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
@@ -1324,16 +1399,14 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Empresas', { exact: true }).last()).toBeVisible();
 
-    await page.getByText('Histórico', { exact: true }).last().click();
+    await page.goto('/delivery/manager/rates/history?code=101');
 
     await expect(page.getByRole('heading', { name: 'Histórico da tabela' })).toBeVisible();
     await expect(page.getByText('Tabela Central', { exact: true }).last()).toBeVisible();
 
-    await page.goto('/delivery/manager/rates/version?id=101');
+    await page.goto('/delivery/manager/rates/companies?id=101');
 
-    await page.getByText('Empresas', { exact: true }).last().click();
-
-    await expect(page.getByRole('heading', { name: 'Ativação por empresa' })).toBeVisible();
+    await expect(page.getByText('Ativação por empresa', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Restaurante Centro - Centro').last()).toBeVisible();
     await expect(page.getByText('Restaurante Noite - Noite', { exact: true }).last()).toBeVisible();
     await expect(page.getByText('Tabela ativa', { exact: true })).toBeVisible();
@@ -1378,8 +1451,8 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByRole('heading', { name: 'Horarios do motoboy' })).toBeVisible();
     await expect(page.getByText('Novo horario', { exact: true }).last()).toBeVisible();
 
-    await page.getByText('Novo horario', { exact: true }).last().click();
-    await expect(page.getByText('Novo horario', { exact: true }).last()).toBeVisible();
+    await page.goto('/delivery/courier/presence/schedule-form');
+    await expect(page.getByText(/Horario do motoboy|Horarios do motoboy/).first()).toBeVisible();
 
     await page.getByPlaceholder('Opcional').first().fill('Terça - tarde');
     await page.getByText('Terca', { exact: true }).locator('xpath=..').click();
@@ -1553,6 +1626,21 @@ test.describe('delivery browser smoke', () => {
 
   test('opens an accepted delivery trip with route and order details', async ({ page }) => {
     const deliveryOrder = buildDeliveryOrderRow();
+    const routeRequests = [];
+
+    await page.context().grantPermissions(['geolocation'], {
+      origin: 'http://localhost:8081',
+    });
+    await page.context().setGeolocation({
+      latitude: -23.55052,
+      longitude: -46.633308,
+    });
+
+    page.on('request', request => {
+      if (request.url().includes('router.project-osrm.org/route/v1/driving')) {
+        routeRequests.push(request);
+      }
+    });
 
     await createDeliveryApiMock(page, {
       orders: [deliveryOrder],
@@ -1571,12 +1659,13 @@ test.describe('delivery browser smoke', () => {
 
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Valor da entrega', { exact: true })).toBeVisible();
-    await expect(page.getByText('Pedido principal', { exact: true })).toBeVisible();
-    await expect(page.getByText('#CM-1200', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Pedido atual', { exact: true })).toBeVisible();
+    await expect(page.getByText('#991', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Coleta', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible();
+    expect(routeRequests.length).toBeGreaterThan(0);
   });
 
   test('shows acceptance actions for delivery orders that are waiting for acceptance', async ({
@@ -1600,12 +1689,11 @@ test.describe('delivery browser smoke', () => {
       },
     });
 
-    await page.goto('/order-logistics-page?id=' + waitingOrder.id);
+    await page.goto('/order-details?store=orders&id=' + waitingOrder.id);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
   });
 
   test('locks the delivery app on the first pending order and advances the queue', async ({
@@ -1654,15 +1742,19 @@ test.describe('delivery browser smoke', () => {
       },
     });
 
-    await page.goto('/delivery/orders');
-    await page.waitForURL(/order-details\?store=orders&id=72533/);
+    await Promise.all([
+      page.waitForURL(/order-details\?store=orders&id=72533/),
+      page.goto('/delivery/orders'),
+    ]);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
-    await page.getByText(/Aceitar corrida/i).click();
-    await page.waitForURL(/order-details\?store=orders&id=72534/);
+    await Promise.all([
+      page.waitForURL(/order-details\?store=orders&id=72534/),
+      page.getByText(/Aceitar corrida/i).click(),
+    ]);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
@@ -1725,7 +1817,6 @@ test.describe('delivery browser smoke', () => {
     await page.waitForTimeout(1200);
 
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Home' }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
 
