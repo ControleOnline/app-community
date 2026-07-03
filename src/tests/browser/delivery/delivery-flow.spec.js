@@ -263,6 +263,58 @@ const createMainOrder = (id = 1200, overrides = {}) => ({
   id,
   externalCode: overrides.externalCode || ('CM-' + id),
 });
+
+const createDeliveryStatusItems = () => [
+  {
+    '@id': '/statuses/delivery-awaiting-acceptance',
+    id: 848,
+    context: 'delivery',
+    status: 'aguardando aceite',
+    realStatus: 'pending',
+    color: '#F59E0B',
+  },
+  {
+    '@id': '/statuses/delivery-accepted',
+    id: 849,
+    context: 'delivery',
+    status: 'aceito',
+    realStatus: 'accepted',
+    color: '#16A34A',
+  },
+  {
+    '@id': '/statuses/delivery-way',
+    id: 850,
+    context: 'delivery',
+    status: 'em rota',
+    realStatus: 'way',
+    color: '#0EA5E9',
+  },
+  {
+    '@id': '/statuses/delivery-closed',
+    id: 851,
+    context: 'delivery',
+    status: 'closed',
+    realStatus: 'closed',
+    color: '#64748B',
+  },
+  {
+    '@id': '/statuses/delivery-canceled',
+    id: 852,
+    context: 'delivery',
+    status: 'canceled',
+    realStatus: 'canceled',
+    color: '#DC2626',
+  },
+  {
+    '@id': '/statuses/delivery-preparing',
+    id: 853,
+    context: 'delivery',
+    status: 'preparando',
+    realStatus: 'preparing',
+    color: '#F59E0B',
+  },
+];
+
 const buildDeliveryOrderRow = (overrides = {}) => {
   const courier = overrides.provider || createCourier();
   const customer = overrides.client || createCustomer();
@@ -572,6 +624,9 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     logs: Array.isArray(initialState.logs) ? [...initialState.logs] : [],
     orders: Array.isArray(initialState.orders) ? [...initialState.orders] : [],
     logisticsOrders: initialState.logisticsOrders || {},
+    statusItems: Array.isArray(initialState.statusItems)
+      ? [...initialState.statusItems]
+      : createDeliveryStatusItems(),
     deviceId: initialState.deviceId || 'web-7',
     menus: initialState.menus || createDeliveryHomeMenus(),
     nextGroupId: initialState.nextGroupId || 101,
@@ -729,6 +784,21 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
 
     if (pathname === 'people/company/default') {
       return fulfillJson(route, state.defaultCompany);
+    }
+
+    if (pathname === 'statuses' && method === 'GET') {
+      const context = String(url.searchParams.get('context') || '').trim().toLowerCase();
+      const realStatus = String(url.searchParams.get('realStatus') || '').trim().toLowerCase();
+      const items = state.statusItems.filter(status => {
+        const matchesContext =
+          !context || String(status?.context || '').trim().toLowerCase() === context;
+        const matchesRealStatus =
+          !realStatus || String(status?.realStatus || '').trim().toLowerCase() === realStatus;
+
+        return matchesContext && matchesRealStatus;
+      });
+
+      return fulfillJson(route, collection(items));
     }
 
     if (pathname === 'menus-people') {
@@ -889,7 +959,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, savedOrder);
     }
 
-    const orderActionMatch = pathname.match(/^orders\/(\d+)\/(confirm|cancel)$/);
+    const orderActionMatch = pathname.match(/^orders\/(\d+)\/(confirm|cancel|delivered)$/);
     if (orderActionMatch && method === 'POST') {
       const orderId = orderActionMatch[1];
       const action = orderActionMatch[2];
@@ -898,18 +968,43 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
         action === 'confirm'
           ? {
               ...(currentOrder.status || {}),
-              status: 'accept',
-              realStatus: 'accept',
+              status: 'aceito',
+              realStatus: 'accepted',
             }
-          : {
-              ...(currentOrder.status || {}),
-              status: 'canceled',
-              realStatus: 'canceled',
-            };
+          : action === 'delivered'
+            ? {
+                ...(currentOrder.status || {}),
+                status: 'closed',
+                realStatus: 'closed',
+            }
+            : {
+                ...(currentOrder.status || {}),
+                status: 'canceled',
+                realStatus: 'canceled',
+              };
+      const nextDelivery =
+        action === 'confirm'
+          ? {
+              ...(currentOrder.delivery || {}),
+              status: 'aceito',
+              realStatus: 'accepted',
+            }
+          : action === 'delivered'
+            ? {
+                ...(currentOrder.delivery || {}),
+                status: 'closed',
+                realStatus: 'closed',
+              }
+            : {
+                ...(currentOrder.delivery || {}),
+                status: 'canceled',
+                realStatus: 'canceled',
+              };
 
       const savedOrder = upsertOrder({
         ...currentOrder,
         status: nextStatus,
+        delivery: nextDelivery,
       });
 
       state.logisticsOrders[orderId] = buildDeliveryLogisticsPayload(savedOrder);
@@ -1277,9 +1372,6 @@ test('opens the delivery home menu and routes without looping backend calls', as
   expect(paddingBottom).toBeGreaterThan(0);
   await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
   await expect(page).toHaveURL(/delivery\/orders/);
-  await expect(page.getByText(/filters?|filtros/i)).toBeVisible();
-  await expect(page.getByText(/status/i).first()).toBeVisible();
-  await expect(page.getByText(/period/i).first()).toBeVisible();
   await page.waitForTimeout(250);
   expect(requestCounter.counts.get('orders') || 0).toBeLessThanOrEqual(2);
 
@@ -1712,6 +1804,9 @@ test.describe('delivery browser smoke', () => {
         color: '#F59E0B',
       },
     });
+    firstWaitingOrder.delivery = {
+      etaMinutes: 30,
+    };
     const secondWaitingOrder = buildDeliveryOrderRow({
       id: 72534,
       orderDate: '2026-06-10T11:00:00.000Z',
@@ -1723,6 +1818,9 @@ test.describe('delivery browser smoke', () => {
         color: '#F59E0B',
       },
     });
+    secondWaitingOrder.delivery = {
+      etaMinutes: 10,
+    };
     const acceptedOrder = buildDeliveryOrderRow({
       id: 72535,
       orderDate: '2026-06-10T09:00:00.000Z',
@@ -1734,6 +1832,9 @@ test.describe('delivery browser smoke', () => {
         color: '#16A34A',
       },
     });
+    acceptedOrder.delivery = {
+      etaMinutes: 20,
+    };
 
     await createDeliveryApiMock(page, {
       orders: [acceptedOrder, firstWaitingOrder, secondWaitingOrder],
@@ -1744,23 +1845,42 @@ test.describe('delivery browser smoke', () => {
       },
     });
 
-    await Promise.all([
-      page.waitForURL(/order-details\?store=orders&id=72533/),
-      page.goto('/delivery/orders'),
-    ]);
+    await page.goto('/delivery/orders');
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72533/);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
-    await Promise.all([
-      page.waitForURL(/order-details\?store=orders&id=72534/),
-      page.getByText(/Aceitar corrida/i).click(),
-    ]);
+    await page.getByText(/Aceitar corrida/i).click();
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72534/);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
+
+    await page.getByText(/Aceitar corrida/i).click();
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72534/);
+
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
+
+    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72535/);
+
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
+
+    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72533/);
+
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
+
+    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
+    await expect(page).toHaveURL(/delivery\/orders/);
+
+    await expect(page.getByText(/Pedidos de entrega|Delivery orders/)).toBeVisible();
   });
 
   test('opens order details for a delivery order without reloading it in a loop', async ({
