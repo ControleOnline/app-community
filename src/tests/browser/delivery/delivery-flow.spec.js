@@ -1625,6 +1625,7 @@ test.describe('delivery browser smoke', () => {
   });
 
   test('opens an accepted delivery trip with route and order details', async ({ page }) => {
+    bindBrowserDiagnostics(page);
     const deliveryOrder = buildDeliveryOrderRow();
     const routeRequests = [];
 
@@ -1699,6 +1700,7 @@ test.describe('delivery browser smoke', () => {
   test('locks the delivery app on the first pending order and advances the queue', async ({
     page,
   }) => {
+    bindBrowserDiagnostics(page);
     const firstWaitingOrder = buildDeliveryOrderRow({
       id: 72533,
       orderDate: '2026-06-10T10:00:00.000Z',
