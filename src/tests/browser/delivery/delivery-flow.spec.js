@@ -459,6 +459,63 @@ const createDeliveryHomeMenus = () => ({
         },
       ],
     },
+    toolbar: {
+      id: 'delivery-toolbar',
+      label: 'Navegacao',
+      icon: 'menu',
+      menus: [
+        {
+          id: 'delivery-toolbar-home',
+          menuKey: 'home',
+          menuType: 'toolbar',
+          label: 'Home',
+          route: 'HomePage',
+          icon: 'home',
+          color: '#0EA5E9',
+          sortOrder: 10,
+        },
+        {
+          id: 'delivery-toolbar-orders',
+          menuKey: 'orders',
+          menuType: 'toolbar',
+          label: 'Pedidos',
+          route: 'DeliveryOrdersPage',
+          icon: 'shopping-bag',
+          color: '#0EA5E9',
+          sortOrder: 20,
+        },
+        {
+          id: 'delivery-toolbar-receivables',
+          menuKey: 'receivables',
+          menuType: 'toolbar',
+          label: 'Recebiveis',
+          route: 'DeliveryReceivablesPage',
+          icon: 'dollar-sign',
+          color: '#16A34A',
+          sortOrder: 30,
+        },
+        {
+          id: 'delivery-toolbar-companies',
+          menuKey: 'companies',
+          menuType: 'toolbar',
+          label: 'Empresas',
+          route: 'DeliveryCompaniesPage',
+          icon: 'briefcase',
+          color: '#7C3AED',
+          sortOrder: 40,
+        },
+        {
+          id: 'delivery-toolbar-rates',
+          menuKey: 'rate_tables',
+          menuType: 'toolbar',
+          label: 'Tabelas',
+          route: 'DeliveryRateTablesPage',
+          icon: 'list',
+          color: '#64748B',
+          sortOrder: 50,
+        },
+      ],
+    },
   },
 });
 
@@ -516,7 +573,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     orders: Array.isArray(initialState.orders) ? [...initialState.orders] : [],
     logisticsOrders: initialState.logisticsOrders || {},
     deviceId: initialState.deviceId || 'web-7',
-    menus: initialState.menus || { modules: {} },
+    menus: initialState.menus || createDeliveryHomeMenus(),
     nextGroupId: initialState.nextGroupId || 101,
     nextVehicleId: initialState.nextVehicleId || 152,
     nextScheduleId: initialState.nextScheduleId || 201,
@@ -1197,6 +1254,7 @@ test('opens the delivery home menu and routes without looping backend calls', as
   const openDeliveryHome = async () => {
     await page.goto('/');
     await expect(page.getByText(/Delivery orders|Pedidos de entrega/).first()).toBeVisible();
+    expect(requestCounter.counts.get('menus-people') || 0).toBeGreaterThanOrEqual(2);
     requestCounter.reset();
   };
 

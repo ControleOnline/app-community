@@ -101,6 +101,85 @@ const createOpenOrder = ({id = 123, products = [], price = 0}) => ({
   orderProducts: products.map(product => buildOrderProduct(product, 1)),
 });
 
+const createPosMenus = () => ({
+  modules: {
+    home: {
+      id: 'pos-home',
+      label: 'Operacao',
+      icon: 'shopping-bag',
+      menus: [
+        {
+          id: 'pos-home-orders',
+          menuKey: 'orders',
+          menuType: 'home',
+          label: 'Pedidos',
+          route: 'OrderHistoryPage',
+          icon: 'shopping-bag',
+          color: '#0EA5E9',
+          sortOrder: 10,
+        },
+        {
+          id: 'pos-home-cash',
+          menuKey: 'cash_register',
+          menuType: 'home',
+          label: 'Caixa',
+          route: 'CashRegisterIndex',
+          icon: 'credit-card',
+          color: '#4682B4',
+          sortOrder: 20,
+        },
+      ],
+    },
+    toolbar: {
+      id: 'pos-toolbar',
+      label: 'Navegacao',
+      icon: 'menu',
+      menus: [
+        {
+          id: 'pos-toolbar-home',
+          menuKey: 'home',
+          menuType: 'toolbar',
+          label: 'Home',
+          route: 'HomePage',
+          icon: 'home',
+          color: '#0EA5E9',
+          sortOrder: 10,
+        },
+        {
+          id: 'pos-toolbar-orders',
+          menuKey: 'orders',
+          menuType: 'toolbar',
+          label: 'Pedidos',
+          route: 'OrderHistoryPage',
+          icon: 'shopping-bag',
+          color: '#0EA5E9',
+          sortOrder: 20,
+        },
+        {
+          id: 'pos-toolbar-cash',
+          menuKey: 'cash_register',
+          menuType: 'toolbar',
+          label: 'Caixa',
+          route: 'CashRegisterIndex',
+          icon: 'credit-card',
+          color: '#4682B4',
+          sortOrder: 30,
+        },
+        {
+          id: 'pos-toolbar-profile',
+          menuKey: 'profile',
+          menuType: 'toolbar',
+          label: 'Perfil',
+          route: 'ProfilePage',
+          icon: 'user',
+          color: '#64748B',
+          sortOrder: 40,
+        },
+      ],
+    },
+  },
+});
+
 const createPaymentOption = ({
   id,
   walletId,
@@ -201,6 +280,7 @@ const createPosApiMock = async (page, initialState = {}) => {
       active: 1,
     },
     deviceId: initialState.deviceId || 'web-7',
+    menus: initialState.menus || createPosMenus(),
     deviceConfig: initialState.deviceConfig || {
       id: 1,
       device: {
@@ -381,7 +461,7 @@ const createPosApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'menus-people') {
-      return fulfillJson(route, collection([]));
+      return fulfillJson(route, state.menus);
     }
 
     if (pathname.startsWith('translates')) {
@@ -694,8 +774,18 @@ test.describe('single-item browser smoke', () => {
   test('shows the runtime footer on the POS shell', async ({ page }) => {
     bindBrowserDiagnostics(page);
     await createPosApiMock(page);
+    const menusPeopleRequests = [];
+    page.on('request', request => {
+      if (
+        request.method().toUpperCase() === 'GET' &&
+        request.url().includes('/menus-people')
+      ) {
+        menusPeopleRequests.push(request);
+      }
+    });
 
     await bootstrapPosBrowser(page);
+    expect(menusPeopleRequests.length).toBeGreaterThanOrEqual(2);
     const bottomNavigation = page.getByTestId('bottom-navigation');
     await expect(bottomNavigation).toBeVisible();
     const bottomNavigationBox = await bottomNavigation.boundingBox();
@@ -727,7 +817,7 @@ test.describe('single-item browser smoke', () => {
 
   test('opens checkout after selecting the single-item product', async ({ page }) => {
     bindBrowserDiagnostics(page);
-    await createPosApiMock(page);
+    const state = await createPosApiMock(page);
 
     await bootstrapPosBrowser(page);
 
@@ -750,7 +840,7 @@ test.describe('single-item browser smoke', () => {
 
     await expect(page).toHaveURL(/checkout/);
     await expect(page.getByText('Dinheiro', { exact: true })).toBeVisible();
-    await expect(page.getByText('Crédito Cielo', { exact: true })).toBeVisible();
+    await expect(page.getByText('Crédito Cielo', { exact: true }).first()).toBeVisible();
     expect(state.lastReplaceProductsPayload).toEqual([{ product: '101', quantity: 1 }]);
   });
 
