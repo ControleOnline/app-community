@@ -1789,6 +1789,115 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
   });
 
+  test('opens the delivery route directly when all orders are already accepted', async ({
+    page,
+  }) => {
+    bindBrowserDiagnostics(page);
+    await page.context().grantPermissions(['geolocation'], {
+      origin: 'http://localhost:8081',
+    });
+    await page.context().setGeolocation({
+      latitude: -23.55052,
+      longitude: -46.633308,
+    });
+
+    const acceptedOrderOne = buildDeliveryOrderRow({
+      id: 72533,
+      orderDate: '2026-06-10T09:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-1',
+        id: 9991,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72533', {
+        label: 'Destino 72533',
+        street: 'Rua Distante',
+        number: '900',
+        district: 'Jardim Maia',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07150-000',
+        latitude: -23.5684,
+        longitude: -46.6058,
+      }),
+    });
+    acceptedOrderOne.delivery = {
+      etaMinutes: 10,
+    };
+
+    const acceptedOrderTwo = buildDeliveryOrderRow({
+      id: 72534,
+      orderDate: '2026-06-10T10:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-2',
+        id: 9992,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72534', {
+        label: 'Destino 72534',
+        street: 'Rua Proxima',
+        number: '120',
+        district: 'Centro',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07010-000',
+        latitude: -23.5512,
+        longitude: -46.6329,
+      }),
+    });
+    acceptedOrderTwo.delivery = {
+      etaMinutes: 30,
+    };
+
+    const acceptedOrderThree = buildDeliveryOrderRow({
+      id: 72535,
+      orderDate: '2026-06-10T11:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-3',
+        id: 9993,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72535', {
+        label: 'Destino 72535',
+        street: 'Avenida Intermediaria',
+        number: '450',
+        district: 'Vila Augusta',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07023-000',
+        latitude: -23.5577,
+        longitude: -46.6391,
+      }),
+    });
+    acceptedOrderThree.delivery = {
+      etaMinutes: 20,
+    };
+
+    await createDeliveryApiMock(page, {
+      orders: [acceptedOrderOne, acceptedOrderTwo, acceptedOrderThree],
+      logisticsOrders: {
+        [acceptedOrderOne.id]: buildDeliveryLogisticsPayload(acceptedOrderOne),
+        [acceptedOrderTwo.id]: buildDeliveryLogisticsPayload(acceptedOrderTwo),
+        [acceptedOrderThree.id]: buildDeliveryLogisticsPayload(acceptedOrderThree),
+      },
+    });
+
+    await page.goto('/delivery/orders');
+    await expect(page).toHaveURL(/delivery\/run/);
+    const runUrl = new URL(page.url());
+    expect(runUrl.pathname).toBe('/delivery/run');
+    expect(runUrl.searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByText(/Parada atual/i)).toBeVisible();
+    await expect(page.getByText(/Marcar como entregue/i)).toBeVisible();
+  });
+
   test('locks the delivery app on the first pending order and advances the queue', async ({
     page,
   }) => {
@@ -1827,8 +1936,8 @@ test.describe('delivery browser smoke', () => {
       status: {
         '@id': '/statuses/accept',
         id: 999,
-        status: 'accept',
-        realStatus: 'accept',
+        status: 'aceito',
+        realStatus: 'accepted',
         color: '#16A34A',
       },
     });
@@ -1853,34 +1962,41 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
     await page.getByText(/Aceitar corrida/i).click();
-    await expect(page).toHaveURL(/order-details\?store=orders&id=72534/);
+    await expect(page).toHaveURL(
+      /order-details.*id=72534/,
+    );
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
     await page.getByText(/Aceitar corrida/i).click();
-    await expect(page).toHaveURL(/order-details\?store=orders&id=72534/);
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
 
     await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
+    await expect(page.getByText(/Parada atual/i)).toBeVisible();
+    const markDeliveredButton = page.getByText(/Marcar como entregue/i).first();
+    await expect(markDeliveredButton).toBeVisible();
 
-    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
-    await expect(page).toHaveURL(/order-details\?store=orders&id=72535/);
-
-    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
-
-    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
-    await expect(page).toHaveURL(/order-details\?store=orders&id=72533/);
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
 
     await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /Marcar como entregue/i })).toBeVisible();
+    await expect(markDeliveredButton).toBeVisible();
 
-    await page.getByRole('button', { name: /Marcar como entregue/i }).click();
-    await expect(page).toHaveURL(/delivery\/orders/);
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
 
-    await expect(page.getByText(/Pedidos de entrega|Delivery orders/)).toBeVisible();
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toHaveCount(0);
+    await expect(page.getByText(/Parada atual/i)).toHaveCount(0);
+    await expect(page.getByText(/Marcar como entregue/i)).toHaveCount(0);
   });
 
   test('opens order details for a delivery order without reloading it in a loop', async ({
@@ -1893,6 +2009,15 @@ test.describe('delivery browser smoke', () => {
       price: 47.47,
       orderDate: '2026-06-10T12:00:00.000Z',
       alterDate: '2026-06-10T12:05:00.000Z',
+      deliveryPeopleId: null,
+      deliveryPeople: null,
+      status: {
+        '@id': '/statuses/closed',
+        id: 1001,
+        status: 'closed',
+        realStatus: 'closed',
+        color: '#6B7280',
+      },
       addressOrigin: createAddress('origin-72532', {
         label: 'Origem da viagem',
         street: 'Rua das Flores',
@@ -1941,7 +2066,9 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Corrida ativa/i)).toHaveCount(0);
+    await expect(page.getByText(/Marcar como entregue/i)).toHaveCount(0);
 
-    expect(orderRequests.length).toBeLessThanOrEqual(2);
+    expect(orderRequests.length).toBeLessThanOrEqual(3);
   });
 });
