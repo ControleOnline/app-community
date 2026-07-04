@@ -7,7 +7,6 @@ No `app-community`, cor hardcoded é qualquer cor ou transparência definida dir
 Isso inclui:
 - `#HEX`, `rgb(...)`, `rgba(...)`
 - `'white'`, `'black'`, `'transparent'`
-- qualquer uso de `colors.*`, incluindo `colors.white`, `colors.black`, `colors.primary`, `colors.background` e similares
 - opacidades e transparências visuais fixas no componente
 - qualquer variação visual decidida localmente no arquivo
 
@@ -21,9 +20,11 @@ E a restrição mais importante:
 - Não usar `defaultCompany.theme`
 - Não usar `currentCompany.theme`
 - Não usar `colors.js` como atalho de tema, inclusive aliases como `colors.white`, `colors.black` ou semelhantes
-- Todo uso de `colors.*` deve ser tratado como hardcoded neste fluxo, mesmo quando o nome parecer equivalente a um token do tema
 - Se a cor vier de um arquivo local de cores e não do tema do `DOMAIN`, ela continua sendo hardcoded para este fluxo
 - Mesmo que existam no código hoje, eles não devem ser tratados como fonte correta de cor
+- Excecao unica permitida: `app-community/modules/controleonline/ui-manager/src/react/pages/ThemeManagerPage.js`
+- Nessa tela, cores hardcoded sao obrigatorias e permitidas
+- Motivo: ela existe para manipular e visualizar cores manualmente sem depender do proprio tema em edicao, evitando perder visibilidade das cores durante o ajuste
 - Nunca mexer no layout
 - Nunca mexer no backend
 - Quando existir estrutura de arquivo pai/filho para cores locais do módulo, não resolver isso agora no fluxo normal
@@ -45,9 +46,10 @@ Então, resumindo em uma frase:
 ### ### ### ### #### #### ### ### ### ###
 
 ### LEVANTAMENTO
-1. Primeiro vamos ler exclusivamente o tema do `DOMAIN` e registrar no arquivo `themes-actual.md`:
-- nome da variável
-- valor atual
+# não executar o item 1
+#1. Primeiro vamos ler exclusivamente o tema do `DOMAIN` e registrar no arquivo `themes-actual.md`:
+#- nome da variável
+#- valor atual
 
 2. Depois vamos varrer `app-community` módulo por módulo e arquivo por arquivo.
 
@@ -79,19 +81,19 @@ Então, resumindo em uma frase:
 - o objetivo é manter o mesmo papel visual, mas trocar a fonte do valor para o tema carregado do `DOMAIN`
 
 exemplo:
-    em themes-actual.md: background=white
+    em themes-actual.md: pageBackground=white
     no arquivo: background=white
 
     substituir no código para algo equivalente a:
-    background = theme.colors.background
+    background = theme.colors.pageBackground
 
 3. Se no arquivo existir uma variável local com nome ruim, mas que claramente representa um token do tema:
 - além de trocar o valor, vamos renomear a variável para o nome canônico do tema
 exemplo:
-    em themes-actual.md: background=white
+    em themes-actual.md: pageBackground=white
     no arquivo: xpto=white
     substituir no código para algo equivalente a:
-    background = theme.colors.background
+    pageBackground = theme.colors.pageBackground
 
 4. Se houver um valor hardcoded mas o contexto não for claro o suficiente para mapear com segurança:
 - não corrigimos no escuro
@@ -102,7 +104,6 @@ exemplo:
 - não registramos essa nova variável no `themes-actual.md` antes de ela existir no tema oficial
 - essa nova variável precisa ser um token semântico do tema, não um apelido técnico de arquivo local
 - e depois usamos essa variável no código
-- a partir do momento em que o token entrar em `themes-new.md`, ele passa a ser a referência operacional correta para aquele papel visual neste fluxo
 
 6. O `themes-todo.md` vira o rastreador operacional:
 - o que está hardcoded
@@ -131,4 +132,40 @@ exemplo:
     arquivo: src/react/pages/exemplo/index.js
     linha: 120
     antes: backgroundColor: '#fff'
-    depois: backgroundColor: theme.colors.background
+    depois: backgroundColor: theme.colors.pageBackground
+
+### NOTA TÉCNICA
+Quando um estilo precisar usar a cor de fundo principal da tela, a implementação correta deve apontar para o tema carregado no store, e não para um valor literal.
+
+Exemplo de referência:
+```js
+import {StyleSheet} from 'react-native';
+import {useStore} from '@store';
+
+const themeStore = useStore('theme');
+const {colors} = themeStore.getters;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.pageBackground,
+  },
+});
+```
+
+Interpretação técnica:
+- `backgroundColor` não deve receber `#HEX`, `white`, `rgba(...)` ou qualquer outro valor hardcoded
+- o valor deve vir de `themeStore.getters.colors.<tokenCanonico>`
+- para isso, o arquivo precisa importar `useStore` e declarar o acesso ao `themeStore` antes de montar o style
+- o token deve ser usado de forma direta, sem fallback, sem alias alternativo e sem tentativa de "adivinhar" outra cor
+- não usar `tokens base` genéricos
+- usar sempre os nomes canônicos definidos em `themes-map.md`, conforme o objeto visual real
+- exemplo correto: `backgroundColor: colors.pageBackground`
+- exemplo incorreto: `backgroundColor: colors.pageBackground || colors.primary || '#FFFFFF'`
+- a mesma regra vale para qualquer outro papel visual, por exemplo:
+  `buttonBackground -> themeStore.getters.colors.buttonBackground`
+  `cardBackground -> themeStore.getters.colors.cardBackground`
+  `inputBackground -> themeStore.getters.colors.inputBackground`
+  `textSecondary -> themeStore.getters.colors.textSecondary`
+- isso cria uma dependência direta entre o componente e o tema ativo
+- com isso, o fundo da tela passa a responder ao tema carregado para o `DOMAIN`, sem precisar alterar o código da tela
+- esse é o comportamento esperado para qualquer token semântico equivalente, não apenas `background`
