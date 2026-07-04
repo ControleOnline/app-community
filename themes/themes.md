@@ -152,6 +152,14 @@ const styles = StyleSheet.create({
 });
 ```
 
+Padronização de nomes:
+- `themeStore` deve ser a referência ao store de tema
+- `themeColors` deve ser o objeto bruto vindo de `themeStore.getters.colors`
+- `palette` deve ser o mapa local usado pelo componente para acessar as cores
+- as chaves da `palette` devem repetir os nomes canônicos do tema, por exemplo `pageBackground`, `cardBackground`, `textPrimary`
+- o uso no style deve seguir `palette.<token>` ou `colors.<token>` quando o arquivo trabalhar direto com o store
+- esse padrão deve ser seguido em todos os arquivos novos ou ajustados, tomando `Profile.js` como referência de estrutura
+
 Interpretação técnica:
 - `backgroundColor` não deve receber `#HEX`, `white`, `rgba(...)` ou qualquer outro valor hardcoded
 - o valor deve vir de `themeStore.getters.colors.<tokenCanonico>`
