@@ -198,6 +198,8 @@ const createCompany = (id, overrides = {}) => ({
   enabled: overrides.enabled !== undefined ? overrides.enabled : true,
   commercial_enabled:
     overrides.commercial_enabled !== undefined ? overrides.commercial_enabled : true,
+  user: overrides.user || {},
+  permission: Array.isArray(overrides.permission) ? overrides.permission : [],
   theme:
     overrides.theme || {
       colors: {
@@ -779,7 +781,16 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'people/companies/my') {
-      return fulfillJson(route, collection(state.companies));
+      const linkType = String(url.searchParams.get('linkType') || '').trim().toLowerCase();
+      const companies =
+        linkType === 'courier'
+          ? state.companies.filter(company =>
+              company?.user?.courier_enabled === true ||
+              (Array.isArray(company?.permission) && company.permission.includes('courier')),
+            )
+          : state.companies;
+
+      return fulfillJson(route, collection(companies));
     }
 
     if (pathname === 'people/company/default') {
@@ -1342,6 +1353,24 @@ const bindBrowserDiagnostics = page => {
 test('opens the delivery home menu and routes without looping backend calls', async ({ page }) => {
   await createDeliveryApiMock(page, {
     menus: createDeliveryHomeMenus(),
+    companies: [
+      createCompany(3, {
+        name: 'Restaurante Centro',
+        alias: 'Centro',
+        user: {
+          courier_enabled: true,
+        },
+        permission: ['courier'],
+      }),
+      createCompany(4, {
+        name: 'Restaurante Noite',
+        alias: 'Noite',
+        user: {
+          courier_enabled: false,
+        },
+        permission: ['employee'],
+      }),
+    ],
   });
 
   const requestCounter = createRequestCounter(page);
@@ -1387,6 +1416,9 @@ test('opens the delivery home menu and routes without looping backend calls', as
   await expect(page).toHaveURL(/delivery\/companies/);
   await expect(page.getByText(/Delivery Companies|Empresas homologadas/).first()).toBeVisible();
   await expect(page.getByText('Lista de empresas')).toBeVisible();
+  await expect(page.getByText('1 empresas', { exact: true })).toBeVisible();
+  await expect(page.getByText('#3', { exact: true })).toBeVisible();
+  await expect(page.getByText('#4', { exact: true })).toHaveCount(0);
   await page.waitForTimeout(1500);
   expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
   expect(requestCounter.counts.get('delivery_courier_company_presences') || 0).toBeLessThanOrEqual(2);
