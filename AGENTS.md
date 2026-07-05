@@ -31,7 +31,7 @@
 - Loadings de tela e seção devem sair de `StateStore`; erros inline/local de tela devem sair de `DefaultErrors`; erros globais e toasts do sistema continuam em `MessageService`/`SystemErrorToast`.
 - Telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store ou renderizado por um componente default compartilhado.
 - `ActivityIndicator` direto e `showError` direto em tela são excecoes e precisam ser raros; quando a mensagem e inline/local, use `DefaultErrors`, e quando for loading de tela/seção use `StateStore`.
-- `StateStore mode="orders"` e o preset canonico para carregamento de pedidos.
+- O `mode` do `StateStore` e generico e pode representar presets como `compact`, `display`, `orders` ou outros modos reais de tela/seção; o contrato nao deve ficar preso a um unico fluxo.
 - `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores.
 - `DefaultErrors` deve ser usado para erro local/inline de tela; não misturar esse contrato dentro do `StateStore`.
 - O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
