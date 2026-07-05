@@ -273,7 +273,7 @@ const createDeliveryStatusItems = () => [
     context: 'delivery',
     status: 'aguardando aceite',
     realStatus: 'pending',
-    color: '#F59E0B',
+    color: '#e67e22',
   },
   {
     '@id': '/statuses/delivery-accepted',
@@ -313,7 +313,7 @@ const createDeliveryStatusItems = () => [
     context: 'delivery',
     status: 'preparando',
     realStatus: 'preparing',
-    color: '#F59E0B',
+    color: '#e67e22',
   },
 ];
 
@@ -1803,7 +1803,7 @@ test.describe('delivery browser smoke', () => {
         id: 944,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
 
@@ -1942,7 +1942,7 @@ test.describe('delivery browser smoke', () => {
         id: 944,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
     firstWaitingOrder.delivery = {
@@ -1956,7 +1956,7 @@ test.describe('delivery browser smoke', () => {
         id: 945,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
     secondWaitingOrder.delivery = {

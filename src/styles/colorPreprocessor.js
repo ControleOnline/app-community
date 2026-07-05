@@ -60,22 +60,13 @@ if (!global.__coThemeColorPatched) {
       '#cccccc': 'border',
       '#ccc': 'border',
 
-      // '#22c55e': 'success', // consolidado // 06/06/2026
-      '#4caf50': 'success',
-      '#27ae60': 'success',
-      '#28a745': 'success',
+      // consolidado // 05/07/2026
       '#10b981': 'success', // usar essa cor
 
-      // '#f59e0b': 'warning', // consolidado // 06/06/2026
-      '#f39c12': 'warning',
-      '#f2c037': 'warning',
-      '#ff9800': 'warning',
+      // consolidado // 05/07/2026
       '#e67e22': 'warning', // usar essa cor
 
-      // '#ef4444': 'error', // consolidado // 06/06/2026
-      '#f44336': 'error',
-      '#e74c3c': 'error',
-      '#ff4444': 'error',
+      // consolidado // 05/07/2026
       '#c10015': 'error', // usar essa cor
 
     };
