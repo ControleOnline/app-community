@@ -33,7 +33,7 @@
 - `ActivityIndicator` direto e `showError` direto em tela são excecoes e precisam ser raros; quando a mensagem e inline/local, use `DefaultErrors`, e quando for loading de tela/seção use `StateStore`.
 - O `mode` do `StateStore` e generico e pode representar presets como `compact`, `display`, `orders` ou outros modos reais de tela/seção; o contrato nao deve ficar preso a um unico fluxo.
 - `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores.
-- `DefaultErrors` deve ser usado para erro local/inline de tela; não misturar esse contrato dentro do `StateStore`.
+- `DefaultErrors` deve ser usado para erro local/inline de tela; ele lê `error` dos stores informados, sobe como popup com fechamento manual por `x`, auto-fecha em 5 segundos e limpa o erro do store ao fechar; não misturar esse contrato dentro do `StateStore`.
 - O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
 
 ## Regra obrigatoria de componentes default
