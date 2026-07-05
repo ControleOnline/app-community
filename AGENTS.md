@@ -11,6 +11,9 @@
 - Componentes devem ser pequenos, o menor possível
 - O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
+- Leitura de dados em telas e tabs deve vir de stores/actions do modulo; não chamar `api.fetch` diretamente quando houver store correspondente.
+- Normalização de coleção e montagem de payload não devem ficar na tela. Se o backend ou o store já expõem o contrato, a tela consome o contrato direto.
+- Não usar cadeia de fallback com `||` para adivinhar campos de payload quando o contrato do backend já define o valor canônico. Use o campo certo e só mantenha fallback quando ele estiver documentado no contrato.
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
 - Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
 - Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
@@ -25,9 +28,10 @@
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 ## Feedback visual centralizado
-- Loadings e erros do sistema devem sair apenas dos componentes centrais do front: `StateStore` para loading/saving e `MessageService`/`SystemErrorToast` para erro.
-- Esses componentes podem receber configuracoes de escopo, estilo e posicao, mas telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store.
-- `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores; os erros devem ser publicados pelo fluxo central ligado a `SET_ERROR`/`storeErrorBridge`, nunca por estado local duplicado.
+- Loadings de tela e seção devem sair de `StateStore`; erros inline/local de tela devem sair de `DefaultErrors`; erros globais e toasts do sistema continuam em `MessageService`/`SystemErrorToast`.
+- Telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store ou renderizado por um componente default compartilhado.
+- `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores.
+- `DefaultErrors` deve ser usado para erro local/inline de tela; não misturar esse contrato dentro do `StateStore`.
 - O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
 
 ## Regra obrigatoria de componentes default
