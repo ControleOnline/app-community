@@ -224,10 +224,11 @@
 - O backend deve receber informacao suficiente para resolver o produto pelo SKU lido e para entender a quantidade vendida quando o SKU representar pack. O contrato do item nao deve depender apenas de nome do produto ou ids visuais da interface.
 - Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
 - O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
-- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo, candidatura a launcher/Home e retomada no boot.
+- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo e retomada no boot.
+- A candidatura a launcher/Home deve ficar em configuracao separada do device, como `android-launcher-enabled`, e nao deve ser acoplada ao totem.
 - A ativacao do kiosk deve ser controlada por uma configuracao separada do device, como `android-kiosk-enabled`, independente do `pos-operation-mode`.
-- O `MANAGER` deve manter a configuracao do modo operacional em `pos-operation-mode=totem` e a configuracao separada do kiosk do Android em `android-kiosk-enabled`.
-- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV e outra configuracao separada para ligar ou desligar o kiosk do Android.
+- O `MANAGER` deve manter a configuracao do modo operacional em `pos-operation-mode=totem`, a configuracao separada do kiosk do Android em `android-kiosk-enabled` e a configuracao separada do launcher/home em `android-launcher-enabled`.
+- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV, outra configuracao separada para ligar ou desligar o kiosk do Android e outra para o launcher/home.
 - A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 
 ### PDV

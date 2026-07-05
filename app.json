@@ -55,6 +55,7 @@
     "plugins": [
       "./withAndroidTV",
       "./withKioskMode",
+      "./withLauncherMode",
       "./withBackgroundRuntime",
       "./withVectorIconsFonts",
       [
