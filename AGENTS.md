@@ -150,6 +150,7 @@
 - Nao introduzir novas cores fixas no codigo-fonte de telas; qualquer ajuste visual por cliente deve nascer de `theme` no banco.
 - Listagens e tabelas devem usar os tokens do tema para cabecalho, borda e zebra striping, com `bg-headers-light` e `bg-even-light` quando existirem.
 - O financeiro legado da empresa 21 deve ser definido por tema no banco, sem hardcode de preto, amarelo ou cinza dentro da tela.
+- Toda tela alterada a partir de agora deve ser revista junto com o tema ativo antes de considerar a tarefa concluida; ao tocar uma screen, use apenas as cores atravéz de variáveis e nunca cores diretamente do código.As variáveis de cor e classes vindas do store/tema do modulo e mantenha o visual aderente ao padrao atual devem estar presentes.
 
 ## Regra transversal de grupos compartilhados
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
