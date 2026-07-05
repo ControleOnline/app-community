@@ -39,6 +39,7 @@
 - O contrato completo do `DefaultTable` vive em `modules/controleonline/ui-default/AGENTS.md`. Telas antigas devem migrar para esse contrato e parar de manter paginacao, busca, ordenacao, filtros, resumo ou contagem duplicados fora do componente.
 - O `DefaultTable` pode receber componentes de composicao, como cards customizados, add customizado, toolbar extra e modais auxiliares, mas sem devolver para a tela a responsabilidade pela paginação, busca, ordenação ou carregamento da lista.
 - Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
+- Explicacoes permanentes de tela sao proibidas. Quando houver contexto necessario, a tela deve usar o componente compartilhado `DefaultTooltip` em `ui-default` acionado por `?`, com o texto fora do corpo principal para nao poluir o layout.
 
 
 ## Estilo de implementação
