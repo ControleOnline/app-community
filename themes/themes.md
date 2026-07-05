@@ -54,6 +54,8 @@ Então, resumindo em uma frase:
 2. Depois vamos varrer `app-community` módulo por módulo e arquivo por arquivo.
 
 3. Para cada cor/transparência fora da regra do `themes.md`, vamos gravar no arquivo themes-todo.md
+- no levantamento do `themes-todo.md`, bastam duas informacoes: `modulo` e `arquivo`
+- nao precisa registrar linha no `themes-todo.md`
 
 4. Sempre que encontrarmos arquivo de imagem, logo, ícone ou outro asset visual, em qualquer formato, usado de forma hardcoded no módulo:
 - registrar no arquivo `images-todo.md`
@@ -110,6 +112,7 @@ exemplo:
 - o que foi corrigido
 - o que ficou pendente
 - e o que precisou nascer como novo token de tema
+- no bloco de levantamento do `themes-todo.md`, registrar somente `modulo` e `arquivo`
 
 7. Quando uma correção for feita e registrada no bloco de corrigidos:
 - ser bem objetivo

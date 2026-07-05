@@ -188,7 +188,9 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `listItemBackground`
 - `listItemBorder`
 - `listItemDisabledText`
+- `listItemEvenRow`
 - `listItemIcon`
+- `listItemOddRow`
 - `listItemSelectedBackground`
 - `listItemSelectedBorder`
 - `listItemSubtitleText`

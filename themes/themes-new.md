@@ -9,6 +9,82 @@
 # não colocar nada aqui
 
 - `novo-token=#abcdef`                           #abcdef
+- `badgeText=#FFFFFF`                            #FFFFFF
+- `buttonBackground=#2529A1`                    #2529A1
+- `buttonBackgroundSecondary=#F1F5F9`           #F1F5F9
+- `buttonBorderSecondary=#6C757D`               #6C757D
+- `buttonDisabledBackground=#94A3B8`            #94A3B8
+- `buttonIcon=#FFFFFF`                          #FFFFFF
+- `buttonShadow=#2529A1`                        #2529A1
+- `buttonText=#FFFFFF`                          #FFFFFF
+- `buttonTextSecondary=#6C757D`                 #6C757D
+- `cardBackground=#FFFFFF`                      #FFFFFF
+- `cardHeaderBackground=#FFFFFF`                #FFFFFF
+- `cardHeaderText=#212529`                      #212529
+- `cardShadow=#0F172A`                          #0F172A
+- `cardText=#212529`                            #212529
+- `chipBackground=#F8FAFC`                      #F8FAFC
+- `chipBorder=#DCE3EC`                          #DCE3EC
+- `chipSelectedBackground=#E7F3FF`              #E7F3FF
+- `chipSelectedBorder=#2529A1`                  #2529A1
+- `chipSelectedText=#2529A1`                    #2529A1
+- `chipText=#64748B`                            #64748B
+- `dividerBorder=#F1F3F4`                       #F1F3F4
+- `headerBackground=#FFFFFF`                    #FFFFFF
+- `headerBorder=#E2E8F0`                        #E2E8F0
+- `headerText=#0F172A`                          #0F172A
+- `iconDanger=#E74C3C`                          #E74C3C
+- `iconDisabled=#CCCCCC`                        #CCCCCC
+- `iconInfo=#2529A1`                            #2529A1
+- `iconSuccess=#4CAF50`                         #4CAF50
+- `inputBackground=#F8F9FA`                     #F8F9FA
+- `inputBorder=#E9ECEF`                         #E9ECEF
+- `inputIcon=#94A3B8`                           #94A3B8
+- `inputPlaceholderText=#999999`                #999999
+- `inputText=#1A1A1A`                           #1A1A1A
+- `listItemBackground=#F8FAFC`                  #F8FAFC
+- `listItemBorder=#E2E8F0`                      #E2E8F0
+- `listItemIcon=#64748B`                        #64748B
+- `listItemSelectedBackground=#F0F9FF`          #F0F9FF
+- `listItemSubtitleText=#64748B`                #64748B
+- `listItemText=#0F172A`                        #0F172A
+- `loadingBackground=#FFFFFF`                   #FFFFFF
+- `loadingBorder=#E2E8F0`                       #E2E8F0
+- `loadingSpinner=#2529A1`                      #2529A1
+- `loadingText=#64748B`                         #64748B
+- `modalBackground=#FFFFFF`                     #FFFFFF
+- `modalBorder=#E9ECEF`                         #E9ECEF
+- `modalCloseIcon=#666666`                      #666666
+- `modalHeaderText=#1A1A1A`                     #1A1A1A
+- `modalOverlay=rgba(0,0,0,0.5)`               rgba(0,0,0,0.5)
+- `modalShadow=#000000`                         #000000
+- `modalText=#1A1A1A`                           #1A1A1A
+- `navigationActiveBackground=#EFF6FF`          #EFF6FF
+- `navigationActiveBorder=#2529A1`              #2529A1
+- `navigationActiveIcon=#2529A1`                #2529A1
+- `navigationActiveText=#2529A1`                #2529A1
+- `navigationBackground=#FFFFFF`                #FFFFFF
+- `navigationBorder=#E2E8F0`                    #E2E8F0
+- `navigationText=#64748B`                      #64748B
+- `pageBackground=#F8FAFC`                      #F8FAFC
+- `sectionBackground=#F8FAFC`                   #F8FAFC
+- `sectionBorder=#E2E8F0`                       #E2E8F0
+- `selectBackground=#F8F9FA`                    #F8F9FA
+- `selectBorder=#E9ECEF`                        #E9ECEF
+- `selectIcon=#666666`                          #666666
+- `selectOptionBackground=#FFFFFF`              #FFFFFF
+- `selectOptionBorder=#F1F3F4`                  #F1F3F4
+- `selectOptionSelectedBackground=#F8F9FF`      #F8F9FF
+- `selectOptionSelectedText=#2529A1`            #2529A1
+- `selectPlaceholderText=#999999`               #999999
+- `selectText=#1A1A1A`                          #1A1A1A
+- `sheetBackground=#FFFFFF`                     #FFFFFF
+- `surface=#F8F9FF`                             #F8F9FF
+- `textDanger=#FF4444`                          #FF4444
+- `textDisabled=#94A3B8`                        #94A3B8
+- `textMuted=#64748B`                           #64748B
+- `textPrimary=#0F172A`                         #0F172A
+- `textSecondary=#334155`                       #334155
 
 ### ### ### TEMA COMPLETO PARA BANCO ### ### ###
 
@@ -60,35 +136,35 @@ JSON consolidado para teste no banco:
   "badgeSelectedBorder": "",
   "badgeSelectedText": "",
   "badgeShadow": "",
-  "badgeText": "",
+  "badgeText": "#FFFFFF",
   "border": "",
-  "buttonBackground": "",
-  "buttonBackgroundSecondary": "",
+  "buttonBackground": "#2529A1",
+  "buttonBackgroundSecondary": "#F1F5F9",
   "buttonBorder": "",
-  "buttonBorderSecondary": "",
-  "buttonDisabledBackground": "",
+  "buttonBorderSecondary": "#6C757D",
+  "buttonDisabledBackground": "#94A3B8",
   "buttonDisabledOpacity": "",
   "buttonDisabledText": "",
   "buttonFocusBorder": "",
   "buttonHoverBackground": "",
-  "buttonIcon": "",
+  "buttonIcon": "#FFFFFF",
   "buttonIconSecondary": "",
   "buttonPressedBackground": "",
-  "buttonShadow": "",
-  "buttonText": "",
-  "buttonTextSecondary": "",
-  "cardBackground": "",
+  "buttonShadow": "#2529A1",
+  "buttonText": "#FFFFFF",
+  "buttonTextSecondary": "#6C757D",
+  "cardBackground": "#FFFFFF",
   "cardBorder": "",
   "cardDisabledBackground": "",
   "cardDisabledText": "",
-  "cardHeaderBackground": "",
-  "cardHeaderText": "",
+  "cardHeaderBackground": "#FFFFFF",
+  "cardHeaderText": "#212529",
   "cardIcon": "",
   "cardSelectedBackground": "",
   "cardSelectedBorder": "",
   "cardSelectedText": "",
-  "cardShadow": "",
-  "cardText": "",
+  "cardShadow": "#0F172A",
+  "cardText": "#212529",
   "checkboxBackground": "",
   "checkboxBorder": "",
   "checkboxDisabledBackground": "",
@@ -98,23 +174,23 @@ JSON consolidado para teste no banco:
   "checkboxSelectedBorder": "",
   "checkboxSelectedMark": "",
   "checkboxText": "",
-  "chipBackground": "",
-  "chipBorder": "",
+  "chipBackground": "#F8FAFC",
+  "chipBorder": "#DCE3EC",
   "chipDisabledBackground": "",
   "chipDisabledText": "",
   "chipIcon": "",
-  "chipSelectedBackground": "",
-  "chipSelectedBorder": "",
-  "chipSelectedText": "",
+  "chipSelectedBackground": "#E7F3FF",
+  "chipSelectedBorder": "#2529A1",
+  "chipSelectedText": "#2529A1",
   "chipShadow": "",
-  "chipText": "",
+  "chipText": "#64748B",
   "containerBackground": "",
   "containerBorder": "",
   "containerTransparentBackground": "",
   "darkBorder": "",
   "darkCard": "",
   "dividerBackground": "",
-  "dividerBorder": "",
+  "dividerBorder": "#F1F3F4",
   "dividerText": "",
   "footerBackground": "",
   "footerBorder": "",
@@ -122,23 +198,23 @@ JSON consolidado para teste no banco:
   "footerLink": "",
   "footerText": "",
   "googleLoading": "",
-  "headerBackground": "",
-  "headerBorder": "",
+  "headerBackground": "#FFFFFF",
+  "headerBorder": "#E2E8F0",
   "headerIcon": "",
   "headerLink": "",
-  "headerText": "",
+  "headerText": "#0F172A",
   "iconActive": "",
   "iconColor": "",
-  "iconDanger": "",
-  "iconDisabled": "",
-  "iconInfo": "",
+  "iconDanger": "#E74C3C",
+  "iconDisabled": "#CCCCCC",
+  "iconInfo": "#2529A1",
   "iconInverse": "",
   "iconMuted": "",
-  "iconSuccess": "",
+  "iconSuccess": "#4CAF50",
   "iconText": "",
   "iconWarning": "",
-  "inputBackground": "",
-  "inputBorder": "",
+  "inputBackground": "#F8F9FA",
+  "inputBorder": "#E9ECEF",
   "inputDisabledBackground": "",
   "inputDisabledBorder": "",
   "inputDisabledText": "",
@@ -147,32 +223,34 @@ JSON consolidado para teste no banco:
   "inputErrorText": "",
   "inputFilledBorder": "",
   "inputFocusBorder": "",
-  "inputIcon": "",
-  "inputPlaceholderText": "",
-  "inputText": "",
+  "inputIcon": "#94A3B8",
+  "inputPlaceholderText": "#999999",
+  "inputText": "#1A1A1A",
   "linkDisabledText": "",
   "linkHoverText": "",
   "linkText": "",
   "linkVisitedText": "",
   "listItemActiveBackground": "",
   "listItemActiveBorder": "",
-  "listItemBackground": "",
-  "listItemBorder": "",
+  "listItemBackground": "#F8FAFC",
+  "listItemBorder": "#E2E8F0",
   "listItemDisabledText": "",
-  "listItemIcon": "",
-  "listItemSelectedBackground": "",
+  "listItemEvenRow": "",
+  "listItemIcon": "#64748B",
+  "listItemOddRow": "",
+  "listItemSelectedBackground": "#F0F9FF",
   "listItemSelectedBorder": "",
-  "listItemSubtitleText": "",
-  "listItemText": "",
-  "loadingBackground": "",
-  "loadingBorder": "",
+  "listItemSubtitleText": "#64748B",
+  "listItemText": "#0F172A",
+  "loadingBackground": "#FFFFFF",
+  "loadingBorder": "#E2E8F0",
   "loadingDisabledBackground": "",
   "loadingDisabledText": "",
   "loadingIcon": "",
   "loadingOverlay": "",
   "loadingShadow": "",
-  "loadingSpinner": "",
-  "loadingText": "",
+  "loadingSpinner": "#2529A1",
+  "loadingText": "#64748B",
   "menuActiveBackground": "",
   "menuActiveBorder": "",
   "menuActiveIcon": "",
@@ -189,32 +267,32 @@ JSON consolidado para teste no banco:
   "menuSelectedText": "",
   "menuShadow": "",
   "menuText": "",
-  "modalBackground": "",
-  "modalBorder": "",
-  "modalCloseIcon": "",
-  "modalHeaderText": "",
-  "modalOverlay": "",
-  "modalShadow": "",
-  "modalText": "",
+  "modalBackground": "#FFFFFF",
+  "modalBorder": "#E9ECEF",
+  "modalCloseIcon": "#666666",
+  "modalHeaderText": "#1A1A1A",
+  "modalOverlay": "rgba(0,0,0,0.5)",
+  "modalShadow": "#000000",
+  "modalText": "#1A1A1A",
   "navbarBackground": "",
   "navbarBorder": "",
-  "navigationActiveBackground": "",
-  "navigationActiveBorder": "",
-  "navigationActiveIcon": "",
-  "navigationActiveText": "",
-  "navigationBackground": "",
-  "navigationBorder": "",
+  "navigationActiveBackground": "#EFF6FF",
+  "navigationActiveBorder": "#2529A1",
+  "navigationActiveIcon": "#2529A1",
+  "navigationActiveText": "#2529A1",
+  "navigationBackground": "#FFFFFF",
+  "navigationBorder": "#E2E8F0",
   "navigationDisabledBackground": "",
   "navigationDisabledBorder": "",
   "navigationDisabledIcon": "",
   "navigationDisabledText": "",
   "navigationIcon": "",
   "navigationShadow": "",
-  "navigationText": "",
+  "navigationText": "#64748B",
   "overlayBackground": "",
   "overlayBorder": "",
   "overlayShadow": "",
-  "pageBackground": "",
+  "pageBackground": "#F8FAFC",
   "pageBorder": "",
   "panelBackground": "",
   "panelBorder": "",
@@ -229,21 +307,21 @@ JSON consolidado para teste no banco:
   "radioSelectedDot": "",
   "radioText": "",
   "screenBackground": "",
-  "sectionBackground": "",
-  "sectionBorder": "",
-  "selectBackground": "",
-  "selectBorder": "",
-  "selectIcon": "",
-  "selectOptionBackground": "",
-  "selectOptionBorder": "",
-  "selectOptionSelectedBackground": "",
-  "selectOptionSelectedText": "",
-  "selectPlaceholderText": "",
-  "selectText": "",
+  "sectionBackground": "#F8FAFC",
+  "sectionBorder": "#E2E8F0",
+  "selectBackground": "#F8F9FA",
+  "selectBorder": "#E9ECEF",
+  "selectIcon": "#666666",
+  "selectOptionBackground": "#FFFFFF",
+  "selectOptionBorder": "#F1F3F4",
+  "selectOptionSelectedBackground": "#F8F9FF",
+  "selectOptionSelectedText": "#2529A1",
+  "selectPlaceholderText": "#999999",
+  "selectText": "#1A1A1A",
   "shadow": "",
-  "sheetBackground": "",
+  "sheetBackground": "#FFFFFF",
   "sheetBorder": "",
-  "surface": "",
+  "surface": "#F8F9FF",
   "switchBorder": "",
   "switchDisabledThumb": "",
   "switchDisabledTrack": "",
@@ -254,14 +332,14 @@ JSON consolidado para teste no banco:
   "switchOnTrack": "",
   "tabBarBackground": "",
   "tabBarBorder": "",
-  "textDanger": "",
-  "textDisabled": "",
+  "textDanger": "#FF4444",
+  "textDisabled": "#94A3B8",
   "textInverse": "",
   "textLink": "",
-  "textMuted": "",
+  "textMuted": "#64748B",
   "textPlaceholder": "",
-  "textPrimary": "",
-  "textSecondary": "",
+  "textPrimary": "#0F172A",
+  "textSecondary": "#334155",
   "textSuccess": "",
   "textWarning": "",
   "toastBackground": "",
