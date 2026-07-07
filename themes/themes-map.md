@@ -237,6 +237,33 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `modalShadow`
 - `modalText`
 
+### table
+
+- `tableActionBackground`
+- `tableActionBorder`
+- `tableActionIcon`
+- `tableFilterBackground`
+- `tableFilterBorder`
+- `tableFilterText`
+- `tableFooterBackground`
+- `tableFooterBorder`
+- `tableFooterText`
+- `tableHeaderBackground`
+- `tableHeaderBorder`
+- `tableHeaderIcon`
+- `tableHeaderText`
+- `tableRowBackground`
+- `tableRowBorder`
+- `tableRowEvenBackground`
+- `tableRowMutedText`
+- `tableRowOddBackground`
+- `tableRowSelectedBackground`
+- `tableRowSelectedBorder`
+- `tableRowText`
+- `tableToolbarBackground`
+- `tableToolbarBorder`
+- `tableToolbarText`
+
 ### select
 
 - `selectBackground`
