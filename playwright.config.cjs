@@ -13,7 +13,7 @@ module.exports = defineConfig({
   workers: 1,
   use: {
     baseURL,
-    screenshot: 'only-on-failure',
+    screenshot: 'on',
     trace: 'on-first-retry',
     video: 'retain-on-failure',
   },

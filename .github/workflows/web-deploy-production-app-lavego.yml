@@ -38,6 +38,19 @@ jobs:
         run: npm install --legacy-peer-deps   
       - name: Fix Expo Dependencies
         run: npx expo install --fix
+      - name: Run Automated Tests
+        run: |
+          rm -rf tests
+          mkdir -p tests/automated
+          npm test -- --runInBand --json --outputFile=tests/automated/jest-results.json
+          printf 'Automated test run completed successfully.\nSee jest-results.json for details.\n' > tests/automated/summary.txt
+      - name: Run Browser Smoke Tests
+        run: npm run test:browser
+      - name: Stage Browser Smoke Results
+        run: |
+          mkdir -p tests/smoke
+          cp -a test-results/. tests/smoke/ 2>/dev/null || true
+          printf 'Smoke test run completed successfully.\nScreenshots and other artifacts were copied from test-results/ when available.\n' > tests/smoke/summary.txt
       - name: Build
         run: |
           npx expo export --platform web
@@ -52,6 +65,20 @@ jobs:
           security: loose
           local-dir: ./dist/
           server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
+      - name: Deploy Test Results via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./tests/
+          server-dir: /tests/
           exclude: |
             **/.git*
             **/.git*/**
