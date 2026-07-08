@@ -75,31 +75,14 @@ jobs:
       - name: Stage Browser Smoke Results
         if: always()
         run: |
+          rm -rf tests/smoke
           mkdir -p tests/smoke/results
-          cp -a test-results/. tests/smoke/results/ 2>/dev/null || true
-          node <<'NODE'
-          const fs = require('fs');
-          const summaryPath = 'tests/smoke/summary.txt';
-          let lastRunStatus = 'unavailable';
-
-          if (fs.existsSync('test-results/.last-run.json')) {
-            try {
-              lastRunStatus = JSON.parse(fs.readFileSync('test-results/.last-run.json', 'utf8')).status || 'unknown';
-            } catch (error) {
-              lastRunStatus = `unreadable (${error.message})`;
-            }
-          }
-
-          fs.writeFileSync(
-            summaryPath,
-            [
-              'Smoke test artifacts copied from test-results/.',
-              `Last run status: ${lastRunStatus}`,
-              'Screenshots, traces, and videos are available under tests/smoke/results/.',
-            ].join('\n') + '\n',
-            'utf8',
-          );
-          NODE
+          cp -a .playwright-smoke-results/. tests/smoke/results/ 2>/dev/null || true
+          if [ -f .playwright-smoke-results/summary.txt ]; then
+            cp .playwright-smoke-results/summary.txt tests/smoke/summary.txt
+          else
+            printf '%s\n' 'Smoke test artifacts were not generated.' 'Check the workflow logs for the failing step.' > tests/smoke/summary.txt
+          fi
       - name: Upload Test Results
         if: always()
         uses: locaweb/ftp-deploy@1.0.0

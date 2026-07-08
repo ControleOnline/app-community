@@ -1,10 +1,16 @@
+const fs = require('fs');
 const path = require('path');
-const {spawnSync} = require('child_process');
+const { spawnSync } = require('child_process');
 const groups = require('./browser-smoke-groups.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const playwrightConfig = path.join(projectRoot, 'playwright.config.cjs');
 const buildScript = path.join(projectRoot, 'scripts/playwright-web-build.cjs');
+const smokeArtifactsDir = path.resolve(
+  projectRoot,
+  process.env.PLAYWRIGHT_SMOKE_RESULTS_DIR || '.playwright-smoke-results',
+);
+const testResultsDir = path.join(projectRoot, 'test-results');
 
 const groupByName = new Map(
   groups.flatMap(group => [
@@ -46,37 +52,133 @@ if (resolvedGroups.some(group => !group)) {
   process.exit(1);
 }
 
-const runCommand = (command, commandArgs, env) => {
-  const result = spawnSync(command, commandArgs, {
+const ensureDir = dir => {
+  fs.mkdirSync(dir, { recursive: true });
+};
+
+const cleanDir = dir => {
+  fs.rmSync(dir, { recursive: true, force: true });
+};
+
+const copyDir = (sourceDir, targetDir) => {
+  if (!fs.existsSync(sourceDir)) {
+    return false;
+  }
+
+  cleanDir(targetDir);
+  ensureDir(path.dirname(targetDir));
+  fs.cpSync(sourceDir, targetDir, {
+    recursive: true,
+    force: true,
+    dereference: true,
+  });
+  return true;
+};
+
+const runCommand = (command, commandArgs, env) =>
+  spawnSync(command, commandArgs, {
     cwd: projectRoot,
     env,
     stdio: 'inherit',
     shell: process.platform === 'win32',
   });
 
-  if (result.status !== 0) {
-    process.exit(result.status || 1);
-  }
+cleanDir(smokeArtifactsDir);
+ensureDir(smokeArtifactsDir);
+
+const manifest = {
+  generatedAt: new Date().toISOString(),
+  groups: [],
 };
+const failures = [];
 
 for (const group of resolvedGroups) {
+  cleanDir(testResultsDir);
+
   const outputDir = path.join('.playwright-web', group.name);
   const env = {
     ...process.env,
     PLAYWRIGHT_APP_TYPE: group.appType,
     PLAYWRIGHT_WEB_OUTPUT_DIR: outputDir,
   };
+  const groupArtifactsDir = path.join(smokeArtifactsDir, group.name);
+  const groupSummary = {
+    name: group.name,
+    appType: group.appType,
+    build: 'not-run',
+    smoke: 'not-run',
+    artifacts: [],
+  };
 
-    console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
-    runCommand(process.execPath, [buildScript], env);
+  ensureDir(groupArtifactsDir);
+
+  console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
+  const buildResult = runCommand(process.execPath, [buildScript], env);
+  const buildExitCode = buildResult.status ?? buildResult.signal ?? 1;
+
+  if (buildResult.status === 0) {
+    groupSummary.build = 'passed';
 
     console.log(`=== Running ${group.name} browser smoke tests ===`);
-    runCommand('npx', [
-    'playwright',
-    'test',
-    '--config',
-    playwrightConfig,
-    group.testDir,
-    ...forwardedArgs,
-  ], env);
+    const testResult = runCommand('npx', [
+      'playwright',
+      'test',
+      '--config',
+      playwrightConfig,
+      group.testDir,
+      ...forwardedArgs,
+    ], env);
+    const testExitCode = testResult.status ?? testResult.signal ?? 1;
+
+    if (testResult.status === 0) {
+      groupSummary.smoke = 'passed';
+    } else {
+      groupSummary.smoke = `failed (exit ${testExitCode})`;
+      failures.push(`[${group.name}] smoke tests failed with exit ${testExitCode}`);
+    }
+  } else {
+    groupSummary.build = `failed (exit ${buildExitCode})`;
+    failures.push(`[${group.name}] build failed with exit ${buildExitCode}`);
+  }
+
+  if (copyDir(testResultsDir, path.join(groupArtifactsDir, 'test-results'))) {
+    groupSummary.artifacts.push('test-results');
+  }
+
+  manifest.groups.push(groupSummary);
+  fs.writeFileSync(
+    path.join(smokeArtifactsDir, 'manifest.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    'utf8',
+  );
+}
+
+const summaryLines = [
+  `Generated at: ${manifest.generatedAt}`,
+  `Groups: ${manifest.groups.length}`,
+  'Artifacts include Playwright screenshots, traces, and videos under each group test-results directory.',
+  '',
+];
+
+for (const group of manifest.groups) {
+  summaryLines.push(`${group.name} (${group.appType})`);
+  summaryLines.push(`  build: ${group.build}`);
+  summaryLines.push(`  smoke: ${group.smoke}`);
+  summaryLines.push(`  artifacts: ${group.artifacts.length ? group.artifacts.join(', ') : 'none'}`);
+  summaryLines.push('');
+}
+
+fs.writeFileSync(
+  path.join(smokeArtifactsDir, 'summary.txt'),
+  `${summaryLines.join('\n')}\n`,
+  'utf8',
+);
+
+if (failures.length) {
+  console.error('\nBrowser smoke failures:');
+  for (const failure of failures) {
+    console.error(`- ${failure}`);
+  }
+
+  process.exit(1);
 }
