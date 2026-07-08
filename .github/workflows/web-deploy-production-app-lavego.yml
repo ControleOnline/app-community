@@ -51,7 +51,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run smoke tests
-        run: npm run test:smoke
+        run: npm run test:browser:manager
 
       - name: Build
         run: |
