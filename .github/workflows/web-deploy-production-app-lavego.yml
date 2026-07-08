@@ -1,46 +1,21 @@
 name: Deploy Project app.lave-go.com
+
 on:
   push:
     branches: [master]
+  workflow_dispatch:
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    permissions:
-      contents: read
-      actions: read
+
     steps:
       - uses: actions/checkout@v5
-      - name: Collect Candidate SHAs
-        run: |
-          PARENTS=$(git rev-list --parents -n 1 HEAD | cut -d' ' -f2-)
-          echo "CANDIDATE_SHAS=${GITHUB_SHA} ${PARENTS}" >> "$GITHUB_ENV"
-      - name: Confirm Staging Success
-        uses: actions/github-script@v7
-        env:
-          STAGING_WORKFLOW_ID: web-deploy-staging-app-lavego.yml
-        with:
-          script: |
-            const workflowId = process.env.STAGING_WORKFLOW_ID;
-            const candidateShas = new Set((process.env.CANDIDATE_SHAS || '').split(/\s+/).filter(Boolean));
-            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflowId,
-              branch: 'staging',
-              event: 'push',
-              status: 'completed',
-              per_page: 100,
-            });
-            const passed = runs.find((run) => run.conclusion === 'success' && candidateShas.has(run.head_sha));
-            if (!passed) {
-              core.setFailed(`No successful staging run found for ${workflowId} on ${[...candidateShas].join(', ')}`);
-              return;
-            }
-            core.info(`Matched staging run ${passed.id} for ${passed.head_sha}.`);
+
       - uses: actions/setup-node@v5
         with:
           node-version: "20"
+
       - name: Creating Config
         run: |
           echo "const env = {\
@@ -60,16 +35,28 @@ jobs:
           };\
           module.exports = { env };\
           " > ./config/env.local.js
+
       - name: Update Submodules
         run: |
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
+
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
+
       - name: Fix Expo Dependencies
         run: npx expo install --fix
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: npm run test:smoke
+
       - name: Build
-        run: npx expo export --platform web
+        run: |
+          npx expo export --platform web
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
