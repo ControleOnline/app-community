@@ -136,6 +136,8 @@
 - As migrations desse slice precisam rodar no tenant `admin.controleonline.com` via `tenant:migrations:migrate`, nao no banco base direto.
 - O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.
 - A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
+- No fluxo de delivery o contexto de status e `delivery`: o aceite materializa `aceito`, a corrida usa `way`/`away`, a conclusao usa `closed` e o cancelamento usa `canceled`; `rejected` e a recusa de aceite e nao pode ser usado como sinônimo de cancelamento. `preparando` nao pertence a esse contexto e nao deve aparecer como opcao, filtro ou transicao operacional.
+- Depois de aceitar todas as corridas, o app deve ficar preso na corrida ativa, mostrar o botao `Marcar como entregue` em cada parada aceita e so liberar a tela quando a fila terminar.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
 - Nao deve ser usado como tipo de device.
@@ -222,10 +224,11 @@
 - O backend deve receber informacao suficiente para resolver o produto pelo SKU lido e para entender a quantidade vendida quando o SKU representar pack. O contrato do item nao deve depender apenas de nome do produto ou ids visuais da interface.
 - Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
 - O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
-- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo, candidatura a launcher/Home e retomada no boot.
+- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo e retomada no boot.
+- A candidatura a launcher/Home deve ficar em configuracao separada do device, como `android-launcher-enabled`, e nao deve ser acoplada ao totem.
 - A ativacao do kiosk deve ser controlada por uma configuracao separada do device, como `android-kiosk-enabled`, independente do `pos-operation-mode`.
-- O `MANAGER` deve manter a configuracao do modo operacional em `pos-operation-mode=totem` e a configuracao separada do kiosk do Android em `android-kiosk-enabled`.
-- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV e outra configuracao separada para ligar ou desligar o kiosk do Android.
+- O `MANAGER` deve manter a configuracao do modo operacional em `pos-operation-mode=totem`, a configuracao separada do kiosk do Android em `android-kiosk-enabled` e a configuracao separada do launcher/home em `android-launcher-enabled`.
+- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV, outra configuracao separada para ligar ou desligar o kiosk do Android e outra para o launcher/home.
 - A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 
 ### PDV

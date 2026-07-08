@@ -14,20 +14,13 @@ Regras:
 
 ### OBSERVACAO
 
-- quando existir duvida sobre o nome, preferir o nome que descreve o papel visual e nao o arquivo onde ele nasceu
-- se o mesmo papel visual aparecer em varios modulos, o token deve continuar sendo o mesmo
-- se o papel visual for diferente, criar outro token semantico, sem prefixo de modulo
-
-### TOKENS BASE
-
-- `background`
-- `border`
-- `googleLoading`
-- `placeholderText`
-- `shadow`
-- `surface`
-- `textPrimary`
-- `textSecondary`
+- este arquivo deve ser usado somente pelo mapa de objetos
+- os nomes permitidos sao apenas os que estao listados nas secoes de objetos abaixo
+- nao usar `tokens base`, nomes genericos, aliases locais ou nomes inventados fora desta listagem
+- no codigo, a referencia de cor deve apontar para o token canonico do objeto visual correspondente
+- quando existir dúvida sobre o nome, preferir o nome que descreve o papel visual e nao o arquivo onde ele nasceu
+- se o mesmo papel visual aparecer em vários modulos, o token deve continuar sendo o mesmo
+- se o papel visual for diferente, parar a execução e perguntar.
 
 ### MAPA DE OBJETOS
 
@@ -37,6 +30,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 - `appBackground`
 - `containerBackground`
+- `containerTransparentBackground`
 - `containerBorder`
 - `pageBackground`
 - `pageBorder`
@@ -51,10 +45,6 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 ### barra
 
-- `footerBackground`
-- `footerBorder`
-- `headerBackground`
-- `headerBorder`
 - `navbarBackground`
 - `navbarBorder`
 - `tabBarBackground`
@@ -78,15 +68,20 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 ### button
 
 - `buttonBackground`
+- `buttonBackgroundSecondary`
 - `buttonBorder`
+- `buttonBorderSecondary`
 - `buttonDisabledBackground`
+- `buttonDisabledOpacity`
 - `buttonDisabledText`
 - `buttonFocusBorder`
 - `buttonHoverBackground`
 - `buttonIcon`
+- `buttonIconSecondary`
 - `buttonPressedBackground`
 - `buttonShadow`
 - `buttonText`
+- `buttonTextSecondary`
 
 ### card
 
@@ -132,6 +127,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 - `dividerBackground`
 - `dividerBorder`
+- `dividerText`
 
 ### footer
 
@@ -151,6 +147,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 ### icon
 
+- `iconColor`
 - `iconActive`
 - `iconDanger`
 - `iconDisabled`
@@ -158,12 +155,14 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `iconInverse`
 - `iconMuted`
 - `iconSuccess`
+- `iconText`
 - `iconWarning`
 
 ### input
 
 - `inputBackground`
 - `inputBorder`
+- `inputFilledBorder`
 - `inputDisabledBackground`
 - `inputDisabledBorder`
 - `inputDisabledText`
@@ -189,7 +188,9 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `listItemBackground`
 - `listItemBorder`
 - `listItemDisabledText`
+- `listItemEvenRow`
 - `listItemIcon`
+- `listItemOddRow`
 - `listItemSelectedBackground`
 - `listItemSelectedBorder`
 - `listItemSubtitleText`
@@ -235,6 +236,45 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `modalOverlay`
 - `modalShadow`
 - `modalText`
+
+### table
+
+- `tableActionBackground`
+- `tableActionBorder`
+- `tableActionIcon`
+- `tableFilterBackground`
+- `tableFilterBorder`
+- `tableFilterText`
+- `tableFooterBackground`
+- `tableFooterBorder`
+- `tableFooterText`
+- `tableHeaderBackground`
+- `tableHeaderBorder`
+- `tableHeaderIcon`
+- `tableHeaderText`
+- `tableRowBackground`
+- `tableRowBorder`
+- `tableRowEvenBackground`
+- `tableRowMutedText`
+- `tableRowOddBackground`
+- `tableRowSelectedBackground`
+- `tableRowSelectedBorder`
+- `tableRowText`
+- `tableToolbarBackground`
+- `tableToolbarBorder`
+- `tableToolbarText`
+
+### select
+
+- `selectBackground`
+- `selectBorder`
+- `selectIcon`
+- `selectOptionBackground`
+- `selectOptionBorder`
+- `selectOptionSelectedBackground`
+- `selectOptionSelectedText`
+- `selectPlaceholderText`
+- `selectText`
 
 ### navigation
 

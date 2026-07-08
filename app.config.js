@@ -111,6 +111,7 @@ module.exports = () => {
     'expo-build-properties',
     './withAndroidTV',
     './withKioskMode',
+    './withLauncherMode',
     './withBackgroundRuntime',
     './withVectorIconsFonts',
   ];

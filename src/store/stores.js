@@ -30,6 +30,7 @@ import order_products from '@controleonline/ui-orders/src/store/order_products';
 import order_products_queue from '@controleonline/ui-ppc/src/store/modules/order_products_queue';
 import orders from '@controleonline/ui-orders/src/store/orders';
 import delivery_orders from '@controleonline/ui-logistic/src/store/delivery_orders';
+import order_logistics from '@controleonline/ui-logistic/src/store/order_logistics';
 import delivery_courier_schedules from '@controleonline/ui-logistic/src/store/delivery_courier_schedules';
 import delivery_courier_company_presences from '@controleonline/ui-logistic/src/store/delivery_courier_company_presences';
 import delivery_tax_groups from '@controleonline/ui-logistic/src/store/delivery_tax_groups';
@@ -99,6 +100,7 @@ export default {
   order_products_queue,
   orders,
   delivery_orders,
+  order_logistics,
   delivery_courier_schedules,
   delivery_courier_company_presences,
   delivery_tax_groups,

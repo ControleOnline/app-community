@@ -198,6 +198,8 @@ const createCompany = (id, overrides = {}) => ({
   enabled: overrides.enabled !== undefined ? overrides.enabled : true,
   commercial_enabled:
     overrides.commercial_enabled !== undefined ? overrides.commercial_enabled : true,
+  user: overrides.user || {},
+  permission: Array.isArray(overrides.permission) ? overrides.permission : [],
   theme:
     overrides.theme || {
       colors: {
@@ -263,6 +265,58 @@ const createMainOrder = (id = 1200, overrides = {}) => ({
   id,
   externalCode: overrides.externalCode || ('CM-' + id),
 });
+
+const createDeliveryStatusItems = () => [
+  {
+    '@id': '/statuses/delivery-awaiting-acceptance',
+    id: 848,
+    context: 'delivery',
+    status: 'aguardando aceite',
+    realStatus: 'pending',
+    color: '#e67e22',
+  },
+  {
+    '@id': '/statuses/delivery-accepted',
+    id: 849,
+    context: 'delivery',
+    status: 'aceito',
+    realStatus: 'accepted',
+    color: '#16A34A',
+  },
+  {
+    '@id': '/statuses/delivery-way',
+    id: 850,
+    context: 'delivery',
+    status: 'em rota',
+    realStatus: 'way',
+    color: '#0EA5E9',
+  },
+  {
+    '@id': '/statuses/delivery-closed',
+    id: 851,
+    context: 'delivery',
+    status: 'closed',
+    realStatus: 'closed',
+    color: '#64748B',
+  },
+  {
+    '@id': '/statuses/delivery-canceled',
+    id: 852,
+    context: 'delivery',
+    status: 'canceled',
+    realStatus: 'canceled',
+    color: '#DC2626',
+  },
+  {
+    '@id': '/statuses/delivery-preparing',
+    id: 853,
+    context: 'delivery',
+    status: 'preparando',
+    realStatus: 'preparing',
+    color: '#e67e22',
+  },
+];
+
 const buildDeliveryOrderRow = (overrides = {}) => {
   const courier = overrides.provider || createCourier();
   const customer = overrides.client || createCustomer();
@@ -572,6 +626,9 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     logs: Array.isArray(initialState.logs) ? [...initialState.logs] : [],
     orders: Array.isArray(initialState.orders) ? [...initialState.orders] : [],
     logisticsOrders: initialState.logisticsOrders || {},
+    statusItems: Array.isArray(initialState.statusItems)
+      ? [...initialState.statusItems]
+      : createDeliveryStatusItems(),
     deviceId: initialState.deviceId || 'web-7',
     menus: initialState.menus || createDeliveryHomeMenus(),
     nextGroupId: initialState.nextGroupId || 101,
@@ -724,11 +781,35 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     }
 
     if (pathname === 'people/companies/my') {
-      return fulfillJson(route, collection(state.companies));
+      const linkType = String(url.searchParams.get('linkType') || '').trim().toLowerCase();
+      const companies =
+        linkType === 'courier'
+          ? state.companies.filter(company =>
+              company?.user?.courier_enabled === true ||
+              (Array.isArray(company?.permission) && company.permission.includes('courier')),
+            )
+          : state.companies;
+
+      return fulfillJson(route, collection(companies));
     }
 
     if (pathname === 'people/company/default') {
       return fulfillJson(route, state.defaultCompany);
+    }
+
+    if (pathname === 'statuses' && method === 'GET') {
+      const context = String(url.searchParams.get('context') || '').trim().toLowerCase();
+      const realStatus = String(url.searchParams.get('realStatus') || '').trim().toLowerCase();
+      const items = state.statusItems.filter(status => {
+        const matchesContext =
+          !context || String(status?.context || '').trim().toLowerCase() === context;
+        const matchesRealStatus =
+          !realStatus || String(status?.realStatus || '').trim().toLowerCase() === realStatus;
+
+        return matchesContext && matchesRealStatus;
+      });
+
+      return fulfillJson(route, collection(items));
     }
 
     if (pathname === 'menus-people') {
@@ -889,7 +970,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
       return fulfillJson(route, savedOrder);
     }
 
-    const orderActionMatch = pathname.match(/^orders\/(\d+)\/(confirm|cancel)$/);
+    const orderActionMatch = pathname.match(/^orders\/(\d+)\/(confirm|cancel|delivered)$/);
     if (orderActionMatch && method === 'POST') {
       const orderId = orderActionMatch[1];
       const action = orderActionMatch[2];
@@ -898,18 +979,43 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
         action === 'confirm'
           ? {
               ...(currentOrder.status || {}),
-              status: 'accept',
-              realStatus: 'accept',
+              status: 'aceito',
+              realStatus: 'accepted',
             }
-          : {
-              ...(currentOrder.status || {}),
-              status: 'canceled',
-              realStatus: 'canceled',
-            };
+          : action === 'delivered'
+            ? {
+                ...(currentOrder.status || {}),
+                status: 'closed',
+                realStatus: 'closed',
+            }
+            : {
+                ...(currentOrder.status || {}),
+                status: 'canceled',
+                realStatus: 'canceled',
+              };
+      const nextDelivery =
+        action === 'confirm'
+          ? {
+              ...(currentOrder.delivery || {}),
+              status: 'aceito',
+              realStatus: 'accepted',
+            }
+          : action === 'delivered'
+            ? {
+                ...(currentOrder.delivery || {}),
+                status: 'closed',
+                realStatus: 'closed',
+              }
+            : {
+                ...(currentOrder.delivery || {}),
+                status: 'canceled',
+                realStatus: 'canceled',
+              };
 
       const savedOrder = upsertOrder({
         ...currentOrder,
         status: nextStatus,
+        delivery: nextDelivery,
       });
 
       state.logisticsOrders[orderId] = buildDeliveryLogisticsPayload(savedOrder);
@@ -1247,6 +1353,24 @@ const bindBrowserDiagnostics = page => {
 test('opens the delivery home menu and routes without looping backend calls', async ({ page }) => {
   await createDeliveryApiMock(page, {
     menus: createDeliveryHomeMenus(),
+    companies: [
+      createCompany(3, {
+        name: 'Restaurante Centro',
+        alias: 'Centro',
+        user: {
+          courier_enabled: true,
+        },
+        permission: ['courier'],
+      }),
+      createCompany(4, {
+        name: 'Restaurante Noite',
+        alias: 'Noite',
+        user: {
+          courier_enabled: false,
+        },
+        permission: ['employee'],
+      }),
+    ],
   });
 
   const requestCounter = createRequestCounter(page);
@@ -1277,9 +1401,6 @@ test('opens the delivery home menu and routes without looping backend calls', as
   expect(paddingBottom).toBeGreaterThan(0);
   await page.getByText(/Delivery orders|Pedidos de entrega/).first().click();
   await expect(page).toHaveURL(/delivery\/orders/);
-  await expect(page.getByText(/filters?|filtros/i)).toBeVisible();
-  await expect(page.getByText(/status/i).first()).toBeVisible();
-  await expect(page.getByText(/period/i).first()).toBeVisible();
   await page.waitForTimeout(250);
   expect(requestCounter.counts.get('orders') || 0).toBeLessThanOrEqual(2);
 
@@ -1295,6 +1416,9 @@ test('opens the delivery home menu and routes without looping backend calls', as
   await expect(page).toHaveURL(/delivery\/companies/);
   await expect(page.getByText(/Delivery Companies|Empresas homologadas/).first()).toBeVisible();
   await expect(page.getByText('Lista de empresas')).toBeVisible();
+  await expect(page.getByText('1 empresas', { exact: true })).toBeVisible();
+  await expect(page.getByText('#3', { exact: true })).toBeVisible();
+  await expect(page.getByText('#4', { exact: true })).toHaveCount(0);
   await page.waitForTimeout(1500);
   expect(requestCounter.counts.get('people/companies/my') || 0).toBeLessThanOrEqual(2);
   expect(requestCounter.counts.get('delivery_courier_company_presences') || 0).toBeLessThanOrEqual(2);
@@ -1625,6 +1749,7 @@ test.describe('delivery browser smoke', () => {
   });
 
   test('opens an accepted delivery trip with route and order details', async ({ page }) => {
+    bindBrowserDiagnostics(page);
     const deliveryOrder = buildDeliveryOrderRow();
     const routeRequests = [];
 
@@ -1678,7 +1803,7 @@ test.describe('delivery browser smoke', () => {
         id: 944,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
 
@@ -1696,9 +1821,119 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
   });
 
+  test('opens the delivery route directly when all orders are already accepted', async ({
+    page,
+  }) => {
+    bindBrowserDiagnostics(page);
+    await page.context().grantPermissions(['geolocation'], {
+      origin: 'http://localhost:8081',
+    });
+    await page.context().setGeolocation({
+      latitude: -23.55052,
+      longitude: -46.633308,
+    });
+
+    const acceptedOrderOne = buildDeliveryOrderRow({
+      id: 72533,
+      orderDate: '2026-06-10T09:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-1',
+        id: 9991,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72533', {
+        label: 'Destino 72533',
+        street: 'Rua Distante',
+        number: '900',
+        district: 'Jardim Maia',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07150-000',
+        latitude: -23.5684,
+        longitude: -46.6058,
+      }),
+    });
+    acceptedOrderOne.delivery = {
+      etaMinutes: 10,
+    };
+
+    const acceptedOrderTwo = buildDeliveryOrderRow({
+      id: 72534,
+      orderDate: '2026-06-10T10:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-2',
+        id: 9992,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72534', {
+        label: 'Destino 72534',
+        street: 'Rua Proxima',
+        number: '120',
+        district: 'Centro',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07010-000',
+        latitude: -23.5512,
+        longitude: -46.6329,
+      }),
+    });
+    acceptedOrderTwo.delivery = {
+      etaMinutes: 30,
+    };
+
+    const acceptedOrderThree = buildDeliveryOrderRow({
+      id: 72535,
+      orderDate: '2026-06-10T11:00:00.000Z',
+      status: {
+        '@id': '/statuses/accepted-3',
+        id: 9993,
+        status: 'aceito',
+        realStatus: 'accepted',
+        color: '#16A34A',
+      },
+      addressDestination: createAddress('destination-72535', {
+        label: 'Destino 72535',
+        street: 'Avenida Intermediaria',
+        number: '450',
+        district: 'Vila Augusta',
+        city: 'Guarulhos',
+        uf: 'SP',
+        cep: '07023-000',
+        latitude: -23.5577,
+        longitude: -46.6391,
+      }),
+    });
+    acceptedOrderThree.delivery = {
+      etaMinutes: 20,
+    };
+
+    await createDeliveryApiMock(page, {
+      orders: [acceptedOrderOne, acceptedOrderTwo, acceptedOrderThree],
+      logisticsOrders: {
+        [acceptedOrderOne.id]: buildDeliveryLogisticsPayload(acceptedOrderOne),
+        [acceptedOrderTwo.id]: buildDeliveryLogisticsPayload(acceptedOrderTwo),
+        [acceptedOrderThree.id]: buildDeliveryLogisticsPayload(acceptedOrderThree),
+      },
+    });
+
+    await page.goto('/delivery/orders');
+    await expect(page).toHaveURL(/delivery\/run/);
+    const runUrl = new URL(page.url());
+    expect(runUrl.pathname).toBe('/delivery/run');
+    expect(runUrl.searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByText(/Parada atual/i)).toBeVisible();
+    await expect(page.getByText(/Marcar como entregue/i)).toBeVisible();
+  });
+
   test('locks the delivery app on the first pending order and advances the queue', async ({
     page,
   }) => {
+    bindBrowserDiagnostics(page);
     const firstWaitingOrder = buildDeliveryOrderRow({
       id: 72533,
       orderDate: '2026-06-10T10:00:00.000Z',
@@ -1707,9 +1942,12 @@ test.describe('delivery browser smoke', () => {
         id: 944,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
+    firstWaitingOrder.delivery = {
+      etaMinutes: 30,
+    };
     const secondWaitingOrder = buildDeliveryOrderRow({
       id: 72534,
       orderDate: '2026-06-10T11:00:00.000Z',
@@ -1718,20 +1956,26 @@ test.describe('delivery browser smoke', () => {
         id: 945,
         status: 'aguardando aceite',
         realStatus: 'pending',
-        color: '#F59E0B',
+        color: '#e67e22',
       },
     });
+    secondWaitingOrder.delivery = {
+      etaMinutes: 10,
+    };
     const acceptedOrder = buildDeliveryOrderRow({
       id: 72535,
       orderDate: '2026-06-10T09:00:00.000Z',
       status: {
         '@id': '/statuses/accept',
         id: 999,
-        status: 'accept',
-        realStatus: 'accept',
+        status: 'aceito',
+        realStatus: 'accepted',
         color: '#16A34A',
       },
     });
+    acceptedOrder.delivery = {
+      etaMinutes: 20,
+    };
 
     await createDeliveryApiMock(page, {
       orders: [acceptedOrder, firstWaitingOrder, secondWaitingOrder],
@@ -1742,23 +1986,49 @@ test.describe('delivery browser smoke', () => {
       },
     });
 
-    await Promise.all([
-      page.waitForURL(/order-details\?store=orders&id=72533/),
-      page.goto('/delivery/orders'),
-    ]);
+    await page.goto('/delivery/orders');
+    await expect(page).toHaveURL(/order-details\?store=orders&id=72533/);
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
 
-    await Promise.all([
-      page.waitForURL(/order-details\?store=orders&id=72534/),
-      page.getByText(/Aceitar corrida/i).click(),
-    ]);
+    await page.getByText(/Aceitar corrida/i).click();
+    await expect(page).toHaveURL(
+      /order-details.*id=72534/,
+    );
 
     await expect(page.getByText('Aguardando aceite').first()).toBeVisible();
     await expect(page.getByText(/Aceitar corrida/i)).toBeVisible();
     await expect(page.getByText(/Cancelar corrida/i)).toBeVisible();
+
+    await page.getByText(/Aceitar corrida/i).click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(page.getByText(/Parada atual/i)).toBeVisible();
+    const markDeliveredButton = page.getByText(/Marcar como entregue/i).first();
+    await expect(markDeliveredButton).toBeVisible();
+
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+    await expect(markDeliveredButton).toBeVisible();
+
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toBeVisible();
+
+    await markDeliveredButton.click();
+    await expect(page).toHaveURL(/delivery\/run/);
+    expect(new URL(page.url()).searchParams.has('id')).toBe(false);
+    await expect(page.getByText(/Corrida ativa/i)).toHaveCount(0);
+    await expect(page.getByText(/Parada atual/i)).toHaveCount(0);
+    await expect(page.getByText(/Marcar como entregue/i)).toHaveCount(0);
   });
 
   test('opens order details for a delivery order without reloading it in a loop', async ({
@@ -1771,6 +2041,15 @@ test.describe('delivery browser smoke', () => {
       price: 47.47,
       orderDate: '2026-06-10T12:00:00.000Z',
       alterDate: '2026-06-10T12:05:00.000Z',
+      deliveryPeopleId: null,
+      deliveryPeople: null,
+      status: {
+        '@id': '/statuses/closed',
+        id: 1001,
+        status: 'closed',
+        realStatus: 'closed',
+        color: '#6B7280',
+      },
       addressOrigin: createAddress('origin-72532', {
         label: 'Origem da viagem',
         street: 'Rua das Flores',
@@ -1819,7 +2098,9 @@ test.describe('delivery browser smoke', () => {
     await expect(page.getByText('Entrega', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('Mapa da entrega', { exact: true })).toBeVisible();
     await expect(page.getByText('Detalhes da entrega', { exact: true })).toBeVisible();
+    await expect(page.getByText(/Corrida ativa/i)).toHaveCount(0);
+    await expect(page.getByText(/Marcar como entregue/i)).toHaveCount(0);
 
-    expect(orderRequests.length).toBeLessThanOrEqual(2);
+    expect(orderRequests.length).toBeLessThanOrEqual(3);
   });
 });

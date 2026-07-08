@@ -11,6 +11,9 @@
 - Componentes devem ser pequenos, o menor possível
 - O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
 - Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
+- Leitura de dados em telas e tabs deve vir de stores/actions do modulo; não chamar `api.fetch` diretamente quando houver store correspondente.
+- Normalização de coleção e montagem de payload não devem ficar na tela. Se o backend ou o store já expõem o contrato, a tela consome o contrato direto.
+- Não usar cadeia de fallback com `||` para adivinhar campos de payload quando o contrato do backend já define o valor canônico. Use o campo certo e só mantenha fallback quando ele estiver documentado no contrato.
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
 - Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
 - Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
@@ -25,9 +28,12 @@
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 ## Feedback visual centralizado
-- Loadings e erros do sistema devem sair apenas dos componentes centrais do front: `StateStore` para loading/saving e `MessageService`/`SystemErrorToast` para erro.
-- Esses componentes podem receber configuracoes de escopo, estilo e posicao, mas telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store.
-- `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores; os erros devem ser publicados pelo fluxo central ligado a `SET_ERROR`/`storeErrorBridge`, nunca por estado local duplicado.
+- Loadings de tela e seção devem sair de `StateStore`; erros inline/local de tela devem sair de `DefaultErrors`; erros globais e toasts do sistema continuam em `MessageService`/`SystemErrorToast`.
+- Telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store ou renderizado por um componente default compartilhado.
+- `ActivityIndicator` direto e `showError` direto em tela são excecoes e precisam ser raros; quando a mensagem e inline/local, use `DefaultErrors`, e quando for loading de tela/seção use `StateStore`.
+- O `mode` do `StateStore` e generico e pode representar presets como `compact`, `display`, `orders` ou outros modos reais de tela/seção; o contrato nao deve ficar preso a um unico fluxo.
+- `StateStore` deve ler `isLoading`/`isSaving` e equivalentes diretamente dos stores.
+- `DefaultErrors` deve ser usado para erro local/inline de tela; ele lê `error` dos stores informados, sobe como popup com fechamento manual por `x`, auto-fecha em 5 segundos e limpa o erro do store ao fechar; não misturar esse contrato dentro do `StateStore`.
 - O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
 
 ## Regra obrigatoria de componentes default
@@ -39,6 +45,7 @@
 - O contrato completo do `DefaultTable` vive em `modules/controleonline/ui-default/AGENTS.md`. Telas antigas devem migrar para esse contrato e parar de manter paginacao, busca, ordenacao, filtros, resumo ou contagem duplicados fora do componente.
 - O `DefaultTable` pode receber componentes de composicao, como cards customizados, add customizado, toolbar extra e modais auxiliares, mas sem devolver para a tela a responsabilidade pela paginação, busca, ordenação ou carregamento da lista.
 - Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
+- Explicacoes permanentes de tela sao proibidas. Quando houver contexto necessario, a tela deve usar o componente compartilhado `DefaultTooltip` em `ui-default` acionado por `?`, com o texto fora do corpo principal para nao poluir o layout.
 
 
 ## Estilo de implementação
@@ -50,13 +57,14 @@
 - Quando um pedido estiver em `app=POS` e `externalCode` vier preenchido, esse valor representa o numero da mesa e deve ocupar o destaque principal no `OrderHeader`, mantendo o id tecnico do pedido como secundario.
 - Quando o payload trouxer `mainOrder.external_code`, esse valor representa o numero da comanda e o `OrderHeader` deve escrever `Comanda: #...` antes do nome do cliente, sem depender de `otherInformations`.
 - No POS, quando o pedido ja estiver pago e nao houver entrega nem fila de producao, ele deve ir direto para `closed` e nao permanecer em `paid`.
-- Se o pedido ja estiver pago e ainda houver entrega ou fila de producao, o proximo estado operacional deve ser `preparando`, nunca `paid`.
+- No POS, se o pedido ja estiver pago e ainda houver entrega ou fila de producao, o proximo estado operacional deve ser `preparando`, nunca `paid`.
 - Itens so podem entrar na fila de producao quando o pedido ja estiver `paid` ou, em entrega, quando `order-charge-on-delivery-enabled` estiver ativo.
 - `order.created` so deve ser anunciado por pedidos `sale`; `cart` continua sendo apenas rascunho.
 - Acoes de adicionar produto, alterar quantidade e remover item ficam liberadas apenas enquanto o pedido ainda for `cart`; depois da promocao para `sale` ou em qualquer estado terminal, a area de itens vira somente leitura.
 - No front React, os dados operacionais devem vir somente de campos materializados do payload. Em logistica, motorista, telefone, rastreio e status devem sair de `deliveryPeople`, `deliveryPeopleId`, `delivery`, `currentIntegration` e campos equivalentes ja retornados pela API; `otherInformations` nao deve ser origem de exibicao.
 - Fluxos de logística de pedidos pertencem ao `ui-logistic`. O `ui-orders` pode disparar a navegação, mas a tela canônica e os componentes da operação devem viver no módulo de logística.
-- `OrderLogisticsPage` e uma tela compartilhada com dois modos. Sem `route.params.order` ela opera como manager/overview, mostra somente origem e destino e monta o bloco de lista abaixo do mapa; com `route.params.order` ela vira o detalhe da delivery, pode mostrar a posicao atual e a rota estimada do motoboy e nao monta a lista.
+- `OrderLogisticsPage` e uma tela compartilhada com dois modos. Sem `route.params.order` ela opera como manager/overview, mostra somente origem e destino e monta o bloco de lista abaixo do mapa; com `route.params.order` ela vira o detalhe da delivery, pode mostrar a posicao atual e a rota estimada do motoboy e nao monta a lista. No delivery, a jornada apos aceite fica presa em `aceito` -> `way`/`away` -> `closed`/`canceled`; `rejected` e a recusa de aceite e nao deve ser confundido com cancelamento. `preparando` nao pertence a esse fluxo.
+- O lock global de delivery deve sempre abrir `OrderDetails` com `id` do pedido. Fallback de `order` em rota e apenas defesa contra caller legado; a navegacao principal nao pode depender dele.
 - O bloco de lista e o bloco de aceite devem ser componentes separados e desacoplaveis; a tela principal decide apenas se monta ou nao cada um.
 - Em ambos os modos, os dados visiveis da entrega devem vir do pedido corrente materializado (`id`, `displayId`, `addressOrigin`, `addressDestination`, `price`, `status`, `deliveryPeople`), sem fallback para `mainOrder` na UI.
 - Enquanto a entrega estiver em `aguardando aceite`, a visao do motoboy deve esconder troca de cliente/endereco, esconder a barra inferior e manter aceite/recusa em card flutuante.
@@ -73,8 +81,10 @@
 - O front-end é composto por vários aplicativos que compartilham módulos. O parâmetro APP_TYPE muda para outro aplicativo, portanto, outra visão do mesmo sistema mas para uma função diferente dentro da empresa. Isso é extramamente importante.
 - O front deve ser `store-first`: use estado e ações de store como fonte de verdade sempre que existir contrato viável; `api.fetch` direto só em caso excepcionalíssimo e devidamente justificado no módulo.
 - Evite passar objetos entre telas, rotas e componentes quando o mesmo dado puder ser resolvido por store; passe apenas IDs, IRIs ou chaves mínimas e hidrate o restante no destino.
+- Explicações permanentes de tela devem sair do corpo principal e ir para `DefaultTooltip`, acionado por `?`, para não poluir o layout.
+- `ActivityIndicator` direto em tela e exceção, não padrão; a tela deve preferir `StateStore` ou estado textual simples.
 - Leia `MODOS_OPERACAO.md` antes de propor ou implementar qualquer fluxo no front. Esse arquivo define as visoes por `APP_TYPE`, os tipos operacionais de device e o planejamento atual do `POS`. Agents como Codex devem trata-lo como contexto obrigatorio.
-- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e deve ser controlada pela chave de device `android-kiosk-enabled`; o modo operacional salvo do device usa `pos-operation-mode=totem` e nao herda essa chave.
+- Em Android dedicado, a trava fisica do totem usa `Lock Task Mode` por `withKioskMode` e deve ser controlada pela chave de device `android-kiosk-enabled`; o modo operacional salvo do device usa `pos-operation-mode=totem` e nao herda essa chave. O comportamento launcher/home fica em `android-launcher-enabled` e nao deve ser acoplado ao totem.
 - Ícones em telas compartilhadas precisam funcionar em Web e nativo. Em ambiente Expo, prefira `@expo/vector-icons` quando possível. Se um módulo usar `react-native-vector-icons`, garanta o registro explícito das fontes no bootstrap web e nunca assuma que o browser carregará essas fontes automaticamente.
 - Quando o store de tradução não estiver claro, use `common` como store padrão para a chave traduzida, mantendo o tipo correto (`label`, `option`, etc.) e sem inventar texto de fallback.
 - Não adicinhar ou criar métodos para pesquisar várias opções.
@@ -149,6 +159,7 @@
 - Nao introduzir novas cores fixas no codigo-fonte de telas; qualquer ajuste visual por cliente deve nascer de `theme` no banco.
 - Listagens e tabelas devem usar os tokens do tema para cabecalho, borda e zebra striping, com `bg-headers-light` e `bg-even-light` quando existirem.
 - O financeiro legado da empresa 21 deve ser definido por tema no banco, sem hardcode de preto, amarelo ou cinza dentro da tela.
+- Toda tela alterada a partir de agora deve ser revista junto com o tema ativo antes de considerar a tarefa concluida; ao tocar uma screen, use apenas as cores atravéz de variáveis e nunca cores diretamente do código.As variáveis de cor e classes vindas do store/tema do modulo e mantenha o visual aderente ao padrao atual devem estar presentes.
 
 ## Regra transversal de grupos compartilhados
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
