@@ -10,13 +10,14 @@
     "start:clear": "expo start -c",
     "lint": "eslint .",
     "test": "jest",
+    "test:automated": "jest --runInBand",
     "test:browser": "node scripts/run-browser-smokes.cjs",
     "test:browser:headed": "node scripts/run-browser-smokes.cjs --headed",
     "test:browser:manager": "node scripts/run-browser-smokes.cjs manager",
     "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
     "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
     "test:browser:install": "playwright install chromium",
-    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
+    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=src/tests/browser/|modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",

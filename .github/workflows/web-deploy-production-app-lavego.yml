@@ -4,8 +4,9 @@ on:
     branches: [master]
   workflow_dispatch:
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -35,25 +36,124 @@ jobs:
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps   
+        run: npm install --legacy-peer-deps
       - name: Fix Expo Dependencies
         run: npx expo install --fix
       - name: Run Automated Tests
         run: |
           rm -rf tests
           mkdir -p tests/automated
-          npm test -- --runInBand --json --outputFile=tests/automated/jest-results.json
-          printf 'Automated test run completed successfully.\nSee jest-results.json for details.\n' > tests/automated/summary.txt
+          npm run test:automated -- --json --outputFile=tests/automated/jest-results.json
+      - name: Summarize Automated Tests
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const reportPath = 'tests/automated/jest-results.json';
+          const summaryPath = 'tests/automated/summary.txt';
+          const lines = [];
+
+          if (fs.existsSync(reportPath)) {
+            try {
+              const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+              lines.push(`Status: ${report.success ? 'passed' : 'failed'}`);
+              lines.push(`Suites: ${report.numPassedTestSuites}/${report.numTotalTestSuites} passed`);
+              lines.push(`Tests: ${report.numPassedTests}/${report.numTotalTests} passed`);
+              lines.push(`Snapshots: ${report.numPassedSnapshots || 0}/${report.numTotalSnapshots || 0} passed`);
+            } catch (error) {
+              lines.push(`Unable to parse automated test report: ${error.message}`);
+            }
+          } else {
+            lines.push('Automated test report not found.');
+          }
+
+          fs.writeFileSync(summaryPath, `${lines.join('\n')}\n`, 'utf8');
+          NODE
       - name: Run Browser Smoke Tests
+        if: always()
         run: npm run test:browser
       - name: Stage Browser Smoke Results
+        if: always()
         run: |
-          mkdir -p tests/smoke
-          cp -a test-results/. tests/smoke/ 2>/dev/null || true
-          printf 'Smoke test run completed successfully.\nScreenshots and other artifacts were copied from test-results/ when available.\n' > tests/smoke/summary.txt
+          mkdir -p tests/smoke/results
+          cp -a test-results/. tests/smoke/results/ 2>/dev/null || true
+          node <<'NODE'
+          const fs = require('fs');
+          const summaryPath = 'tests/smoke/summary.txt';
+          let lastRunStatus = 'unavailable';
+
+          if (fs.existsSync('test-results/.last-run.json')) {
+            try {
+              lastRunStatus = JSON.parse(fs.readFileSync('test-results/.last-run.json', 'utf8')).status || 'unknown';
+            } catch (error) {
+              lastRunStatus = `unreadable (${error.message})`;
+            }
+          }
+
+          fs.writeFileSync(
+            summaryPath,
+            [
+              'Smoke test artifacts copied from test-results/.',
+              `Last run status: ${lastRunStatus}`,
+              'Screenshots, traces, and videos are available under tests/smoke/results/.',
+            ].join('\n') + '\n',
+            'utf8',
+          );
+          NODE
+      - name: Upload Test Results via FTP
+        if: always()
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./tests/
+          server-dir: /tests/
+          exclude: |
+            **/.git*
+            **/.git*/**
+  deploy:
+    runs-on: ubuntu-latest
+    needs: tests
+    if: ${{ needs.tests.result == 'success' }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - name: Creating Config
+        run: |
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          APP_TYPE: 'MANAGER',\
+          COMPANY_NAME: 'lavego',\
+          ZOOM: 0.80,\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID: '${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY: '${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON: '${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON: '${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };\
+          " > ./config/env.local.js
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
       - name: Build
-        run: |
-          npx expo export --platform web
+        run: npx expo export --platform web
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -65,20 +165,6 @@ jobs:
           security: loose
           local-dir: ./dist/
           server-dir: /
-          exclude: |
-            **/.git*
-            **/.git*/**
-      - name: Deploy Test Results via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTPHOST_APPLAVEGO }}
-          username: ${{ secrets.FTPUSER_APPLAVEGO }}
-          password: ${{ secrets.FTPPASS_APPLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ./tests/
-          server-dir: /tests/
           exclude: |
             **/.git*
             **/.git*/**
