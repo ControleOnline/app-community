@@ -1,7 +1,7 @@
 const { expect, test } = require('playwright/test');
 const packageJson = require('../../../../package.json');
+const { API_ORIGIN } = require('../apiOrigin');
 
-const API_ORIGIN = 'https://api.controleonline.com';
 const APP_VERSION = packageJson?.version || '1.0.0';
 const CORS_HEADERS = {
   'access-control-allow-origin': '*',
@@ -296,7 +296,15 @@ const mockMenuCostsApi = async page => {
 
   await page.addInitScript(
     ({ appVersion }) => {
-      localStorage.setItem(
+      const setLocalStorageItem = (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Some initial documents (like about:blank) do not expose storage.
+        }
+      };
+
+      setLocalStorageItem(
         'session',
         JSON.stringify({
           id: 7,
@@ -306,8 +314,8 @@ const mockMenuCostsApi = async page => {
           mycompany: 3,
         }),
       );
-      localStorage.setItem('config', JSON.stringify({ language: 'pt-br' }));
-      localStorage.setItem(
+      setLocalStorageItem('config', JSON.stringify({ language: 'pt-br' }));
+      setLocalStorageItem(
         'device',
         JSON.stringify({
           id: 'web-manager',
@@ -322,7 +330,7 @@ const mockMenuCostsApi = async page => {
           metadata: {},
         }),
       );
-      },
+    },
     { appVersion: APP_VERSION },
   );
 

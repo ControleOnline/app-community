@@ -6,8 +6,8 @@
 
 const {expect, test} = require('playwright/test');
 const packageJson = require('../../../../package.json');
+const {API_ORIGIN} = require('../apiOrigin');
 
-const API_ORIGIN = 'https://api.controleonline.com';
 const CORS_HEADERS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers':
@@ -1032,7 +1032,7 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
     const logisticsOrderMatch = pathname.match(/^marketplace\/logistics\/orders\/(\d+)$/);
     if (logisticsOrderMatch && method === 'GET') {
       const payload = findLogisticsPayload(logisticsOrderMatch[1]);
-      return fulfillJson(route, payload || null);
+      return fulfillJson(route, collection(payload ? [payload] : []));
     }
     if (pathname === 'delivery_courier_vehicles' && method === 'GET') {
       const courierId = String(url.searchParams.get('courier') || '').replace(/\D+/g, '');
@@ -1312,12 +1312,22 @@ const createDeliveryApiMock = async (page, initialState = {}) => {
   });
 
   await page.addInitScript(
-    ({ session, config, device }) => {
-      localStorage.setItem('session', JSON.stringify(session));
-      localStorage.setItem('config', JSON.stringify(config));
-      localStorage.setItem('device', JSON.stringify(device));
+    ({ session, config, device, appType }) => {
+      const setLocalStorageItem = (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Some initial documents (like about:blank) do not expose storage.
+        }
+      };
+
+      setLocalStorageItem('session', JSON.stringify(session));
+      setLocalStorageItem('config', JSON.stringify(config));
+      setLocalStorageItem('device', JSON.stringify(device));
+      setLocalStorageItem('app-type', appType);
     },
     {
+      appType: 'DELIVERY',
       session: createFakeSession(),
       config: { language: 'pt-br' },
       device: {

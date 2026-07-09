@@ -1,7 +1,7 @@
 const {expect, test} = require('playwright/test');
 const packageJson = require('../../../../package.json');
+const {API_ORIGIN} = require('../apiOrigin');
 
-const API_ORIGIN = 'https://api.controleonline.com';
 const CORS_HEADERS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers':
@@ -680,13 +680,23 @@ const createPosApiMock = async (page, initialState = {}) => {
   });
 
   await page.addInitScript(
-    ({ session, config, device }) => {
-      localStorage.setItem('session', JSON.stringify(session));
-      localStorage.setItem('config', JSON.stringify(config));
-      localStorage.setItem('device', JSON.stringify(device));
-      localStorage.setItem('pdv-active-order:3:web-7', '123');
+    ({ session, config, device, appType }) => {
+      const setLocalStorageItem = (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          // Some initial documents (like about:blank) do not expose storage.
+        }
+      };
+
+      setLocalStorageItem('session', JSON.stringify(session));
+      setLocalStorageItem('config', JSON.stringify(config));
+      setLocalStorageItem('device', JSON.stringify(device));
+      setLocalStorageItem('app-type', appType);
+      setLocalStorageItem('pdv-active-order:3:web-7', '123');
     },
     {
+      appType: 'POS',
       session: createFakeSession({
         companyId: 3,
         deviceId: 'web-7',
