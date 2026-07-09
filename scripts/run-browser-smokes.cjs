@@ -48,7 +48,7 @@ const resolvedGroups =
     : groups;
 
 if (resolvedGroups.some(group => !group)) {
-  console.error('Unknown browser smoke group. Use manager, delivery, pos, or all.');
+  console.error('Unknown browser smoke group. Use manager, admin, delivery, pos, or all.');
   process.exit(1);
 }
 

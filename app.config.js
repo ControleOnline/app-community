@@ -39,10 +39,16 @@ module.exports = () => {
     return expo;
   }
 
-  const appType = (process.env.APP_TYPE || DEFAULT_APP_TYPE).toUpperCase();
+  const appType = String(
+    localEnv.APP_TYPE || process.env.APP_TYPE || DEFAULT_APP_TYPE,
+  ).toUpperCase();
   const appLower = appType.toLowerCase();
-  const assetsFolder = (process.env.ASSETS_VARIANT || appType).toLowerCase();
+  const assetsFolder = String(
+    process.env.ASSETS_VARIANT ||
+      (appType === 'ADMIN' ? 'manager' : appType),
+  ).toLowerCase();
   const displayName =
+    localEnv.APP_DISPLAY_NAME ||
     process.env.APP_DISPLAY_NAME ||
     removeNamePrefix(expo.displayName) ||
     removeNamePrefix(expo.name) ||

@@ -1,9 +1,9 @@
-Generated at: 2026-07-09T03:22:33.398Z
+Generated at: 2026-07-09T04:05:42.385Z
 Groups: 1
 Artifacts include Playwright screenshots, traces, and videos under each group test-results directory.
 
-manager (MANAGER)
-  build: failed (exit 1)
-  smoke: not-run
-  artifacts: none
+admin (ADMIN)
+  build: passed
+  smoke: passed
+  artifacts: test-results
 

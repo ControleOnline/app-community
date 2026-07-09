@@ -5,6 +5,11 @@ module.exports = [
     testDir: 'src/tests/browser/manager',
   },
   {
+    name: 'admin',
+    appType: 'ADMIN',
+    testDir: 'src/tests/browser/admin',
+  },
+  {
     name: 'delivery',
     appType: 'DELIVERY',
     testDir: 'src/tests/browser/delivery',

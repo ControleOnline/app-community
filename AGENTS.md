@@ -108,7 +108,7 @@
 - Preferir trabalhar com store ao invés de mandar parâmetros para componentes filhos
 - Exemplo de módulo ideal: Orders.js que inclui orderHeader.js, orderInvoices.js, printOrder.js, orderPreparationQueue.js. Por sua vez um módulo chamado Invoice.js poderia incluir o orderInvoice.js e o módulo KDS poderia incluir orderHeader.js e printOrder.js, orderPreparationQueue.js. Sempre prefira modularizar assim.
 - Sempre começe as telas por listagens e dentro delas, coloque botões para adicionar e editar, também para cancelar, nunca deletar.
-- Atente-se que algumas ações não são pertinentes à aquela visão, como no CRM que é feito para vendedores, não haverá cadastros de categorias ou modelos de contratos, isso é função do admin (Manager). Sempre tenha em mente as visões de cada aplicativo q quem os usa.
+- Atente-se que algumas ações não são pertinentes àquela visão, como no CRM que é feito para vendedores, não haverá cadastros de categorias ou modelos de contratos, isso é função do admin (`ADMIN`). Sempre tenha em mente as visões de cada aplicativo e quem os usa.
 - Sempre verifique o backend pasa ser melhor direcionado em tudo.
 - Ao verificar o backend, preencha sempre os stores correspondentes com as colunas da entidade, formatando elas da melhor maneira possível
 - Comente todo o código
@@ -158,6 +158,7 @@
 - O menu da home deve vir do backend por `menus-people` com o `APP_TYPE` atual e ser salvo em `theme.menus`.
 - Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
+- A tela de configuracao de menus por perfil agora vive no `APP_TYPE=ADMIN`; o `MANAGER` nao deve mais exibir `MenuAccessConfigPage` como atalho principal.
 - A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
 
 ## Regra transversal de tema

@@ -1,12 +1,14 @@
 {
-  "generatedAt": "2026-07-09T03:22:33.398Z",
+  "generatedAt": "2026-07-09T04:05:42.385Z",
   "groups": [
     {
-      "name": "manager",
-      "appType": "MANAGER",
-      "build": "failed (exit 1)",
-      "smoke": "not-run",
-      "artifacts": []
+      "name": "admin",
+      "appType": "ADMIN",
+      "build": "passed",
+      "smoke": "passed",
+      "artifacts": [
+        "test-results"
+      ]
     }
   ]
 }

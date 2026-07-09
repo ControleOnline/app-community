@@ -14,7 +14,8 @@
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
-- `MANAGER` e a visao administrativa.
+- `MANAGER` e a visao administrativa operacional.
+- `ADMIN` e a visao administrativa inicial para menus, acessos e cadastros super.
 - `CRM` e a visao comercial.
 - `SHOP` e a visao cliente-facing.
 
@@ -35,6 +36,18 @@
 - Nao deve virar uma copia do `POS`.
 - Mesmo quando abrir a tela de PDV, em `APP_TYPE=MANAGER` o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
 - Nao deve concentrar responsabilidades de atendimento comercial do `CRM` nem fluxo cliente-facing do `SHOP`.
+- O cadastro de menus por perfil nao pertence mais ao `MANAGER`; ele foi movido para o `ADMIN`.
+
+### ADMIN
+- Publico: owner, super admin e backoffice responsavel por governanca de menus.
+- Missao: entrada inicial para cadastrar menus, rotas e permissões da nova visao web.
+- Modulos mais envolvidos: `ui-manager` e `ui-common`.
+- Responsabilidades:
+- Cadastro e manutencao de menus por perfil.
+- Entrada inicial da home com o atalho de `MenuAccessConfigPage`.
+- Limites:
+- Nao deve carregar por padrao os fluxos operacionais amplos do `MANAGER`.
+- Nao deve disputar o mesmo atalho principal do `MANAGER` para configuracao de menus.
 
 ### SERVICE
 - Publico: `employee` e `owner` da operacao.

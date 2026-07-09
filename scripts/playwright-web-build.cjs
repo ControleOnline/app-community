@@ -32,7 +32,7 @@ const overrideEnvLocalAppType = appType => {
   }
 
   const originalEnvLocal = fs.readFileSync(envLocalFile, 'utf8');
-  const appTypePattern = /APP_TYPE:\s*['"]([^'"]+)['"]/;
+  const appTypePattern = /APP_TYPE:\s*(?:resolveAppType\(\)|['"][^'"]+['"])/;
   const appTypeMatch = originalEnvLocal.match(appTypePattern);
 
   if (!appTypeMatch) {
@@ -41,7 +41,14 @@ const overrideEnvLocalAppType = appType => {
     );
   }
 
-  if (appTypeMatch[1].trim().toUpperCase() === normalizedAppType) {
+  const currentAppType = String(appTypeMatch[0] || '')
+    .replace(/^APP_TYPE:\s*/, '')
+    .replace(/^resolveAppType\(\)$/, 'MANAGER')
+    .replace(/^['"]|['"]$/g, '')
+    .trim()
+    .toUpperCase();
+
+  if (currentAppType === normalizedAppType) {
     return null;
   }
 

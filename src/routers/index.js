@@ -133,6 +133,7 @@ const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
   DELIVERY: DeliveryHomePage,
+  ADMIN: ManagerHomePage,
   MANAGER: ManagerHomePage,
   SERVICE: ServiceHomePage,
   SHOP: ShopHomePage,
