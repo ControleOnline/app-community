@@ -27,8 +27,7 @@ import peopleRoutes from '@controleonline/ui-people/src/react/router/routes'
 import logisticRoutes from '@controleonline/ui-logistic/src/react/router/routes'
 import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
 import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
-
-import { env } from '@env'
+import {app_type} from '@appType'
 import {
   normalizeInitialBrowserPath,
   normalizeProductDetailsTabPath,
@@ -141,7 +140,7 @@ const homeByType = {
   PPC: PPCHomePage,
 }
 
-const normalizedAppType = String(env.APP_TYPE || '').toUpperCase()
+const normalizedAppType = app_type
 
 if (homeByType[normalizedAppType]) {
   allRoutes.push({
