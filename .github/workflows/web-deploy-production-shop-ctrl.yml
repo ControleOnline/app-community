@@ -75,7 +75,7 @@ jobs:
         with:
           host: ${{ secrets.SHOP_HOST }}
           user: ${{ secrets.SHOP_USER }}
-          password: ${{ secrets.SHOP_PASSWORD }}
+          password: ${{ secrets.SHOP_PASS }}
           localDir: "./dist"
           remoteDir: "~/public_html"
           forceSsl: false
