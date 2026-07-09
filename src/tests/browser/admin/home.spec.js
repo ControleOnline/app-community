@@ -203,6 +203,7 @@ test.describe('admin browser smoke', () => {
     await page.goto('/');
 
     await expect(page.getByText('Cadastro de menus')).toBeVisible();
+    await expect(page.getByText('Configuracoes', {exact: true})).toBeVisible();
 
     await page.getByText('Cadastro de menus').click();
 
