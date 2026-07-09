@@ -1,8 +1,9 @@
 ## Configuração local para testes
+
 - app-community\config\key.local.js tem a informação da chave de API de um usuário de testes. Esse usuário pode ser utilizado para realizar chamadas à API e confirmar informações sobre o funcionamento. Use quando precisar.
 
-
 ## Qualidade
+
 - Rodar lint e testes antes de concluir.
 - Não introduzir breaking changes sem destacar.
 - Preferir mudanças pequenas e isoladas.
@@ -28,6 +29,7 @@
 - Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
 
 ## Feedback visual centralizado
+
 - Loadings de tela e seção devem sair de `StateStore`; erros inline/local de tela devem sair de `DefaultErrors`; erros globais e toasts do sistema continuam em `MessageService`/`SystemErrorToast`.
 - Telas, cards, modais e tabs nao devem recriar `ActivityIndicator`, skeleton, banner, alert ou caixa de erro paralela quando o estado puder ser lido do store ou renderizado por um componente default compartilhado.
 - `ActivityIndicator` direto e `showError` direto em tela são excecoes e precisam ser raros; quando a mensagem e inline/local, use `DefaultErrors`, e quando for loading de tela/seção use `StateStore`.
@@ -37,7 +39,9 @@
 - O footer de runtime deve exibir um loading discreto quando qualquer store apontar `isLoading` ou `isSaving`; isso complementa o `StateStore` e nao substitui o fluxo central.
 
 ## Regra obrigatoria de componentes default
+
 - Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
+- Imagens e arquivos vindos do backend devem usar `DefaultFile` de `ui-default`. A URL de download precisa carregar `app-domain=<dominio configurado>` e, quando a plataforma suportar, esse valor tambem deve ir em `headers`.
 - Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile deve ser gerenciado pelo proprio `DefaultTable`, recebendo da tela apenas um renderer/componente de card customizado quando o visual precisar ser especifico. Nao criar uma listagem paralela com `FlatList`/cards na tela se ela ja usa `DefaultTable`.
 - Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
@@ -47,8 +51,8 @@
 - Em tabelas React, `add: true` no store pertence ao `DefaultTable`: o botao fica na toolbar e, quando a tela nao passar um fluxo proprio por `onAdd`, o componente deve abrir o `DefaultForm` como fallback padrao.
 - Explicacoes permanentes de tela sao proibidas. Quando houver contexto necessario, a tela deve usar o componente compartilhado `DefaultTooltip` em `ui-default` acionado por `?`, com o texto fora do corpo principal para nao poluir o layout.
 
-
 ## Estilo de implementação
+
 - Seguir padrão dos módulos existentes.
 - Reaproveitar utilitários antes de criar novos.
 - Nomear arquivos e classes de forma consistente com os módulos atuais.
@@ -72,8 +76,8 @@
 - Heros e blocos explicativos fixos sao proibidos em qualquer tela. Quando existir informacao contextual realmente necessaria, ela deve vir de um componente reutilizavel e parametrizado acionado por um icone `?`, sem texto longo permanente no corpo da pagina.
 - O `RuntimeInfoFooter` deve manter o device/identificador visivel e acrescentar o modo de operacao traduzido quando existir; nunca substituir o device por um label de fallback.
 
-
 ## Convenções
+
 - Não esqueça que as colunas dos stores representam as entidades da API. Isso vai ajudar muito no desenvolvimento.
 - O código Vue é legado e pode ser usado como referência, mas o sistema é feito em React Native para Web e para Aplicações nativas.
 - Vue está em fase de remoção. Quando um trabalho tocar um fluxo já coberto em React, remova o equivalente Vue em vez de duplicar a mudança. Se o módulo ainda não tiver equivalente React, apague `src/vue` mesmo assim e mantenha o pacote com um entrypoint neutro fora de `src/vue`, salvo quando o usuario pedir explicitamente para manter o legado.
@@ -117,9 +121,9 @@
 - Diversas configurações que ligam o frontend aos dados do backend estão centralizadas nos stores. Use isso sempre que possível. E alimente o store com essas informações ao criar novas telas.
 - Não há diversos nomes ou diversos jeitos de fazer alguma coisa. Se houver dois arquivos diferentes tratando a mesma coisa, pergunte qual deve manter e ejuste para que apenas um componente tenha a responsabilidade por aquela função.
 - Se houver erros de grafia, ou diversos nomes para encontrar algo como um array de palavras por conta de dúvidas do que é o correto, simplesmente pergunte qual o correto. Exemplo: [order, orders] num campo de tipos provavelmente haverá uma grafia correta e outra que age como um fallback, porém isso não deve existir de forma alguma.
-- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva. 
+- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva.
 - Quando a regra for transversal entre módulos, o `AGENTS.md` da raiz também deve ser atualizado.
-- Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests 
+- Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests
 - Testes de browser do web ficam em `src/tests/browser` e usam Playwright.
 - Quando uma mudança tocar login, navegacao ou qualquer fluxo visivel no browser, atualize ou adicione um smoke test e valide com `npm run test:browser`.
 - Toda mudança com efeito visivel no browser deve ganhar cobertura em `src/tests/browser`; teste unitario sozinho nao fecha o contrato visual.
@@ -136,6 +140,7 @@
 - Para facilitar debugs, envie logs para a tabela de logs via API sempre que achar necessário, depois as leia no backend via API ou database.
 
 ## Regra transversal de seletor de empresa
+
 - O frontend deve tratar `/people/companies/my` como a fonte de verdade do seletor de empresas.
 - O seletor deve mostrar todas as empresas retornadas pela API; empresa fora do fluxo comercial do domínio atual deve aparecer desabilitada, nunca escondida.
 - `company.enabled` significa apenas que a empresa está ativa no cadastro.
@@ -149,12 +154,14 @@
 - Você deve manter o .scrutinizer.yml do projeto e dos submódulos sempre atualizados e se não existir, deve criar.
 
 ## Regra transversal de menu
+
 - O menu da home deve vir do backend por `menus-people` com o `APP_TYPE` atual e ser salvo em `theme.menus`.
 - Apps devem renderizar atalhos a partir de `theme.menus`; menus fixos por role so permanecem quando forem fluxos fora da home/bottom toolbar.
 - A configuracao de menu e exclusiva de `ROLE_SUPER`; usuarios comuns nao devem ver a tela de configuracao.
 - A configuracao de menu por perfil usa apenas vinculos humanos; `client`, `provider` e `franchisee` sao vinculos comerciais e nao devem aparecer na matriz de perfis.
 
 ## Regra transversal de tema
+
 - A fonte de verdade de cores e estilos de cliente e o tema salvo no banco e exposto em `themeStore.getters.colors` e `currentCompany.theme.colors`.
 - Nao introduzir novas cores fixas no codigo-fonte de telas; qualquer ajuste visual por cliente deve nascer de `theme` no banco.
 - Listagens e tabelas devem usar os tokens do tema para cabecalho, borda e zebra striping, com `bg-headers-light` e `bg-even-light` quando existirem.
@@ -162,6 +169,7 @@
 - Toda tela alterada a partir de agora deve ser revista junto com o tema ativo antes de considerar a tarefa concluida; ao tocar uma screen, use apenas as cores atravéz de variáveis e nunca cores diretamente do código.As variáveis de cor e classes vindas do store/tema do modulo e mantenha o visual aderente ao padrao atual devem estar presentes.
 
 ## Regra transversal de grupos compartilhados
+
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
 - O front nao deve ler nem escrever `parentProduct` legado em `product_group`; esse dado nao faz parte do contrato atual.
 - Listagens e buscas de grupos compartilhados devem ser feitas por `company` e pelos vinculos de `product_group_parent`, sem fallback para o campo antigo.
@@ -169,17 +177,20 @@
 - As imagens exibidas pela `MenuCostsPage` devem vir apenas de `productFiles`, `categoryFiles` ou relacoes equivalentes do banco, resolvidas por `resolveFileImageUrl`; nao usar assets estaticos do `ui-manager` como fallback.
 
 ## Regra transversal de parâmetros da engenharia
+
 - A tela de parâmetros da engenharia tem rota própria em `/menu-costs-page/parametros`.
 - Essa rota deve ler e gravar apenas `configs` da empresa selecionada, com os keys `menu-costs-default-markup-pct`, `menu-costs-target-margin-pct`, `menu-costs-estimated-monthly-units` e `menu-costs-cost-engine-rules`.
 - A chave `menu-costs-cost-engine-rules` é o contrato oficial inicial do Motor de custo da engenharia para regras por canal, margem, taxa, comissão, repasse e arredondamento.
 - O carregamento desses dados deve acontecer ao exibir a rota; o botão `Parâmetros` da `MenuCostsPage` deve navegar para essa tela separada.
 
 ## Regra transversal de anexos de pedidos
+
 - Anexos de pedido devem usar o mini gerenciador reaproveitado do upload de produtos, mas com escopo exclusivo de `order_file`.
 - A barra do pedido deve expor o atalho de anexos fora do fluxo de debug; o modal precisa permitir subir, vincular, abrir e remover arquivos sem tocar em `products` ou `components`.
 - O front nao deve criar nem editar produto de venda para resolver anexo de pedido; a biblioteca de arquivos fica separada da engenharia de produto.
 
 ## Regra transversal de fornecedores da engenharia
+
 - A tela oficial de fornecedores da engenharia deve ficar em `/menu-costs-page/fornecedores`.
 - Essa tela deve carregar os dados do `people` do ERP com `link.linkType=provider` apenas quando estiver em foco, sem persistir mutacao em `products` ou `components`.
 - A normalizacao e unificacao de fornecedores deve ficar em `ui-people`; o lookup de ultimas compras deve ficar em `ui-products`; `ui-manager` deve apenas orquestrar a rota e a apresentacao.
@@ -188,18 +199,21 @@
 - Quando o seed trouxer fornecedor duplicado, a tela deve unificar o cadastro mais rico e enriquecer contatos, observacoes e movimentos, em vez de duplicar a listagem.
 
 ## Regra transversal de ingredientes da engenharia
+
 - A tela oficial de ingredientes da engenharia deve ficar em `/menu-costs-page/ingredientes`.
 - Essa tela e a sua listagem real vivem em `ui-products`, que carrega o recorte de `products` do tipo `feedstock` quando a rota ganha foco.
 - O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
 - `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `feedstock`.
 
 ## Regra transversal de embalagens da engenharia
+
 - A tela oficial de embalagens da engenharia deve ficar em `/menu-costs-page/embalagens`.
 - Essa tela carrega o recorte apenas quando exibida e usa o fluxo de sincronizacao de insumos para criar `package` no ERP.
 - O cadastro deve validar duplicidade por codigo/nome e bloquear ou sinalizar matches conflitantes antes de persistir.
 - `products` e `components` continuam fora do escopo dessa tela; a escrita permitida aqui e apenas de insumos do tipo `package`.
 
 ## Regra transversal de revenda da engenharia
+
 - A tela oficial de revenda da engenharia deve ficar em `/menu-costs-page/revenda`.
 - Essa tela usa uma classificacao operacional local da `MenuCostsPage`: bebidas prontas compradas e revendidas podem entrar no recorte de revenda mesmo quando o ERP ainda as traz como `feedstock`.
 - A classificacao local da engenharia deve ficar em `ui-manager/src/react/pages/MenuCostsPage/domain`, sem alterar o tipo gravado no banco nem virar regra global do ERP.
@@ -207,6 +221,7 @@
 - A listagem de revenda deve usar carregamento infinito e paginação, igual as demais telas operacionais.
 
 ## Regra transversal de compras e evidencias da engenharia
+
 - A tela oficial de compras e evidencias da engenharia deve ficar em `/menu-costs-page/compras-e-evidencias`.
 - Essa tela carrega apenas pedidos do ERP com `orderType=purchase`, usando `orders` como fonte de verdade e `order_file`/`files` para as evidencias.
 - A listagem deve ser paginada com carregamento infinito e o detalhe do pedido deve reaproveitar `OrderHeader` e o mini gerenciador de anexos do fluxo de pedidos.
@@ -214,17 +229,21 @@
 - O seed JSON nao deve ser usado como fonte dessa tela.
 
 ## Regra transversal de dock operacional
+
 - Em `POS` nos modos `PDV`, `GARCOM` e `BALCAO`, a dock inferior de navegacao deve continuar visivel durante a navegacao operacional, inclusive em catalogo e `OrderDetails`. O modo `kiosk` continua sendo a excecao sem dock operacional.
 - O modo `single-item` segue o mesmo contrato de `PDV` para a dock, mas usa catalogo sem categoria, carrinho com um item principal por vez e volta para `OrderHistoryPage` ao concluir a venda.
 
 ## Regra transversal de checkout Cielo
+
 - No browser/web, pagamento `Cielo` nunca pode acionar plugin nativo local. Nesse ambiente, a cobranca deve seguir pelo fluxo remoto via websocket para uma maquina Cielo configurada e o retorno vem por callback no store de `invoice`.
 - O caminho local de `Cielo` continua permitido apenas em device nativo compatível com o gateway local.
 
 ## Regra transversal de runtime em background
+
 - Em Android, os apps compilados com `APP_TYPE` e `packageName` diferentes devem compartilhar um unico runtime de background por dispositivo para websocket e impressao.
 
 ## Regra transversal de displays de pedidos
+
 - Os displays `orders` e `tv` devem carregar `/orders` com a arvore completa de `orderProducts`; o endpoint de fila nao e a fonte desses paines.
 - Quando o item tiver fila, o leitor de codigo de barras deve trabalhar com `order_product_queue.id`; quando nao tiver fila, o match deve cair para `SKU`.
 - O leitor de conferencia deve contar localmente a quantidade de bips por linha e so chamar `POST /order_products/{id}/check` quando a quantidade prevista for atingida.
