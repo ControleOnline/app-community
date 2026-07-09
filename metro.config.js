@@ -16,6 +16,7 @@ config.resolver.nodeModulesPaths = [
 
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
+  '@appType': path.resolve(projectRoot, 'src', 'appType.js'),
   react: path.resolve(appNodeModules, 'react'),
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };
