@@ -30,6 +30,11 @@
 - `chipSelectedText=#2529A1`                    #2529A1
 - `chipText=#64748B`                            #64748B
 - `dividerBorder=#F1F3F4`                       #F1F3F4
+- `footerBackground=#FFFFFF`                    #FFFFFF
+- `footerBorder=#DFDFDF`                        #DFDFDF
+- `footerIcon=#FEBC1D`                          #FEBC1D
+- `footerLink=#1C8FBD`                          #1C8FBD
+- `footerText=#FEBC1D`                          #FEBC1D
 - `headerBackground=#FFFFFF`                    #FFFFFF
 - `headerBorder=#E2E8F0`                        #E2E8F0
 - `headerText=#0F172A`                          #0F172A
@@ -37,6 +42,7 @@
 - `iconDisabled=#CCCCCC`                        #CCCCCC
 - `iconInfo=#2529A1`                            #2529A1
 - `iconSuccess=#4CAF50`                         #4CAF50
+- `iconWarning=#F2C037`                         #F2C037
 - `inputBackground=#F8F9FA`                     #F8F9FA
 - `inputBorder=#E9ECEF`                         #E9ECEF
 - `inputIcon=#94A3B8`                           #94A3B8
@@ -65,6 +71,12 @@
 - `navigationActiveText=#2529A1`                #2529A1
 - `navigationBackground=#FFFFFF`                #FFFFFF
 - `navigationBorder=#E2E8F0`                    #E2E8F0
+- `navigationDisabledBackground=#FFFFFF`        #FFFFFF
+- `navigationDisabledBorder=#E2E8F0`            #E2E8F0
+- `navigationDisabledIcon=#94A3B8`              #94A3B8
+- `navigationDisabledText=#94A3B8`              #94A3B8
+- `navigationIcon=#64748B`                      #64748B
+- `navigationShadow=#0F172A`                    #0F172A
 - `navigationText=#64748B`                      #64748B
 - `pageBackground=#F8FAFC`                      #F8FAFC
 - `sectionBackground=#F8FAFC`                   #F8FAFC
@@ -85,6 +97,8 @@
 - `textMuted=#64748B`                           #64748B
 - `textPrimary=#0F172A`                         #0F172A
 - `textSecondary=#334155`                       #334155
+- `textSuccess=#10B981`                         #10B981
+- `textWarning=#F2C037`                         #F2C037
 
 ### ### ### TEMA COMPLETO PARA BANCO ### ### ###
 
@@ -192,11 +206,11 @@ JSON consolidado para teste no banco:
   "dividerBackground": "",
   "dividerBorder": "#F1F3F4",
   "dividerText": "",
-  "footerBackground": "",
-  "footerBorder": "",
-  "footerIcon": "",
-  "footerLink": "",
-  "footerText": "",
+  "footerBackground": "#FFFFFF",
+  "footerBorder": "#DFDFDF",
+  "footerIcon": "#FEBC1D",
+  "footerLink": "#1C8FBD",
+  "footerText": "#FEBC1D",
   "googleLoading": "",
   "headerBackground": "#FFFFFF",
   "headerBorder": "#E2E8F0",
@@ -212,7 +226,7 @@ JSON consolidado para teste no banco:
   "iconMuted": "",
   "iconSuccess": "#4CAF50",
   "iconText": "",
-  "iconWarning": "",
+  "iconWarning": "#F2C037",
   "inputBackground": "#F8F9FA",
   "inputBorder": "#E9ECEF",
   "inputDisabledBackground": "",
@@ -282,12 +296,12 @@ JSON consolidado para teste no banco:
   "navigationActiveText": "#2529A1",
   "navigationBackground": "#FFFFFF",
   "navigationBorder": "#E2E8F0",
-  "navigationDisabledBackground": "",
-  "navigationDisabledBorder": "",
-  "navigationDisabledIcon": "",
-  "navigationDisabledText": "",
-  "navigationIcon": "",
-  "navigationShadow": "",
+  "navigationDisabledBackground": "#FFFFFF",
+  "navigationDisabledBorder": "#E2E8F0",
+  "navigationDisabledIcon": "#94A3B8",
+  "navigationDisabledText": "#94A3B8",
+  "navigationIcon": "#64748B",
+  "navigationShadow": "#0F172A",
   "navigationText": "#64748B",
   "overlayBackground": "",
   "overlayBorder": "",
@@ -340,8 +354,8 @@ JSON consolidado para teste no banco:
   "textPlaceholder": "",
   "textPrimary": "#0F172A",
   "textSecondary": "#334155",
-  "textSuccess": "",
-  "textWarning": "",
+  "textSuccess": "#10B981",
+  "textWarning": "#F2C037",
   "toastBackground": "",
   "toastBorder": "",
   "toastDangerBackground": "",

@@ -401,6 +401,76 @@
 ### ui-support
 - `src/react/pages/home/index.styles.js`
 
+### ### ### MODULOS / ARQUIVOS CORRIGIDOS ### ### ###
+
+### app-community
+- `src/styles/branding.js`
+- `linha 142-155`
+- `antes: resolveThemePalette derivava footerBackground, footerBorder, footerIcon, footerLink e footerText a partir do tema oficial do DOMAIN`
+- `depois: resolveThemePalette nao deriva tokens de footer; sem fallback para footer`
+
+- `themes/themes-new.md`
+- `linha 33-37, 71-76, 206-210, 294-299`
+- `antes: tokens footer* vazios no json consolidado e navigationIcon/navigationShadow/navigationDisabled* sem proposta operacional`
+- `depois: footer* preenchidos para proposta de tema e navigationIcon/navigationShadow/navigationDisabled* registrados para a navegacao inferior`
+
+### ui-common
+- `src/react/components/BottomNavigationBar.js`
+- `linha 21-29, 49-85, 117-156`
+- `antes: navegacao inferior usando footer* e herdando estado ativo por footerLink com fallback vindo da palette`
+- `depois: navegacao inferior usando navigationBackground/navigationBorder/navigationIcon/navigationText e navigationActive* sem fallback; RuntimeInfoFooter recebe apenas os tokens crus do tema`
+
+- `src/react/components/BottomNavigationBar.styles.js`
+- `linha 3-83`
+- `antes: estilo calculava realce com withAlpha, sombra herdada e estados ativos presos ao proxy anterior`
+- `depois: estilo aplica navigationBackground/navigationBorder/navigationShadow e navigationActiveBackground/navigationActiveBorder sem fallback`
+
+- `src/react/components/RuntimeInfoFooter.js`
+- `linha 112-166`
+- `antes: background / border / textSecondary / primary e bolinha do socket dependente de indicatorColor hardcoded`
+- `depois: footerBackground / footerBorder / footerText / footerLink e bolinha do socket resolvida por success / warning / error do tema`
+
+- `src/react/utils/socketRuntimePipeline.js`
+- `linha 107-127`
+- `antes: indicatorColor hardcoded em verde / laranja / vermelho`
+- `depois: indicatorTone semantico success / warning / error`
+
+- `src/react/components/WebsocketListener.native.js`
+- `linha 77-93`
+- `antes: indicatorColor hardcoded em verde / laranja / vermelho`
+- `depois: indicatorTone semantico success / warning / error`
+
+- `src/react/components/DefaultProvider.web.js`
+- `linha 887-892`
+- `antes: RuntimeInfoFooter recebia palette resolvida`
+- `depois: RuntimeInfoFooter recebe somente colors crus do tema`
+
+- `src/react/components/DefaultProvider.native.js`
+- `linha 820-825`
+- `antes: RuntimeInfoFooter recebia palette resolvida`
+- `depois: RuntimeInfoFooter recebe somente colors crus do tema`
+
+### ui-orders
+- `src/react/components/OrderHeader.js`
+- `linha 4-24, 64-108, 154-360`
+- `antes: WAITING_RULES, leading icons, customer action, chip de data e badge de status usavam hex hardcoded ou status.color fora do tema`
+- `depois: OrderHeader monta palette a partir de themeStore.getters.colors e resolve tons com textSuccess / textWarning / textDanger / textMuted / iconInfo / iconWarning / iconDanger`
+
+- `src/react/components/OrderHeader.styles.js`
+- `linha 1-257`
+- `antes: leadingWrap, textos, chips, preco e variacoes purchase/transfer/loss usavam cores locais`
+- `depois: createStyles(palette, isKds) usa cardText, chipBackground, chipBorder, chipText, chipSelectedBackground, chipSelectedBorder, chipSelectedText, textSuccess, textWarning e textDanger`
+
+- `src/react/pages/orders/OrderHistoryPage.js`
+- `linha 91-99, 173-177, 637-666`
+- `antes: card do historico dependia de style estatico e fundo da tela seguia palette derivada fora do fluxo do tema`
+- `depois: tela monta orderHistoryPalette com tokens do themeStore e aplica o card renderer dentro desse contexto`
+
+- `src/react/pages/orders/OrderHistoryPage.styles.js`
+- `linha 1-69`
+- `antes: wrapper do card, divisor e textos secundarios usavam #fff / #0F172A / #475569 / #F1F5F9`
+- `depois: createStyles(palette) usa cardBackground, cardBorder, cardShadow, dividerBorder, textPrimary e textSecondary`
+
 ### ### ### MODULOS / ARQUIVOS PENDENTES ### ### ###
 
 ### ui-accounting

@@ -76,3 +76,51 @@ Formato:
 - `ui-contracts / src/react/pages/ContractDetails.styles.js / 1-321`
 - `antigo: page '#f8fafc', header '#fff', tabs '#64748b', listagem '#e2e8f0', disabled '#cbd5e1'`
 - `novo: createStyles(palette) com pageBackground, headerBackground, navigationText, listItemBorder e buttonDisabledBackground`
+
+- `app-community / src/styles/branding.js / 142-155`
+- `antigo: resolveThemePalette derivava footerBackground, footerBorder, footerIcon, footerLink e footerText a partir de background, border, primary e accent`
+- `novo: resolveThemePalette nao deriva tokens de footer e deixa o componente depender apenas do token presente no tema`
+
+- `ui-common / src/react/components/BottomNavigationBar.js / 21-29, 49-85, 117-156`
+- `antigo: navegacao inferior usava footer* e herdava azul por footerLink vindo da palette`
+- `novo: navegacao inferior usa navigationBackground, navigationBorder, navigationIcon, navigationText, navigationActiveBackground, navigationActiveBorder, navigationActiveIcon e navigationActiveText sem fallback`
+
+- `ui-common / src/react/components/BottomNavigationBar.styles.js / 3-83`
+- `antigo: withAlpha calculava o destaque localmente e a sombra herdava cor local`
+- `novo: estilo usa navigationBackground, navigationBorder, navigationShadow, navigationActiveBackground e navigationActiveBorder sem derivacao local`
+
+- `ui-common / src/react/components/RuntimeInfoFooter.js / 112-166`
+- `antigo: backgroundColor=colors?.background || runtimeColors.background, borderColor=colors?.border || runtimeColors.border, textColor=colors?.textSecondary || runtimeColors.textSecondary, loadingColor=colors?.primary || runtimeColors.primary || textColor e socketEntry.indicatorColor hardcoded`
+- `novo: backgroundColor=colors?.footerBackground, borderColor=colors?.footerBorder, textColor=colors?.footerText, loadingColor=colors?.footerLink e socketEntry.indicatorTone resolvido por colors.success / colors.warning / colors.error`
+
+- `ui-common / src/react/utils/socketRuntimePipeline.js / 107-127`
+- `antigo: indicatorColor '#10b981' / '#e67e22' / '#c10015'`
+- `novo: indicatorTone 'success' / 'warning' / 'error'`
+
+- `ui-common / src/react/components/WebsocketListener.native.js / 77-93`
+- `antigo: indicatorColor '#10b981' / '#e67e22' / '#c10015'`
+- `novo: indicatorTone 'success' / 'warning' / 'error'`
+
+- `ui-common / src/react/components/DefaultProvider.web.js / 887-892`
+- `antigo: colors={resolveThemePalette(colors, runtimeColors)}`
+- `novo: colors={colors}`
+
+- `ui-common / src/react/components/DefaultProvider.native.js / 820-825`
+- `antigo: colors={resolveThemePalette(colors, runtimeColors)}`
+- `novo: colors={colors}`
+
+- `ui-orders / src/react/components/OrderHeader.js / 4-24, 64-108, 154-360`
+- `antigo: WAITING_RULES '#10b981/#FACC15/#c10015', truck '#D97706', repeat '#7C3AED', trending-down '#DC2626', calendar '#475569' e badge preso a status.color`
+- `novo: palette do tema ativo com textSuccess, textWarning, textDanger, textMuted, iconInfo, iconWarning, iconDanger e chipText para waiting chip, icones e badge semantico`
+
+- `ui-orders / src/react/components/OrderHeader.styles.js / 1-257`
+- `antigo: backgroundColor '#F8FAFC', border '#E2E8F0/#CBD5E1', textos '#0F172A/#475569/#64748B' e preco '#16A34A/#D97706/#7C3AED/#DC2626'`
+- `novo: createStyles(palette, isKds) com chipBackground, chipBorder, chipSelectedBackground, chipSelectedBorder, chipSelectedText, cardText, textMuted, textSuccess, textWarning e textDanger`
+
+- `ui-orders / src/react/pages/orders/OrderHistoryPage.js / 91-99, 173-177, 637-666`
+- `antigo: styles importavam objeto estatico e o contexto visual do card nao lia tokens semanticos do themeStore`
+- `novo: buildOrderHistoryPalette(themeColors) e createStyles(orderHistoryPalette) para o card renderer e fundo da tela`
+
+- `ui-orders / src/react/pages/orders/OrderHistoryPage.styles.js / 1-69`
+- `antigo: orderCard '#fff', shadow '#0F172A', cardMetaRow '#F1F5F9' e channelText '#475569'`
+- `novo: createStyles(palette) com cardBackground, cardBorder, cardShadow, dividerBorder e textSecondary`
