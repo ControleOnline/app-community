@@ -42,28 +42,6 @@ const createCompany = () => ({
   configs: {},
 });
 
-const createAdminMenus = () => ({
-  modules: {
-    admin: {
-      id: 'admin-configuracoes',
-      label: 'Configuracoes',
-      icon: 'settings',
-      menus: [
-        {
-          id: 'menu_access',
-          menuKey: 'menu_access',
-          label: 'Menus por perfil',
-          route: 'MenuAccessConfigPage',
-          icon: 'list',
-          color: '#64748B',
-          sortOrder: 10,
-          menuType: 'home',
-        },
-      ],
-    },
-  },
-});
-
 const createMenuConfigResponse = () => ({
   member: [],
   summary: {
@@ -126,7 +104,7 @@ const mockAdminApi = async page => {
       return route.fulfill({
         status: 200,
         headers: jsonHeaders(),
-        body: JSON.stringify(createAdminMenus()),
+        body: JSON.stringify({modules: {}}),
       });
     }
 
@@ -190,24 +168,103 @@ const mockAdminApi = async page => {
           metadata: {},
         }),
       );
-      setLocalStorageItem('app-type', 'ADMIN');
     },
     {appVersion: '1.0.0'},
   );
 };
 
+const openAdminHome = async page => {
+  await page.goto('/');
+
+  await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toContainText(
+    'ADMIN',
+  );
+};
+
+const switchAppType = async (page, appType) => {
+  await page.getByRole('button', {name: 'Selecionar tipo de app'}).click();
+  await expect(page.getByRole('button', {name: appType})).toBeVisible();
+  await page.getByRole('button', {name: appType}).click();
+  await page.waitForLoadState('domcontentloaded');
+};
+
+const expectAppTypeAfterRefresh = async (page, appType, marker) => {
+  await page.reload({waitUntil: 'domcontentloaded'});
+
+  await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toContainText(
+    appType,
+  );
+
+  if (marker) {
+    await expect(page.getByText(marker, {exact: true})).toBeVisible();
+  }
+};
+
 test.describe('admin browser smoke', () => {
-  test('opens the admin home and reaches menu configuration', async ({page}) => {
+  test('loads the admin shell from the app_type selector and keeps it after refresh', async ({
+    page,
+  }) => {
     await mockAdminApi(page);
 
-    await page.goto('/');
+    await openAdminHome(page);
+    await expect(page.getByRole('button', {name: 'Voltar para ADMIN'})).toHaveCount(0);
+    await expect(page.getByRole('button', {name: 'Resultados de testes'})).toBeVisible();
 
-    await expect(page.getByText('Cadastro de menus')).toBeVisible();
-    await expect(page.getByText('Configuracoes', {exact: true})).toBeVisible();
+    await page.reload({waitUntil: 'domcontentloaded'});
 
-    await page.getByText('Cadastro de menus').click();
+    await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toContainText(
+      'ADMIN',
+    );
+  });
 
-    await expect(page).toHaveURL(/menu-access-config-page/);
+  test('switches to manager and can return to admin through the reset path', async ({
+    page,
+  }) => {
+    await mockAdminApi(page);
+
+    await openAdminHome(page);
+    await switchAppType(page, 'MANAGER');
+    await expectAppTypeAfterRefresh(page, 'MANAGER', 'web • MANAGER (127.0.0.1) / v1.3.93');
+    await expect(page.getByRole('button', {name: 'Voltar para ADMIN'})).toBeVisible();
+
+    await page.getByRole('button', {name: 'Voltar para ADMIN'}).click();
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toContainText(
+      'ADMIN',
+    );
+  });
+
+  for (const {appType, marker} of [
+    {appType: 'SERVICE', marker: 'Operacional'},
+    {appType: 'DELIVERY', marker: 'Cadastro do veículo'},
+    {appType: 'SHOP', marker: 'Nenhuma entrada do shop esta disponivel'},
+    {appType: 'POS', marker: 'web • PDV (127.0.0.1) / v1.3.93'},
+    {appType: 'PPC', marker: 'web • DISPLAY (127.0.0.1) / v1.3.93'},
+    {appType: 'CRM', marker: 'web • CRM (127.0.0.1) / v1.3.93'},
+  ]) {
+    test(`switches to ${appType} and keeps it after refresh`, async ({page}) => {
+      await mockAdminApi(page);
+
+      await openAdminHome(page);
+      await switchAppType(page, appType);
+      await expectAppTypeAfterRefresh(page, appType, marker);
+      await expect(page.getByRole('button', {name: 'Voltar para ADMIN'})).toBeVisible();
+    });
+  }
+
+  test('opens menu config directly from the admin build', async ({page}) => {
+    await mockAdminApi(page);
+
+    await page.goto('/menu-access-config-page');
+
     await expect(page.getByRole('heading', {name: 'Menus por perfil'})).toBeVisible();
+    await expect(page.getByText('APP_TYPE', {exact: true})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Selecionar tipo de app'})).toContainText(
+      'ADMIN',
+    );
+    await expect(
+      page.getByText('Nenhum menu cadastrado para este APP_TYPE.', {exact: true}),
+    ).toBeVisible();
   });
 });

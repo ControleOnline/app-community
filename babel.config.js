@@ -4,6 +4,7 @@ module.exports = {
     [
       'module-resolver',
       {
+        cwd: 'babelrc',
         alias: {
           '@assets': './src/assets',
           '@appType': './src/appType.js',

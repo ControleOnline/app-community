@@ -45,6 +45,8 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
+          HTACCESS_USER: '${{ secrets.HTACCESS_USER }}',\
+          HTACCESS_PASSWORD: '${{ secrets.HTACCESS_PASSWORD }}',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'ADMIN',\
           APP_DISPLAY_NAME: 'Admin',\

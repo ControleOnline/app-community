@@ -122,3 +122,7 @@
 	path = modules/modules/controleonline/ui-login
 	url = https://github.com/ControleOnline/ui-login.git
 	branch = staging
+[submodule "modules/controleonline/ui-tests"]
+	path = modules/controleonline/ui-tests
+	url = https://github.com/ControleOnline/ui-tests.git
+	branch = staging

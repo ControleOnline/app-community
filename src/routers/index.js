@@ -27,6 +27,7 @@ import peopleRoutes from '@controleonline/ui-people/src/react/router/routes'
 import logisticRoutes from '@controleonline/ui-logistic/src/react/router/routes'
 import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
 import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
+import testsRoutes from '@controleonline/ui-tests/src/react/router/routes'
 import {app_type} from '@appType'
 import {
   normalizeInitialBrowserPath,
@@ -125,7 +126,8 @@ export const allRoutes = [
   ...logisticRoutes,
   ...peopleRoutes,
   ...productsRoutes,
-  ...shopRoutes
+  ...shopRoutes,
+  ...testsRoutes,
 ]
 
 const homeByType = {
