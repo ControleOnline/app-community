@@ -52,6 +52,25 @@ const createMenuConfigResponse = () => ({
   },
 });
 
+const createSmokeIndexResponse = () => ({
+  generatedAt: '2026-07-11T13:11:24-03:00',
+  status: 'idle',
+  progress: 0,
+  message: 'Nenhum relatório publicado ainda.',
+  lastRunAt: null,
+  summary: {
+    types: {total: 0, passed: 0, failed: 0},
+    suites: {total: 0, passed: 0, failed: 0},
+    tests: {total: 0, passed: 0, failed: 0},
+  },
+  types: [],
+  suites: [],
+  links: {
+    self: '/tests/index.json',
+    artifacts: '/tests/artifacts',
+  },
+});
+
 const mockAdminApi = async page => {
   const company = createCompany();
 
@@ -121,6 +140,14 @@ const mockAdminApi = async page => {
         status: 200,
         headers: jsonHeaders(),
         body: JSON.stringify({configs: {}}),
+      });
+    }
+
+    if (pathname === 'tests/index.json') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(createSmokeIndexResponse()),
       });
     }
 
@@ -209,7 +236,12 @@ test.describe('admin browser smoke', () => {
 
     await openAdminHome(page);
     await expect(page.getByRole('button', {name: 'Voltar para ADMIN'})).toHaveCount(0);
-    await expect(page.getByRole('button', {name: 'Resultados de testes'})).toBeVisible();
+    const resultsButton = page.getByRole('button', {name: 'Resultados de testes'});
+    await expect(resultsButton).toBeVisible();
+
+    await resultsButton.click();
+    await page.waitForURL(/\/tests-playground\/?$/);
+    await expect(page.getByText('Smoke Atlas', {exact: true})).toBeVisible();
 
     await page.reload({waitUntil: 'domcontentloaded'});
 
