@@ -52,6 +52,38 @@ const createMenuConfigResponse = () => ({
   },
 });
 
+const createAdminRuntimeMenusResponse = () => ({
+  modules: {
+    configuracoes: {
+      id: 'admin-configuracoes',
+      label: 'Configuracoes',
+      icon: 'settings',
+      menus: [
+        {
+          id: 'menu_access',
+          menuKey: 'menu_access',
+          label: 'Menus por perfil',
+          route: 'MenuAccessConfigPage',
+          icon: 'list',
+          color: '#64748B',
+          sortOrder: 10,
+          menuType: 'home',
+        },
+        {
+          id: 'test_results',
+          menuKey: 'test_results',
+          label: 'Resultados de testes',
+          route: 'TestsPlaygroundPage',
+          icon: 'clipboard',
+          color: '#0EA5E9',
+          sortOrder: 20,
+          menuType: 'home',
+        },
+      ],
+    },
+  },
+});
+
 const createSmokeIndexResponse = () => ({
   generatedAt: '2026-07-11T13:11:24-03:00',
   status: 'idle',
@@ -66,7 +98,7 @@ const createSmokeIndexResponse = () => ({
   types: [],
   suites: [],
   links: {
-    self: '/tests/index.json',
+    self: '/tests',
     artifacts: '/tests/artifacts',
   },
 });
@@ -123,7 +155,7 @@ const mockAdminApi = async page => {
       return route.fulfill({
         status: 200,
         headers: jsonHeaders(),
-        body: JSON.stringify({modules: {}}),
+        body: JSON.stringify(createAdminRuntimeMenusResponse()),
       });
     }
 
@@ -143,7 +175,7 @@ const mockAdminApi = async page => {
       });
     }
 
-    if (pathname === 'tests/index.json') {
+    if (pathname === 'tests') {
       return route.fulfill({
         status: 200,
         headers: jsonHeaders(),
