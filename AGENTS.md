@@ -2,6 +2,12 @@
 
 - app-community\config\key.local.js tem a informação da chave de API de um usuário de testes. Esse usuário pode ser utilizado para realizar chamadas à API e confirmar informações sobre o funcionamento. Use quando precisar.
 
+## Regra transversal de categorias e filtros financeiros
+- Consumidores internos carregam categorias por `company` e contexto; `people` nao e parametro valido de `Category`.
+- O Shop anonimo le categorias somente pelas rotas `/shop/categories`, nunca pela colecao interna generica.
+- Contas a receber usam categorias `receive` e contrapartes `client`/`provider`; contas a pagar usam categorias `payer` e todas as pessoas com vinculo ativo na empresa.
+- Opcoes de listas compartilhadas devem permanecer isoladas por coluna, empresa e parametros da tela, inclusive durante respostas concorrentes.
+
 ## Qualidade
 
 - Rodar lint e testes antes de concluir.
