@@ -100,6 +100,7 @@ for (const group of resolvedGroups) {
     ...process.env,
     PLAYWRIGHT_APP_TYPE: group.appType,
     PLAYWRIGHT_WEB_OUTPUT_DIR: outputDir,
+    PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE: path.join(testResultsDir, 'report.json'),
   };
   const groupArtifactsDir = path.join(smokeArtifactsDir, group.name);
   const groupSummary = {

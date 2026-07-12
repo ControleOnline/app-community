@@ -2,13 +2,18 @@ const path = require('path');
 const { defineConfig } = require('playwright/test');
 
 const baseURL = 'http://127.0.0.1:4173';
+const smokeJsonOutputFile = String(process.env.PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE || '').trim();
+const baseReporter = process.env.CI ? 'line' : 'list';
+const reporter = smokeJsonOutputFile
+  ? [baseReporter, ['json', {outputFile: smokeJsonOutputFile}]]
+  : baseReporter;
 
 module.exports = defineConfig({
   testDir: path.join(__dirname, 'src/tests/browser'),
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? 'line' : 'list',
+  reporter,
   timeout: 30000,
   workers: 1,
   use: {

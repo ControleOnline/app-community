@@ -130,6 +130,9 @@ jobs:
           else
             printf '%s\n' 'Smoke test artifacts were not generated.' 'Check the workflow logs for the failing step.' > tests/smoke/summary.txt
           fi
+      - name: Build Test Index
+        if: always()
+        run: npm run tests:index
       - name: Upload Test Results
         if: always()
         uses: locaweb/ftp-deploy@1.0.0
