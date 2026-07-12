@@ -22,7 +22,7 @@ const updateAssetPath = (currentPath, label) => {
 
   if (newPath === currentPath) {
     console.error(`✗  ${label}: regex não casou com → "${currentPath}"`);
-    process.exit(1);
+    return currentPath;
   }
 
   const absolutePath = path.join(rootDir, newPath);

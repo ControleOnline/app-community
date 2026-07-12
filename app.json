@@ -1,21 +1,21 @@
 {
   "expo": {
-"name": "Lave-go",
-"displayName": "Lave-go",
-"slug": "shop_lavego",
+"name": "On Manager",
+"displayName": "On Manager",
+"slug": "manager-controle-online",
     "platforms": [
       "android",
       "ios",
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.3.92",
+    "version": "1.3.96",
     "android": {
       "jsEngine": "hermes",
-"package": "com.lavego.shop",
-      "versionCode": 1390,
+"package": "com.controleonline.manager",
+      "versionCode": 1396,
       "adaptiveIcon": {
-"foregroundImage": "./src/assets/shop_lavego/logo.png",
+"foregroundImage": "./src/assets/manager/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -29,16 +29,16 @@
       ],
 "tvBanner": "./src/assets/tv.png"
     },
-"icon": "./src/assets/shop_lavego/logo.png",
+"icon": "./src/assets/manager/logo.png",
     "splash": {
-"image": "./src/assets/shop_lavego/splash.png",
+"image": "./src/assets/manager/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
       "jsEngine": "hermes",
-"bundleIdentifier": "com.lavego.shop",
+"bundleIdentifier": "com.controleonline.manager",
       "infoPlist": {
         "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
         "NFCReaderUsageDescription": "Necessário para ler tags NFC e RFID no PDV.",
@@ -50,7 +50,7 @@
       }
     },
     "web": {
-"favicon": "./src/assets/shop_lavego/logo.png"
+"favicon": "./src/assets/manager/logo.png"
     },
     "plugins": [
       "./withAndroidTV",
