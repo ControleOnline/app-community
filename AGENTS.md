@@ -21,6 +21,7 @@
 - Leitura de dados em telas e tabs deve vir de stores/actions do modulo; não chamar `api.fetch` diretamente quando houver store correspondente.
 - Normalização de coleção e montagem de payload não devem ficar na tela. Se o backend ou o store já expõem o contrato, a tela consome o contrato direto.
 - Não usar cadeia de fallback com `||` para adivinhar campos de payload quando o contrato do backend já define o valor canônico. Use o campo certo e só mantenha fallback quando ele estiver documentado no contrato.
+- A tela de fidelidade do Shop consome o snapshot canonico via store `orders` e `/orders/fidelityById/{id}`; nao recriar carimbos ou cartoes em util local nem usar fallback legado de `paid/cart`.
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
 - Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
 - Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
