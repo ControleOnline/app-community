@@ -5,7 +5,7 @@ const baseURL = 'http://127.0.0.1:4173';
 const smokeJsonOutputFile = String(process.env.PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE || '').trim();
 const baseReporter = process.env.CI ? 'line' : 'list';
 const reporter = smokeJsonOutputFile
-  ? [baseReporter, ['json', {outputFile: smokeJsonOutputFile}]]
+  ? [[baseReporter], ['json', {outputFile: smokeJsonOutputFile}]]
   : baseReporter;
 
 module.exports = defineConfig({

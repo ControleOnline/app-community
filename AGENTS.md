@@ -117,7 +117,7 @@
 - Atente-se que algumas ações não são pertinentes àquela visão, como no CRM que é feito para vendedores, não haverá cadastros de categorias ou modelos de contratos, isso é função do admin (`ADMIN`). Sempre tenha em mente as visões de cada aplicativo e quem os usa.
 - Sempre verifique o backend pasa ser melhor direcionado em tudo.
 - Ao verificar o backend, preencha sempre os stores correspondentes com as colunas da entidade, formatando elas da melhor maneira possível
-- Comente todo o código
+- Comente todo o código com blocos em inglês e prefira comentários de regra em bloco começando com `@agents` na primeira linha, sem repetir o marcador nas linhas de continuidade.
 - Quando um modulo tiver React e Vue, materialize o contrato apenas nos arquivos React; Vue legado nao deve receber bloco de contrato importado.
 - Sempre utilize a tradução atravéz da função tt presente no global do front para qualquer coisa que o cliente terá acesso, isso inclui preenchimento de objetos com label utilizados em listas por exemplo. Se encontrar algo não traduzido, traduzir.
 - Tudo o que for comum, usar o módulo common em vez de criar helpers espalhados pelo sistema.
