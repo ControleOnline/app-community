@@ -74,7 +74,7 @@ const createCardSnapshot = ({id, requiredSales, stampIds = [], closed = false}) 
   })),
 });
 
-const createSnapshotResponse = (clientId, providerId, cards) => ({
+const createSnapshotResponse = (clientId, providerId, cards, summary = {}) => ({
   clientId,
   providerId,
   count: cards.length,
@@ -82,12 +82,16 @@ const createSnapshotResponse = (clientId, providerId, cards) => ({
   'hydra:member': cards,
   totalItems: cards.length,
   'hydra:totalItems': cards.length,
-  summary: {},
+  summary: {
+    historyRequested: Boolean(summary.historyRequested),
+    historyEmpty: Boolean(summary.historyEmpty),
+  },
 });
 
 /*
  * @agents This smoke verifies the loyalty page renders the backend snapshot,
- * keeps the empty state stable, and switches to history without rebuilding stamps locally.
+ * keeps the empty state stable, distinguishes "no open card" from "no history found",
+ * and switches to history without rebuilding stamps locally.
  */
 const mockShopLoyaltyApi = async (
   page,
@@ -198,7 +202,10 @@ const mockShopLoyaltyApi = async (
         status: 200,
         headers: jsonHeaders(),
         body: JSON.stringify(
-          createSnapshotResponse(3, 3, cards),
+          createSnapshotResponse(3, 3, cards, {
+            historyRequested: isHistory,
+            historyEmpty: isHistory && cards.length === 0,
+          }),
         ),
       });
     }
@@ -347,5 +354,38 @@ test.describe('shop loyalty browser smoke', () => {
     await expect(page.getByText('Últimos cartões', {exact: true})).toBeVisible();
     await expect(page.getByText('Cartão #500')).toBeVisible();
     await expect(page.getByText('Ver atual', {exact: true})).toBeVisible();
+  });
+
+  test('shows the no-history empty state when the history snapshot is empty', async ({
+    page,
+  }) => {
+    await mockShopLoyaltyApi(page, {
+      currentCards: [
+        createCardSnapshot({
+          id: 600,
+          requiredSales: 3,
+          stampIds: [701],
+        }),
+      ],
+      historyCards: [],
+    });
+
+    await page.goto('/shop/loyalty');
+
+    await expect(page.getByText('Cartão #600')).toBeVisible();
+
+    const historyRequestPromise = page.waitForRequest(request => {
+      return (
+        request.url().includes('/orders/fidelityById/3') &&
+        request.url().includes('history=1')
+      );
+    });
+
+    await page.getByText('Ver últimos', {exact: true}).click();
+    await historyRequestPromise;
+
+    await expect(
+      page.getByText('Nenhum histórico encontrado para este cliente.'),
+    ).toBeVisible();
   });
 });
