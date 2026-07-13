@@ -21,7 +21,6 @@
 - Leitura de dados em telas e tabs deve vir de stores/actions do modulo; não chamar `api.fetch` diretamente quando houver store correspondente.
 - Normalização de coleção e montagem de payload não devem ficar na tela. Se o backend ou o store já expõem o contrato, a tela consome o contrato direto.
 - Não usar cadeia de fallback com `||` para adivinhar campos de payload quando o contrato do backend já define o valor canônico. Use o campo certo e só mantenha fallback quando ele estiver documentado no contrato.
-- A tela de fidelidade do Shop consome o snapshot canonico via store `orders` e `/orders/fidelityById/{id}`; nao recriar carimbos ou cartoes em util local nem usar fallback legado de `paid/cart`.
 - Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
 - Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
 - Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
@@ -128,7 +127,7 @@
 - Diversas configurações que ligam o frontend aos dados do backend estão centralizadas nos stores. Use isso sempre que possível. E alimente o store com essas informações ao criar novas telas.
 - Não há diversos nomes ou diversos jeitos de fazer alguma coisa. Se houver dois arquivos diferentes tratando a mesma coisa, pergunte qual deve manter e ejuste para que apenas um componente tenha a responsabilidade por aquela função.
 - Se houver erros de grafia, ou diversos nomes para encontrar algo como um array de palavras por conta de dúvidas do que é o correto, simplesmente pergunte qual o correto. Exemplo: [order, orders] num campo de tipos provavelmente haverá uma grafia correta e outra que age como um fallback, porém isso não deve existir de forma alguma.
-- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem ter regras claras sobre o funcionamento daquele módulo, principalmente regras de negócio pedidas em prompt. Se uma regra mudar, apague e reescreva.
+- Crie e mantenha atualizado de forma concisa, AGENTS.md em cada módulo. Eles devem registrar apenas padrões reutilizaveis, modos de operacao e contratos genericos. Regras de negocio especificas devem ir em comentarios de codigo em ingles, proximos da implementacao.
 - Quando a regra for transversal entre módulos, o `AGENTS.md` da raiz também deve ser atualizado.
 - Crie testes automatizados sempre que possível e os mantenha atualizados. Crie os testes dentro dos módulos correspondententes e não na raiz. A pasta de testes é src/tests
 - Testes de browser do web ficam em `src/tests/browser` e usam Playwright.
