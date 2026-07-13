@@ -124,3 +124,11 @@ Formato:
 - `ui-orders / src/react/pages/orders/OrderHistoryPage.styles.js / 1-69`
 - `antigo: orderCard '#fff', shadow '#0F172A', cardMetaRow '#F1F5F9' e channelText '#475569'`
 - `novo: createStyles(palette) com cardBackground, cardBorder, cardShadow, dividerBorder e textSecondary`
+
+- `ui-people / src/react/pages/People.js / 36-154, 238-261`
+- `antigo: renderClientCard usava '#CBD5E1' no chevron e dependia de styles com card/avatar/textos fora dos tokens canonicos`
+- `novo: palette vinda de themeStore.getters.colors com cardBackground, cardBorder, cardShadow, cardIcon, iconInverse, listItemText, listItemSubtitleText e listItemIcon aplicada no renderClientCard`
+
+- `ui-people / src/react/pages/People.styles.js / 76-114, 144`
+- `antigo: card, avatar e textos do renderClientCard traziam '#fff', '#F1F5F9', '#64748B', '#1E293B' e '#94A3B8' no style estatico`
+- `novo: styles preservam apenas layout/espacamento do card e deixam as cores do renderClientCard entrarem pela palette do tema ativo`

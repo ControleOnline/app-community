@@ -79,6 +79,8 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `buttonIcon`
 - `buttonIconSecondary`
 - `buttonPressedBackground`
+- `buttonPressedBorder`
+- `buttonPressedIcon`
 - `buttonShadow`
 - `buttonText`
 - `buttonTextSecondary`

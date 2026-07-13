@@ -471,6 +471,17 @@
 - `antes: wrapper do card, divisor e textos secundarios usavam #fff / #0F172A / #475569 / #F1F5F9`
 - `depois: createStyles(palette) usa cardBackground, cardBorder, cardShadow, dividerBorder, textPrimary e textSecondary`
 
+### ui-people
+- `src/react/pages/People.js`
+- `linha 36-154, 238-261`
+- `antes: renderClientCard lia card/avatar/textos por styles estaticos e chevron com '#CBD5E1'`
+- `depois: tela monta palette a partir de themeStore.getters.colors e aplica cardBackground, cardBorder, cardShadow, cardIcon, iconInverse, listItemText, listItemSubtitleText e listItemIcon no renderClientCard`
+
+- `src/react/pages/People.styles.js`
+- `linha 76-114, 144`
+- `antes: card/avatar/textos do renderer usavam '#fff', '#F1F5F9', '#1E293B', '#94A3B8' e '#fff' no style estatico`
+- `depois: styles do renderer preservam layout e deixam as cores entrarem pela palette do tema ativo`
+
 ### ### ### MODULOS / ARQUIVOS PENDENTES ### ### ###
 
 ### ui-accounting
