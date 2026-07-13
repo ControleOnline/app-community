@@ -83,6 +83,25 @@ const buildOrderProduct = (product, quantity = 1) => ({
   order: '/orders/123',
 });
 
+const buildCustomizationSignature = (subProducts = [], rootQuantity = 1) => {
+  const quantityDivisor = Number(rootQuantity || 0) > 0
+    ? Number(rootQuantity)
+    : 1;
+
+  return (Array.isArray(subProducts) ? subProducts : [])
+    .map(subProduct => ({
+      product: Number(subProduct?.product?.id || subProduct?.product || 0),
+      productGroup: Number(
+        subProduct?.productGroup?.id || subProduct?.productGroup || 0,
+      ),
+      quantity: Number(subProduct?.quantity || 0) / quantityDivisor,
+    }))
+    .filter(subProduct => subProduct.product > 0 && subProduct.quantity > 0)
+    .sort((left, right) =>
+      left.productGroup - right.productGroup || left.product - right.product,
+    );
+};
+
 const createOpenOrder = ({
   id = 123,
   products = [],
@@ -689,13 +708,17 @@ const createPosApiMock = async (page, initialState = {}) => {
       const nextOrderProducts = [...(state.order.orderProducts || [])];
       addedProducts.forEach((addedProduct, index) => {
         const incomingItem = Array.isArray(body) ? body[index] : body;
-        const isSimpleProduct = !Array.isArray(incomingItem?.sub_products);
-        const equivalentIndex = isSimpleProduct
-          ? nextOrderProducts.findIndex(item =>
-              Number(item?.product?.id) === Number(addedProduct?.product?.id) &&
-              !Array.isArray(item?.subProducts),
-            )
-          : -1;
+        const incomingSignature = buildCustomizationSignature(
+          incomingItem?.sub_products,
+          incomingItem?.quantity,
+        );
+        const equivalentIndex = nextOrderProducts.findIndex(item =>
+          Number(item?.product?.id) === Number(addedProduct?.product?.id) &&
+          JSON.stringify(buildCustomizationSignature(
+            item?.subProducts,
+            item?.quantity,
+          )) === JSON.stringify(incomingSignature),
+        );
 
         if (equivalentIndex >= 0) {
           const equivalentItem = nextOrderProducts[equivalentIndex];
@@ -705,6 +728,26 @@ const createPosApiMock = async (page, initialState = {}) => {
             ...equivalentItem,
             quantity: nextQuantity,
             total: Number(equivalentItem?.price || 0) * nextQuantity,
+            ...(Array.isArray(equivalentItem?.subProducts)
+              ? {
+                  subProducts: equivalentItem.subProducts.map(subProduct => {
+                    const incomingSubProduct = (incomingItem?.sub_products || [])
+                      .find(candidate =>
+                        Number(candidate?.product) === Number(subProduct?.product) &&
+                        Number(candidate?.productGroup || 0) ===
+                          Number(subProduct?.productGroup || 0),
+                      );
+
+                    return incomingSubProduct
+                      ? {
+                          ...subProduct,
+                          quantity: Number(subProduct?.quantity || 0) +
+                            Number(incomingSubProduct?.quantity || 0),
+                        }
+                      : subProduct;
+                  }),
+                }
+              : {}),
           };
           return;
         }
@@ -1172,6 +1215,30 @@ test.describe('waiter cart browser flow', () => {
     expect(state.order.orderProducts[0]).toMatchObject({quantity: 2, total: 25});
   });
 
+  test('removes the last simple item after decrementing from two', async ({page}) => {
+    const product = createProduct(101, {product: 'Agua', price: 8});
+    const order = createOpenOrder({id: 123, products: [product], price: 16});
+    order.orderProducts[0] = buildOrderProduct(product, 2);
+    const state = await createPosApiMock(page, {order});
+    await bootstrapPosBrowser(page);
+    const targetItem = order.orderProducts[0];
+
+    const decrementResponse = await browserApi(
+      page,
+      `order_products/${targetItem.id}`,
+      {method: 'PUT', body: {id: targetItem.id, quantity: 1}},
+    );
+    const deleteResponse = await browserApi(
+      page,
+      `order_products/${targetItem.id}`,
+      {method: 'DELETE'},
+    );
+
+    expect([decrementResponse.status, deleteResponse.status]).toEqual([200, 204]);
+    expect(state.order.orderProducts).toEqual([]);
+    expect(state.order.price).toBe(0);
+  });
+
   test('deletes a cart item and its customized component tree', async ({page}) => {
     const rootProduct = createProduct(101, {product: 'Amendoim customizado', price: 12.5});
     const childProduct = createProduct(102, {product: 'Adicional', price: 2});
@@ -1314,11 +1381,7 @@ test.describe('waiter cart browser flow', () => {
     ]);
   });
 
-  test('documents that identical customizations must consolidate quantity', async ({page}) => {
-    test.fail(
-      true,
-      'Known defect: equivalent customized product trees are persisted as separate lines.',
-    );
+  test('consolidates identical customizations into one line', async ({page}) => {
     const state = await createPosApiMock(page, {
       order: createOpenOrder({id: 123, products: [], price: 0}),
     });
