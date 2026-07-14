@@ -2,6 +2,12 @@
 
 - app-community\config\key.local.js tem a informação da chave de API de um usuário de testes. Esse usuário pode ser utilizado para realizar chamadas à API e confirmar informações sobre o funcionamento. Use quando precisar.
 
+## Regra transversal de RH
+- `employee_profile` e a camada local de `ui-employee` pertencem ao recorte de RH e devem continuar ligados ao `people_link` do tipo `employee`.
+- `people_access_event`, `people_schedule` e `people_export_job` sao contratos genéricos por `context`; o uso inicial e `employment`, mas a UI e os stores devem sempre enviar `context` explicitamente para permitir `building_access` e `procedure` depois.
+- Contrato de trabalho continua no fluxo de `contract` com `context=employment` e `client=employee`; nao criar segunda modelagem de contrato.
+- Telas novas ou alteradas desse recorte devem nascer em `ui-employee` usando stores/shared components e ganhar smoke de browser quando expostas por rota.
+
 ## Regra transversal de categorias e filtros financeiros
 - Consumidores internos carregam categorias por `company` e contexto; `people` nao e parametro valido de `Category`.
 - O Shop anonimo le categorias somente pelas rotas `/shop/categories`, nunca pela colecao interna generica.
