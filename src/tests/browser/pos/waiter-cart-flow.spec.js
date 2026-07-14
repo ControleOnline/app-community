@@ -1432,10 +1432,6 @@ test.describe('waiter cart browser flow', () => {
   });
 
   test('documents PIX cancellation returning to checkout without residual error', async ({page}) => {
-    test.fail(
-      true,
-      'Known defect: a canceled remote PIX result is stored as an invoice error and replaces the payment options with an intrusive error state.',
-    );
     bindBrowserDiagnostics(page);
     const state = await createPosApiMock(page);
     await bootstrapPosBrowser(page);
@@ -1463,7 +1459,7 @@ test.describe('waiter cart browser flow', () => {
         store: 'invoice',
         action: 'pay-result',
         requestKey: websocketPayload.requestKey,
-        status: 'canceled',
+        status: 'error',
         error: 'Pagamento PIX cancelado pelo usuario.',
         order: '123',
       },
@@ -1473,6 +1469,86 @@ test.describe('waiter cart browser flow', () => {
     await expect(page.getByText('PIX Cielo', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Falha ao montar o pagamento', {exact: true})).not.toBeVisible();
     await expect(page.getByText(/Pagamento PIX cancelado/i)).not.toBeVisible();
+    expect(state.invoices).toEqual([]);
+    expect(state.order.payable).toBe(12.5);
+
+    await page.evaluate(
+      message => window.__codexInjectInvoiceMessage(message),
+      {
+        destination: 'web-7',
+        store: 'invoice',
+        action: 'pay-result',
+        requestKey: websocketPayload.requestKey,
+        status: 'canceled',
+        error: 'Pagamento PIX cancelado pelo usuario.',
+        order: '123',
+      },
+    );
+
+    await expect(page.getByText('PIX Cielo', {exact: true}).first()).toBeVisible();
+    expect(state.invoices).toEqual([]);
+    expect(state.order.payable).toBe(12.5);
+
+    const retryRequestPromise = page.waitForRequest(request =>
+      request.url().endsWith('/websocket') && request.method() === 'POST',
+    );
+    await page.getByText('PIX Cielo', {exact: true}).last().click();
+    await page.getByText('Enviar para Cielo Principal', {exact: true}).first().click();
+    await page.getByText('Continuar', {exact: true}).click();
+
+    const retryPayload = (await retryRequestPromise).postDataJSON();
+    expect(retryPayload.requestKey).not.toBe(websocketPayload.requestKey);
+    await page.evaluate(
+      message => window.__codexInjectInvoiceMessage(message),
+      {
+        destination: 'web-7',
+        store: 'invoice',
+        action: 'pay-result',
+        requestKey: retryPayload.requestKey,
+        status: 'canceled',
+        order: '123',
+      },
+    );
+
+    await expect(page.getByText('PIX Cielo', {exact: true}).first()).toBeVisible();
+    expect(state.invoices).toEqual([]);
+    expect(state.order.payable).toBe(12.5);
+  });
+
+  test('keeps a real remote PIX gateway failure visible', async ({page}) => {
+    bindBrowserDiagnostics(page);
+    const state = await createPosApiMock(page);
+    await bootstrapPosBrowser(page);
+    await page.goto('/checkout?id=123');
+
+    const websocketRequestPromise = page.waitForRequest(request =>
+      request.url().endsWith('/websocket') && request.method() === 'POST',
+    );
+    await page.getByText('PIX Cielo', {exact: true}).last().click();
+    await page.getByText('Enviar para Cielo Principal', {exact: true}).first().click();
+    await page.getByText('Continuar', {exact: true}).click();
+
+    const websocketPayload = (await websocketRequestPromise).postDataJSON();
+    await page.waitForFunction(
+      () => typeof window.__codexInjectInvoiceMessage === 'function',
+    );
+    await page.evaluate(
+      message => window.__codexInjectInvoiceMessage(message),
+      {
+        destination: 'web-7',
+        store: 'invoice',
+        action: 'pay-result',
+        requestKey: websocketPayload.requestKey,
+        status: 'error',
+        error: 'Falha de comunicacao com o terminal.',
+        order: '123',
+      },
+    );
+
+    await expect(page.getByText('Falha ao montar o pagamento', {exact: true})).toBeVisible();
+    await expect(
+      page.getByText('Falha de comunicacao com o terminal.', {exact: true}).first(),
+    ).toBeVisible();
     expect(state.invoices).toEqual([]);
     expect(state.order.payable).toBe(12.5);
   });
