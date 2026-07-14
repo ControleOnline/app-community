@@ -781,6 +781,74 @@ const bindBrowserDiagnostics = page => {
 };
 
 test.describe('single-item browser smoke', () => {
+  test('does not request a linked order code for loyalty stamp before customer CPF identification', async ({
+    page,
+  }) => {
+    bindBrowserDiagnostics(page);
+    const company = createCompany(3, {
+      name: 'Restaurante Centro',
+      alias: 'Centro',
+      configs: {
+        'pos-cash-wallet': 101,
+        'pos-cielo-wallet': 102,
+        'shop-loyalty-coupons-enabled': '1',
+      },
+    });
+    const deviceConfig = {
+      id: 1,
+      device: {
+        id: 1,
+        device: 'web-7',
+      },
+      people: {
+        id: 3,
+      },
+      type: 'PDV',
+      configs: JSON.stringify({
+        'config-version': APP_VERSION,
+        'pos-operation-mode': 'single-item',
+        'check-order-type': 'stamp',
+        'pos-gateway': 'cielo',
+        'pos-type': 'simple',
+        'payment-type-ids': [1, 2],
+        'cash-wallet-closed-id': 0,
+        'pos-default-status': 901,
+        'pos-paid-status': 902,
+      }),
+    };
+
+    await createPosApiMock(page, {
+      company,
+      deviceConfig,
+      runtimeConfigs: {
+        'pos-cash-wallet': 101,
+        'pos-cielo-wallet': 102,
+        'shop-loyalty-coupons-enabled': '1',
+      },
+    });
+    await bootstrapPosBrowser(page);
+
+    await page.goto('/add-product-screen');
+
+    await expect(page.getByText('Suco', {exact: true})).toBeVisible();
+    await expect(page.getByPlaceholder('Linked Order Code')).toBeHidden();
+
+    const replaceRequestPromise = page.waitForRequest(request =>
+      request.url().includes('/orders/123/replace-products') &&
+      request.method() === 'PUT',
+    );
+
+    await page.getByText('Selecionar', {exact: true}).nth(1).click();
+
+    const replaceRequest = await replaceRequestPromise;
+    expect(replaceRequest.postDataJSON()).toEqual([{product: '102', quantity: 1}]);
+
+    await expect(page).toHaveURL(/checkout/);
+    await expect(page.getByText('Identificar cliente', {exact: true})).toBeVisible();
+    await expect(page.getByPlaceholder('Digite o CPF')).toBeVisible();
+    await expect(page.getByText('Dinheiro', {exact: true})).toBeHidden();
+  });
+
   test('shows the runtime footer on the POS shell', async ({ page }) => {
     bindBrowserDiagnostics(page);
     await createPosApiMock(page);
