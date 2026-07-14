@@ -36,8 +36,10 @@ import delivery_courier_company_presences from '@controleonline/ui-logistic/src/
 import delivery_tax_groups from '@controleonline/ui-logistic/src/store/delivery_tax_groups';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import employee_profiles from '@controleonline/ui-employee/src/store/employee_profiles';
+import attendance_reports from '@controleonline/ui-employee/src/store/attendance_reports';
 import people_access_events from '@controleonline/ui-employee/src/store/people_access_events';
 import people_export_jobs from '@controleonline/ui-employee/src/store/people_export_jobs';
+import people_absences from '@controleonline/ui-employee/src/store/people_absences';
 import people_schedules from '@controleonline/ui-employee/src/store/people_schedules';
 import people from '@controleonline/ui-people/src/store/people';
 import people_link from '@controleonline/ui-people/src/store/people_link';
@@ -110,9 +112,11 @@ export default {
   delivery_courier_company_presences,
   delivery_tax_groups,
   employee_profiles,
+  attendance_reports,
   paymentType,
   people,
   people_access_events,
+  people_absences,
   people_export_jobs,
   phones,
   print,

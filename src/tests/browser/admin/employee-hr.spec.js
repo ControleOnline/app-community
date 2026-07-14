@@ -21,12 +21,12 @@ const textHeaders = () => ({
   'content-type': 'text/css; charset=utf-8',
 });
 
-const collection = (member = []) => ({
+const collection = (member = [], summary = {}) => ({
   member,
   'hydra:member': member,
   totalItems: member.length,
   'hydra:totalItems': member.length,
-  summary: {},
+  summary,
 });
 
 const createCompany = () => ({
@@ -136,6 +136,175 @@ const createSchedule = employee => ({
   alterDate: '2026-07-10T08:00:00.000Z',
 });
 
+const createContract = employee => ({
+  '@id': '/contracts/61',
+  id: 61,
+  contractModel: {
+    '@id': '/models/71',
+    id: 71,
+    model: 'Contrato CLT',
+    context: 'employment',
+  },
+  status: {
+    '@id': '/statuses/1',
+    id: 1,
+    status: 'open',
+    realStatus: 'open',
+    color: '#16A34A',
+  },
+  provider: createCompany(),
+  client: employee,
+  peoples: [
+    {
+      peopleType: 'Contractor',
+      people: employee,
+    },
+  ],
+  docKey: 'employment-61',
+  startDate: '2026-01-05T00:00:00.000Z',
+  endDate: '2027-01-05T00:00:00.000Z',
+  creationDate: '2026-07-10T08:00:00.000Z',
+  alterDate: '2026-07-10T08:00:00.000Z',
+});
+
+const createExportJob = (employee, company) => ({
+  '@id': '/people_export_jobs/51',
+  id: 51,
+  context: 'employment',
+  contextLabel: 'employment',
+  kind: 'timesheet',
+  kindLabel: 'Folha de ponto',
+  company: company || createCompany(),
+  companyLabel: 'GYROS',
+  people: employee,
+  peopleLabel: 'Ana Souza',
+  periodStart: '2026-07-01',
+  periodEnd: '2026-07-31',
+  status: 'done',
+  statusLabel: 'Concluido',
+  fileLabel: 'folha-rh-2026-07.pdf',
+  file: {
+    '@id': '/files/91',
+    id: 91,
+    fileName: 'folha-rh-2026-07',
+    extension: 'pdf',
+  },
+  filters: {
+    period: {
+      shortcut: '30d',
+    },
+  },
+  creationDate: '2026-07-10T08:00:00.000Z',
+  alterDate: '2026-07-10T08:00:00.000Z',
+});
+
+const createAttendanceLateRow = employee => ({
+  '@id': '/report/people/attendance/1',
+  id: '1-20260713',
+  context: 'employment',
+  contextLabel: 'RH',
+  company: createCompany(),
+  companyLabel: 'GYROS',
+  peopleId: employee.id,
+  peopleLabel: 'Ana Souza',
+  department: 'Gente e gestao',
+  jobTitle: 'Analista de RH',
+  jobFunction: 'Departamento pessoal',
+  date: '2026-07-13',
+  dateLabel: '13/07/2026',
+  weekdayLabel: 'Segunda',
+  scheduleLabel: 'Segunda 08:00 - 17:00',
+  entryTimesLabel: '08:15',
+  exitTimesLabel: '17:25',
+  workedMinutes: 550,
+  workedHoursLabel: '09:10',
+  expectedMinutes: 540,
+  expectedHoursLabel: '09:00',
+  delayMinutes: 15,
+  delayLabel: '+00:15',
+  overtimeMinutes: 25,
+  overtimeLabel: '+00:25',
+  balanceMinutes: 10,
+  status: 'late_overtime',
+  statusLabel: 'Atraso e extra',
+  tone: 'warning',
+  absenceLabel: '-',
+  justificationLabel: '-',
+  justificationFileLabel: '-',
+  absenceId: null,
+});
+
+const createAttendanceAbsenceRow = employee => ({
+  '@id': '/report/people/attendance/2',
+  id: '1-20260714',
+  context: 'employment',
+  contextLabel: 'RH',
+  company: createCompany(),
+  companyLabel: 'GYROS',
+  peopleId: employee.id,
+  peopleLabel: 'Ana Souza',
+  department: 'Gente e gestao',
+  jobTitle: 'Analista de RH',
+  jobFunction: 'Departamento pessoal',
+  date: '2026-07-14',
+  dateLabel: '14/07/2026',
+  weekdayLabel: 'Terca',
+  scheduleLabel: 'Segunda 08:00 - 17:00',
+  entryTimesLabel: '-',
+  exitTimesLabel: '-',
+  workedMinutes: 0,
+  workedHoursLabel: '00:00',
+  expectedMinutes: 540,
+  expectedHoursLabel: '09:00',
+  delayMinutes: 0,
+  delayLabel: '-',
+  overtimeMinutes: 0,
+  overtimeLabel: '-',
+  balanceMinutes: -540,
+  status: 'absent_justified',
+  statusLabel: 'Falta justificada',
+  tone: 'danger',
+  absenceLabel: 'Falta justificada',
+  justificationLabel: 'Atestado medico',
+  justificationFileLabel: 'atestado-medico.pdf',
+  absenceId: 81,
+});
+
+const createAttendanceSummary = () => ({
+  rows: 2,
+  late: 1,
+  absences: 1,
+  overtime: 1,
+  justifiedAbsences: 1,
+  workedMinutes: 550,
+  expectedMinutes: 1080,
+  delayMinutes: 15,
+  overtimeMinutes: 25,
+  balanceMinutes: -530,
+});
+
+const createAbsence = employee => ({
+  '@id': '/people_absences/81',
+  id: 81,
+  context: 'employment',
+  contextLabel: 'RH',
+  company: createCompany(),
+  companyLabel: 'GYROS',
+  people: employee,
+  peopleLabel: 'Ana Souza',
+  absenceDate: '2026-07-14',
+  absenceDateLabel: '14/07/2026',
+  reason: 'Atestado medico',
+  justificationFileId: 91,
+  justificationFileLabel: 'atestado-medico.pdf',
+  justificationLabel: 'Atestado medico',
+  hasJustification: true,
+  statusLabel: 'Justificada',
+  active: true,
+  creationDate: '2026-07-14T08:00:00.000Z',
+  alterDate: '2026-07-14T08:00:00.000Z',
+});
+
 const createAdminRuntimeMenusResponse = () => ({
   modules: {},
 });
@@ -147,6 +316,14 @@ const mockAdminHrApi = async page => {
   const employeeProfile = createEmployeeProfile(employeeLink);
   const movement = createMovement(employee);
   const schedule = createSchedule(employee);
+  const contract = createContract(employee);
+  const exportJob = createExportJob(employee, company);
+  const attendanceRows = [
+    createAttendanceLateRow(employee),
+    createAttendanceAbsenceRow(employee),
+  ];
+  const attendanceSummary = createAttendanceSummary();
+  const absences = [createAbsence(employee)];
 
   await page.route(`${API_ORIGIN}/**`, async route => {
     const request = route.request();
@@ -233,6 +410,14 @@ const mockAdminHrApi = async page => {
       });
     }
 
+    if (pathname === 'people') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection([employee])),
+      });
+    }
+
     if (pathname === 'people_links') {
       return route.fulfill({
         status: 200,
@@ -269,7 +454,31 @@ const mockAdminHrApi = async page => {
       return route.fulfill({
         status: 200,
         headers: jsonHeaders(),
-        body: JSON.stringify(collection([])),
+        body: JSON.stringify(collection([exportJob])),
+      });
+    }
+
+    if (pathname === 'report/people/attendance') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection(attendanceRows, attendanceSummary)),
+      });
+    }
+
+    if (pathname === 'people_absences') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection(absences)),
+      });
+    }
+
+    if (pathname === 'contracts') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify(collection([contract])),
       });
     }
 
@@ -334,6 +543,7 @@ test.describe('admin employee smoke', () => {
     await expect(page.getByText('Analista de RH', {exact: true}).first()).toBeVisible();
     await expect(page.getByRole('button', {name: 'Cargo e funcao'})).toBeVisible();
     await expect(page.getByRole('button', {name: 'Movimentos'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Ponto'})).toBeVisible();
     await expect(page.getByRole('button', {name: 'Agendas'})).toBeVisible();
     await expect(page.getByRole('button', {name: 'Exportacao'})).toBeVisible();
 
@@ -343,6 +553,17 @@ test.describe('admin employee smoke', () => {
     await page.getByRole('button', {name: 'Movimentos'}).click();
     await expect(page.getByText('Entrada', {exact: true}).first()).toBeVisible();
 
+    await page.getByRole('button', {name: 'Ponto'}).click();
+    await expect(page.getByText('Atrasos: 1', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Faltas: 1', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Falta justificada', {exact: true}).first()).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Registrar falta'})).toBeVisible();
+
+    await page.getByRole('button', {name: 'Registrar falta'}).click();
+    await expect(page.getByText('Atestado ou justificativa', {exact: true}).first()).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Selecionar arquivo'})).toBeVisible();
+    await page.getByRole('button', {name: 'Cancelar'}).click();
+
     await page.getByRole('button', {name: 'Agendas'}).click();
     await expect(page.getByText('Turno da manha', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Segunda 08:00 17:00', {exact: true}).first()).toBeVisible();
@@ -350,5 +571,52 @@ test.describe('admin employee smoke', () => {
     await page.getByRole('button', {name: 'Exportacao'}).click();
     await expect(page.getByRole('button', {name: 'Gerar folha'})).toBeVisible();
     await expect(page.getByText('Periodo', {exact: true}).first()).toBeVisible();
+  });
+
+  test('opens the RH hub and the dedicated management screens', async ({page}) => {
+    await mockAdminHrApi(page);
+
+    await page.goto('/hr');
+
+    await expect(page.getByText('RH', {exact: true}).first()).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Funcionarios'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Cargos e funcoes'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Movimentos'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Ponto por setor'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Contratos'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Agendas'})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Folha de ponto'})).toBeVisible();
+
+    await page.getByRole('button', {name: 'Ponto por setor'}).click();
+    await expect(page.getByText('Ponto por setor', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Ana Souza', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Falta justificada', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr');
+
+    await page.getByRole('button', {name: 'Funcionarios'}).click();
+    await expect(page.getByText('Ana Souza', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr/functions');
+    await expect(page.getByText('Cargos e funcoes', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Analista de RH', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr/movements');
+    await expect(page.getByText('Movimentos', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Entrada', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr/contracts');
+    await expect(page.getByText('Contratos', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Contrato CLT', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr/schedules');
+    await expect(page.getByText('Agendas', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Turno da manha', {exact: true}).first()).toBeVisible();
+
+    await page.goto('/hr/exports');
+    await expect(page.getByText('Folha de ponto', {exact: true}).first()).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Gerar folha'})).toBeVisible();
+    await expect(page.getByText('folha-rh-2026-07.pdf', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Periodo da folha', {exact: true}).first()).toBeVisible();
   });
 });
