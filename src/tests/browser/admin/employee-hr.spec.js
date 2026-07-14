@@ -65,14 +65,25 @@ const createEmployeeLink = employee => ({
   enable: true,
 });
 
+const createCategory = (id, name, context) => ({
+  '@id': `/categories/${id}`,
+  id,
+  name,
+  context,
+});
+
 const createEmployeeProfile = employeeLink => ({
   '@id': '/employee_profiles/21',
   id: 21,
   peopleLink: employeeLink,
-  jobTitle: 'Analista de RH',
-  jobFunction: 'Departamento pessoal',
-  department: 'Gente e gestao',
-  employmentType: 'CLT',
+  jobTitle: createCategory(101, 'Analista de RH', 'employment-job'),
+  jobTitleLabel: 'Analista de RH',
+  jobFunction: createCategory(102, 'Departamento pessoal', 'employment-function'),
+  jobFunctionLabel: 'Departamento pessoal',
+  department: createCategory(103, 'Gente e gestao', 'employment-department'),
+  departmentLabel: 'Gente e gestao',
+  employmentType: createCategory(104, 'CLT', 'employment-type'),
+  employmentTypeLabel: 'CLT',
   admissionDate: '2026-01-05',
   terminationDate: null,
   workloadHours: 44,
@@ -324,13 +335,23 @@ const mockAdminHrApi = async page => {
   ];
   const attendanceSummary = createAttendanceSummary();
   const absences = [createAbsence(employee)];
+  const requestCounts = new Map();
+
+  const incrementRequestCount = pathname => {
+    requestCounts.set(pathname, (requestCounts.get(pathname) || 0) + 1);
+  };
 
   await page.route(`${API_ORIGIN}/**`, async route => {
     const request = route.request();
     const url = new URL(request.url());
     const pathname = url.pathname.replace(/^\/+/, '');
+    const method = request.method().toUpperCase();
 
-    if (request.method().toUpperCase() === 'OPTIONS') {
+    if (method !== 'OPTIONS') {
+      incrementRequestCount(pathname);
+    }
+
+    if (method === 'OPTIONS') {
       return route.fulfill({
         status: 204,
         headers: CORS_HEADERS,
@@ -530,11 +551,13 @@ const mockAdminHrApi = async page => {
     },
     {appVersion: APP_VERSION},
   );
+
+  return {requestCounts};
 };
 
 test.describe('admin employee smoke', () => {
   test('opens the RH detail and switches the generic tabs', async ({page}) => {
-    await mockAdminHrApi(page);
+    const {requestCounts} = await mockAdminHrApi(page);
 
     await page.goto('/hr/employees/details?id=1&context=employment');
 
@@ -572,10 +595,13 @@ test.describe('admin employee smoke', () => {
     await page.getByRole('button', {name: 'Exportacao'}).click();
     await expect(page.getByRole('button', {name: 'Gerar folha'})).toBeVisible();
     await expect(page.getByText('Periodo', {exact: true}).first()).toBeVisible();
+
+    expect(requestCounts.get('menus-people') || 0).toBe(0);
+    expect(requestCounts.get('orders') || 0).toBe(0);
   });
 
   test('opens the RH hub and the dedicated management screens', async ({page}) => {
-    await mockAdminHrApi(page);
+    const {requestCounts} = await mockAdminHrApi(page);
 
     await page.goto('/hr');
 
@@ -620,5 +646,8 @@ test.describe('admin employee smoke', () => {
     await expect(page.getByRole('button', {name: 'Gerar folha'})).toBeVisible();
     await expect(page.getByText('folha-rh-2026-07.pdf', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Periodo da folha', {exact: true}).first()).toBeVisible();
+
+    expect(requestCounts.get('menus-people') || 0).toBe(0);
+    expect(requestCounts.get('orders') || 0).toBe(0);
   });
 });
