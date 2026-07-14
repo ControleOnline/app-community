@@ -556,6 +556,7 @@ test.describe('admin employee smoke', () => {
     await page.getByRole('button', {name: 'Ponto'}).click();
     await expect(page.getByText('Atrasos: 1', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Faltas: 1', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('Hora extra: 1', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Falta justificada', {exact: true}).first()).toBeVisible();
     await expect(page.getByRole('button', {name: 'Registrar falta'})).toBeVisible();
 
@@ -591,6 +592,7 @@ test.describe('admin employee smoke', () => {
     await expect(page.getByText('Ponto por setor', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Ana Souza', {exact: true}).first()).toBeVisible();
     await expect(page.getByText('Falta justificada', {exact: true}).first()).toBeVisible();
+    await expect(page.getByText('+00:15', {exact: true}).first()).toBeVisible();
 
     await page.goto('/hr');
 
