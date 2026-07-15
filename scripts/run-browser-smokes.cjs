@@ -121,12 +121,13 @@ for (const group of resolvedGroups) {
     groupSummary.build = 'passed';
 
     console.log(`=== Running ${group.name} browser smoke tests ===`);
+    const testPaths = Array.isArray(group.testPaths) ? group.testPaths : [group.testDir].filter(Boolean);
     const testResult = runCommand('npx', [
       'playwright',
       'test',
       '--config',
       playwrightConfig,
-      group.testDir,
+      ...testPaths,
       ...forwardedArgs,
     ], env);
     const testExitCode = testResult.status ?? testResult.signal ?? 1;

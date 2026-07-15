@@ -63,7 +63,15 @@ function normalizeRelativePath(value) {
 }
 
 function stripSourcePrefix(value) {
-  return normalizeRelativePath(value)
+  const normalized = normalizeRelativePath(value);
+  const browserPrefix = 'src/tests/browser/';
+  const browserIndex = normalized.indexOf(browserPrefix);
+
+  if (browserIndex >= 0) {
+    return normalized.slice(browserIndex + browserPrefix.length);
+  }
+
+  return normalized
     .replace(/^src\/tests\/browser\//, '')
     .replace(/^src\/tests\//, '')
     .replace(/^tests\//, '')

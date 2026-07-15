@@ -9,7 +9,8 @@ const reporter = smokeJsonOutputFile
   : baseReporter;
 
 module.exports = defineConfig({
-  testDir: path.join(__dirname, 'src/tests/browser'),
+  testDir: path.join(__dirname),
+  testMatch: ['**/src/tests/browser/**/*.spec.js'],
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

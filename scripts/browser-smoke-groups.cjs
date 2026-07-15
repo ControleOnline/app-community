@@ -2,21 +2,28 @@ module.exports = [
   {
     name: 'manager',
     appType: 'MANAGER',
-    testDir: 'src/tests/browser/manager',
+    testPaths: [
+      'modules/controleonline/ui-login/src/tests/browser/manager',
+      'modules/controleonline/ui-manager/src/tests/browser/manager',
+      'modules/controleonline/ui-shop/src/tests/browser/manager',
+    ],
   },
   {
     name: 'admin',
     appType: 'ADMIN',
-    testDir: 'src/tests/browser/admin',
+    testPaths: [
+      'modules/controleonline/ui-manager/src/tests/browser/admin',
+      'modules/controleonline/ui-employee/src/tests/browser/admin',
+    ],
   },
   {
     name: 'delivery',
     appType: 'DELIVERY',
-    testDir: 'src/tests/browser/delivery',
+    testPaths: ['modules/controleonline/ui-logistic/src/tests/browser/delivery'],
   },
   {
     name: 'pos',
     appType: 'POS',
-    testDir: 'src/tests/browser/pos',
+    testPaths: ['modules/controleonline/ui-orders/src/tests/browser/pos'],
   },
 ];
