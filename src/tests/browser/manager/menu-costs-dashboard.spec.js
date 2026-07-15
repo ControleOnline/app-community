@@ -186,6 +186,14 @@ const mockMenuCostsApi = async page => {
       });
     }
 
+    if (pathname === 'menus-people') {
+      return route.fulfill({
+        status: 200,
+        headers: jsonHeaders(),
+        body: JSON.stringify({modules: {}}),
+      });
+    }
+
     if (pathname === 'configs/discovery-configs') {
       return route.fulfill({
         status: 200,

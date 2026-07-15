@@ -1,5 +1,6 @@
 const {expect, test} = require('playwright/test');
 const {API_ORIGIN} = require('../apiOrigin');
+const {version: appVersion} = require('../../../../package.json');
 
 const CORS_HEADERS = {
   'access-control-allow-origin': '*',
@@ -289,7 +290,7 @@ test.describe('admin browser smoke', () => {
 
     await openAdminHome(page);
     await switchAppType(page, 'MANAGER');
-    await expectAppTypeAfterRefresh(page, 'MANAGER', 'web • MANAGER (127.0.0.1) / v1.3.93');
+    await expectAppTypeAfterRefresh(page, 'MANAGER', `web • MANAGER (127.0.0.1) / v${appVersion}`);
     await expect(page.getByRole('button', {name: 'Voltar para ADMIN'})).toBeVisible();
 
     await page.getByRole('button', {name: 'Voltar para ADMIN'}).click();
@@ -303,9 +304,9 @@ test.describe('admin browser smoke', () => {
     {appType: 'SERVICE', marker: 'Operacional'},
     {appType: 'DELIVERY', marker: 'Cadastro do veículo'},
     {appType: 'SHOP', marker: 'Nenhuma entrada do shop esta disponivel'},
-    {appType: 'POS', marker: 'web • PDV (127.0.0.1) / v1.3.93'},
-    {appType: 'PPC', marker: 'web • DISPLAY (127.0.0.1) / v1.3.93'},
-    {appType: 'CRM', marker: 'web • CRM (127.0.0.1) / v1.3.93'},
+    {appType: 'POS', marker: `web • PDV (127.0.0.1) / v${appVersion}`},
+    {appType: 'PPC', marker: `web • DISPLAY (127.0.0.1) / v${appVersion}`},
+    {appType: 'CRM', marker: `web • CRM (127.0.0.1) / v${appVersion}`},
   ]) {
     test(`switches to ${appType} and keeps it after refresh`, async ({page}) => {
       await mockAdminApi(page);
