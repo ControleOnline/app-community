@@ -10,12 +10,10 @@ jobs:
       - name: Create test file
         run: echo "FTP funcionando! $(date)" > teste.txt
 
-      - name: Upload to FTP
-        uses: locaweb/ftp-deploy@1.0.0
-        with:
-          host: ${{ secrets.FTP_HOST }}
-          user: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localDir: .
-          remoteDir: public_html/1.3.99/com.lavego.app/apk
-          forceSsl: false
+      - name: Test FTP connection with lftp
+        run: |
+          sudo apt-get install -y lftp
+          lftp -d \
+            -u "${{ secrets.FTP_USER }},${{ secrets.FTP_PASSWORD }}" \
+            -e "set ftp:passive-mode yes; ls; bye" \
+            ftp://${{ secrets.FTP_HOST }} || echo "❌ Conexão falhou!"
