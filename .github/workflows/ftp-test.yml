@@ -1,13 +1,22 @@
-- name: Debug FTP connection
-  run: |
-    echo "=== Host sendo usado ==="
-    echo "${{ secrets.FTP_HOST }}"
+name: FTP Test
 
-    echo "=== Resolvendo DNS ==="
-    nslookup ${{ secrets.FTP_HOST }} || echo "❌ DNS falhou!"
+on:
+  workflow_dispatch:
 
-    echo "=== Testando porta 21 ==="
-    nc -zv -w5 ${{ secrets.FTP_HOST }} 21 && echo "✅ Porta 21 aberta" || echo "❌ Porta 21 bloqueada!"
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug FTP connection
+        run: |
+          echo "=== Host sendo usado ==="
+          echo "${{ secrets.FTP_HOST }}"
 
-    echo "=== Testando porta 22 (SFTP) ==="
-    nc -zv -w5 ${{ secrets.FTP_HOST }} 22 && echo "✅ Porta 22 aberta" || echo "❌ Porta 22 bloqueada!"
+          echo "=== Resolvendo DNS ==="
+          nslookup ${{ secrets.FTP_HOST }} || echo "❌ DNS falhou!"
+
+          echo "=== Testando porta 21 ==="
+          nc -zv -w5 ${{ secrets.FTP_HOST }} 21 && echo "✅ Porta 21 aberta" || echo "❌ Porta 21 bloqueada!"
+
+          echo "=== Testando porta 22 (SFTP) ==="
+          nc -zv -w5 ${{ secrets.FTP_HOST }} 22 && echo "✅ Porta 22 aberta" || echo "❌ Porta 22 bloqueada!"
