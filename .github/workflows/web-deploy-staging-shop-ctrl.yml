@@ -116,6 +116,9 @@ jobs:
 
           fs.writeFileSync(summaryPath, `${lines.join('\n')}\n`, 'utf8');
           NODE
+      - name: Install Playwright Browsers
+        if: always()
+        run: npx playwright install --with-deps chromium
       - name: Run Browser Smoke Tests
         if: always()
         run: npm run test:browser
