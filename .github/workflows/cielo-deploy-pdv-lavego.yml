@@ -109,7 +109,8 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
-          ./gradlew assembleRelease --init-script ../signing.gradle
+          ./gradlew assembleRelease --init-script ../signing.gradle --stacktrace --info 2>&1 | tail -200
+
           
       - name: Extract App Version
         run: |
