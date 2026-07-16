@@ -7,16 +7,13 @@ jobs:
   test-ftp:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug FTP connection
+      - name: Create test file
+        run: echo "FTP funcionando! $(date)" > teste.txt
+
+      - name: Test FTP connection with lftp
         run: |
-          echo "=== Host sendo usado ==="
-          echo "${{ secrets.FTP_HOST }}"
-
-          echo "=== Resolvendo DNS ==="
-          nslookup ${{ secrets.FTP_HOST }} || echo "❌ DNS falhou!"
-
-          echo "=== Testando porta 21 ==="
-          nc -zv -w5 ${{ secrets.FTP_HOST }} 21 && echo "✅ Porta 21 aberta" || echo "❌ Porta 21 bloqueada!"
-
-          echo "=== Testando porta 22 (SFTP) ==="
-          nc -zv -w5 ${{ secrets.FTP_HOST }} 22 && echo "✅ Porta 22 aberta" || echo "❌ Porta 22 bloqueada!"
+          sudo apt-get install -y lftp
+          lftp -d \
+            -u "${{ secrets.FTP_USER }},${{ secrets.FTP_PASSWORD }}" \
+            -e "set ftp:passive-mode yes; ls; bye" \
+            ftp://${{ secrets.FTP_HOST }} || echo "❌ Conexão falhou!"
