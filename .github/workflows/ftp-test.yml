@@ -1,0 +1,21 @@
+name: FTP Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create test file
+        run: echo "FTP funcionando! $(date)" > teste.txt
+
+      - name: Upload to FTP
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          user: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localDir: .
+          remoteDir: public_html/1.3.99/com.lavego.app/apk
+          forceSsl: false
