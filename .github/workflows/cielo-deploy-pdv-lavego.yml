@@ -114,6 +114,7 @@ jobs:
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
+          echo "App version: $VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Upload APK to Website (FTP)
