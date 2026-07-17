@@ -71,6 +71,8 @@ import wallet from '@controleonline/ui-financial/src/store/wallet';
 import walletPaymentType from '@controleonline/ui-financial/src/store/walletPaymentType';
 import websocket from '@controleonline/ui-common/src/store/websocket';
 import connections from '@controleonline/ui-common/src/store/connections';
+import cron_job_commands from '@controleonline/ui-manager/src/store/cron_job_commands';
+import cron_jobs from '@controleonline/ui-manager/src/store/cron_jobs';
 
 export default {
   acl,
@@ -83,6 +85,8 @@ export default {
   category_file,
   city,
   connections,
+  cron_job_commands,
+  cron_jobs,
   configs,
   contract,
   people_link,
