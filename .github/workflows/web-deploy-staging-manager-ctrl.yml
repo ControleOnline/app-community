@@ -16,7 +16,6 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://s.controleonline.com',\
-          DOMAIN: 'https://s.controleonline.com',\
           SOCKET: 'wss://s.controleonline.com',\
           APP_TYPE: 'MANAGER',\
           COMPANY_NAME: 'CTRL',\
@@ -64,7 +63,6 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://s.controleonline.com',\
-          DOMAIN: 'https://s.controleonline.com',\
           SOCKET: 'wss://s.controleonline.com',\
           APP_TYPE: 'MANAGER',\
           COMPANY_NAME: 'CTRL',\

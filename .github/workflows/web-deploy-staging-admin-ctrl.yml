@@ -16,7 +16,6 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://s.controleonline.com',\
-          DOMAIN: 'https://s.controleonline.com',\
           HTACCESS_USER: '${{ secrets.HTACCESS_USER }}',\
           HTACCESS_PASSWORD: '${{ secrets.HTACCESS_PASSWORD }}',\
           SOCKET: 'wss://s.controleonline.com',\
@@ -67,7 +66,6 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://s.controleonline.com',\
-          DOMAIN: 'https://s.controleonline.com',\
           HTACCESS_USER: '${{ secrets.HTACCESS_USER }}',\
           HTACCESS_PASSWORD: '${{ secrets.HTACCESS_PASSWORD }}',\
           SOCKET: 'wss://s.controleonline.com',\
