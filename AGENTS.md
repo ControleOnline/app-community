@@ -252,6 +252,8 @@
 
 - No browser/web, pagamento `Cielo` nunca pode acionar plugin nativo local. Nesse ambiente, a cobranca deve seguir pelo fluxo remoto via websocket para uma maquina Cielo configurada e o retorno vem por callback no store de `invoice`.
 - O caminho local de `Cielo` continua permitido apenas em device nativo compatível com o gateway local.
+- Quando a configuracao privada `CIELO` trouxer `MERCHANT_CODE`, o checkout local deve envia-lo como `merchantCode` no Deep Link; o app transacional Cielo o converte para o EC da requisicao.
+- Com `MERCHANT_CODE` configurado, o callback local so pode ser aceito quando todos os pagamentos retornarem o mesmo `merchantCode`; divergencia deve impedir a baixa automatica.
 
 ## Regra transversal de runtime em background
 
