@@ -73,6 +73,9 @@ import websocket from '@controleonline/ui-common/src/store/websocket';
 import connections from '@controleonline/ui-common/src/store/connections';
 import cron_job_commands from '@controleonline/ui-manager/src/store/cron_job_commands';
 import cron_jobs from '@controleonline/ui-manager/src/store/cron_jobs';
+import people_domains from '@controleonline/ui-manager/src/store/people_domains';
+import people_domains_api from '@controleonline/ui-manager/src/store/people_domains_api';
+import themes from '@controleonline/ui-common/src/store/themes';
 
 export default {
   acl,
@@ -87,6 +90,8 @@ export default {
   connections,
   cron_job_commands,
   cron_jobs,
+  people_domains,
+  people_domains_api,
   configs,
   contract,
   people_link,
@@ -144,6 +149,7 @@ export default {
   tasksInterations,
   tests,
   theme,
+  themes,
   timezones,
   translate,
   users,
