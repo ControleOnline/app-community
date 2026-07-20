@@ -186,6 +186,10 @@
 - O financeiro legado da empresa 21 deve ser definido por tema no banco, sem hardcode de preto, amarelo ou cinza dentro da tela.
 - Toda tela alterada a partir de agora deve ser revista junto com o tema ativo antes de considerar a tarefa concluida; ao tocar uma screen, use apenas as cores atravéz de variáveis e nunca cores diretamente do código.As variáveis de cor e classes vindas do store/tema do modulo e mantenha o visual aderente ao padrao atual devem estar presentes.
 
+## Regra transversal de midias da empresa
+
+- Imagens institucionais da empresa, incluindo logo, icone e carimbo de fidelidade do shop, devem vir de `people_media` com o `media_type` correspondente. Nao criar configs de URL para substituir essas midias.
+
 ## Regra transversal de grupos compartilhados
 
 - A criacao/importacao de `product_group` deve enviar `company` e depender de `product_group_parent` para o vinculo com o produto pai.
