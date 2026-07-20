@@ -55,6 +55,8 @@ import product_group_parent from '@controleonline/ui-products/src/store/products
 import product_group_product from '@controleonline/ui-products/src/store/products/product_group_product';
 import product_people from '@controleonline/ui-products/src/store/products/product_people';
 import product_inventories from '@controleonline/ui-products/src/store/product_inventories';
+import product_showcase_items from '@controleonline/ui-products/src/store/product_showcase_items';
+import product_showcases from '@controleonline/ui-products/src/store/product_showcases';
 import product_unit from '@controleonline/ui-products/src/store/products/product_unit';
 import products from '@controleonline/ui-products/src/store/products';
 import queues from '@controleonline/ui-ppc/src/store/modules/queues';
@@ -139,6 +141,8 @@ export default {
   product_group_product,
   product_people,
   product_inventories,
+  product_showcase_items,
+  product_showcases,
   product_unit,
   products,
   queues,
