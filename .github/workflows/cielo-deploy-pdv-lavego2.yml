@@ -137,41 +137,32 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Upload APK to Website (FTP)
-        uses: locaweb/ftp-deploy@1.0.0
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
+          server: ${{ secrets.FTPHOST }}
+          username: ${{ secrets.FTPUSER }}
           password: ${{ secrets.FTPPASS }}
-          localDir: ${{ env.APK_DIR }}
-          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
-          forceSsl: false
+          protocol: ftp
+          port: 21
+          local-dir: ${{ env.APK_DIR }}/
+          server-dir: /public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk/
 
       - name: Verify uploaded APK on FTP
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
-
           REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
           LOG_FILE="$(mktemp)"
+          FTP_URL="ftp://${{ secrets.FTPHOST }}/${REMOTE_DIR}/"
 
           set +e
-          lftp -d -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
-            set cmd:fail-exit yes
-            set net:timeout 20
-            set net:max-retries 1
-            set ftp:passive-mode true
-            set ftp:ssl-allow no
-            set ftp:ssl-force no
-            set ssl:verify-certificate no
-            cls -la ${REMOTE_DIR}
-            bye
-          " 2>&1 | tee \"$LOG_FILE\"
-          LFTP_STATUS=${PIPESTATUS[0]}
+          curl --silent --show-error --fail --ftp-pasv \
+            --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
+            --list-only "$FTP_URL" 2>&1 | tee "$LOG_FILE"
+          CURL_STATUS=${PIPESTATUS[0]}
           set -e
 
-          if [ "$LFTP_STATUS" -ne 0 ]; then
+          if [ "$CURL_STATUS" -ne 0 ]; then
             echo "Falha ao listar o diretório remoto após o upload." >&2
-            exit "$LFTP_STATUS"
+            exit "$CURL_STATUS"
           fi
 
           if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
