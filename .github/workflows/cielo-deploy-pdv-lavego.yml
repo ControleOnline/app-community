@@ -111,6 +111,24 @@ jobs:
           cd android
           ./gradlew assembleRelease --init-script ../signing.gradle --stacktrace --info 2>&1 | tail -200
 
+      - name: Validate generated APK
+        run: |
+          APK_PATH=$(find ./android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "Nenhum APK foi gerado em ./android/app/build/outputs/apk/release" >&2
+            exit 1
+          fi
+
+          APK_DIR=$(dirname "$APK_PATH")
+          APK_FILENAME=$(basename "$APK_PATH")
+
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          echo "APK_DIR=$APK_DIR" >> "$GITHUB_ENV"
+          echo "APK_FILENAME=$APK_FILENAME" >> "$GITHUB_ENV"
+
+          ls -lah "$APK_DIR"
+          echo "APK localizado: $APK_FILENAME"
+
           
       - name: Extract App Version
         run: |
@@ -124,6 +142,39 @@ jobs:
           host: ${{ secrets.FTPHOST }}
           user: ${{ secrets.FTPUSER }}
           password: ${{ secrets.FTPPASS }}
-          localDir: "./android/app/build/outputs/apk/release"
+          localDir: ${{ env.APK_DIR }}
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
+
+      - name: Verify uploaded APK on FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
+          LOG_FILE="$(mktemp)"
+
+          set +e
+          lftp -d -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          " 2>&1 | tee \"$LOG_FILE\"
+          LFTP_STATUS=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$LFTP_STATUS" -ne 0 ]; then
+            echo "Falha ao listar o diretório remoto após o upload." >&2
+            exit "$LFTP_STATUS"
+          fi
+
+          if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${APK_FILENAME}"
+          else
+            echo "O upload terminou sem erro, mas o arquivo ${APK_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
+            exit 1
+          fi

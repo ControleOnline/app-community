@@ -1,6 +1,13 @@
 flowchart TD
 
 %% =====================================================
+%% BANCO DE DADOS
+%% =====================================================
+
+    BD_ORDERTYPE_F[ORDER_TYPE = FIDELITY]
+    BD_ORDERTYPE_S[ORDER_TYPE = SALE]
+
+%% =====================================================
 %% ENTRADA NO ORDER HISTORY (+)
 %% =====================================================
 
@@ -10,9 +17,13 @@ flowchart TD
     PDV_VINCULO[Validar e criar vínculo]
 
     PDV_NOVA --> PDV_TIPO
-    PDV_TIPO -->|TAB| PDV_NUMERO
-    PDV_TIPO -->|TABLE| PDV_NUMERO
-    PDV_TIPO -->|STAMP| PDV_VINCULO
+    PDV_TIPO -->|TAB| BD_ORDERTYPE_S
+    PDV_TIPO -->|TABLE| BD_ORDERTYPE_S
+    BD_ORDERTYPE_S --> PDV_NUMERO
+    PDV_TIPO -->|STAMP| BD_ORDERTYPE_F
+    BD_ORDERTYPE_F --> PDV_VINCULO
+
+
     PDV_NUMERO --> PDV_VINCULO
     PDV_VINCULO --> COMPRA_INICIO
 
@@ -40,30 +51,26 @@ flowchart TD
     CPF_CADASTRADO -->|Não| PAGAMENTO_TELA
     CPF_CADASTRADO -->|Sim| CPF_COMPLETO
     CPF_COMPLETO -->|Não| PAGAMENTO_TELA
-    CPF_COMPLETO -->|Sim| BRINDE_MENSAGEM
+    CPF_COMPLETO -->|Sim| BRINDE_TELA
 
 %% =====================================================
 %% FLUXO DE BRINDE
 %% =====================================================
 
-    BRINDE_MENSAGEM[Exibir mensagem de brinde]
-    BRINDE_TELA[Abrir tela pagamento]
-    BRINDE_CARTAO[Mostrar apenas Cartão Fidelidade]
-    BRINDE_BLOQUEIO[Bloquear troca de opção]
+    BRINDE_TELA[Abrir tela pagamento\n com mensagem de brinde]
+    BRINDE_CARTAO[Cartão Fidelidade\n selecionado e bloqueado]
     BRINDE_FINALIZAR[Finalizar operação]
-    BRINDE_FECHAR_PAI[Alterar pai para closed]
+    BRINDE_FECHAR_PAI[Alterar linha\n ORDER_TYPE = FIDELITY\n para CLOSED]
 
-    BRINDE_MENSAGEM --> BRINDE_TELA
     BRINDE_TELA --> BRINDE_CARTAO
-    BRINDE_CARTAO --> BRINDE_BLOQUEIO
-    BRINDE_BLOQUEIO --> BRINDE_FINALIZAR
+    BRINDE_CARTAO --> BRINDE_FINALIZAR
     BRINDE_FINALIZAR --> BRINDE_FECHAR_PAI
 
 %% =====================================================
 %% PAGAMENTO NORMAL
 %% =====================================================
 
-    PAGAMENTO_TELA[Ir para tela de pagamento]
+    PAGAMENTO_TELA[Abrir tela de pagamento]
     PAGAMENTO_MEIOS[Mostrar meios de pagamento]
     PAGAMENTO_FINALIZAR[Finalizar operação]
 
@@ -79,9 +86,9 @@ flowchart TD
     FIDELIDADE_VERIFICAR{Possui produto participante?}
 
     FIDELIDADE_VERIFICAR -->|Não| FIDELIDADE_SALE
-    FIDELIDADE_VERIFICAR -->|Sim| FIDELIDADE_PAI_STATUS
+    FIDELIDADE_VERIFICAR -->|!!!organizar!!!| FIDELIDADE_PAI_STATUS
 
-    FIDELIDADE_SALE[Pedido permanece como sale]
+    FIDELIDADE_SALE[ORDER_TYPE\n continua como\n SALE]
 
     FIDELIDADE_PAI_STATUS{Pai está open?}
 

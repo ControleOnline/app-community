@@ -96,6 +96,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `cardIcon`
 - `cardIconColor`
 - `cardIconBackground`
+- `cardIconBorder`
 - `cardSelectedBackground`
 - `cardSelectedBorder`
 - `cardSelectedText`
