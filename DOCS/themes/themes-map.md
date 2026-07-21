@@ -94,6 +94,8 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `cardHeaderBackground`
 - `cardHeaderText`
 - `cardIcon`
+- `cardIconColor`
+- `cardIconBackground`
 - `cardSelectedBackground`
 - `cardSelectedBorder`
 - `cardSelectedText`
@@ -149,8 +151,9 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 ### icon
 
-- `iconColor`
 - `iconActive`
+- `iconBackground`
+- `iconColor`
 - `iconDanger`
 - `iconDisabled`
 - `iconInfo`

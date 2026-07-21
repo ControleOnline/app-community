@@ -66,10 +66,9 @@ Então, resumindo em uma frase:
 
 5. Depois que terminar, revise novamente para ver se não ficou nada para trás.
 
-6. Sempre que registrar conteudo em `themes-actual.md`, `themes-new.md` ou `themes-todo.md`:
+6. Sempre que registrar conteudo em `themes-actual.md` ou `themes-todo.md`:
 - manter a mesma tabulacao visual para facilitar comparacao
 - em `themes-actual.md`, alinhar nome da variavel e conteudo na mesma linha
-- em `themes-new.md`, alinhar nome da variavel e conteudo conforme as cores forem sendo adicionadas
 
 ### EXECUÇÃO
 1. Para cada registro no themes-todo.md em MÓDULOS / ARQUIVOS HARDCODED:

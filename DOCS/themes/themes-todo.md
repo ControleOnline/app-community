@@ -110,6 +110,7 @@
 - `src/react/components/filters/DefaultSearch.styles.js`
 - `src/react/components/form/DefaultForm.js`
 - `src/react/components/form/DefaultForm.styles.js`
+- `src/react/components/errors/DefaultErrors.js`
 - `src/react/components/inputs/DefaultInput.js`
 - `src/react/components/inputs/DefaultInput.styles.js`
 - `src/react/components/inputs/DefaultSelect.js`
@@ -123,6 +124,21 @@
 - `src/react/components/map/DefaultNativeMap.native.js`
 - `src/react/components/map/DefaultNativeMap.shared.js`
 - `src/react/components/map/DefaultNativeMap.styles.js`
+
+- `src/react/components/errors/DefaultErrors.js`
+- `linha 36-107, 185-334`
+- `antes: modal de erro resolvia cor por pickThemeColor com fallback '#DC2626', '#FFFFFF', 'rgba(...)', '#B91C1C' e '#334155', e o botao retry usava transparência local`
+- `depois: modal usa apenas themeStore.getters.colors com inputErrorBorder, inputErrorText, modalBackground, modalBorder, modalOverlay, modalText, modalCloseIcon, buttonBackground, buttonBorder e buttonText`
+
+- `src/react/components/form/DefaultForm.js`
+- `linha 57-84, 162-209`
+- `antes: form usava accentColor='#2563EB' como default do botao primario e styles estaticos sem palette do tema`
+- `depois: form monta palette a partir de themeStore.getters.colors e usa buttonBackground, buttonBackgroundSecondary, buttonBorderSecondary, buttonDisabledBackground, buttonDisabledText, buttonText, buttonTextSecondary, dividerBorder e textSecondary`
+
+- `src/react/components/form/DefaultForm.styles.js`
+- `linha 3-75`
+- `antes: emptyText, actions, secondaryButton e primaryButtonText usavam '#64748B', '#E2E8F0', '#CBD5E1', '#FFFFFF', '#334155' e opacity fixa 0.62`
+- `depois: createStyles(palette) usa textSecondary, dividerBorder, buttonBorderSecondary, buttonBackgroundSecondary, buttonTextSecondary, buttonDisabledBackground, buttonDisabledText e buttonText`
 
 ### ui-financial
 - `src/react/pages/FinancialEntriesPage.js`
@@ -414,6 +430,74 @@
 - `antes: tokens footer* vazios no json consolidado e navigationIcon/navigationShadow/navigationDisabled* sem proposta operacional`
 - `depois: footer* preenchidos para proposta de tema e navigationIcon/navigationShadow/navigationDisabled* registrados para a navegacao inferior`
 
+- `themes/themes-map.md`
+- `linha 88-102, 151-163`
+- `antes: nao existiam tokens especificos para o fundo do wrapper de icone dentro e fora de card`
+- `depois: mapa canonico passa a ter cardIconBackground e iconBackground`
+
+- `themes/themes-new.md`
+- `linha 75-83, 121-129`
+- `antes: proposta consolidada ainda nao trazia cardIconBackground e iconBackground`
+- `depois: proposta passa a registrar cardIconBackground e iconBackground para ajuste no tema`
+
+### ui-layout
+- `src/react/components/AppMenuGrid.js`
+- `linha 15-136`
+- `antes: grid de menus calculava tom dos icones com variacao local e transparência derivada por withAlpha`
+- `depois: grid de menus usa iconBackground fora de card, cardIconBackground dentro de card e iconColor na cor do icone`
+
+- `src/react/components/AppMenuGrid.styles.js`
+- `linha 3-116`
+- `antes: sectionIcon e cardIcon dependiam de withAlpha(actionText, ...) e background translúcido local`
+- `depois: sectionTone usa iconBackground e segmentTone usa cardIconBackground, sem transparencia local`
+
+### ui-manager
+- `src/react/pages/ThemeManagerPage.js`
+- `linha 220-303`
+- `antes: editor de tema nao listava cardIconBackground e iconBackground`
+- `depois: editor passa a listar cardIconBackground no bloco card e iconBackground no bloco icon`
+
+- `src/react/pages/ThemePreviewPage.js`
+- `linha 74-94`
+- `antes: preview default nao tinha cardIconBackground e iconBackground`
+- `depois: preview default registra cardIconBackground e iconBackground para demonstracao e edicao`
+
+- `src/react/pages/home/index.js`
+- `linha 50-68, 193-255`
+- `antes: home misturava withOpacity local e usava actionBackground nos icones dos cards`
+- `depois: home usa textMuted/textSecondary do tema, cardIconBackground nos wrappers internos e iconColor nos icones`
+
+- `src/react/pages/home/index.styles.js`
+- `linha 4-14, 70-107`
+- `antes: banner e cards da home usavam withOpacity no boxShadow, no actionSub e no fundo do icone estatistico`
+- `depois: home usa cardShadow/buttonShadow do tema para sombra web e cardIconBackground nos wrappers de icone dentro dos cards`
+
+- `src/react/pages/PdvPage.js`
+- `linha 12-87`
+- `antes: botao de liquidacao no header com borderColor '#BFDBFE', backgroundColor '#EFF6FF' e icon/text '#0369A1' hardcoded`
+- `depois: botao de liquidacao usando themeStore.getters.colors com buttonBackgroundSecondary, buttonBorderSecondary, buttonIconSecondary e buttonTextSecondary`
+
+- `src/react/pages/ConfiguratorPage.js`
+- `linha 12-169`
+- `antes: tela montava o tema no componente, mas mantinha hero/cards dependentes de style estatico com fallback local e icones usando mapa semantico diferente do combinado`
+- `depois: tela usa resolveConfiguratorColors + createStyles(configuratorColors), com cardIconBackground nos wrappers internos e iconColor nos icones`
+
+- `src/react/pages/ConfiguratorPage.styles.js`
+- `linha 1-119`
+- `antes: hero, cards e textos usavam colors.js e opacidades locais como fonte final de cor`
+- `depois: createStyles(palette) recebe a paleta resolvida da tela e aplica actionBackground, actionText, cardBackground, cardBorder, cardIconBackground, cardText e mutedText sem hardcode local`
+
+### app-community
+- `src/styles/branding.js`
+- `linha 142-164`
+- `antes: resolveThemePalette nao promovia iconBackground e cardIconBackground vindos do tema ativo, mantendo fallback local mesmo apos ajuste no banco`
+- `depois: resolveThemePalette passa a ler iconBackground/icon-background e cardIconBackground/card-icon-background do tema ativo`
+
+- `src/styles/colors.js`
+- `linha 6-19`
+- `antes: defaults locais nao expunham iconBackground e cardIconBackground e ainda liam variaveis CSS com nome diferente do tema ativo`
+- `depois: defaults locais passam a expor iconBackground e cardIconBackground usando o mesmo nome de variavel CSS aplicado pelo runtime`
+
 ### ui-common
 - `src/react/components/BottomNavigationBar.js`
 - `linha 21-29, 49-85, 117-156`
@@ -470,6 +554,37 @@
 - `linha 1-69`
 - `antes: wrapper do card, divisor e textos secundarios usavam #fff / #0F172A / #475569 / #F1F5F9`
 - `depois: createStyles(palette) usa cardBackground, cardBorder, cardShadow, dividerBorder, textPrimary e textSecondary`
+
+- `src/react/pages/CashRegister/index.js`
+- `linha 21-269`
+- `antes: valores do caixa usavam vermelho hardcoded para retirada, botoes com icone/texto em '#fff' e destaque local fora do tema`
+- `depois: tela usa themeStore.getters.colors com textDanger, buttonBackground, buttonIcon, buttonText, cardText e footerText`
+
+- `src/react/pages/CashRegister/index.styles.js`
+- `linha 1-10`
+- `antes: labels dos botoes com color '#fff' hardcoded`
+- `depois: arquivo preserva somente espacamento; a cor do label vem do tema na tela`
+
+- `src/react/css/orders.js`
+- `linha 11-15, 37-39, 92-99, 332-352`
+- `antes: fundo da pagina, card do caixa, texto base e footer usavam page/background/card/footer hardcoded ou base local`
+- `depois: cash-register-index usa pageBackground, cardBackground, cardBorder, cardText, footerBackground, footerBorder e footerText`
+
+### ui-products
+- `src/react/components/products/ProductItem.js`
+- `linha 14-72, 128-223, 235-514`
+- `antes: chips de tipo usavam roxo/azul/laranja/verde/ciano/rosa/amarelo hardcoded, preco em verde hardcoded e ProductTotem do card herdava seletor com vermelho/verde locais`
+- `depois: chips de tipo, preco e acao do card usam tokens canonicos como chipSelectedBackground, chipSelectedText, buttonBackgroundSecondary, buttonTextSecondary, chipBackground, textWarning, textSuccess e textMuted`
+
+- `src/react/pages/Products.js`
+- `linha 1110-1133, 1191-1215`
+- `antes: atalhos e cabecalhos por tipo reutilizavam bg/color hardcoded do PRODUCT_TYPE_CONFIG e ainda aplicavam borda com opacidade local`
+- `depois: atalhos e cabecalhos por tipo resolvem as cores pelo mesmo mapa semantico de tokens do ProductItem, sem hex nem opacidade local`
+
+- `src/react/components/cart/ProductTotem.js`
+- `linha 31-74, 202-221`
+- `antes: seletor Selecionar usava circulo vermelho, check verde e texto cinza hardcoded`
+- `depois: seletor usa iconDisabled, iconSuccess e textMuted vindos da palette do tema`
 
 ### ui-people
 - `src/react/pages/People.js`

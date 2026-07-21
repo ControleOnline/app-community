@@ -1,68 +1,110 @@
-# LoyaltyFlow
-
-Regra do fluxo no PDV:
-
-- Antes do pagamento, o cliente pode informar ou nao o CPF.
-- Se informar CPF e o cadastro existir, o sistema verifica se o cartao de fidelidade esta completo.
-- Se o cartao estiver completo:
-  - exibe a mensagem de brinde;
-  - abre a tela de pagamento com apenas `Cartao Fidelidade`;
-  - a opcao nao pode ser alterada;
-  - finaliza a operacao;
-  - depois muda o status do pai para `closed`.
-- Se o cartao nao estiver completo, o pagamento segue o fluxo normal.
-
-Regra de entrada no `order-history-page`:
-
-- Ao clicar no `+`, se o tipo for `TAB` ou `TABLE`, o sistema pede o numero exatamente como hoje.
-- Se o tipo for `STAMP`, o sistema nao pergunta o numero e segue direto.
-
-Regra de gravacao da fidelidade no `orders`:
-
-- O pedido filho continua como `sale`.
-- O pedido pai vira `fidelity` apenas quando a primeira compra elegivel tiver ao menos um produto participante.
-- Se a compra nao tiver produto participante, ela nao cria fidelidade e permanece apenas como `sale`.
-- Para entrar na conta do carimbo, um filho precisa:
-  - estar pago;
-  - estar vinculado ao pai fidelidade aberto;
-  - ter pelo menos um `order_product` com produto participante.
-- Filhos sem produto participante nao contam para o progresso `1/n`.
-- O pai precisa permanecer com status `open` para receber novos filhos elegiveis.
-
-Exemplo pratico:
-
-- Login no shop da empresa `6`.
-- Compra `72638` filha de `72637`.
-- Se `72638` tiver um `order_product` com produto participante, ele conta como carimbo.
-- Se nao tiver, nao entra na fidelidade.
-
-```mermaid
 flowchart TD
-  A[Iniciar compra no PDV] --> B{CPF foi informado?}
-  B -- nao --> L[Seguir pagamento normal]
-  B -- sim --> C{CPF cadastrado?}
-  C -- nao --> L
-  C -- sim --> D{Cliente tem cartao de fidelidade completo?}
-  D -- nao --> L
-  D -- sim --> E[Exibir mensagem de brinde]
-  E --> F[Ir para tela de pagamento]
-  F --> G[Mostrar apenas Cartao Fidelidade]
-  G --> H[Bloquear troca da opcao]
-  H --> I[Finalizar operacao]
-  I --> J[Mudar o status do pai para closed]
-```
 
-Observacoes:
+%% =====================================================
+%% ENTRADA NO ORDER HISTORY (+)
+%% =====================================================
 
-- `sale` e o tipo comercial do filho.
-- `fidelity` e o tipo do pai/cartao.
-- O criterio de elegibilidade vem dos produtos configurados como participantes da fidelidade.
+    PDV_NOVA[PDV - Nova compra]
+    PDV_TIPO{Tipo do vínculo}
+    PDV_NUMERO[Perguntar número]
+    PDV_VINCULO[Validar e criar vínculo]
 
-```mermaid
-flowchart TD
-  A[Entrar no order-history-page e clicar no +] --> B{Tipo do vinculo}
-  B -- TAB/TABLE --> C[Perguntar o numero, como hoje]
-  B -- STAMP --> D[Seguir direto, sem perguntar]
-  C --> E[Validar e criar o vinculo]
-  D --> E
-```
+    PDV_NOVA --> PDV_TIPO
+    PDV_TIPO -->|TAB| PDV_NUMERO
+    PDV_TIPO -->|TABLE| PDV_NUMERO
+    PDV_TIPO -->|STAMP| PDV_VINCULO
+    PDV_NUMERO --> PDV_VINCULO
+    PDV_VINCULO --> COMPRA_INICIO
+
+%% =====================================================
+%% FLUXO DE COMPRA NO PDV
+%% =====================================================
+
+    COMPRA_INICIO[Iniciar compra]
+    COMPRA_FIDELIDADE{Fidelidade ativada?}
+
+    COMPRA_INICIO --> COMPRA_FIDELIDADE
+    COMPRA_FIDELIDADE -->|Não| PAGAMENTO_TELA
+    COMPRA_FIDELIDADE -->|Sim| CPF_INFORMADO
+
+%% =====================================================
+%% VALIDAÇÃO DE CPF
+%% =====================================================
+
+    CPF_INFORMADO{CPF informado?}
+    CPF_CADASTRADO{CPF cadastrado?}
+    CPF_COMPLETO{Cartão completo?}
+
+    CPF_INFORMADO -->|Não| PAGAMENTO_TELA
+    CPF_INFORMADO -->|Sim| CPF_CADASTRADO
+    CPF_CADASTRADO -->|Não| PAGAMENTO_TELA
+    CPF_CADASTRADO -->|Sim| CPF_COMPLETO
+    CPF_COMPLETO -->|Não| PAGAMENTO_TELA
+    CPF_COMPLETO -->|Sim| BRINDE_MENSAGEM
+
+%% =====================================================
+%% FLUXO DE BRINDE
+%% =====================================================
+
+    BRINDE_MENSAGEM[Exibir mensagem de brinde]
+    BRINDE_TELA[Abrir tela pagamento]
+    BRINDE_CARTAO[Mostrar apenas Cartão Fidelidade]
+    BRINDE_BLOQUEIO[Bloquear troca de opção]
+    BRINDE_FINALIZAR[Finalizar operação]
+    BRINDE_FECHAR_PAI[Alterar pai para closed]
+
+    BRINDE_MENSAGEM --> BRINDE_TELA
+    BRINDE_TELA --> BRINDE_CARTAO
+    BRINDE_CARTAO --> BRINDE_BLOQUEIO
+    BRINDE_BLOQUEIO --> BRINDE_FINALIZAR
+    BRINDE_FINALIZAR --> BRINDE_FECHAR_PAI
+
+%% =====================================================
+%% PAGAMENTO NORMAL
+%% =====================================================
+
+    PAGAMENTO_TELA[Ir para tela de pagamento]
+    PAGAMENTO_MEIOS[Mostrar meios de pagamento]
+    PAGAMENTO_FINALIZAR[Finalizar operação]
+
+    PAGAMENTO_TELA --> PAGAMENTO_MEIOS
+    PAGAMENTO_MEIOS --> PAGAMENTO_FINALIZAR
+
+%% =====================================================
+%% REGRA DE GRAVAÇÃO NOS ORDERS
+%% =====================================================
+
+    PAGAMENTO_FINALIZAR --> FIDELIDADE_VERIFICAR
+
+    FIDELIDADE_VERIFICAR{Possui produto participante?}
+
+    FIDELIDADE_VERIFICAR -->|Não| FIDELIDADE_SALE
+    FIDELIDADE_VERIFICAR -->|Sim| FIDELIDADE_PAI_STATUS
+
+    FIDELIDADE_SALE[Pedido permanece como sale]
+
+    FIDELIDADE_PAI_STATUS{Pai está open?}
+
+    FIDELIDADE_PAI_STATUS -->|Não| FIDELIDADE_NAO_CONTA
+    FIDELIDADE_PAI_STATUS -->|Sim| FIDELIDADE_FILHO_VALIDO
+
+    FIDELIDADE_FILHO_VALIDO{Filho está pago\n+ vinculado ao pai\n+ possui produto participante?}
+
+    FIDELIDADE_FILHO_VALIDO -->|Não| FIDELIDADE_NAO_CONTA
+    FIDELIDADE_FILHO_VALIDO -->|Sim| FIDELIDADE_CONTAR
+
+    FIDELIDADE_CONTAR[Conta como carimbo]
+
+    FIDELIDADE_NAO_CONTA[Não entra na fidelidade]
+
+%% =====================================================
+%% PRIMEIRA COMPRA ELEGÍVEL
+%% =====================================================
+
+    FIDELIDADE_CONTAR --> FIDELIDADE_PRIMEIRA{É a primeira compra elegível?}
+
+    FIDELIDADE_PRIMEIRA -->|Sim| FIDELIDADE_TRANSFORMAR
+    FIDELIDADE_PRIMEIRA -->|Não| FIDELIDADE_MANTER
+
+    FIDELIDADE_TRANSFORMAR[Pai vira tipo fidelity]
+    FIDELIDADE_MANTER[Pai permanece open para novos filhos]

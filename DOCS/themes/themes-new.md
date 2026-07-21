@@ -5,101 +5,6 @@
 - manter a mesma tabulacao visual de `themes-actual.md`
 - cada novo token deve ficar em uma linha alinhada entre nome e conteudo
 
-### EXEMPLO
-# não colocar nada aqui
-
-- `novo-token=#abcdef`                           #abcdef
-- `badgeText=#FFFFFF`                            #FFFFFF
-- `buttonBackground=#2529A1`                    #2529A1
-- `buttonBackgroundSecondary=#F1F5F9`           #F1F5F9
-- `buttonBorderSecondary=#6C757D`               #6C757D
-- `buttonDisabledBackground=#94A3B8`            #94A3B8
-- `buttonIcon=#FFFFFF`                          #FFFFFF
-- `buttonShadow=#2529A1`                        #2529A1
-- `buttonText=#FFFFFF`                          #FFFFFF
-- `buttonTextSecondary=#6C757D`                 #6C757D
-- `cardBackground=#FFFFFF`                      #FFFFFF
-- `cardHeaderBackground=#FFFFFF`                #FFFFFF
-- `cardHeaderText=#212529`                      #212529
-- `cardShadow=#0F172A`                          #0F172A
-- `cardText=#212529`                            #212529
-- `chipBackground=#F8FAFC`                      #F8FAFC
-- `chipBorder=#DCE3EC`                          #DCE3EC
-- `chipSelectedBackground=#E7F3FF`              #E7F3FF
-- `chipSelectedBorder=#2529A1`                  #2529A1
-- `chipSelectedText=#2529A1`                    #2529A1
-- `chipText=#64748B`                            #64748B
-- `dividerBorder=#F1F3F4`                       #F1F3F4
-- `footerBackground=#FFFFFF`                    #FFFFFF
-- `footerBorder=#DFDFDF`                        #DFDFDF
-- `footerIcon=#FEBC1D`                          #FEBC1D
-- `footerLink=#1C8FBD`                          #1C8FBD
-- `footerText=#FEBC1D`                          #FEBC1D
-- `headerBackground=#FFFFFF`                    #FFFFFF
-- `headerBorder=#E2E8F0`                        #E2E8F0
-- `headerText=#0F172A`                          #0F172A
-- `iconDanger=#E74C3C`                          #E74C3C
-- `iconDisabled=#CCCCCC`                        #CCCCCC
-- `iconInfo=#2529A1`                            #2529A1
-- `iconSuccess=#4CAF50`                         #4CAF50
-- `iconWarning=#F2C037`                         #F2C037
-- `inputBackground=#F8F9FA`                     #F8F9FA
-- `inputBorder=#E9ECEF`                         #E9ECEF
-- `inputIcon=#94A3B8`                           #94A3B8
-- `inputPlaceholderText=#999999`                #999999
-- `inputText=#1A1A1A`                           #1A1A1A
-- `listItemBackground=#F8FAFC`                  #F8FAFC
-- `listItemBorder=#E2E8F0`                      #E2E8F0
-- `listItemIcon=#64748B`                        #64748B
-- `listItemSelectedBackground=#F0F9FF`          #F0F9FF
-- `listItemSubtitleText=#64748B`                #64748B
-- `listItemText=#0F172A`                        #0F172A
-- `loadingBackground=#FFFFFF`                   #FFFFFF
-- `loadingBorder=#E2E8F0`                       #E2E8F0
-- `loadingSpinner=#2529A1`                      #2529A1
-- `loadingText=#64748B`                         #64748B
-- `modalBackground=#FFFFFF`                     #FFFFFF
-- `modalBorder=#E9ECEF`                         #E9ECEF
-- `modalCloseIcon=#666666`                      #666666
-- `modalHeaderText=#1A1A1A`                     #1A1A1A
-- `modalOverlay=rgba(0,0,0,0.5)`               rgba(0,0,0,0.5)
-- `modalShadow=#000000`                         #000000
-- `modalText=#1A1A1A`                           #1A1A1A
-- `navigationActiveBackground=#EFF6FF`          #EFF6FF
-- `navigationActiveBorder=#2529A1`              #2529A1
-- `navigationActiveIcon=#2529A1`                #2529A1
-- `navigationActiveText=#2529A1`                #2529A1
-- `navigationBackground=#FFFFFF`                #FFFFFF
-- `navigationBorder=#E2E8F0`                    #E2E8F0
-- `navigationDisabledBackground=#FFFFFF`        #FFFFFF
-- `navigationDisabledBorder=#E2E8F0`            #E2E8F0
-- `navigationDisabledIcon=#94A3B8`              #94A3B8
-- `navigationDisabledText=#94A3B8`              #94A3B8
-- `navigationIcon=#64748B`                      #64748B
-- `navigationShadow=#0F172A`                    #0F172A
-- `navigationText=#64748B`                      #64748B
-- `pageBackground=#F8FAFC`                      #F8FAFC
-- `sectionBackground=#F8FAFC`                   #F8FAFC
-- `sectionBorder=#E2E8F0`                       #E2E8F0
-- `selectBackground=#F8F9FA`                    #F8F9FA
-- `selectBorder=#E9ECEF`                        #E9ECEF
-- `selectIcon=#666666`                          #666666
-- `selectOptionBackground=#FFFFFF`              #FFFFFF
-- `selectOptionBorder=#F1F3F4`                  #F1F3F4
-- `selectOptionSelectedBackground=#F8F9FF`      #F8F9FF
-- `selectOptionSelectedText=#2529A1`            #2529A1
-- `selectPlaceholderText=#999999`               #999999
-- `selectText=#1A1A1A`                          #1A1A1A
-- `sheetBackground=#FFFFFF`                     #FFFFFF
-- `surface=#F8F9FF`                             #F8F9FF
-- `textDanger=#FF4444`                          #FF4444
-- `textDisabled=#94A3B8`                        #94A3B8
-- `textMuted=#64748B`                           #64748B
-- `textPrimary=#0F172A`                         #0F172A
-- `textSecondary=#334155`                       #334155
-- `textSuccess=#10B981`                         #10B981
-- `textWarning=#F2C037`                         #F2C037
-
 ### ### ### TEMA COMPLETO PARA BANCO ### ### ###
 
 JSON consolidado para teste no banco:
@@ -174,6 +79,7 @@ JSON consolidado para teste no banco:
   "cardHeaderBackground": "#FFFFFF",
   "cardHeaderText": "#212529",
   "cardIcon": "",
+  "cardIconBackground": "#FFFFFF",
   "cardSelectedBackground": "",
   "cardSelectedBorder": "",
   "cardSelectedText": "",
@@ -217,6 +123,7 @@ JSON consolidado para teste no banco:
   "headerIcon": "",
   "headerLink": "",
   "headerText": "#0F172A",
+  "iconBackground": "#FFFFFF",
   "iconActive": "",
   "iconColor": "",
   "iconDanger": "#E74C3C",

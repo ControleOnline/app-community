@@ -25,6 +25,70 @@ Formato:
 - `antigo: resolveThemePalette(themeTokens, colors), currentCompany.theme e fallbacks locais`
 - `novo: palette vinda diretamente de themeStore.getters.colors com tokens canônicos e sem fallback`
 
+- `app-community / DOCS/themes/themes-map.md / 88-102, 151-163`
+- `antigo: mapa canônico sem tokens específicos para fundo de wrapper de ícone dentro e fora de card`
+- `novo: mapa canônico com cardIconBackground e iconBackground`
+
+- `app-community / DOCS/themes/themes-new.md / 75-83, 121-129`
+- `antigo: proposta consolidada ainda nao trazia cardIconBackground e iconBackground`
+- `novo: proposta consolidada passa a registrar cardIconBackground e iconBackground`
+
+- `app-community / src/styles/colors.js / 6-19`
+- `antigo: defaults locais nao expunham iconBackground e cardIconBackground e liam CSS vars com nome diferente do runtime`
+- `novo: defaults locais passam a expor iconBackground e cardIconBackground usando os mesmos nomes de CSS var aplicados pelo runtime`
+
+- `app-community / src/styles/branding.js / 142-164`
+- `antigo: resolveThemePalette nao promovia iconBackground e cardIconBackground vindos do tema ativo`
+- `novo: resolveThemePalette promove iconBackground/icon-background e cardIconBackground/card-icon-background do tema ativo para a palette final`
+
+- `ui-default / src/react/components/errors/DefaultErrors.js / 36-107, 185-334`
+- `antigo: modal de erro usava pickThemeColor com fallback '#DC2626', '#FFFFFF', 'rgba(15, 23, 42, 0.55)', '#B91C1C', '#334155' e botao retry com fundo transparente local`
+- `novo: modal usa somente inputErrorBorder, inputErrorText, modalBackground, modalBorder, modalOverlay, modalText, modalCloseIcon, buttonBackground, buttonBorder e buttonText vindos de themeStore.getters.colors`
+
+- `ui-default / src/react/components/form/DefaultForm.js / 57-84, 162-209`
+- `antigo: form dependia de accentColor='#2563EB' e aplicava o botao primario por prop local, sem palette canônica do tema`
+- `novo: form monta palette com buttonBackground, buttonBackgroundSecondary, buttonBorderSecondary, buttonDisabledBackground, buttonDisabledText, buttonText, buttonTextSecondary, dividerBorder e textSecondary vindos de themeStore.getters.colors`
+
+- `ui-default / src/react/components/form/DefaultForm.styles.js / 3-75`
+- `antigo: emptyText '#64748B', actions '#E2E8F0', secondaryButton '#CBD5E1/#FFFFFF/#334155', primaryButtonText '#FFFFFF' e disabled opacity 0.62`
+- `novo: styles usam textSecondary, dividerBorder, buttonBorderSecondary, buttonBackgroundSecondary, buttonTextSecondary, buttonDisabledBackground, buttonDisabledText e buttonText`
+
+- `ui-manager / src/react/pages/PdvPage.js / 12-87`
+- `antigo: headerRight da liquidacao com borderColor '#BFDBFE', backgroundColor '#EFF6FF' e icon/text '#0369A1'`
+- `novo: headerRight da liquidacao com buttonBackgroundSecondary, buttonBorderSecondary, buttonIconSecondary e buttonTextSecondary vindos de themeStore.getters.colors`
+
+- `ui-manager / src/react/pages/ConfiguratorPage.js / 12-169`
+- `antigo: hero e cards do configurador dependiam de style estatico com palette local baseada em colors.js, usando primary/text/white como fonte final e icones sem seguir o mapa cardIcon/iconColor`
+- `novo: configurador resolve a palette da empresa ativa e aplica cardIconBackground no fundo do wrapper interno e iconColor na cor do icone, preservando cardBackground, cardBorder, cardText e mutedText`
+
+- `ui-manager / src/react/pages/ConfiguratorPage.styles.js / 1-119`
+- `antigo: hero, cards e textos usavam colors.js e opacidades locais como cor final do componente`
+- `novo: createStyles(palette) recebe a palette resolvida pela tela e usa apenas tokens semanticos como actionBackground, actionText, cardBackground, cardBorder, cardIconBackground, cardText e mutedText`
+
+- `ui-layout / src/react/components/AppMenuGrid.js / 15-136`
+- `antigo: grid de menus calculava cor/fundo do icone com variacao local por modulo e transparencia derivada por withAlpha`
+- `novo: grid de menus usa iconBackground no wrapper fora de card, cardIconBackground no wrapper dentro de card e iconColor na cor do icone`
+
+- `ui-layout / src/react/components/AppMenuGrid.styles.js / 3-116`
+- `antigo: sectionIcon e cardIcon usavam withAlpha(actionText, ...) para gerar fundo translúcido local`
+- `novo: sectionTone usa iconBackground e segmentTone usa cardIconBackground, sem transparencia local`
+
+- `ui-manager / src/react/pages/home/index.js / 50-68`
+- `antigo: mutedText vinha de withOpacity(text, 0.68), statIconBackground de withOpacity(actionText, 0.7) e os icones dos cards usavam actionBackground`
+- `novo: mutedText vem de textMuted/textSecondary do tema, wrappers internos usam cardIconBackground e os icones usam iconColor`
+
+- `ui-manager / src/react/pages/home/index.styles.js / 4-14, 70-107`
+- `antigo: home usava withOpacity no boxShadow web, no actionSub e no fundo do icone estatistico`
+- `novo: home usa cardShadow/buttonShadow do tema para sombra web e cardIconBackground no fundo dos wrappers de icone internos`
+
+- `ui-manager / src/react/pages/ThemeManagerPage.js / 220-303`
+- `antigo: editor de tema nao listava cardIconBackground e iconBackground`
+- `novo: editor de tema lista cardIconBackground no grupo card e iconBackground no grupo icon`
+
+- `ui-manager / src/react/pages/ThemePreviewPage.js / 74-94`
+- `antigo: preview default nao tinha cardIconBackground e iconBackground`
+- `novo: preview default registra cardIconBackground e iconBackground`
+
 - `ui-manager / src/react/pages/FinancialHubPage.styles.js / 1-64`
 - `antigo: createStyles baseado em colors e chip com base visual padrão`
 - `novo: createStyles baseado em palette do tema ativo, sem cores hardcoded`
@@ -108,6 +172,30 @@ Formato:
 - `ui-common / src/react/components/DefaultProvider.native.js / 820-825`
 - `antigo: colors={resolveThemePalette(colors, runtimeColors)}`
 - `novo: colors={colors}`
+
+- `ui-products / src/react/components/products/ProductItem.js / 14-72, 128-223, 235-514`
+- `antigo: PRODUCT_TYPE_CONFIG com color/bg hardcoded por tipo, preco verde local e acao do card dependente de seletor com vermelho/verde/cinza hardcoded`
+- `novo: chips de tipo, preco e acao do card resolvidos por chipSelectedBackground, chipSelectedText, buttonBackgroundSecondary, buttonTextSecondary, chipBackground, textWarning, textSuccess, textMuted, iconDisabled e buttonBackground/buttonText`
+
+- `ui-products / src/react/pages/Products.js / 1110-1133, 1191-1215`
+- `antigo: atalhos e cabecalhos por tipo reutilizavam bg/color hardcoded do PRODUCT_TYPE_CONFIG e ainda aplicavam borda com opacidade local`
+- `novo: atalhos e cabecalhos por tipo usam resolveProductTypeTheme com tokens canonicos do tema, sem hex e sem opacidade local`
+
+- `ui-orders / src/react/components/cart/ProductTotem.js / 31-74, 202-221`
+- `antigo: radio-button-unchecked vermelho, check-circle verde e label '#666'`
+- `novo: seletor usa iconDisabled, iconSuccess e textMuted vindos da palette de tema recebida pelo card`
+
+- `ui-orders / src/react/pages/CashRegister/index.js / 21-269`
+- `antigo: retirada em vermelho hardcoded e botoes do rodape com icone/texto '#fff'`
+- `novo: cash-register-index usa textDanger para retirada e buttonBackground/buttonIcon/buttonText para os botoes, com cardText e footerText nos blocos de resumo`
+
+- `ui-orders / src/react/pages/CashRegister/index.styles.js / 1-10`
+- `antigo: labels auxiliares dos botoes com color '#fff'`
+- `novo: arquivo preserva apenas o deslocamento horizontal; a cor do label vem do tema na tela`
+
+- `ui-orders / src/react/css/orders.js / 11-15, 37-39, 92-99, 332-352`
+- `antigo: cash-register-index usava colors.background, wallet '#fff', footer '#f8f8f8/#ddd' e texto base '#000000/#333'`
+- `novo: cash-register-index usa pageBackground, cardBackground, cardBorder, cardText, footerBackground, footerBorder e footerText`
 
 - `ui-orders / src/react/components/OrderHeader.js / 4-24, 64-108, 154-360`
 - `antigo: WAITING_RULES '#10b981/#FACC15/#c10015', truck '#D97706', repeat '#7C3AED', trending-down '#DC2626', calendar '#475569' e badge preso a status.color`
