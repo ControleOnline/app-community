@@ -108,8 +108,16 @@ jobs:
 
       - name: Build Android APK
         run: |
+          set -o pipefail
           cd android
-          ./gradlew assembleRelease --init-script ../signing.gradle --stacktrace --info 2>&1 | tail -200
+          ./gradlew assembleRelease \
+            --init-script ../signing.gradle \
+            --stacktrace \
+            --info \
+            --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" \
+            -Dorg.gradle.parallel=false \
+            2>&1 | tee /tmp/gradle-assemble-release.log | tail -300
 
       - name: Validate generated APK
         run: |
