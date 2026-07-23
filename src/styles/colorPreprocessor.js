@@ -6,6 +6,7 @@ if (!global.__coThemeColorPatched) {
   global.__coThemeColorPatched = true;
 
   try {
+    const SKIP_THEME_COLOR_MAPPING_PROP = '__skipThemeColorMapping';
     const cssVarByToken = {
       primary: '--primary',
       secondary: '--secondary',
@@ -223,6 +224,12 @@ if (!global.__coThemeColorPatched) {
     const mapPropsColors = props => {
       if (!props || typeof props !== 'object') {
         return props;
+      }
+
+      if (props[SKIP_THEME_COLOR_MAPPING_PROP]) {
+        const nextProps = {...props};
+        delete nextProps[SKIP_THEME_COLOR_MAPPING_PROP];
+        return nextProps;
       }
 
       let nextProps = props;
