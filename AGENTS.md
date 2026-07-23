@@ -131,6 +131,7 @@
 - Quando um modulo tiver React e Vue, materialize o contrato apenas nos arquivos React; Vue legado nao deve receber bloco de contrato importado.
 - Sempre utilize a tradução atravéz da função tt presente no global do front para qualquer coisa que o cliente terá acesso, isso inclui preenchimento de objetos com label utilizados em listas por exemplo. Se encontrar algo não traduzido, traduzir.
 - O bootstrap de traduções nao deve fazer carga total no mount. `global.t` precisa carregar sob demanda e confiar no cache de `localStorage` para nao refazer consultas ja resolvidas.
+- O bootstrap do servico de traducao preserva os gates de autenticacao, empresa atual/padrao, rota nao publica, device carregado e idioma. A rota deve chegar ao `DefaultProvider` por estado/prop React, nunca por callback global opcional, e telas autenticadas nao devem permanecer montadas sem o contexto correspondente em `global.t` e na store `translate`.
 - Tudo o que for comum, usar o módulo common em vez de criar helpers espalhados pelo sistema.
 - Se encontrar algo fora desse padrão, favor corrigir, inclusive movendo e renomeando arquivos para os módulos corretos
 - Tradução ausente nunca é problema, não use fallbacks pra isso.
