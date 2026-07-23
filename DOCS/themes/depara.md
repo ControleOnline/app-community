@@ -220,3 +220,79 @@ Formato:
 - `ui-people / src/react/pages/People.styles.js / 76-114, 144`
 - `antigo: card, avatar e textos do renderClientCard traziam '#fff', '#F1F5F9', '#64748B', '#1E293B' e '#94A3B8' no style estatico`
 - `novo: styles preservam apenas layout/espacamento do card e deixam as cores do renderClientCard entrarem pela palette do tema ativo`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.js / 11-15, 138-155, 254-294`
+- `antigo: tela resolvia palette com resolveThemePalette + defaultThemeColors + currentCompany.theme.colors e usava styles estaticos`
+- `novo: tela usa buildGeneralSettingsPalette(themeStore.getters.colors) + useGeneralSettingsStyles(), sem currentCompany.theme e sem fallback local`
+
+- `ui-crm / src/react/pages/settings/GeneralSettingsSection.js / 10-24, 26-45`
+- `antigo: card da secao usava styles estaticos e tooltip com accentColor vindo de colors.js`
+- `novo: secao usa useGeneralSettingsStyles() e tooltip com accentColor vindo de themeStore.getters.colors.info`
+
+- `ui-crm / src/react/pages/settings/GeneralSettingsSection.js / 40-41`
+- `antigo: botoes de ajuda (?) do general-settings usavam accentColor vindo de themeStore.getters.colors.info`
+- `novo: botoes de ajuda (?) do general-settings usam accentColor vindo de themeStore.getters.colors.iconInfo`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / 10-562`
+- `antigo: pageTitle, tabBar, cards, inputs, listas, modal e chips do general-settings dependiam de #HEX e transparent locais`
+- `novo: buildGeneralSettingsPalette/createGeneralSettingsStyles/useGeneralSettingsStyles leem apenas tokens canonicos como navigation*, card*, input*, listItem*, modal*, badge* e text*`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js, GeneralSettings.js, GeneralSettingsSection.js, sections/ShopSection.js / hooks e leituras de palette`
+- `antigo: general-settings lia apenas themeStore.getters.colors, entao alguns icones da shop caiam no preto padrao quando a cor existia apenas em currentCompany.theme.colors no banco`
+- `novo: general-settings passa a mesclar themeStore.getters.colors com currentCompany.theme.colors antes de montar a palette, refletindo iconActive e iconDisabled da empresa ativa`
+
+- `ui-crm / src/react/pages/settings/sections/*.js / icones de secao, chips, seletores, loading e placeholders`
+- `antigo: abas fora da shop ainda misturavam localStyles estatico, HEX hardcoded, wrappers de icone por cor local, chips verdes/vermelhos fixos, seletores azuis/roxos fixos e placeholder/loading fora do tema`
+- `novo: demais abas do general-settings usam useGeneralSettingsStyles/useGeneralSettingsPalette com cardIconBackground/cardIconColor, badgeSelectedText/badgeDisabledText, iconActive/iconDisabled, loadingSpinner e inputPlaceholderText`
+
+- `DOCS/themes/themes-patterns.md / arquivo novo`
+- `antigo: nao existia documento global consolidando o map por papel visual`
+- `novo: themes-patterns.md registra o padrao global de contador, card de secao, tooltip, icone de cabecalho, seletor, exclusao, loading, placeholder e chip de status`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / 159-167`
+- `antigo: sectionIconWrap dos cards internos do general-settings usava cardIconBackground sem borda`
+- `novo: sectionIconWrap dos cards internos do general-settings usa cardIconBackground com cardIconBorder`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js, sections/LogSection.js, sections/MaintenanceSection.js / palette e switches`
+- `antigo: switches de logs e rotinas usavam a cor nativa do React Native, sem map do tema`
+- `novo: switches de logs e rotinas usam switchOnTrack, switchOffTrack, switchOnThumb, switchOffThumb, switchDisabledTrack e switchDisabledThumb`
+
+- `DOCS/themes/themes-map.md, DOCS/themes/themes-new.md, ui-manager/src/react/pages/ThemeManagerPage.js, ui-manager/src/react/pages/ThemePreviewPage.js, ui-crm/src/react/pages/settings/GeneralSettings.styles.js / tokens de switch`
+- `antigo: switchBorder e switchFocusBorder ainda existiam no mapa e nos previews, embora nao fossem usados pelo switch nativo real`
+- `novo: switchBorder e switchFocusBorder sao removidos do mapa, do preview/manager de tema e da palette compartilhada do general-settings`
+
+- `ui-manager / src/react/pages/ThemeManagerPage.js / 2270-2334`
+- `antigo: preview de switch no theme manager era desenhado manualmente com View, thumb e track simulados`
+- `novo: preview de switch no theme manager usa o componente Switch real do React Native com switchOnTrack, switchOffTrack, switchOnThumb, switchOffThumb, switchDisabledTrack e switchDisabledThumb`
+
+- `ui-crm / src/react/pages/settings/sections/ShopSection.js / 194-515, 519-1958`
+- `antigo: toggles, modais de selecao, placeholders, loaders, icones e secoes da aba shop usavam #166534, #991B1B, #0F766E, #94A3B8, #B45309, #FFFFFF e similares`
+- `novo: aba shop usa palette do tema ativo com badgeSelectedText/badgeDisabledText, inputPlaceholderText, loadingSpinner, iconActive/iconDisabled/iconSuccess/iconWarning, buttonIcon, primary, success, warning e cardIconBackground`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / 23-27, 579-583`
+- `antigo: palette compartilhada do general-settings expunha cardIconBackground/cardIconBorder, mas nao cardIconColor`
+- `novo: palette compartilhada passa a expor cardIconColor para os icones dos grupos de preferencias`
+
+- `ui-crm / src/react/pages/settings/sections/ShopSection.js / 1158-1163, 1178-1183, 1542-1547, 1578-1583, 1645-1650`
+- `antigo: icones dos grupos da aba shop misturavam cardIconBackground com success/info/primary/warning`
+- `novo: icones dos grupos da aba shop usam exatamente cardIconBackground e cardIconColor`
+
+- `ui-crm / src/react/pages/settings/sections/ShopSection.js / 1345-1349, 1394-1398, 1445-1447, 1757-1761, 1812-1816, 1886-1890, 1904-1908`
+- `antigo: icones internos dos cards/listas da aba shop usavam iconSuccess e iconWarning fora do padrao visual da pagina`
+- `novo: icones internos dos cards/listas da aba shop usam cardIconColor; apenas controles de estado continuam com iconActive/iconDisabled`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / 10-61, 579-610`
+- `antigo: buildGeneralSettingsPalette e o fallback local do general-settings nao expunham iconDanger, entao os icones de remocao da aba shop nao refletiam a cor configurada no banco`
+- `novo: buildGeneralSettingsPalette e o fallback local do general-settings passam a expor iconDanger`
+
+- `ui-crm / src/react/pages/settings/sections/CrmSection.js / 241-244`
+- `antigo: icone delete do crm usava themePalette.error`
+- `novo: icone delete do crm usa themePalette.iconDanger`
+
+- `ui-crm / src/react/pages/settings/sections/ShopSection.js / 1568-1576`
+- `antigo: checkbox do catalogo do shop usava themePalette.primary quando marcado`
+- `novo: checkbox do catalogo do shop usa iconActive quando marcado e iconDisabled quando desmarcado`
+
+- `ui-default / src/react/components/table/DefaultTable.styles.js / 531-537`
+- `antigo: footerCountPill mantinha backgroundColor '#EFF6FF' como fallback local no contador do rodape`
+- `novo: footerCountPill preserva apenas layout; a cor final do contador vem somente de themeColors.badgeBackground em DefaultTable.js`

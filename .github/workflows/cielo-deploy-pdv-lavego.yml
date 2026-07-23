@@ -121,12 +121,15 @@ jobs:
 
       - name: Validate generated APK
         run: |
-          APK_PATH=$(find ./android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort | head -n 1)
+          APK_PATH=$(find ./android/app/build/outputs/apk -type f -name '*.apk' | sort | head -n 1)
           if [ -z "$APK_PATH" ]; then
-            echo "Nenhum APK foi gerado em ./android/app/build/outputs/apk/release" >&2
+            echo "Nenhum APK foi gerado dentro de ./android/app/build/outputs/apk" >&2
+            echo
+            echo "Conteudo disponivel em ./android/app/build/outputs:"
+            find ./android/app/build/outputs -maxdepth 4 -type f | sort || true
             exit 1
           fi
-
+  
           APK_DIR=$(dirname "$APK_PATH")
           APK_FILENAME=$(basename "$APK_PATH")
 
@@ -173,7 +176,7 @@ jobs:
             set ssl:verify-certificate no
             cls -la ${REMOTE_DIR}
             bye
-          " 2>&1 | tee \"$LOG_FILE\"
+          " 2>&1 | tee "$LOG_FILE"
           LFTP_STATUS=${PIPESTATUS[0]}
           set -e
 

@@ -318,10 +318,8 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 
 ### switch
 
-- `switchBorder`
 - `switchDisabledThumb`
 - `switchDisabledTrack`
-- `switchFocusBorder`
 - `switchOffThumb`
 - `switchOffTrack`
 - `switchOnThumb`
