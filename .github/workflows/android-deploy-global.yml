@@ -23,7 +23,7 @@ jobs:
             display_name: "Checkout"
             track: internal
             release_status: draft
-            changes_not_sent_for_review: true
+            changes_not_sent_for_review: false
 
           - app_type: CRM
             display_name: "CRM"
@@ -43,8 +43,8 @@ jobs:
             release_status: completed
             changes_not_sent_for_review: false
 
-          - app_type: SERVICE
-            display_name: "Service"
+          - app_type: MENU
+            display_name: "Menu"
             track: internal
             release_status: completed
             changes_not_sent_for_review: false
@@ -57,6 +57,12 @@ jobs:
 
           - app_type: PPC
             display_name: "PCP"
+            track: internal
+            release_status: completed
+            changes_not_sent_for_review: false
+
+          - app_type: SERVICE
+            display_name: "Service"
             track: internal
             release_status: completed
             changes_not_sent_for_review: false

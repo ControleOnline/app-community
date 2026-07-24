@@ -296,3 +296,11 @@ Formato:
 - `ui-default / src/react/components/table/DefaultTable.styles.js / 531-537`
 - `antigo: footerCountPill mantinha backgroundColor '#EFF6FF' como fallback local no contador do rodape`
 - `novo: footerCountPill preserva apenas layout; a cor final do contador vem somente de themeColors.badgeBackground em DefaultTable.js`
+
+- `ui-orders / src/react/pages/orders/OrderHistoryPage.js / 166-198, 280-287, 708-760, 907-954`
+- `antigo: palette e accentColor misturavam themeStore + currentCompany.theme + colors.js via resolveThemePalette, e acoes de cancelamento/details dependiam de fallbacks locais fora do tema canonico`
+- `novo: OrderHistoryPage monta palette apenas com themeStore.getters.colors usando tokens canonicos como primary, iconInfo, iconDanger, modalBackground, modalBorder, inputText e buttonTextSecondary, e repassa accentColor/acoes sem currentCompany.theme nem colors.js`
+
+- `ui-orders / src/react/pages/orders/OrderHistoryPage.styles.js / 3-24, 47-58, 96-261`
+- `antigo: estilos do modal e dos cards usavam pickColor com fallbacks locais como '#FFFFFF', '#E2E8F0', '#0F172A', '#64748B', '#DC2626', 'rgba(15, 23, 42, 0.42)' e opacity fixa 0.55`
+- `novo: createStyles/createModalStyles usam somente tokens canonicos do tema ativo como pageBackground, cardBackground, cardBorder, cardText, modalOverlay, modalBackground, modalBorder, modalHeaderText, modalText, inputBackground, inputBorder, buttonBackgroundSecondary, buttonTextSecondary e buttonDisabledOpacity`
