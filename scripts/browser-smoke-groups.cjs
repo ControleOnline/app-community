@@ -5,6 +5,7 @@ module.exports = [
     testPaths: [
       'modules/controleonline/ui-login/src/tests/browser/manager',
       'modules/controleonline/ui-manager/src/tests/browser/manager',
+      'modules/controleonline/ui-customers/src/tests/browser/manager',
       'modules/controleonline/ui-shop/src/tests/browser/manager',
     ],
   },
