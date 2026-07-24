@@ -25,6 +25,7 @@ import inventories from '@controleonline/ui-products/src/store/inventories';
 import invoice from '@controleonline/ui-financial/src/store/invoice';
 import models from '@controleonline/ui-crm/src/store/model';
 import order_invoices from '@controleonline/ui-orders/src/store/order_invoices';
+import order_cancellation_reasons from '@controleonline/ui-orders/src/store/order_cancellation_reasons';
 import order_file from '@controleonline/ui-orders/src/store/order_file';
 import order_products from '@controleonline/ui-orders/src/store/order_products';
 import order_products_queue from '@controleonline/ui-ppc/src/store/modules/order_products_queue';
@@ -113,6 +114,7 @@ export default {
   imports,
   models,
   order_invoices,
+  order_cancellation_reasons,
   order_file,
   order_products,
   order_products_queue,
