@@ -110,6 +110,7 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `checkboxDisabledBackground`
 - `checkboxDisabledBorder`
 - `checkboxDisabledMark`
+- `checkboxDisabledText`
 - `checkboxSelectedBackground`
 - `checkboxSelectedBorder`
 - `checkboxSelectedMark`

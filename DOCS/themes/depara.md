@@ -213,6 +213,14 @@ Formato:
 - `antigo: orderCard '#fff', shadow '#0F172A', cardMetaRow '#F1F5F9' e channelText '#475569'`
 - `novo: createStyles(palette) com cardBackground, cardBorder, cardShadow, dividerBorder e textSecondary`
 
+- `ui-customers / src/react/components/tabs/GeneralTab.js / 14-25, 138-142, 340-479`
+- `antigo: aba geral de cadastro usava colors.js, placeholders hardcoded, switch nativo com track/thumb locais e botao salvar com hex locais`
+- `novo: aba usa somente themeStore.getters.colors com inputBackground, inputBorder, inputText, inputPlaceholderText, inputIcon, textSecondary, switchOnTrack, switchOffTrack, switchOnThumb, switchOffThumb, buttonBackground, buttonDisabledBackground, buttonText e buttonDisabledText`
+
+- `ui-customers / src/react/components/tabs/GeneralTab.styles.js / 1-84`
+- `antigo: estilos inline com '#fff', '#334155', '#E2E8F0', '#0F172A', '#F8FAFC', '#475569', '#CBD5E1' e dependencia de colors.primary`
+- `novo: createGeneralTabStyles(themeColors) usando apenas pageBackground, textSecondary, inputBorder, inputText, inputBackground, buttonBackground, buttonDisabledBackground, buttonText e buttonDisabledText`
+
 - `ui-people / src/react/pages/People.js / 36-154, 238-261`
 - `antigo: renderClientCard usava '#CBD5E1' no chevron e dependia de styles com card/avatar/textos fora dos tokens canonicos`
 - `novo: palette vinda de themeStore.getters.colors com cardBackground, cardBorder, cardShadow, cardIcon, iconInverse, listItemText, listItemSubtitleText e listItemIcon aplicada no renderClientCard`
@@ -304,3 +312,71 @@ Formato:
 - `ui-orders / src/react/pages/orders/OrderHistoryPage.styles.js / 3-24, 47-58, 96-261`
 - `antigo: estilos do modal e dos cards usavam pickColor com fallbacks locais como '#FFFFFF', '#E2E8F0', '#0F172A', '#64748B', '#DC2626', 'rgba(15, 23, 42, 0.42)' e opacity fixa 0.55`
 - `novo: createStyles/createModalStyles usam somente tokens canonicos do tema ativo como pageBackground, cardBackground, cardBorder, cardText, modalOverlay, modalBackground, modalBorder, modalHeaderText, modalText, inputBackground, inputBorder, buttonBackgroundSecondary, buttonTextSecondary e buttonDisabledOpacity`
+
+- `ui-customers / src/react/styles/details.js / 5-37, 119-157`
+- `antigo: details expunha apenas o conjunto base da pagina e os icones auxiliares da aba geral acabavam usando estilos secundarios fora do padrao visual da tela de perfil`
+- `novo: details expõe tokens canonicos cardIcon, buttonBorder, buttonBackground e buttonText para compor os tres padroes da tela de perfil: addButton, botao circular com borda e editNameButton`
+
+- `ui-customers / src/react/components/tabs/ContactTab.js / 482-490, 503-520, 537-545, 556-573`
+- `antigo: botoes de adicionar/editar e icones de telefone/email estavam usando o estilo secundario anterior da client-details`
+- `novo: ContactTab segue o padrao da tela de perfil com addButton para "+" , editNameButton para o lapis e cardIcon para os icones dos cards`
+
+- `ui-customers / src/react/components/tabs/DocumentsTab.js / 370-378, 389-413`
+- `antigo: "+" e lapis usavam colors.primary, e o icone de descricao tambem ficava preso ao legado fora do theme map`
+- `novo: DocumentsTab usa addButton para "+", editNameButton para o lapis e cardIcon para o icone do documento, todos vindos do themeStore sem fallback`
+
+- `ui-customers / src/react/components/tabs/AddressesTab.js / 475-481, 492-501, 523-529`
+- `antigo: "+", pin e lapis usavam colors.primary sem respeitar o padrao visual da tela de perfil`
+- `novo: AddressesTab usa addButton para "+", botao circular com borda para o pin e editNameButton para o lapis, todos mapeados pelos tokens canonicos do tema ativo`
+
+- `ui-customers / src/react/styles/details.js / 14-25, 254-291`
+- `antigo: a base compartilhada de client-details nao expunha avatar, chevron e loader no mesmo padrao visual da tela de perfil`
+- `novo: details passa a expor loadingSpinner, listAvatarBrand, listAvatarText e itemChevronIcon para que vendedores e contatos usem avatar inicial, seta e loader derivados apenas do tema ativo`
+
+- `ui-customers / src/react/components/tabs/SalesmanTab.js / 75-119`
+- `antigo: vendedores usavam loader com colors.primary, icone MaterialIcons simple e chevron com cor legada`
+- `novo: SalesmanTab usa loadingSpinner do tema, UserAvatar no padrao da tela de perfil e chevron vindo de listItemSubtitleText`
+
+- `ui-customers / src/react/components/tabs/EmployeesTab.js / 284-343`
+- `antigo: contatos usavam "+" com colors.primary, loader legado, icone person simples e chevron hardcoded`
+- `novo: EmployeesTab usa addButton para "+", loadingSpinner do tema, UserAvatar no padrao da tela de perfil e chevron derivado do map compartilhado`
+
+- `ui-customers / src/react/pages/details.js / 380-389`
+- `antigo: o cabecalho de client-details montava o avatar manualmente com inicial em um circulo separado do componente canonico de perfil`
+- `novo: client-details usa UserAvatar no cabecalho com buttonBackground e buttonText, seguindo o mesmo padrao visual da tela de perfil`
+
+- `ui-contracts / src/react/components/contracts.js / 17-99`
+- `antigo: contratos ainda tinha fallback local para themeStore e mostrava o beneficiario com icone person simples`
+- `novo: contracts usa somente themeStore.getters.colors e renderiza o beneficiario com UserAvatar no padrao da tela de perfil`
+
+- `ui-contracts / src/react/components/contracts.styles.js / 58-72`
+- `antigo: a linha de beneficiario do card de contrato era estruturada para um icone simples inline`
+- `novo: contracts.styles passa a suportar avatar e bloco textual alinhado na linha de beneficiario`
+
+- `ui-default / src/react/components/inputs/DefaultInput.js / 44-66, 177-216`
+- `antigo: DefaultInput usava estilo estatico com cores hardcoded para label, borda, texto, placeholder, icone de editar e botao de fechar`
+- `novo: DefaultInput passa a montar palette via themeStore.getters.colors e aplica tokens canonicos como inputBackground, inputBorder, inputFocusBorder, inputText, inputPlaceholderText, inputIcon, buttonBackgroundSecondary, buttonBorderSecondary e buttonIconSecondary`
+
+- `ui-default / src/react/components/inputs/DefaultDateInput.js / 46-68, 130-170`
+- `antigo: DefaultDateInput usava o mesmo pacote de cores hardcoded do input base, inclusive calendario, placeholder e botao de fechar`
+- `novo: DefaultDateInput passa a usar os tokens canonicos inputBackground, inputBorder, inputFocusBorder, inputText, inputPlaceholderText, inputIcon, inputErrorText, buttonBackgroundSecondary, buttonBorderSecondary e buttonIconSecondary`
+
+- `ui-default / src/react/components/inputs/DefaultInput.styles.js / 1-101`
+- `antigo: os estilos compartilhados de inputs do ui-default fixavam #CBD5E1, #FFFFFF, #0F172A, #94A3B8, #64748B e #DC2626`
+- `novo: DefaultInput.styles exporta createStyles com tokens canonicos do tema ativo para campos, labels, placeholders, acoes secundarias e mensagens de erro`
+
+- `ui-default / src/react/components/inputs/DefaultSelect.js / 117-148, 325-374`
+- `antigo: DefaultSelect usava modal, busca, chevron, close e estado de selecao com cores hardcoded e fallback visual local`
+- `novo: DefaultSelect passa a usar themeStore.getters.colors com tokens modalOverlay, modalBackground, modalBorder, modalCloseIcon, modalHeaderText, dividerBorder, inputBackground, inputBorder, inputText, inputPlaceholderText e inputIcon`
+
+- `ui-default / src/react/components/inputs/DefaultSelect.styles.js / 1-69`
+- `antigo: os estilos do seletor generico fixavam rgba(15,23,42,0.38), #FFFFFF, #E2E8F0, #F1F5F9, #0F172A e #64748B`
+- `novo: DefaultSelect.styles exporta createStyles com tokens canonicos do tema ativo para overlay, card modal, header, divisores e textos`
+
+- `ui-orders / src/react/pages/orders/OrderHistoryPage.styles.js / 83-314`
+- `antigo: createModalStyles do order-history-page ainda misturava fallback local e literais para background, border, texto, danger, placeholder e overlay`
+- `novo: createModalStyles passa a usar somente tokens canonicos do tema ativo como modalOverlay, modalBackground, modalBorder, modalHeaderText, modalText, modalShadow, buttonBackground, buttonBorder, buttonText, buttonBackgroundSecondary, buttonBorderSecondary, buttonTextSecondary, buttonDisabledBackground, buttonDisabledText, inputPlaceholderText e textDanger`
+
+- `ui-orders / src/react/pages/orders/OrderCancellationModals.js / 110-116, 157-164, 193-219, 286-293, 420-427`
+- `antigo: a tela Order Cancellation Reasons e os modais relacionados ainda instanciavam estilos com fallback e o botao "+ Add Cancel Reason" dependia de accentColor local`
+- `novo: OrderCancellationModals usa somente themeStore.getters.colors para createModalStyles, e o botao "+ Add Cancel Reason" segue diretamente buttonBackground, buttonBorder, buttonText e os estados disabled do tema ativo`
