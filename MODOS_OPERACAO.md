@@ -45,6 +45,7 @@
 - Responsabilidades:
 - Cadastro e manutencao de menus por perfil.
 - Entrada inicial da home com o atalho de `MenuAccessConfigPage`.
+- Leitura de fluxogramas administrativos versionados em Mermaid.
 - Limites:
 - Nao deve carregar por padrao os fluxos operacionais amplos do `MANAGER`.
 - Nao deve disputar o mesmo atalho principal do `MANAGER` para configuracao de menus.
