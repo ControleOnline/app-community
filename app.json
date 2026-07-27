@@ -1,21 +1,21 @@
 {
   "expo": {
-    "name": "Lave-go",
-    "displayName": "Lave-go",
-    "slug": "shop_lavego",
+"name": "Lave-go",
+"displayName": "Lave-go",
+"slug": "shop_lavego",
     "platforms": [
       "android",
       "ios",
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "android": {
       "jsEngine": "hermes",
-      "package": "com.lavego.shop",
-      "versionCode": 1402,
+"package": "com.lavego.shop",
+      "versionCode": 1403,
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/shop_lavego/logo.png",
+"foregroundImage": "./src/assets/shop_lavego/logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -27,18 +27,18 @@
         "CAMERA",
         "NFC"
       ],
-      "tvBanner": "./src/assets/tv.png"
+"tvBanner": "./src/assets/tv.png"
     },
-    "icon": "./src/assets/shop_lavego/logo.png",
+"icon": "./src/assets/shop_lavego/logo.png",
     "splash": {
-      "image": "./src/assets/shop_lavego/splash.png",
+"image": "./src/assets/shop_lavego/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
       "jsEngine": "hermes",
-      "bundleIdentifier": "com.lavego.shop",
+"bundleIdentifier": "com.lavego.shop",
       "deploymentTarget": "15.1",
       "infoPlist": {
         "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
@@ -51,7 +51,7 @@
       }
     },
     "web": {
-      "favicon": "./src/assets/shop_lavego/logo.png"
+"favicon": "./src/assets/shop_lavego/logo.png"
     },
     "_androidAppOptimizationNote": "R8/minify e shrinkResources foram ativados no bloco do plugin expo-build-properties abaixo.",
     "plugins": [
