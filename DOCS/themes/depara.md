@@ -293,9 +293,29 @@ Formato:
 - `antigo: buildGeneralSettingsPalette e o fallback local do general-settings nao expunham iconDanger, entao os icones de remocao da aba shop nao refletiam a cor configurada no banco`
 - `novo: buildGeneralSettingsPalette e o fallback local do general-settings passam a expor iconDanger`
 
+- `ui-crm / src/react/pages/settings/GeneralSettings.js / header de abas`
+- `antigo: header do general-settings usava colorToken por aba, navigationActiveBackground/navigationText e borderBottomColor por contexto`
+- `novo: header do general-settings usa buttonBackground/buttonBorder/buttonIcon/buttonText na aba selecionada e buttonBackgroundSecondary/buttonBorderSecondary/buttonIconSecondary/buttonTextSecondary nas demais`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / tabBarContent/tabItem/tabLabel e palette`
+- `antigo: estilos das abas fixavam underline de selecao e palette nao expunha buttonBorder/buttonIconSecondary`
+- `novo: abas preservam layout de botao com borda/raio/gap, palette expoe buttonBorder/buttonIconSecondary e as cores entram pelo JSX`
+
 - `ui-crm / src/react/pages/settings/sections/CrmSection.js / 241-244`
 - `antigo: icone delete do crm usava themePalette.error`
 - `novo: icone delete do crm usa themePalette.iconDanger`
+
+- `ui-crm / src/react/pages/settings/sections/CrmSection.js / 245-260`
+- `antigo: botao Add Profile dependia apenas de globalStyles.button/local primaryButton e nao aplicava explicitamente buttonBackground/buttonIcon no padrao`
+- `novo: botao Add Profile usa themePalette.buttonBackground, themePalette.buttonIcon e themePalette.buttonText`
+
+- `ui-crm / src/react/pages/settings/sections/CrmSection.js / 236-247`
+- `antigo: botao delete dos perfis CRM usava removeProfileButton simples e icone themePalette.iconDanger`
+- `novo: botao delete dos perfis CRM segue o padrao dos botoes de acao da carteira com buttonBackground/buttonIcon e icone Feather trash-2`
+
+- `ui-crm / src/react/pages/settings/GeneralSettings.styles.js / removeProfileButton`
+- `antigo: removeProfileButton tinha apenas marginLeft e padding local`
+- `novo: removeProfileButton preserva layout de botao iconico 34x34 com borda/raio/alinhamento; cores entram por themePalette no JSX`
 
 - `ui-crm / src/react/pages/settings/sections/ShopSection.js / 1568-1576`
 - `antigo: checkbox do catalogo do shop usava themePalette.primary quando marcado`
@@ -380,3 +400,83 @@ Formato:
 - `ui-orders / src/react/pages/orders/OrderCancellationModals.js / 110-116, 157-164, 193-219, 286-293, 420-427`
 - `antigo: a tela Order Cancellation Reasons e os modais relacionados ainda instanciavam estilos com fallback e o botao "+ Add Cancel Reason" dependia de accentColor local`
 - `novo: OrderCancellationModals usa somente themeStore.getters.colors para createModalStyles, e o botao "+ Add Cancel Reason" segue diretamente buttonBackground, buttonBorder, buttonText e os estados disabled do tema ativo`
+
+- `ui-financial / src/react/pages/InvoiceCategoriesPage.js / 213-215`
+- `antigo: botao "Nova categoria" usava backgroundColor palette.primary, icon color '#fff' e texto herdando '#fff' do style estatico`
+- `novo: botao "Nova categoria" usa themeStore.getters.colors.buttonBackground, buttonIcon e buttonText`
+
+- `ui-financial / src/react/pages/InvoiceCategoriesPage.styles.js / 17`
+- `antigo: addBtnText fixava color '#fff'`
+- `novo: addBtnText preserva apenas tipografia; a cor vem de themeStore.getters.colors.buttonText no JSX`
+
+- `ui-financial / src/react/pages/WalletsPage.js / 308-317`
+- `antigo: botao "Nova carteira" usava withOpacity(palette.primary), icon color palette.primary e texto em palette.primary`
+- `novo: botao "Nova carteira" usa themeStore.getters.colors.buttonBackground, buttonIcon e buttonText`
+
+- `ui-financial / src/react/pages/WalletsPage.styles.js / 22-30`
+- `antigo: addBtn tinha borderWidth/backgroundColor '#FFFFFF'/borderRadius 999 e addBtnText fixava color '#64748B'`
+- `novo: addBtn usa o mesmo formato do "Nova categoria" e addBtnText preserva apenas tipografia`
+
+- `ui-financial / src/react/pages/WalletsPage.js / 344-378`
+- `antigo: botoes link/editar/trash usavam icon color '#64748B'/'#c10015' e trash com borderColor '#FCA5A5'`
+- `novo: botoes link/editar/trash usam themeStore.getters.colors.buttonBackground e buttonIcon`
+
+- `ui-financial / src/react/pages/WalletsPage.styles.js / 52-55`
+- `antigo: iconBtn fixava borderColor '#E2E8F0' e backgroundColor '#F8FAFC'`
+- `novo: iconBtn preserva apenas layout; as cores vem de themeStore.getters.colors no JSX`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 1808-1845`
+- `antigo: abas PDV usavam withOpacity(brandColors.primary), brandColors.primary e '#64748B' para diferenciar ativo/inativo`
+- `novo: aba ativa usa themeStore.getters.colors.buttonBackground/buttonBorder/buttonIcon/buttonText; abas inativas usam buttonBackgroundSecondary/buttonBorderSecondary/buttonIconSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.styles.js / 72-87`
+- `antigo: tabButton fixava borderColor 'transparent', backgroundColor '#F8FAFC' e tabButtonText fixava color '#64748B'`
+- `novo: tabButton/tabButtonText preservam apenas layout e tipografia; as cores vem de themeStore.getters.colors no JSX`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 1918-1931`
+- `antigo: botoes Comanda/Garçom/Totem/Single Item Sale/Caixa herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes Comanda/Garçom/Totem/Single Item Sale/Caixa passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 196-240, 1722-1750, 1990-2021`
+- `antigo: botoes None/Tab/Table/Stamp herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes None/Tab/Table/Stamp passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 2116-2130`
+- `antigo: botoes Pedido/Fichas herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes Pedido/Fichas passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 2141-2160`
+- `antigo: botoes Abertura e fechamento de caixa/Fechamento diario herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes Abertura e fechamento de caixa/Fechamento diario passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 2244-2258`
+- `antigo: botoes Nenhum/Infinite Pay/Cielo herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes Nenhum/Infinite Pay/Cielo passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 2330-2355`
+- `antigo: botoes Somente deste device/Todos da empresa herdavam optionButton com cores hardcoded para ativo e inativo`
+- `novo: botoes Somente deste device/Todos da empresa passam optionColors; selecionado usa buttonBackground/buttonBorder/buttonText e demais usam buttonBackgroundSecondary/buttonBorderSecondary/buttonTextSecondary`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / switches do device-detail`
+- `antigo: switches da tela eram TouchableOpacity com icones toggle-left/toggle-right e cores hex/brandColors para ligado/desligado`
+- `novo: switches usam o componente Switch nativo com switchOnTrack, switchOffTrack, switchOnThumb, switchOffThumb, switchDisabledTrack e switchDisabledThumb`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.styles.js / toggleRow/toggleRowLabel/toggleRowValue`
+- `antigo: estilos dos switches fixavam borderColor/backgroundColor/textos e estado ativo com sucesso hardcoded`
+- `novo: estilos preservam apenas layout; cores de linha e textos entram por listItemBackground, listItemBorder, listItemText e listItemSubtitleText no JSX`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / 2618-2633`
+- `antigo: botao Limpar cache de produtos usava background '#0EA5E9', icone trash-2 tamanho 14 e cor '#fff'`
+- `novo: botao usa o padrao de cor/icone dos botoes de acao da carteira com buttonBackground, buttonIcon, buttonText e icone Feather trash-2 tamanho 16`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.styles.js / configButton/configButtonText`
+- `antigo: configButton/configButtonText fixavam backgroundColor '#0EA5E9' e texto '#fff'`
+- `novo: estilos preservam apenas layout; cores entram por themeStore.getters.colors no JSX`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.styles.js / editAliasBtn`
+- `antigo: botao de edicao do alias usava 26x26, borderRadius 13 e backgroundColor '#E2E8F0'`
+- `novo: botao de edicao do alias usa o mesmo formato dos botoes de acao da carteira: 34x34, borderRadius 8, borderWidth 1; cores e icone edit-2 vem do JSX com buttonBackground/buttonIcon`
+
+- `ui-manager / src/react/pages/DeviceDetailPage.js / renderHelpButton`
+- `antigo: botoes de ajuda "?" usavam accentColor brandColors.primary e formato padrao pequeno do DefaultTooltip`
+- `novo: botoes de ajuda "?" usam o mesmo formato dos botoes de acao da carteira: 34x34, borderRadius 8, buttonBackground e buttonIcon`
