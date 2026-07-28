@@ -66,6 +66,7 @@ import report from '@controleonline/ui-report/src/store/report';
 import status from '@controleonline/ui-common/src/store/status';
 import tasks from '@controleonline/ui-tasks/src/store/tasks';
 import tasksInterations from '@controleonline/ui-tasks/src/store/task_interations';
+import tenancies from '@controleonline/ui-manager/src/store/tenancies';
 import tests from '@controleonline/ui-tests/src/store/tests';
 import theme from '@controleonline/ui-layout/src/store/theme';
 import timezones from '@controleonline/ui-common/src/store/timezones';
@@ -155,6 +156,7 @@ export default {
   status,
   tasks,
   tasksInterations,
+  tenancies,
   tests,
   theme,
   themes,
