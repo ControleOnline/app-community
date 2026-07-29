@@ -21,7 +21,7 @@ import documentsTypes from '@controleonline/ui-people/src/store/documents/docume
 import emails from '@controleonline/ui-people/src/store/emails';
 import expanded_order_products from '@controleonline/ui-orders/src/store/expanded_order_products';
 import file from '@controleonline/ui-common/src/store/file';
-import flowcharts from '@controleonline/ui-config/src/store/flowcharts';
+import flowcharts from '@controleonline/ui-report/src/store/flowcharts';
 import inventories from '@controleonline/ui-products/src/store/inventories';
 import invoice from '@controleonline/ui-financial/src/store/invoice';
 import models from '@controleonline/ui-crm/src/store/model';
