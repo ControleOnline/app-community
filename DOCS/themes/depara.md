@@ -361,9 +361,17 @@ Formato:
 - `antigo: contatos usavam "+" com colors.primary, loader legado, icone person simples e chevron hardcoded`
 - `novo: EmployeesTab usa addButton para "+", loadingSpinner do tema, UserAvatar no padrao da tela de perfil e chevron derivado do map compartilhado`
 
-- `ui-customers / src/react/components/tabs/SalesmanTab.js, EmployeesTab.js, src/react/styles/details.js / cards de vendedores e contatos com botao olho`
+- `ui-customers / src/react/components/tabs/SalesmanTab.js, EmployeesTab.js, src/react/styles/details.js / cards de vendedores e contatos com botao lapis`
 - `antigo: vendedor usava chevron-right simples e contato/vendedor mantinham paddingRight 16, deixando a acao recuada em relacao ao +`
-- `novo: vendedor e contato usam Feather eye no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+- `novo: vendedor e contato usam Feather edit-2 no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+
+- `ui-customers / src/react/components/tabs/SalesmanTab.js, EmployeesTab.js / avatar dos cards de vendedores e contatos`
+- `antigo: UserAvatar recebia apenas name, entao mesmo pessoas/empresas com midia cadastrada em people_media caiam para iniciais`
+- `novo: contatos buscam people_media mediaType.type=avatar e vendedores buscam mediaType.type=logo, passando imageUrl para UserAvatar com fallback para iniciais`
+
+- `ui-customers / src/react/pages/details.js / avatar do header da client-details`
+- `antigo: UserAvatar recebia apenas name, entao contato/empresa aberta no detalhe caia para iniciais mesmo com people_media`
+- `novo: header busca people_media mediaType.type=avatar para PF e logo para PJ, passando imageUrl para UserAvatar com fallback para iniciais`
 
 - `ui-customers / src/react/components/tabs/DocumentsTab.js, DocumentsTab.styles.js / botao Salvar do modal de documentos`
 - `antigo: Salvar usava inlineStyle_353_14/inlineStyle_360_20 com '#007bff' e '#fff'`

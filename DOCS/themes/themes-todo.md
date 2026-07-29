@@ -95,9 +95,20 @@
 - `src/react/components/tabs/SalesmanTab.js`
 - `src/react/components/tabs/EmployeesTab.js`
 - `src/react/styles/details.js`
-- `linha cards de vendedores e contatos com botao olho`
+- `linha cards de vendedores e contatos com botao lapis`
 - `antes: vendedor usava chevron-right simples e contato/vendedor mantinham paddingRight 16, deixando a acao recuada em relacao ao +`
-- `depois: vendedor e contato usam Feather eye no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+- `depois: vendedor e contato usam Feather edit-2 no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+
+- `src/react/components/tabs/SalesmanTab.js`
+- `src/react/components/tabs/EmployeesTab.js`
+- `linha avatar dos cards de vendedores e contatos`
+- `antes: UserAvatar recebia apenas name, entao mesmo pessoas/empresas com midia cadastrada em people_media caiam para iniciais`
+- `depois: contatos buscam people_media mediaType.type=avatar e vendedores buscam mediaType.type=logo, passando imageUrl para UserAvatar com fallback para iniciais`
+
+- `src/react/pages/details.js`
+- `linha avatar do header da client-details`
+- `antes: UserAvatar recebia apenas name, entao contato/empresa aberta no detalhe caia para iniciais mesmo com people_media`
+- `depois: header busca people_media mediaType.type=avatar para PF e logo para PJ, passando imageUrl para UserAvatar com fallback para iniciais`
 
 - `src/react/components/tabs/DocumentsTab.js`
 - `src/react/components/tabs/DocumentsTab.styles.js`
