@@ -47,6 +47,29 @@ jobs:
       - name: Fix Expo Dependencies
         run: npx expo install --fix
 
+      - name: Configure Lave-Go Web app.json
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const app = require('./app.json');
+          const expo = app.expo;
+
+          expo.name = 'Lave-Go';
+          expo.displayName = 'Lave-Go';
+          expo.slug = 'app-lavego';
+          expo.icon = './src/assets/shop_lavego/logo.png';
+          expo.splash = {
+            ...(expo.splash || {}),
+            image: './src/assets/shop_lavego/splash.png',
+          };
+          expo.web = {
+            ...(expo.web || {}),
+            favicon: './src/assets/shop_lavego/logo.png',
+          };
+
+          fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          NODE
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
