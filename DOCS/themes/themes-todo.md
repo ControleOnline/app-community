@@ -92,6 +92,19 @@
 - `src/react/pages/details.page.styles.js`
 - `src/react/styles/details.js`
 
+- `src/react/components/tabs/SalesmanTab.js`
+- `src/react/components/tabs/EmployeesTab.js`
+- `src/react/styles/details.js`
+- `linha cards de vendedores e contatos com botao olho`
+- `antes: vendedor usava chevron-right simples e contato/vendedor mantinham paddingRight 16, deixando a acao recuada em relacao ao +`
+- `depois: vendedor e contato usam Feather eye no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+
+- `src/react/components/tabs/DocumentsTab.js`
+- `src/react/components/tabs/DocumentsTab.styles.js`
+- `linha botao Salvar do modal de documentos`
+- `antes: Salvar usava inlineStyle_353_14/inlineStyle_360_20 com '#007bff' e '#fff'`
+- `depois: Salvar usa customStyles.saveButton/saveButtonText e icone buttonIcon, seguindo o padrao do client-details`
+
 ### ui-dashboard
 - `src/react/components/operationalInsights/OperationalInsightsAbcCard.js`
 - `src/react/components/operationalInsights/shared.js`

@@ -361,6 +361,14 @@ Formato:
 - `antigo: contatos usavam "+" com colors.primary, loader legado, icone person simples e chevron hardcoded`
 - `novo: EmployeesTab usa addButton para "+", loadingSpinner do tema, UserAvatar no padrao da tela de perfil e chevron derivado do map compartilhado`
 
+- `ui-customers / src/react/components/tabs/SalesmanTab.js, EmployeesTab.js, src/react/styles/details.js / cards de vendedores e contatos com botao olho`
+- `antigo: vendedor usava chevron-right simples e contato/vendedor mantinham paddingRight 16, deixando a acao recuada em relacao ao +`
+- `novo: vendedor e contato usam Feather eye no iconButtonGhost e listItemWithEndAction com paddingRight 0 para alinhar ao limite direito do +`
+
+- `ui-customers / src/react/components/tabs/DocumentsTab.js, DocumentsTab.styles.js / botao Salvar do modal de documentos`
+- `antigo: Salvar usava inlineStyle_353_14/inlineStyle_360_20 com '#007bff' e '#fff'`
+- `novo: Salvar usa customStyles.saveButton/saveButtonText e icone buttonIcon, seguindo o padrao do client-details`
+
 - `ui-customers / src/react/pages/details.js / 380-389`
 - `antigo: o cabecalho de client-details montava o avatar manualmente com inicial em um circulo separado do componente canonico de perfil`
 - `novo: client-details usa UserAvatar no cabecalho com buttonBackground e buttonText, seguindo o mesmo padrao visual da tela de perfil`
