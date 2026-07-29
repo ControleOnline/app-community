@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
 
     steps:
       - uses: actions/checkout@v5
@@ -19,7 +21,6 @@ jobs:
           API_ENTRYPOINT: 'https://apinew.lave-go.com',\
           SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: 'MANAGER',\
-          COMPANY_NAME: 'lavego',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\

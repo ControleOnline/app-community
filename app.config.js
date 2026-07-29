@@ -5,6 +5,20 @@ const DEFAULT_APP_TYPE = 'MANAGER';
 const DEFAULT_DISPLAY_NAME = 'Gestor';
 const DEFAULT_SLUG_SUFFIX = 'controle-online';
 const DEFAULT_PACKAGE_PREFIX = 'com.controleonline';
+const APP_JSON_IDENTITY_SOURCE = 'app-json';
+
+const DEFAULT_DISPLAY_NAMES = {
+  ADMIN: 'Admin',
+  CHECKOUT: 'Checkout',
+  CRM: 'CRM',
+  DELIVERY: 'Delivery',
+  MANAGER: DEFAULT_DISPLAY_NAME,
+  MENU: 'Menu',
+  POS: 'PDV',
+  PPC: 'PCP',
+  SERVICE: 'Service',
+  SHOP: 'Shop',
+};
 
 const clone = value => JSON.parse(JSON.stringify(value));
 
@@ -16,8 +30,13 @@ const resolveLocalEnv = () => {
   }
 };
 
-const removeNamePrefix = value =>
-  typeof value === 'string' ? value.replace(/^On\s+/, '') : value;
+const normalizeIdentitySource = value =>
+  String(value || '')
+    .trim()
+    .toLowerCase();
+
+const resolveDefaultDisplayName = appType =>
+  DEFAULT_DISPLAY_NAMES[appType] || DEFAULT_DISPLAY_NAME;
 
 const updateAssetPath = (currentPath, assetsFolder) => {
   if (typeof currentPath === 'string' && currentPath.startsWith('./src/assets/')) {
@@ -34,8 +53,8 @@ module.exports = () => {
   const expo = clone(appJson.expo || {});
   const localEnv = resolveLocalEnv();
 
-  const companyName = localEnv.COMPANY_NAME || process.env.COMPANY_NAME;
-  if (companyName !== 'CTRL') {
+  const identitySource = normalizeIdentitySource(process.env.EXPO_IDENTITY_SOURCE);
+  if (identitySource === APP_JSON_IDENTITY_SOURCE) {
     return expo;
   }
 
@@ -50,9 +69,7 @@ module.exports = () => {
   const displayName =
     localEnv.APP_DISPLAY_NAME ||
     process.env.APP_DISPLAY_NAME ||
-    removeNamePrefix(expo.displayName) ||
-    removeNamePrefix(expo.name) ||
-    DEFAULT_DISPLAY_NAME;
+    resolveDefaultDisplayName(appType);
   const packageName =
     process.env.PACKAGE_NAME || `${DEFAULT_PACKAGE_PREFIX}.${appLower}`;
   const slug = process.env.APP_SLUG || `${appLower}-${DEFAULT_SLUG_SUFFIX}`;

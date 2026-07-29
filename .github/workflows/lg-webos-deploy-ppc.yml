@@ -16,7 +16,6 @@ jobs:
       APP_SLUG: ppc-controle-online
       PACKAGE_NAME: com.controleonline.ppc
       ASSETS_VARIANT: ppc
-      COMPANY_NAME: CTRL
       EXPO_OS: web
 
     steps:
@@ -40,7 +39,6 @@ jobs:
           MANAGER_APP: 'https://app.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: '${APP_TYPE}',\
-          COMPANY_NAME: '${COMPANY_NAME}',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\

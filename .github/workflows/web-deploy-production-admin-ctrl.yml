@@ -68,7 +68,6 @@ jobs:
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'ADMIN',\
           APP_DISPLAY_NAME: 'Admin',\
-          COMPANY_NAME: 'CTRL',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\

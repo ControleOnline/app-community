@@ -65,7 +65,6 @@ jobs:
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'MANAGER',\
-          COMPANY_NAME: 'CTRL',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\

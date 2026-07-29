@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      EXPO_IDENTITY_SOURCE: app-json
       APP_TYPE: POS
       APP_DISPLAY_NAME: PDV
       APP_SLUG: pos
@@ -51,7 +52,6 @@ jobs:
           MANAGER_APP: 'https://app.lave-go.com',\
           SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
-          COMPANY_NAME: 'lavego',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
