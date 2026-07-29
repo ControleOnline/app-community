@@ -57,7 +57,7 @@
 ## Regra obrigatoria de componentes default
 
 - Todas as telas novas e todas as telas alteradas devem usar componentes default e stores como padrao, sem excecao. Tudo o que for possivel deve virar componente default em `ui-default`, para que as telas sejam reutilizaveis, pequenas, componentizadas e consistentes.
-- Imagens e arquivos vindos do backend devem usar `DefaultFile` de `ui-default`. A URL de download precisa carregar `app-domain=<dominio configurado>` e, quando a plataforma suportar, esse valor tambem deve ir em `headers`.
+- Imagens e arquivos vindos do backend devem usar `DefaultFile` de `ui-default`. Quando nao for possivel enviar header, a URL de download deve carregar o dominio no path (`/{dominio}/files/{id}/download`); quando a plataforma suportar, esse valor tambem deve ir em `headers`.
 - Listagens devem seguir o conceito do `DefaultTable`: desktop prioriza visao em tabela, edicao por coluna e botoes de acao no toolbar; mobile deve ser gerenciado pelo proprio `DefaultTable`, recebendo da tela apenas um renderer/componente de card customizado quando o visual precisar ser especifico. Nao criar uma listagem paralela com `FlatList`/cards na tela se ela ja usa `DefaultTable`.
 - Toda edicao do `DefaultTable` React deve passar pelos componentes default de input/select em `ui-default`, tanto em celulas desktop quanto em cards compactos e modais fallback. A tela pode definir layout visual, mas nao deve criar inputs locais para editar campos da listagem.
 - A coluna do store e a fonte da configuracao da listagem. Use `columns` para label, formatacao, visibilidade, filtros, tipo de input, `list`, `format`, `formatList`, `formatFilter`, `saveFormat` e regras de edicao. Nao duplicar essa configuracao dentro da tela.
