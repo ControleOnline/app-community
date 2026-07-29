@@ -170,7 +170,8 @@ jobs:
       - name: Build Android Bundle
         run: |
           cd android
-          ./gradlew bundleRelease --init-script ../signing.gradle
+          ./gradlew bundleRelease --init-script ../signing.gradle \
+            -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
 
       - name: Extract App Version
         run: |
