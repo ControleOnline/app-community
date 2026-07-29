@@ -60,6 +60,9 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
 
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
 
