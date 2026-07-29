@@ -23,49 +23,49 @@ jobs:
             display_name: "Checkout"
             track: internal
             release_status: draft
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: CRM
             display_name: "CRM"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: DELIVERY
             display_name: "Delivery"
             track: internal
             release_status: draft
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: MANAGER
             display_name: "Gestor"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: MENU
             display_name: "Menu"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: POS
             display_name: "PDV"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: PPC
             display_name: "PCP"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
           - app_type: SERVICE
             display_name: "Service"
             track: internal
             release_status: completed
-            changes_not_sent_for_review: false
+            changes_not_sent_for_review: true
 
     env:
       APP_TYPE: ${{ matrix.app_type }}
