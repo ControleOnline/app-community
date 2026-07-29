@@ -23,27 +23,36 @@ jobs:
           script: |
             const workflowId = process.env.STAGING_WORKFLOW_ID;
             const candidateShas = new Set((process.env.CANDIDATE_SHAS || '').split(/\s+/).filter(Boolean));
-            const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflowId,
-              branch: 'staging',
-              event: 'push',
-              per_page: 100,
-            });
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-            for (const run of runs.filter((run) => candidateShas.has(run.head_sha))) {
-              const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+            for (let attempt = 1; attempt <= 40; attempt += 1) {
+              const runs = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                run_id: run.id,
+                workflow_id: workflowId,
+                branch: 'staging',
+                event: 'push',
                 per_page: 100,
               });
-              const deployJob = jobs.find((job) => job.name === 'deploy');
-              if (deployJob?.conclusion === 'success') {
-                core.info(`Matched staging deploy job ${deployJob.id} from run ${run.id} for ${run.head_sha}.`);
-                return;
+
+              for (const run of runs.filter((run) => candidateShas.has(run.head_sha))) {
+                const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                  per_page: 100,
+                });
+                const deployJob = jobs.find((job) => job.name === 'deploy');
+                if (deployJob?.conclusion === 'success') {
+                  core.info(`Matched staging deploy job ${deployJob.id} from run ${run.id} for ${run.head_sha}.`);
+                  return;
+                }
+
+                core.info(`Waiting for staging deploy on ${run.head_sha}: run=${run.status}/${run.conclusion || 'pending'}, deploy=${deployJob?.status || 'missing'}/${deployJob?.conclusion || 'pending'}.`);
               }
+
+              core.info(`No successful staging deploy yet for ${workflowId}; attempt ${attempt}/40.`);
+              await sleep(30000);
             }
 
             core.setFailed(`No successful staging deploy job found for ${workflowId} on ${[...candidateShas].join(', ')}`);
