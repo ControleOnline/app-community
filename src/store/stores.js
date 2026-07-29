@@ -21,7 +21,7 @@ import documentsTypes from '@controleonline/ui-people/src/store/documents/docume
 import emails from '@controleonline/ui-people/src/store/emails';
 import expanded_order_products from '@controleonline/ui-orders/src/store/expanded_order_products';
 import file from '@controleonline/ui-common/src/store/file';
-import flowcharts from '@controleonline/ui-manager/src/store/flowcharts';
+import flowcharts from '@controleonline/ui-config/src/store/flowcharts';
 import inventories from '@controleonline/ui-products/src/store/inventories';
 import invoice from '@controleonline/ui-financial/src/store/invoice';
 import models from '@controleonline/ui-crm/src/store/model';
@@ -66,7 +66,7 @@ import report from '@controleonline/ui-report/src/store/report';
 import status from '@controleonline/ui-common/src/store/status';
 import tasks from '@controleonline/ui-tasks/src/store/tasks';
 import tasksInterations from '@controleonline/ui-tasks/src/store/task_interations';
-import tenancies from '@controleonline/ui-manager/src/store/tenancies';
+import tenancies from '@controleonline/ui-config/src/store/tenancies';
 import tests from '@controleonline/ui-tests/src/store/tests';
 import theme from '@controleonline/ui-layout/src/store/theme';
 import timezones from '@controleonline/ui-common/src/store/timezones';
@@ -76,10 +76,10 @@ import wallet from '@controleonline/ui-financial/src/store/wallet';
 import walletPaymentType from '@controleonline/ui-financial/src/store/walletPaymentType';
 import websocket from '@controleonline/ui-common/src/store/websocket';
 import connections from '@controleonline/ui-common/src/store/connections';
-import cron_job_commands from '@controleonline/ui-manager/src/store/cron_job_commands';
-import cron_jobs from '@controleonline/ui-manager/src/store/cron_jobs';
-import people_domains from '@controleonline/ui-manager/src/store/people_domains';
-import people_domains_api from '@controleonline/ui-manager/src/store/people_domains_api';
+import cron_job_commands from '@controleonline/ui-config/src/store/cron_job_commands';
+import cron_jobs from '@controleonline/ui-config/src/store/cron_jobs';
+import people_domains from '@controleonline/ui-people/src/store/people_domains';
+import people_domains_api from '@controleonline/ui-people/src/store/people_domains_api';
 import themes from '@controleonline/ui-common/src/store/themes';
 
 export default {

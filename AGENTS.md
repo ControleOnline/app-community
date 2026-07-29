@@ -239,7 +239,7 @@
 
 - A tela oficial de revenda da engenharia deve ficar em `/menu-costs-page/revenda`.
 - Essa tela usa uma classificacao operacional local da `MenuCostsPage`: bebidas prontas compradas e revendidas podem entrar no recorte de revenda mesmo quando o ERP ainda as traz como `feedstock`.
-- A classificacao local da engenharia deve ficar em `ui-manager/src/react/pages/MenuCostsPage/domain`, sem alterar o tipo gravado no banco nem virar regra global do ERP.
+- A classificacao local da engenharia deve ficar em `ui-products/src/react/pages/MenuCostsPage/domain`, sem alterar o tipo gravado no banco nem virar regra global do ERP.
 - `manufactured`, `component`, `package`, `preparation`, `custom` e `service` nao entram no recorte de revenda.
 - A listagem de revenda deve usar carregamento infinito e paginação, igual as demais telas operacionais.
 
