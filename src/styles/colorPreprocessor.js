@@ -6,6 +6,7 @@ if (!global.__coThemeColorPatched) {
   global.__coThemeColorPatched = true;
 
   try {
+    const SKIP_THEME_COLOR_MAPPING_PROP = '__skipThemeColorMapping';
     const cssVarByToken = {
       primary: '--primary',
       secondary: '--secondary',
@@ -60,23 +61,15 @@ if (!global.__coThemeColorPatched) {
       '#cccccc': 'border',
       '#ccc': 'border',
 
-      '#ef4444': 'error',
-      '#f44336': 'error',
-      '#e74c3c': 'error',
-      '#ff4444': 'error',
-      '#c10015': 'error',
+      // consolidado // 05/07/2026
+      '#10b981': 'success', // usar essa cor
 
-      '#22c55e': 'success',
-      '#4caf50': 'success',
-      '#27ae60': 'success',
-      '#28a745': 'success',
-      '#10b981': 'success',
+      // consolidado // 05/07/2026
+      '#e67e22': 'warning', // usar essa cor
 
-      '#f59e0b': 'warning',
-      '#f39c12': 'warning',
-      '#f2c037': 'warning',
-      '#ff9800': 'warning',
-      '#e67e22': 'warning',
+      // consolidado // 05/07/2026
+      '#c10015': 'error', // usar essa cor
+
     };
 
     const styleColorProps = [
@@ -231,6 +224,12 @@ if (!global.__coThemeColorPatched) {
     const mapPropsColors = props => {
       if (!props || typeof props !== 'object') {
         return props;
+      }
+
+      if (props[SKIP_THEME_COLOR_MAPPING_PROP]) {
+        const nextProps = {...props};
+        delete nextProps[SKIP_THEME_COLOR_MAPPING_PROP];
+        return nextProps;
       }
 
       let nextProps = props;

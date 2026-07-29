@@ -5,14 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,8 +25,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -56,8 +58,11 @@ private const val SOCKET_CONNECT_TIMEOUT_MS = 5000L
 private const val SOCKET_FLUSH_DELAY_MS = 180L
 private const val SPOOL_POLL_INTERVAL_MS = 10000L
 private const val FAILED_SPOOL_RETRY_MS = 30000L
+private const val LOCAL_EVENT_PORT = 41572
 private const val REGISTRATION_TTL_MS = 7L * 24L * 60L * 60L * 1000L
+private const val DEFAULT_ALERT_SOUND_RESOURCE_NAME = "caixa"
 private const val JSON_MIME_TYPE = "application/ld+json"
+private const val FRONTEND_DEBUG_LOG_PATH = "logs/frontend-debug"
 private val EMPTY_REQUEST_BODY = ByteArray(0).toRequestBody(null, 0, 0)
 private val BASE64_REGEX =
   Regex("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
@@ -77,6 +82,16 @@ private fun normalizeOrderId(value: Any?): String {
 
     else -> safeTrim(value).replace(Regex("\\D+"), "")
   }
+}
+
+private fun buildDefaultAlertSoundUri(packageName: String): String {
+  return Uri.Builder()
+    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+    .authority(packageName)
+    .appendPath("raw")
+    .appendPath(DEFAULT_ALERT_SOUND_RESOURCE_NAME)
+    .build()
+    .toString()
 }
 
 private fun parseNumericValue(value: Any?): Double? {
@@ -155,6 +170,141 @@ private fun parseStringArray(values: JSONArray?): List<String> {
   }
 }
 
+private fun jsonCompatibleValue(value: Any?): Any? {
+  if (value == null || value == JSONObject.NULL) {
+    return JSONObject.NULL
+  }
+
+  return when (value) {
+    is JSONObject,
+    is JSONArray,
+    is Boolean,
+    is Int,
+    is Long,
+    is Double,
+    is Float,
+    is Short,
+    is Byte,
+    is Number,
+    is String -> value
+
+    is Map<*, *> -> buildJsonObject(
+      value.entries
+        .mapNotNull { entry ->
+          val key = safeTrim(entry.key)
+          if (key.isEmpty()) {
+            return@mapNotNull null
+          }
+
+          key to entry.value
+        }
+        .toMap(),
+    )
+
+    is Iterable<*> -> JSONArray().apply {
+      value.forEach { put(jsonCompatibleValue(it)) }
+    }
+
+    is Array<*> -> JSONArray().apply {
+      value.forEach { put(jsonCompatibleValue(it)) }
+    }
+
+    else -> value.toString()
+  }
+}
+
+private fun buildJsonObject(values: Map<String, Any?>): JSONObject {
+  val json = JSONObject()
+
+  values.forEach { (key, value) ->
+    if (key.isBlank() || value == null) {
+      return@forEach
+    }
+
+    json.put(key, jsonCompatibleValue(value))
+  }
+
+  return json
+}
+
+private fun buildRuntimeDebugContext(
+  registration: RuntimeRegistration,
+  context: Map<String, Any?> = emptyMap(),
+): JSONObject {
+  val payload = linkedMapOf<String, Any?>(
+    "runtimeSource" to "background-runtime",
+    "registrationId" to registration.registrationId,
+    "packageName" to registration.packageName,
+    "companyId" to registration.companyId,
+    "deviceId" to registration.deviceId,
+    "appType" to registration.appType,
+    "deviceType" to registration.deviceType,
+    "backgroundEnabled" to registration.backgroundEnabled,
+    "notificationEnabled" to registration.notificationEnabled,
+    "runtimeDebugInfoEnabled" to registration.runtimeDebugInfoEnabled,
+  )
+
+  context.forEach { (key, value) ->
+    if (key.isNotBlank() && value != null) {
+      payload[key] = value
+    }
+  }
+
+  return buildJsonObject(payload)
+}
+
+internal data class RuntimeRegistrationScopeKey(
+  val packageName: String,
+  val deviceId: String,
+  val companyId: String,
+)
+
+private fun RuntimeRegistration.scopeKey(): RuntimeRegistrationScopeKey {
+  return RuntimeRegistrationScopeKey(
+    packageName = packageName,
+    deviceId = deviceId,
+    companyId = companyId,
+  )
+}
+
+internal fun pruneRuntimeRegistrations(
+  registrations: Collection<RuntimeRegistration>,
+  now: Long = System.currentTimeMillis(),
+): Map<String, RuntimeRegistration> {
+  val pruned = linkedMapOf<RuntimeRegistrationScopeKey, RuntimeRegistration>()
+
+  registrations
+    .filter { !it.isExpired(now) }
+    .sortedWith(
+      compareByDescending<RuntimeRegistration> { it.updatedAt }
+        .thenBy { it.registrationId },
+    )
+    .forEach { registration ->
+      val key = registration.scopeKey()
+      if (!pruned.containsKey(key)) {
+        pruned[key] = registration
+      }
+    }
+
+  return pruned.values.associateBy { it.registrationId }
+}
+
+internal fun selectSocketOwnerRegistrationCandidate(
+  registrations: Collection<RuntimeRegistration>,
+): RuntimeRegistration? {
+  return registrations
+    .filter { it.isSocketCapable() }
+    .sortedWith(
+      compareByDescending<RuntimeRegistration> {
+        it.appType.equals("MANAGER", ignoreCase = true)
+      }
+        .thenByDescending { it.updatedAt }
+        .thenBy { it.packageName }
+        .thenBy { it.registrationId },
+    )
+    .firstOrNull()
+}
+
 internal data class RuntimeManagedPrinter(
   val deviceId: String,
   val host: String,
@@ -201,12 +351,19 @@ internal data class RuntimeRegistration(
   val deviceId: String,
   val deviceType: String,
   val notificationEnabled: Boolean,
+  val alertSoundEnabled: Boolean,
+  val alertSoundUrl: String,
+  val deviceAlertSoundEnabled: Boolean,
+  val deviceAlertSoundUrl: String,
+  val userAlertSoundEnabled: Boolean,
+  val userAlertSoundUrl: String,
   val printEnabled: Boolean,
   val managedPrinters: List<RuntimeManagedPrinter>,
   val socketUrl: String,
   val spoolDeviceIds: List<String>,
   val token: String,
   val apiBaseUrl: String,
+  val runtimeDebugInfoEnabled: Boolean,
   val updatedAt: Long,
 ) {
   fun toJson(): JSONObject {
@@ -227,12 +384,19 @@ internal data class RuntimeRegistration(
       .put("deviceId", deviceId)
       .put("deviceType", deviceType)
       .put("notificationEnabled", notificationEnabled)
+      .put("alertSoundEnabled", alertSoundEnabled)
+      .put("alertSoundUrl", alertSoundUrl)
+      .put("deviceAlertSoundEnabled", deviceAlertSoundEnabled)
+      .put("deviceAlertSoundUrl", deviceAlertSoundUrl)
+      .put("userAlertSoundEnabled", userAlertSoundEnabled)
+      .put("userAlertSoundUrl", userAlertSoundUrl)
       .put("printEnabled", printEnabled)
       .put("managedPrinters", printerArray)
       .put("socketUrl", socketUrl)
       .put("spoolDeviceIds", spoolDeviceArray)
       .put("token", token)
       .put("apiBaseUrl", apiBaseUrl)
+      .put("runtimeDebugInfoEnabled", runtimeDebugInfoEnabled)
       .put("updatedAt", updatedAt)
   }
 
@@ -266,7 +430,42 @@ internal data class RuntimeRegistration(
       token,
       socketUrl,
       appDomain,
+      alertSoundEnabled,
+      alertSoundUrl,
+      deviceAlertSoundEnabled,
+      deviceAlertSoundUrl,
+      userAlertSoundEnabled,
+      userAlertSoundUrl,
     ).joinToString("|")
+  }
+
+  fun resolveAlertSoundUrl(): String {
+    if (userAlertSoundEnabled) {
+      if (userAlertSoundUrl.isNotEmpty()) {
+        return userAlertSoundUrl
+      }
+
+      // A configuracao do usuario sempre vence e, vazia, usa o som embutido.
+      return buildDefaultAlertSoundUri(packageName)
+    }
+
+    if (deviceAlertSoundEnabled) {
+      if (deviceAlertSoundUrl.isNotEmpty()) {
+        return deviceAlertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
+    }
+
+    if (alertSoundEnabled) {
+      if (alertSoundUrl.isNotEmpty()) {
+        return alertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
+    }
+
+    return ""
   }
 
   companion object {
@@ -303,17 +502,93 @@ internal data class RuntimeRegistration(
         deviceId = normalizeDeviceId(json.opt("deviceId")),
         deviceType = safeTrim(json.opt("deviceType")),
         notificationEnabled = json.optBoolean("notificationEnabled", true),
+        alertSoundEnabled = json.optBoolean("alertSoundEnabled", false),
+        alertSoundUrl = safeTrim(json.opt("alertSoundUrl")),
+        deviceAlertSoundEnabled = json.optBoolean("deviceAlertSoundEnabled", false),
+        deviceAlertSoundUrl = safeTrim(json.opt("deviceAlertSoundUrl")),
+        userAlertSoundEnabled = json.optBoolean("userAlertSoundEnabled", false),
+        userAlertSoundUrl = safeTrim(json.opt("userAlertSoundUrl")),
         printEnabled = json.optBoolean("printEnabled", false),
         managedPrinters = managedPrinters,
         socketUrl = safeTrim(json.opt("socketUrl")),
         spoolDeviceIds = parseStringArray(json.optJSONArray("spoolDeviceIds")),
         token = safeTrim(json.opt("token")),
         apiBaseUrl = safeTrim(json.opt("apiBaseUrl")),
+        runtimeDebugInfoEnabled =
+          json.optBoolean("runtimeDebugInfoEnabled", false),
         updatedAt = json.optLong("updatedAt", fallbackUpdatedAt),
       )
     }
   }
 }
+
+internal data class RuntimeSocketState(
+  val connected: Boolean = false,
+  val identified: Boolean = false,
+  val status: String = "idle",
+  val attempts: Int = 0,
+  val updatedAt: Long = System.currentTimeMillis(),
+  val device: String = "",
+  val error: String = "",
+  val code: Int? = null,
+  val reason: String = "",
+  val ownerRegistrationId: String = "",
+  val ownerPackageName: String = "",
+  val ownerCompanyId: String = "",
+  val lastEventAt: Long? = null,
+  val lastEventCount: Int = 0,
+  val lastStores: List<String> = emptyList(),
+  val lastCompanies: List<String> = emptyList(),
+) {
+  fun toJson(): JSONObject {
+    val json = JSONObject()
+      .put("type", "socket-state")
+      .put("connected", connected)
+      .put("identified", identified)
+      .put("status", status)
+      .put("attempts", attempts)
+      .put("updatedAt", updatedAt)
+      .put("lastEventCount", lastEventCount)
+      .put("lastStores", JSONArray(lastStores))
+      .put("lastCompanies", JSONArray(lastCompanies))
+
+    if (device.isNotBlank()) {
+      json.put("device", device)
+    }
+
+    if (error.isNotBlank()) {
+      json.put("error", error)
+    }
+
+    code?.let { json.put("code", it) }
+
+    if (reason.isNotBlank()) {
+      json.put("reason", reason)
+    }
+
+    if (ownerRegistrationId.isNotBlank()) {
+      json.put("ownerRegistrationId", ownerRegistrationId)
+    }
+
+    if (ownerPackageName.isNotBlank()) {
+      json.put("ownerPackageName", ownerPackageName)
+    }
+
+    if (ownerCompanyId.isNotBlank()) {
+      json.put("ownerCompanyId", ownerCompanyId)
+    }
+
+    lastEventAt?.let { json.put("lastEventAt", it) }
+
+    return json
+  }
+}
+
+internal data class LocalEventClient(
+  val socket: Socket,
+  val writer: BufferedWriter,
+  val writeLock: Any = Any(),
+)
 
 internal object BackgroundRuntimeStore {
   private const val PREFERENCES_NAME = "controleonline-background-runtime"
@@ -344,36 +619,54 @@ internal object BackgroundRuntimeStore {
       }
     }
 
-    if (registrations.size != parsed.length()) {
-      saveRegistrationsLocked(context, registrations)
+    val prunedRegistrations = pruneRuntimeRegistrations(registrations.values, now)
+
+    if (prunedRegistrations.size != parsed.length()) {
+      saveRegistrationsLocked(context, prunedRegistrations)
     }
 
-    registrations
+    prunedRegistrations
   }
 
   fun upsertRegistration(
     context: Context,
     registration: RuntimeRegistration,
   ) = synchronized(storeLock) {
-    val registrations = loadRegistrationsLocked(context).toMutableMap()
-    registrations[registration.registrationId] = registration.copy(
-      updatedAt = System.currentTimeMillis(),
+    val registrations = loadRegistrationsLocked(context).values.toMutableList()
+    registrations.removeAll {
+      it.packageName == registration.packageName &&
+        it.deviceId == registration.deviceId &&
+        it.companyId == registration.companyId
+    }
+    registrations.add(
+      registration.copy(
+        updatedAt = System.currentTimeMillis(),
+      ),
     )
-    saveRegistrationsLocked(context, registrations)
+    saveRegistrationsLocked(
+      context,
+      pruneRuntimeRegistrations(registrations),
+    )
   }
 
   fun removeRegistration(context: Context, registrationId: String) =
     synchronized(storeLock) {
-      val registrations = loadRegistrationsLocked(context).toMutableMap()
-      registrations.remove(registrationId)
-      saveRegistrationsLocked(context, registrations)
+      val registrations = loadRegistrationsLocked(context).values
+        .filterNot { it.registrationId == registrationId }
+      saveRegistrationsLocked(
+        context,
+        pruneRuntimeRegistrations(registrations),
+      )
     }
 
   fun removePackageRegistrations(context: Context, packageName: String) =
     synchronized(storeLock) {
-      val registrations = loadRegistrationsLocked(context)
-        .filterValues { it.packageName != packageName }
-      saveRegistrationsLocked(context, registrations)
+      val registrations = loadRegistrationsLocked(context).values
+        .filterNot { it.packageName == packageName }
+      saveRegistrationsLocked(
+        context,
+        pruneRuntimeRegistrations(registrations),
+      )
     }
 
   private fun loadRegistrationsLocked(
@@ -408,7 +701,7 @@ internal object BackgroundRuntimeStore {
     preferences(context)
       .edit()
       .putString(REGISTRATIONS_KEY, serialized.toString())
-      .apply()
+      .commit()
   }
 }
 
@@ -481,6 +774,7 @@ class BackgroundRuntimeService : Service() {
   private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
   private val okHttpClient = OkHttpClient.Builder()
     .connectTimeout(SOCKET_CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+    .pingInterval(30L, TimeUnit.SECONDS)
     .readTimeout(0L, TimeUnit.MILLISECONDS)
     .build()
   private val refreshMutex = Mutex()
@@ -491,8 +785,19 @@ class BackgroundRuntimeService : Service() {
   private val reconnectAttempts = ConcurrentHashMap<String, Int>()
   private val reconnectJobs = ConcurrentHashMap<String, Job>()
   private val failedSpoolAttempts = ConcurrentHashMap<String, Long>()
+  private val socketStateLock = Any()
+  private val localEventClients = ConcurrentHashMap<String, LocalEventClient>()
   private var leaderSocket: ServerSocket? = null
   private var leaderServerJob: Job? = null
+  private var localEventSocket: ServerSocket? = null
+  private var localEventServerJob: Job? = null
+  private var activeSocket: WebSocket? = null
+  private var activeSocketOwnerRegistrationId: String? = null
+  private var activeSocketOwnerSignature: String? = null
+  private var closingSocketRegistrationId: String? = null
+  private var reconnectAttempt = 0
+  private var reconnectJob: Job? = null
+  private var socketRuntimeState = RuntimeSocketState()
   private var spoolPollingJob: Job? = null
 
   override fun onBind(intent: Intent?): IBinder? = null
@@ -524,33 +829,128 @@ class BackgroundRuntimeService : Service() {
     serviceScope.cancel()
   }
 
-  private suspend fun refreshRuntime() = refreshMutex.withLock {
-    val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
-    val nextActiveRegistrations = storedRegistrations.values
-      .filter { it.backgroundEnabled && !it.isExpired() }
-      .associateBy { it.registrationId }
+  private fun shouldSendRuntimeDebugLog(registration: RuntimeRegistration): Boolean {
+    return registration.runtimeDebugInfoEnabled &&
+      registration.apiBaseUrl.isNotBlank() &&
+      registration.token.isNotBlank() &&
+      registration.deviceId.isNotBlank()
+  }
 
-    if (nextActiveRegistrations.isEmpty()) {
-      activeRegistrations.clear()
-      shutdownRuntime()
-      stopSelfSafely()
+  private fun logRuntimeDebugAsync(
+    registration: RuntimeRegistration,
+    message: String,
+    level: String = "info",
+    context: Map<String, Any?> = emptyMap(),
+    entityClass: String? = null,
+    entityRow: Int? = null,
+  ) {
+    if (!shouldSendRuntimeDebugLog(registration)) {
       return
     }
 
-    if (!ensureLeaderServer()) {
-      nextActiveRegistrations.values.forEach { registration ->
-        BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+    serviceScope.launch {
+      logRuntimeDebug(
+        registration = registration,
+        message = message,
+        level = level,
+        context = context,
+        entityClass = entityClass,
+        entityRow = entityRow,
+      )
+    }
+  }
+
+  private suspend fun logRuntimeDebug(
+    registration: RuntimeRegistration,
+    message: String,
+    level: String = "info",
+    context: Map<String, Any?> = emptyMap(),
+    entityClass: String? = null,
+    entityRow: Int? = null,
+  ) {
+    if (!shouldSendRuntimeDebugLog(registration)) {
+      return
+    }
+
+    val normalizedMessage = safeTrim(message).ifEmpty {
+      "Background runtime debug log"
+    }
+    val normalizedLevel = safeTrim(level).lowercase().ifEmpty { "info" }
+    val payload = JSONObject()
+      .put("channel", "frontend-debug")
+      .put("level", normalizedLevel)
+      .put("message", normalizedMessage)
+      .put(
+        "context",
+        buildRuntimeDebugContext(
+          registration = registration,
+          context = context,
+        ),
+      )
+
+    if (entityClass != null && entityClass.isNotBlank()) {
+      payload.put("entityClass", entityClass.trim())
+    }
+
+    if (entityRow != null) {
+      payload.put("entityRow", entityRow)
+    }
+
+    runCatching {
+      executeRequest(
+        registration = registration,
+        path = FRONTEND_DEBUG_LOG_PATH,
+        method = "POST",
+        body = payload.toString().toRequestBody(
+          JSON_MIME_TYPE.toMediaTypeOrNull(),
+        ),
+      )
+    }
+  }
+
+  private suspend fun refreshRuntime() {
+    refreshMutex.withLock {
+      val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
+      val nextActiveRegistrations = storedRegistrations.values
+        .filter { it.backgroundEnabled && !it.isExpired() }
+        .associateBy { it.registrationId }
+
+      if (nextActiveRegistrations.isEmpty()) {
+        activeRegistrations.clear()
+        shutdownRuntime()
+        stopSelfSafely()
+        return
       }
-      stopSelfSafely()
-      return
+
+      if (!ensureLeaderServer()) {
+        nextActiveRegistrations.values.forEach { registration ->
+          BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+        }
+        stopSelfSafely()
+        return
+      }
+
+      activeRegistrations.clear()
+      activeRegistrations.putAll(nextActiveRegistrations)
+
+      ensureLocalEventServer()
+      syncSocketConnection()
+      syncSpoolPolling()
+      updateServiceNotification(nextActiveRegistrations.size)
+
+      selectSocketOwnerRegistration()?.let { socketOwner ->
+        logRuntimeDebugAsync(
+          registration = socketOwner,
+          message = "Background runtime synced",
+          context = mapOf(
+            "activeRegistrationCount" to nextActiveRegistrations.size,
+            "ownerRegistrationId" to socketOwner.registrationId,
+            "ownerPackageName" to socketOwner.packageName,
+          ),
+          entityClass = "BackgroundRuntime",
+        )
+      }
     }
-
-    activeRegistrations.clear()
-    activeRegistrations.putAll(nextActiveRegistrations)
-
-    syncSocketConnections()
-    syncSpoolPolling()
-    updateServiceNotification(nextActiveRegistrations.size)
   }
 
   private fun ensureLeaderServer(): Boolean {
@@ -781,6 +1181,559 @@ class BackgroundRuntimeService : Service() {
     }
   }
 
+  private fun ensureLocalEventServer(): Boolean {
+    if (localEventServerJob?.isActive == true && localEventSocket != null) {
+      return true
+    }
+
+    return try {
+      val serverSocket = ServerSocket()
+      serverSocket.reuseAddress = true
+      serverSocket.bind(
+        InetSocketAddress(
+          InetAddress.getByName("127.0.0.1"),
+          LOCAL_EVENT_PORT,
+        ),
+      )
+      localEventSocket = serverSocket
+      localEventServerJob = serviceScope.launch {
+        acceptLocalEventConnections(serverSocket)
+      }
+      true
+    } catch (_: Exception) {
+      false
+    }
+  }
+
+  private suspend fun acceptLocalEventConnections(serverSocket: ServerSocket) {
+    while (serviceScope.isActive) {
+      val client = try {
+        serverSocket.accept()
+      } catch (_: Exception) {
+        break
+      }
+
+      serviceScope.launch {
+        handleLocalEventClient(client)
+      }
+    }
+  }
+
+  private suspend fun handleLocalEventClient(client: Socket) {
+    val clientId =
+      "${client.inetAddress?.hostAddress ?: "127.0.0.1"}:${client.port}:${System.nanoTime()}"
+
+    try {
+      val writer = BufferedWriter(
+        OutputStreamWriter(client.getOutputStream(), Charsets.UTF_8),
+      )
+      localEventClients[clientId] = LocalEventClient(
+        socket = client,
+        writer = writer,
+      )
+
+      val currentState = snapshotSocketState()
+      val currentClient = localEventClients[clientId]
+      if (currentClient != null) {
+        runCatching {
+          synchronized(currentClient.writeLock) {
+            writer.write(currentState.toJson().toString())
+            writer.newLine()
+            writer.flush()
+          }
+        }
+      }
+
+      val reader = BufferedReader(
+        InputStreamReader(client.getInputStream(), Charsets.UTF_8),
+      )
+
+      while (serviceScope.isActive) {
+        val line = try {
+          reader.readLine()
+        } catch (_: Exception) {
+          break
+        }
+
+        if (line == null) {
+          break
+        }
+      }
+    } catch (_: Exception) {
+      // local clients reconnect automatically when the service restarts.
+    } finally {
+      closeLocalEventClient(clientId)
+    }
+  }
+
+  private fun closeLocalEventClient(clientId: String) {
+    val client = localEventClients.remove(clientId) ?: return
+
+    runCatching {
+      client.socket.close()
+    }
+  }
+
+  private fun broadcastLocalPayload(payload: String) {
+    val normalizedPayload = payload.trim()
+    if (normalizedPayload.isEmpty()) {
+      return
+    }
+
+    localEventClients.entries.toList().forEach { (clientId, client) ->
+      val written = runCatching {
+        synchronized(client.writeLock) {
+          client.writer.write(normalizedPayload)
+          client.writer.newLine()
+          client.writer.flush()
+        }
+        true
+      }.getOrDefault(false)
+
+      if (!written) {
+        closeLocalEventClient(clientId)
+      }
+    }
+  }
+
+  private fun snapshotSocketState(): RuntimeSocketState = synchronized(socketStateLock) {
+    socketRuntimeState
+  }
+
+  private fun updateSocketState(transform: (RuntimeSocketState) -> RuntimeSocketState) {
+    val nextState = synchronized(socketStateLock) {
+      val next = transform(socketRuntimeState).copy(updatedAt = System.currentTimeMillis())
+      socketRuntimeState = next
+      next
+    }
+
+    broadcastLocalPayload(nextState.toJson().toString())
+  }
+
+  private fun selectSocketOwnerRegistration(): RuntimeRegistration? {
+    return selectSocketOwnerRegistrationCandidate(activeRegistrations.values)
+  }
+
+  private fun syncSocketConnection() {
+    val currentOwner = activeSocketOwnerRegistrationId
+      ?.let { activeRegistrations[it] }
+      ?.takeIf { it.isSocketCapable() }
+    val desiredOwner = currentOwner ?: selectSocketOwnerRegistration()
+
+    if (desiredOwner == null) {
+      closeCurrentSocketConnection(clearOwner = true)
+      updateSocketState { current ->
+        current.copy(
+          connected = false,
+          identified = false,
+          status = "idle",
+          attempts = 0,
+          device = "",
+          error = "",
+          code = null,
+          reason = "",
+          ownerRegistrationId = "",
+          ownerPackageName = "",
+          ownerCompanyId = "",
+        )
+      }
+      return
+    }
+
+    val currentOwnerId = activeSocketOwnerRegistrationId
+    val currentSignature = activeSocketOwnerSignature
+    val desiredSignature = desiredOwner.connectionSignature()
+
+    if (
+      currentOwnerId == desiredOwner.registrationId &&
+      currentSignature == desiredSignature &&
+      activeSocket != null
+    ) {
+      return
+    }
+
+    if (currentOwnerId != null) {
+      closeCurrentSocketConnection(clearOwner = true)
+    }
+
+    openSocketConnection(desiredOwner)
+  }
+
+  private fun openSocketConnection(registration: RuntimeRegistration) {
+    reconnectJob?.cancel()
+    reconnectJob = null
+    reconnectAttempt = 0
+    activeSocketOwnerRegistrationId = registration.registrationId
+    activeSocketOwnerSignature = registration.connectionSignature()
+
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = "connecting",
+        attempts = reconnectAttempt,
+        device = registration.deviceId,
+        error = "",
+        code = null,
+        reason = "",
+        ownerRegistrationId = registration.registrationId,
+        ownerPackageName = registration.packageName,
+        ownerCompanyId = registration.companyId,
+      )
+    }
+
+    val request = Request.Builder()
+      .url(registration.socketUrl)
+      .build()
+
+    val webSocket = okHttpClient.newWebSocket(
+      request,
+      object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          reconnectAttempt = 0
+          updateSocketState { current ->
+            current.copy(
+              connected = false,
+              identified = false,
+              status = "open",
+              attempts = reconnectAttempt,
+              device = registration.deviceId,
+              error = "",
+              code = null,
+              reason = "",
+              ownerRegistrationId = registration.registrationId,
+              ownerPackageName = registration.packageName,
+              ownerCompanyId = registration.companyId,
+            )
+          }
+
+          logRuntimeDebugAsync(
+            registration = registration,
+            message = "Background runtime socket connected",
+            context = mapOf(
+              "status" to "open",
+              "attempts" to reconnectAttempt,
+            ),
+          )
+
+          val payload = JSONObject()
+            .put("command", "identify")
+            .put("device", registration.deviceId)
+          webSocket.send(payload.toString())
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketMessage(registration, text)
+        }
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketDisconnect(
+            registrationId = registration.registrationId,
+            code = code,
+            reason = reason,
+            errorMessage = "",
+          )
+        }
+
+        override fun onFailure(
+          webSocket: WebSocket,
+          t: Throwable,
+          response: Response?,
+        ) {
+          if (!isCurrentSocketOwner(registration.registrationId, webSocket)) {
+            return
+          }
+
+          handleActiveSocketDisconnect(
+            registrationId = registration.registrationId,
+            code = response?.code,
+            reason = response?.message.orEmpty(),
+            errorMessage = t.message.orEmpty(),
+          )
+        }
+      },
+    )
+
+    activeSocket = webSocket
+  }
+
+  private fun isCurrentSocketOwner(
+    registrationId: String,
+    webSocket: WebSocket,
+  ): Boolean {
+    return activeSocketOwnerRegistrationId == registrationId &&
+      activeSocket === webSocket
+  }
+
+  private fun handleActiveSocketDisconnect(
+    registrationId: String,
+    code: Int? = null,
+    reason: String = "",
+    errorMessage: String = "",
+  ) {
+    val registration = activeRegistrations[registrationId]
+    val isManualClose = closingSocketRegistrationId == registrationId
+
+    if (isManualClose) {
+      closingSocketRegistrationId = null
+      if (activeSocketOwnerRegistrationId == registrationId) {
+        activeSocket = null
+      }
+      return
+    }
+
+    if (activeSocketOwnerRegistrationId != registrationId) {
+      return
+    }
+
+    activeSocket = null
+
+    val nextStatus = if (errorMessage.isNotBlank()) "error" else "disconnected"
+
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = nextStatus,
+        attempts = reconnectAttempt,
+        device = registration?.deviceId ?: current.device,
+        error = errorMessage.ifBlank { current.error.ifBlank { reason } },
+        code = code,
+        reason = reason,
+        ownerRegistrationId = registration?.registrationId ?: current.ownerRegistrationId,
+        ownerPackageName = registration?.packageName ?: current.ownerPackageName,
+        ownerCompanyId = registration?.companyId ?: current.ownerCompanyId,
+      )
+    }
+
+    registration?.let { runtimeRegistration ->
+      logRuntimeDebugAsync(
+        registration = runtimeRegistration,
+        message = if (errorMessage.isNotBlank()) {
+          "Background runtime socket failed"
+        } else {
+          "Background runtime socket disconnected"
+        },
+        level = if (errorMessage.isNotBlank()) "error" else "debug",
+        context = mapOf(
+          "code" to code,
+          "reason" to reason.ifBlank { null },
+          "error" to errorMessage.ifBlank { null },
+          "status" to nextStatus,
+        ),
+        entityClass = "BackgroundRuntime",
+      )
+    }
+
+    scheduleSocketReconnect()
+  }
+
+  private fun scheduleSocketReconnect() {
+    if (reconnectJob?.isActive == true) {
+      return
+    }
+
+    reconnectAttempt = (reconnectAttempt + 1).coerceAtMost(8)
+    updateSocketState { current ->
+      current.copy(
+        connected = false,
+        identified = false,
+        status = "reconnecting",
+        attempts = reconnectAttempt,
+      )
+    }
+
+    val delayMs = min(12000L, 1500L * (1L shl min(reconnectAttempt, 4)))
+    reconnectJob = serviceScope.launch {
+      delay(delayMs)
+      reconnectJob = null
+      syncSocketConnection()
+    }
+  }
+
+  private fun closeCurrentSocketConnection(clearOwner: Boolean = true) {
+    reconnectJob?.cancel()
+    reconnectJob = null
+    reconnectAttempt = 0
+
+    val currentSocket = activeSocket
+    val closingRegistrationId = activeSocketOwnerRegistrationId
+    if (currentSocket != null && !closingRegistrationId.isNullOrEmpty()) {
+      closingSocketRegistrationId = closingRegistrationId
+    } else {
+      closingSocketRegistrationId = null
+    }
+
+    runCatching {
+      currentSocket?.close(1000, "refresh")
+    }
+    activeSocket = null
+
+    if (clearOwner) {
+      activeSocketOwnerRegistrationId = null
+      activeSocketOwnerSignature = null
+    }
+  }
+
+  private fun handleActiveSocketMessage(
+    registration: RuntimeRegistration,
+    payload: String,
+  ) {
+    val normalizedPayload = payload.trim()
+    if (normalizedPayload.isEmpty()) {
+      return
+    }
+
+    runCatching {
+      if (normalizedPayload.startsWith("[")) {
+        val events = JSONArray(normalizedPayload)
+        val stores = linkedSetOf<String>()
+        val companies = linkedSetOf<String>()
+
+        for (index in 0 until events.length()) {
+          val event = events.optJSONObject(index) ?: continue
+          processEvent(registration, event)
+          collectSocketEventSummary(event, stores, companies)
+        }
+
+        updateSocketState { current ->
+          current.copy(
+            connected = true,
+            identified = true,
+            status = "connected",
+            attempts = 0,
+            device = registration.deviceId,
+            error = "",
+            code = null,
+            reason = "",
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+            lastEventAt = System.currentTimeMillis(),
+            lastEventCount = events.length(),
+            lastStores = stores.toList(),
+            lastCompanies = companies.toList(),
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        return@runCatching
+      }
+
+      val json = JSONObject(normalizedPayload)
+      val status = safeTrim(json.opt("status")).lowercase()
+
+      if (status == "identified" || status == "ok") {
+        updateSocketState { current ->
+          current.copy(
+            connected = true,
+            identified = true,
+            status = "connected",
+            attempts = 0,
+            device = registration.deviceId,
+            error = "",
+            code = null,
+            reason = "",
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        return@runCatching
+      }
+
+      if (status == "error") {
+        val message = safeTrim(json.opt("message")).ifEmpty {
+          "WebSocket identify failed"
+        }
+
+        updateSocketState { current ->
+          current.copy(
+            connected = false,
+            identified = false,
+            status = "error",
+            attempts = reconnectAttempt,
+            device = registration.deviceId,
+            error = message,
+            code = null,
+            reason = message,
+            ownerRegistrationId = registration.registrationId,
+            ownerPackageName = registration.packageName,
+            ownerCompanyId = registration.companyId,
+          )
+        }
+
+        broadcastLocalPayload(normalizedPayload)
+        handleActiveSocketDisconnect(
+          registrationId = registration.registrationId,
+          errorMessage = message,
+        )
+        return@runCatching
+      }
+
+      processEvent(registration, json)
+      val stores = linkedSetOf<String>()
+      val companies = linkedSetOf<String>()
+      collectSocketEventSummary(json, stores, companies)
+
+      updateSocketState { current ->
+        current.copy(
+          connected = true,
+          identified = true,
+          status = "connected",
+          attempts = 0,
+          device = registration.deviceId,
+          error = "",
+          code = null,
+          reason = "",
+          ownerRegistrationId = registration.registrationId,
+          ownerPackageName = registration.packageName,
+          ownerCompanyId = registration.companyId,
+          lastEventAt = System.currentTimeMillis(),
+          lastEventCount = 1,
+          lastStores = stores.toList(),
+          lastCompanies = companies.toList(),
+        )
+      }
+
+      broadcastLocalPayload(normalizedPayload)
+    }
+  }
+
+  private fun collectSocketEventSummary(
+    event: JSONObject,
+    stores: MutableSet<String>,
+    companies: MutableSet<String>,
+  ) {
+    val store = safeTrim(event.opt("store")).lowercase()
+    if (store.isNotEmpty()) {
+      stores.add(store)
+    }
+
+    val companyId = safeTrim(
+      event.optJSONObject("company")?.opt("id")
+        ?: event.opt("companyId")
+        ?: event.opt("company"),
+    )
+    if (companyId.isNotEmpty()) {
+      companies.add(companyId)
+    }
+  }
+
   private fun processEvent(
     registration: RuntimeRegistration,
     event: JSONObject,
@@ -789,17 +1742,84 @@ class BackgroundRuntimeService : Service() {
     val action = safeTrim(event.opt("action")).lowercase()
     val eventName = safeTrim(event.opt("event")).lowercase()
     val realStatus = safeTrim(event.opt("realStatus")).lowercase()
-
-    if (
+    val orderId = normalizeOrderId(event.opt("order"))
+    val shouldNotifyOrder =
       registration.notificationEnabled &&
-      store == "orders" &&
-      eventName == "order.created" &&
-      realStatus == "open"
-    ) {
+        store == "orders" &&
+        (
+          eventName == "order.created" && realStatus == "open" ||
+            eventName == "store.opened" && realStatus == "open" ||
+            eventName == "store.closed" && realStatus == "closed" ||
+            eventName == "cash.closed" && realStatus == "closed"
+          )
+
+    if (registration.runtimeDebugInfoEnabled && store == "orders") {
+      logRuntimeDebugAsync(
+        registration = registration,
+        message = if (shouldNotifyOrder) {
+          "Order event matched notification rules"
+        } else {
+          "Order event skipped by notification rules"
+        },
+        level = if (shouldNotifyOrder) "info" else "debug",
+        context = mapOf(
+          "store" to store,
+          "action" to action,
+          "event" to eventName,
+          "realStatus" to realStatus,
+          "orderId" to orderId.ifEmpty { null },
+          "matchesNotificationRules" to shouldNotifyOrder,
+          "notificationEnabled" to registration.notificationEnabled,
+        ),
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+    }
+
+    if (shouldNotifyOrder) {
       serviceScope.launch {
+        val enrichedEvent = runCatching {
+          enrichOrderNotificationEvent(registration, event)
+        }.getOrElse { error ->
+          logRuntimeDebug(
+            registration = registration,
+            message = "Failed to enrich order notification",
+            level = "error",
+            context = mapOf(
+              "store" to store,
+              "event" to eventName,
+              "realStatus" to realStatus,
+              "orderId" to orderId.ifEmpty { null },
+              "error" to error.message.orEmpty(),
+            ),
+            entityClass = "Order",
+            entityRow = orderId.toIntOrNull(),
+          )
+          event
+        }
+
+        runCatching {
+          playAlertSound(registration)
+        }.onFailure { error ->
+          logRuntimeDebug(
+            registration = registration,
+            message = "Failed to play alert sound",
+            level = "error",
+            context = mapOf(
+              "store" to store,
+              "event" to eventName,
+              "realStatus" to realStatus,
+              "orderId" to orderId.ifEmpty { null },
+              "error" to error.message.orEmpty(),
+            ),
+            entityClass = "Order",
+            entityRow = orderId.toIntOrNull(),
+          )
+        }
+
         showOrderNotification(
           registration,
-          enrichOrderNotificationEvent(registration, event),
+          enrichedEvent,
         )
       }
     }
@@ -808,6 +1828,35 @@ class BackgroundRuntimeService : Service() {
       serviceScope.launch {
         pollRegistrationSpools(registration)
       }
+    }
+  }
+
+  private fun playAlertSound(registration: RuntimeRegistration) {
+    val alertSoundUrl = registration.resolveAlertSoundUrl()
+    if (alertSoundUrl.isBlank()) {
+      return
+    }
+
+    val player = MediaPlayer()
+    runCatching {
+      player.setOnPreparedListener { preparedPlayer ->
+        runCatching {
+          preparedPlayer.start()
+        }.onFailure {
+          preparedPlayer.release()
+        }
+      }
+      player.setOnCompletionListener { completedPlayer ->
+        completedPlayer.release()
+      }
+      player.setOnErrorListener { errorPlayer, _, _ ->
+        errorPlayer.release()
+        true
+      }
+      player.setDataSource(this, Uri.parse(alertSoundUrl))
+      player.prepareAsync()
+    }.onFailure {
+      player.release()
     }
   }
 
@@ -1266,10 +2315,10 @@ class BackgroundRuntimeService : Service() {
     )
   }
 
-  private fun showOrderNotification(
+  private suspend fun showOrderNotification(
     registration: RuntimeRegistration,
     event: JSONObject,
-  ) {
+  ): Boolean {
     val orderId = normalizeOrderId(event.opt("order"))
     val statusLabel = safeTrim(
       event.opt("notificationStatusLabel").takeIf { it != null }
@@ -1338,28 +2387,93 @@ class BackgroundRuntimeService : Service() {
     } else {
       null
     }
-
-    val notification = NotificationCompat.Builder(this, ORDER_CHANNEL_ID)
-      .setContentTitle(title)
-      .setContentText(body)
-      .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-      .setSmallIcon(android.R.drawable.stat_notify_more)
-      .setAutoCancel(true)
-      .setContentIntent(pendingIntent)
-      .setPriority(NotificationCompat.PRIORITY_HIGH)
-      .build()
-
     val notificationManager =
       getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(
-      (registration.registrationId + orderId).hashCode(),
-      notification,
+    val notificationsEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      notificationManager.areNotificationsEnabled()
+    } else {
+      true
+    }
+    val channelImportance = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      notificationManager.getNotificationChannel(ORDER_CHANNEL_ID)?.importance
+    } else {
+      null
+    }
+    val notificationId = (registration.registrationId + orderId).hashCode()
+    val debugContext = linkedMapOf<String, Any?>(
+      "orderId" to orderId.ifEmpty { null },
+      "title" to title,
+      "body" to body,
+      "statusLabel" to statusLabel,
+      "subtitle" to subtitle.ifEmpty { null },
+      "customerName" to customerName.ifEmpty { null },
+      "priceLabel" to priceLabel.ifEmpty { null },
+      "notificationId" to notificationId,
+      "channelId" to ORDER_CHANNEL_ID,
+      "notificationsEnabled" to notificationsEnabled,
+      "channelImportance" to channelImportance,
+      "pendingIntentAvailable" to (pendingIntent != null),
+      "launchPackage" to launchPackage,
     )
+
+    return runCatching {
+      logRuntimeDebug(
+        registration = registration,
+        message = "Posting order notification",
+        context = debugContext,
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      val notification = NotificationCompat.Builder(this, ORDER_CHANNEL_ID)
+        .setContentTitle(title)
+        .setContentText(body)
+        .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+        .setSmallIcon(android.R.drawable.stat_notify_more)
+        .setAutoCancel(true)
+        .setContentIntent(pendingIntent)
+        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setPriority(NotificationCompat.PRIORITY_MAX)
+        .build()
+
+      notificationManager.notify(
+        notificationId,
+        notification,
+      )
+
+      logRuntimeDebug(
+        registration = registration,
+        message = "Order notification posted",
+        context = debugContext,
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      true
+    }.getOrElse { error ->
+      logRuntimeDebug(
+        registration = registration,
+        message = "Failed to show order notification",
+        level = "error",
+        context = debugContext + mapOf(
+          "error" to error.message.orEmpty(),
+          "exception" to error::class.java.simpleName,
+        ),
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      false
+    }
   }
 
   private fun shutdownRuntime() {
     spoolPollingJob?.cancel()
     spoolPollingJob = null
+
+    reconnectJob?.cancel()
+    reconnectJob = null
 
     leaderServerJob?.cancel()
     leaderServerJob = null
@@ -1368,6 +2482,20 @@ class BackgroundRuntimeService : Service() {
       leaderSocket?.close()
     }
     leaderSocket = null
+
+    localEventServerJob?.cancel()
+    localEventServerJob = null
+
+    runCatching {
+      localEventSocket?.close()
+    }
+    localEventSocket = null
+
+    localEventClients.keys.toList().forEach { clientId ->
+      closeLocalEventClient(clientId)
+    }
+
+    closeCurrentSocketConnection(clearOwner = true)
 
     activeSockets.keys.toList().forEach { registrationId ->
       closeSocketConnection(registrationId)

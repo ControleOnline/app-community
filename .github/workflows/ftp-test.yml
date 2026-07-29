@@ -1,0 +1,180 @@
+name: FTP Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      remote_dir:
+        description: "Diretorio remoto para teste de escrita e leitura"
+        required: false
+        default: "public_html/ftp-diagnostics"
+        type: string
+
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run FTP diagnostics
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp dnsutils netcat-openbsd
+
+          FAILURES=0
+          REMOTE_DIR="${{ inputs.remote_dir }}"
+          PROBE_FILE="ftp-test-${GITHUB_RUN_ID}.txt"
+          PROBE_CONTENT="FTP funcionando! run=${GITHUB_RUN_ID} at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          printf '%s\n' "$PROBE_CONTENT" > "$PROBE_FILE"
+
+          print_section() {
+            echo
+            echo "============================================================"
+            echo "$1"
+            echo "============================================================"
+          }
+
+          fail() {
+            FAILURES=$((FAILURES + 1))
+          }
+
+          run_check() {
+            local label="$1"
+            shift
+
+            print_section "$label"
+            set +e
+            "$@"
+            local status=$?
+            set -e
+
+            if [ "$status" -eq 0 ]; then
+              echo "RESULTADO: OK"
+            else
+              echo "RESULTADO: FALHOU (exit ${status})"
+              fail
+            fi
+
+            return 0
+          }
+
+          run_info_check() {
+            local label="$1"
+            shift
+
+            print_section "$label"
+            set +e
+            "$@"
+            local status=$?
+            set -e
+
+            if [ "$status" -eq 0 ]; then
+              echo "RESULTADO: OK"
+            else
+              echo "RESULTADO: INFO (falhou com exit ${status}, sem reprovar o diagnostico)"
+            fi
+
+            return 0
+          }
+
+          run_lftp_check() {
+            local label="$1"
+            local script="$2"
+
+            print_section "$label"
+            set +e
+            lftp -d -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
+              set cmd:fail-exit yes
+              set net:timeout 20
+              set net:max-retries 1
+              set ftp:passive-mode true
+              set ssl:verify-certificate no
+              ${script}
+              bye
+            "
+            local status=$?
+            set -e
+
+            if [ "$status" -eq 0 ]; then
+              echo "RESULTADO: OK"
+            else
+              echo "RESULTADO: FALHOU (exit ${status})"
+              fail
+            fi
+
+            return 0
+          }
+
+          print_section "Resumo das secrets usadas pelo teste"
+          if [ -n "${{ secrets.FTPHOST }}" ]; then
+            echo "FTPHOST: definido"
+          else
+            echo "FTPHOST: ausente"
+            fail
+          fi
+          if [ -n "${{ secrets.FTPUSER }}" ]; then
+            echo "FTPUSER: definido"
+          else
+            echo "FTPUSER: ausente"
+            fail
+          fi
+          if [ -n "${{ secrets.FTPPASS }}" ]; then
+            echo "FTPPASS: definido"
+          else
+            echo "FTPPASS: ausente"
+            fail
+          fi
+          echo "remote_dir: ${REMOTE_DIR}"
+
+          run_check "Resolucao DNS do host FTP" getent hosts "${{ secrets.FTPHOST }}"
+          run_info_check "Consulta DNS detalhada" sh -c "dig +short '${{ secrets.FTPHOST }}'"
+          run_check "Conectividade TCP na porta 21" nc -vz -w 10 "${{ secrets.FTPHOST }}" 21
+          run_info_check "Conectividade TCP na porta 990" nc -vz -w 10 "${{ secrets.FTPHOST }}" 990
+
+          run_lftp_check "Login FTP + pwd + listagem da raiz" "
+            pwd
+            cls -la
+          "
+
+          run_lftp_check "Listagem do diretorio alvo" "
+            cls -la ${REMOTE_DIR}
+          "
+
+          run_lftp_check "Criacao do diretorio de diagnostico" "
+            mkdir -p ${REMOTE_DIR}
+            cls -la ${REMOTE_DIR}
+          "
+
+          run_lftp_check "Upload do arquivo de teste" "
+            put ${PROBE_FILE} -o ${REMOTE_DIR}/${PROBE_FILE}
+            cls -la ${REMOTE_DIR}
+          "
+
+          print_section "Verificacao de conteudo do arquivo remoto"
+          set +e
+          REMOTE_CONTENT=$(lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ssl:verify-certificate no
+            cat ${REMOTE_DIR}/${PROBE_FILE}
+            bye
+          " 2>&1)
+          REMOTE_CONTENT_STATUS=$?
+          set -e
+          printf '%s\n' "$REMOTE_CONTENT"
+          if [ "$REMOTE_CONTENT_STATUS" -ne 0 ]; then
+            echo "RESULTADO: FALHOU ao ler o arquivo remoto"
+            fail
+          elif printf '%s' "$REMOTE_CONTENT" | grep -Fq "$PROBE_CONTENT"; then
+            echo "RESULTADO: arquivo enviado com sucesso"
+          else
+            echo "RESULTADO: upload ocorreu, mas o conteudo remoto nao bate com o arquivo local"
+            fail
+          fi
+
+          print_section "Resumo final"
+          if [ "$FAILURES" -gt 0 ]; then
+            echo "Foram encontrados ${FAILURES} problema(s) no diagnostico FTP."
+            exit 1
+          fi
+
+          echo "Todos os testes FTP passaram."

@@ -57,7 +57,10 @@ class KioskModeModule(
     activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     applyImmersiveMode(activity)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    if (
+      Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+      !isAnyLockTaskModeActive()
+    ) {
       try {
         activity.startLockTask()
       } catch (_: Exception) {

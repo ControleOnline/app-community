@@ -1,0 +1,6 @@
+package __PACKAGE__.launcher
+
+object LauncherModeState {
+  @Volatile
+  var launcherEnabled: Boolean = false
+}

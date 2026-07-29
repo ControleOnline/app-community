@@ -26,6 +26,21 @@ cd android
 ./gradlew bundleRelease --init-script ../signing.gradle
 ```
 
+### Browser smoke tests
+```bash
+npm run test:browser:install
+npm run test:browser
+```
+
+The browser suite now exports the web app once per `APP_TYPE`, serves each export with a tiny static server, and runs the grouped Playwright smoke tests from `src/tests/browser/<app_type>/`.
+
+To run a single group:
+```bash
+npm run test:browser:manager
+npm run test:browser:delivery
+npm run test:browser:pos
+```
+
 
 
 ### Comercial Contacts

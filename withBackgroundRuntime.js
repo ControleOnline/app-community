@@ -11,7 +11,11 @@ const TEMPLATE_DIR = path.join(
 
 const FOREGROUND_SERVICE_PERMISSION =
   'android.permission.FOREGROUND_SERVICE_DATA_SYNC';
+const RECEIVE_BOOT_COMPLETED_PERMISSION =
+  'android.permission.RECEIVE_BOOT_COMPLETED';
 const BACKGROUND_SERVICE_NAME = '.background.BackgroundRuntimeService';
+const BACKGROUND_BOOT_RECEIVER_NAME =
+  '.background.BackgroundRuntimeBootReceiver';
 
 const ensureFileContents = (filePath, contents) => {
   fs.mkdirSync(path.dirname(filePath), {recursive: true});
@@ -65,6 +69,55 @@ const ensureService = application => {
   }
 };
 
+const ensureBootReceiver = application => {
+  application.receiver = application.receiver || [];
+
+  let receiver = application.receiver.find(
+    item => item?.$?.['android:name'] === BACKGROUND_BOOT_RECEIVER_NAME,
+  );
+
+  if (!receiver) {
+    receiver = {
+      $: {
+        'android:name': BACKGROUND_BOOT_RECEIVER_NAME,
+        'android:enabled': 'true',
+        'android:exported': 'true',
+      },
+      'intent-filter': [],
+    };
+    application.receiver.push(receiver);
+  }
+
+  receiver.$ = {
+    ...(receiver.$ || {}),
+    'android:name': BACKGROUND_BOOT_RECEIVER_NAME,
+    'android:enabled': 'true',
+    'android:exported': 'true',
+  };
+
+  const currentFilter = receiver['intent-filter']?.[0] || {};
+  const currentActions = Array.isArray(currentFilter.action)
+    ? currentFilter.action
+    : [];
+  const actionNames = new Set(
+    currentActions
+      .map(item => item?.$?.['android:name'])
+      .filter(Boolean),
+  );
+
+  actionNames.add('android.intent.action.BOOT_COMPLETED');
+  actionNames.add('android.intent.action.MY_PACKAGE_REPLACED');
+
+  receiver['intent-filter'] = [
+    {
+      ...currentFilter,
+      action: Array.from(actionNames).map(actionName => ({
+        $: {'android:name': actionName},
+      })),
+    },
+  ];
+};
+
 const patchMainApplication = (filePath, packageName) => {
   if (!fs.existsSync(filePath)) {
     return;
@@ -106,7 +159,9 @@ module.exports = function withBackgroundRuntime(config) {
     }
 
     ensurePermission(manifest, FOREGROUND_SERVICE_PERMISSION);
+    ensurePermission(manifest, RECEIVE_BOOT_COMPLETED_PERMISSION);
     ensureService(application);
+    ensureBootReceiver(application);
 
     return currentConfig;
   });
@@ -131,6 +186,10 @@ module.exports = function withBackgroundRuntime(config) {
         path.join(backgroundRoot, 'BackgroundRuntimeService.kt'),
         readTemplate('BackgroundRuntimeService.kt.template', packageName),
       );
+      ensureFileContents(
+        path.join(backgroundRoot, 'BackgroundRuntimeBootReceiver.kt'),
+        readTemplate('BackgroundRuntimeBootReceiver.kt.template', packageName),
+      );
 
       patchMainApplication(
         path.join(javaRoot, ...packagePath, 'MainApplication.kt'),
@@ -142,4 +201,10 @@ module.exports = function withBackgroundRuntime(config) {
   ]);
 
   return config;
+};
+
+module.exports.__private__ = {
+  ensureBootReceiver,
+  ensurePermission,
+  ensureService,
 };

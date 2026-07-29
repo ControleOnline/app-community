@@ -1,4 +1,4 @@
-name: Deploy Cielo App
+name: Deploy Cielo PDV CONTROLE ONLINE
 
 # para executar sempre que subir um branch do tipo production    
 #on:
@@ -26,16 +26,18 @@ jobs:
         include:
           - app_type: POS
             display_name: "PDV"
-            track: internal
+            tracks: internal
             release_status: completed
             changes_not_sent_for_review: false
 
     env:
       APP_TYPE: ${{ matrix.app_type }}
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Update Submodules
         run: |
@@ -50,7 +52,7 @@ jobs:
           build-tools-version: 36.0.0
           ndk-version: 27.1.12297006
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
 
@@ -79,23 +81,22 @@ jobs:
       - name: Backup app.json
         run: cp app.json app.json.backup
 
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/manager/${APP_LOWER}/g" app.json
-
-      - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets.js
-        env:
-          APP_TYPE: ${{ env.APP_TYPE }}
-
       - name: Install Dependencies
         run: npm install
-      - name: Fix Expo Dependencies
-        run: npx expo install --fix
+#
+#      - name: Fix Expo Dependencies
+#        run: npx expo install --fix
+#
+#      - name: Prebuild
+#        run: npx expo prebuild --clean
+#
       - name: Prebuild
         run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
+
+
 
       - name: Create Android Signing Files
         run: |
@@ -142,21 +143,5 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
-      - name: Restore app.json (revert dynamic changes)
-        run: |
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          cp app.json.backup app.json
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            app.expo.android.versionCode = $VERSION_CODE;
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
-
-      - name: Commit app.json changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.json
-          git commit -m "chore: update versionCode to ${{ env.VERSION }}"
-          git push
+      - name: Restore app.json
+        run: cp app.json.backup app.json

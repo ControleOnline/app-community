@@ -1,21 +1,23 @@
-name: Deploy Project Manager LaveGo
+name: Deploy Project app.lave-go.com
 on:
   push:
-    branches: [production]
+    branches: [staging]
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
       - name: Creating Config
         run: |
           echo "const env = {\
-          API_ENTRYPOINT: 'https://api.lave-go.com',\
-          SOCKET: 'wss://api.lave-go.com',\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
           APP_TYPE: 'MANAGER',\
           ZOOM: 0.80,\
           NEW_RELIC:{\
@@ -43,14 +45,14 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-            server: ${{ secrets.FTPHOSTLAVEGO }}
-            username: ${{ secrets.FTPUSERLAVEGO }}
-            password: ${{ secrets.FTPPASSLAVEGO }}
-            protocol: ftps
-            port: 21
-            security: loose
-            local-dir: ./dist/
-            server-dir: public_html/
-            exclude: |
-              **/.git*
-              **/.git*/**
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist/
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**

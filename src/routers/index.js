@@ -1,3 +1,4 @@
+import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {getStateFromPath as defaultGetStateFromPath} from '@react-navigation/native'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -7,8 +8,10 @@ import {Pressable, StyleSheet} from 'react-native'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
+import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
+import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
 
@@ -19,11 +22,18 @@ import customersRoutes from '@controleonline/ui-customers/src/react/router/route
 import loginRoutes from '@controleonline/ui-login/src/react/router/routes'
 import managerRoutes from '@controleonline/ui-manager/src/react/router/routes'
 import ordersRoutes from '@controleonline/ui-orders/src/react/router/routes'
+import reportRoutes from '@controleonline/ui-report/src/react/router/routes'
+import employeeRoutes from '@controleonline/ui-employee/src/react/router/routes'
 import peopleRoutes from '@controleonline/ui-people/src/react/router/routes'
+import logisticRoutes from '@controleonline/ui-logistic/src/react/router/routes'
 import productsRoutes from '@controleonline/ui-products/src/react/router/routes'
 import shopRoutes from '@controleonline/ui-shop/src/react/router/routes'
-
-import { env } from '@env'
+import testsRoutes from '@controleonline/ui-tests/src/react/router/routes'
+import {app_type} from '@appType'
+import {
+  normalizeInitialBrowserPath,
+  normalizeProductDetailsTabPath,
+} from './browserPath'
 
 const Stack = createNativeStackNavigator()
 
@@ -50,42 +60,52 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
       : (screenOptions || {})
   const {headerBackFallback, ...nativeOptions} = resolvedOptions
 
+  if (typeof nativeOptions.title === 'function') {
+    nativeOptions.title = nativeOptions.title(args)
+  }
+
   if (headerBackFallback && nativeOptions.headerShown !== false) {
     nativeOptions.headerBackVisible = false
     nativeOptions.headerLeft = () => (
-      <Pressable
-        accessibilityLabel="Voltar"
-        accessibilityRole="button"
-        hitSlop={8}
-        onPress={() => {
-          const {navigation, route} = args
+      React.createElement(
+        Pressable,
+        {
+          accessibilityLabel: 'Voltar',
+          accessibilityRole: 'button',
+          hitSlop: 8,
+          onPress: () => {
+            const {navigation, route} = args
 
-          if (navigation?.canGoBack?.()) {
-            navigation.goBack()
-            return
-          }
+            if (navigation?.canGoBack?.()) {
+              navigation.goBack()
+              return
+            }
 
-          const fallback =
-            typeof headerBackFallback === 'function'
-              ? headerBackFallback({navigation, route})
-              : headerBackFallback
+            const fallback =
+              typeof headerBackFallback === 'function'
+                ? headerBackFallback({navigation, route})
+                : headerBackFallback
 
-          if (Array.isArray(fallback?.resetRoutes) && fallback.resetRoutes.length > 0) {
-            navigation?.reset?.({
-              index: fallback.resetRoutes.length - 1,
-              routes: fallback.resetRoutes,
-            })
-            return
-          }
+            if (Array.isArray(fallback?.resetRoutes) && fallback.resetRoutes.length > 0) {
+              navigation?.reset?.({
+                index: fallback.resetRoutes.length - 1,
+                routes: fallback.resetRoutes,
+              })
+              return
+            }
 
-          if (fallback?.name) {
-            navigation?.navigate?.(fallback.name, fallback.params || {})
-          }
-        }}
-        style={routerStyles.headerBackButton}
-      >
-        <MaterialCommunityIcons name="arrow-left" size={24} color="#0F172A" />
-      </Pressable>
+            if (fallback?.name) {
+              navigation?.navigate?.(fallback.name, fallback.params || {})
+            }
+          },
+          style: routerStyles.headerBackButton,
+        },
+        React.createElement(MaterialCommunityIcons, {
+          color: '#0F172A',
+          name: 'arrow-left',
+          size: 24,
+        }),
+      )
     )
   }
 
@@ -103,22 +123,28 @@ export const allRoutes = [
   ...loginRoutes,
   ...managerRoutes,
   ...ordersRoutes,
+  ...reportRoutes,
+  ...employeeRoutes,
+  ...logisticRoutes,
   ...peopleRoutes,
   ...productsRoutes,
-  ...shopRoutes
+  ...shopRoutes,
+  ...testsRoutes,
 ]
 
 const homeByType = {
 //  CHECKOUT: CheckoutHomePage,
   CRM: CRMHomePage,
-  DELIVERY: POSHomePage,
+  DELIVERY: DeliveryHomePage,
+  ADMIN: ManagerHomePage,
   MANAGER: ManagerHomePage,
+  SERVICE: ServiceHomePage,
   SHOP: ShopHomePage,
   POS: POSHomePage,
   PPC: PPCHomePage,
 }
 
-const normalizedAppType = String(env.APP_TYPE || '').toUpperCase()
+const normalizedAppType = app_type
 
 if (homeByType[normalizedAppType]) {
   allRoutes.push({
@@ -130,7 +156,7 @@ if (homeByType[normalizedAppType]) {
       title: 'Menu',
       showBottomToolBar: normalizedAppType !== 'PPC',
       showBottomCart: false,
-      showCompanyFilter: true,
+      showCompanyFilter: normalizedAppType !== 'DELIVERY',
     },
   })
 }
@@ -139,41 +165,15 @@ const routeDefinitions = allRoutes.filter(
   route => route?.name && route?.component,
 )
 
-const PRODUCT_DETAILS_TAB_PATH_REGEX =
-  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque)([?#].*)?$/i
-
-const normalizeProductDetailsTabPath = path => {
-  const normalizedPath = String(path || '')
-  const productDetailsTabMatch = normalizedPath.match(PRODUCT_DETAILS_TAB_PATH_REGEX)
-
-  if (!productDetailsTabMatch?.[1]) {
-    return normalizedPath
-  }
-
-  return `product-details/${productDetailsTabMatch[1]}${productDetailsTabMatch[2] || ''}`
-}
-
-const normalizeInitialBrowserPath = () => {
-  if (typeof window === 'undefined') return
-
-  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
-  const normalizedPath = normalizeProductDetailsTabPath(currentPath)
-  const nextPath = normalizedPath.startsWith('/') ? normalizedPath : `/${normalizedPath}`
-
-  if (nextPath === currentPath) return
-
-  window.history.replaceState(window.history.state, '', nextPath)
-}
-
-normalizeInitialBrowserPath()
+normalizeInitialBrowserPath(globalThis?.window)
 
 const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
   const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
 
-  return (
-    <DefaultLayout navigation={navigation} route={route} options={resolvedOptions}>
-      <Component navigation={navigation} route={route} />
-    </DefaultLayout>
+  return React.createElement(
+    DefaultLayout,
+    {navigation, options: resolvedOptions, route},
+    React.createElement(Component, {navigation, route}),
   )
 }
 
@@ -237,17 +237,20 @@ const getInitialRouteName = () => {
 }
 
 export default function Routes() {
-  return (
-    <Stack.Navigator detachInactiveScreens initialRouteName={getInitialRouteName()}>
-      {routeDefinitions.map((route, index) => (
-        <Stack.Screen
-          key={index}
-          name={route.name}
-          component={WrappedComponent(route.options, route.component)}
-          options={args => resolveRouteOptions(route.options, args)}
-          initialParams={route.initialParams}
-        />
-      ))}
-    </Stack.Navigator>
+  return React.createElement(
+    Stack.Navigator,
+    {
+      detachInactiveScreens: true,
+      initialRouteName: getInitialRouteName(),
+    },
+    routeDefinitions.map((route, index) =>
+      React.createElement(Stack.Screen, {
+        component: WrappedComponent(route.options, route.component),
+        initialParams: route.initialParams,
+        key: index,
+        name: route.name,
+        options: args => resolveRouteOptions(route.options, args),
+      }),
+    ),
   )
 }
