@@ -8,16 +8,23 @@ const outputDir = path.resolve(
   process.env.PLAYWRIGHT_WEB_OUTPUT_DIR || '.playwright-web',
 );
 const envLocalFile = path.join(projectRoot, 'config/env.local.js');
-const envLocalSampleFile = path.join(projectRoot, 'config/env.local.sample.js');
+const envLocalSampleFiles = [
+  path.join(projectRoot, 'config/env.local.sample.js'),
+  path.join(projectRoot, 'config/env.local.sample'),
+];
 
 const ensureEnvLocalFile = () => {
   if (fs.existsSync(envLocalFile)) {
     return;
   }
 
-  if (!fs.existsSync(envLocalSampleFile)) {
+  const envLocalSampleFile = envLocalSampleFiles.find(sampleFile =>
+    fs.existsSync(sampleFile),
+  );
+
+  if (!envLocalSampleFile) {
     throw new Error(
-      'config/env.local.js is missing and config/env.local.sample.js was not found.',
+      'config/env.local.js is missing and no env.local sample file was found.',
     );
   }
 
