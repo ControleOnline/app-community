@@ -4,10 +4,10 @@
 name: DEPLOY CIELO PDV LAVEGO STAGING
 
 on:
-  workflow_run:
+#  workflow_run:
 #    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
-    types: [completed]
-    branches: [staging]
+#    types: [completed]
+#    branches: [staging]
   workflow_dispatch: {}
 
 jobs:
