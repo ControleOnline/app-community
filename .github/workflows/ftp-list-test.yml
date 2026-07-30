@@ -19,51 +19,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install lftp
+      - name: Install curl
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
+          sudo apt-get install -y -qq curl
 
-      - name: Connect and List Directory
+      - name: List FTP Directory (ROOT CHECK)
         run: |
           VERSION="${{ inputs.version }}"
           PACKAGE="${{ inputs.package_name }}"
 
-          # IMPORTANTE:
-          # O root do FTP já é public_html
-          REMOTE_DIR="${VERSION}/${PACKAGE}/apk"
+          REMOTE_PATH="${VERSION}/${PACKAGE}/apk/"
 
           echo
           echo "============================================================"
-          echo "Conectando ao FTP..."
+          echo "Conectando ao FTP com curl..."
           echo "Host: ${{ secrets.FTPHOST }}"
-          echo "Diretório que será listado:"
-          echo "$REMOTE_DIR"
+          echo "Caminho: $REMOTE_PATH"
           echo "============================================================"
           echo
 
-          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
-            set cmd:fail-exit yes
-            set net:timeout 20
-            set net:max-retries 1
-            set ftp:passive-mode true
-            set ssl:verify-certificate no
-
-            echo ===== DIRETÓRIO ATUAL (PWD) =====
-            pwd
-
-            echo ===== LISTAGEM DA RAIZ FTP =====
-            cls -la
-
-            echo ===== ENTRANDO NO DIRETÓRIO =====
-            cd ${REMOTE_DIR}
-
-            echo ===== LISTAGEM REAL DO DIRETÓRIO =====
-            cls -la
-            echo ======================================
-
-            bye
-          "
+          echo "===== LISTAGEM DA RAIZ FTP ====="
+          curl -v --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
+               "ftp://${{ secrets.FTPHOST }}/" \
+               --ftp-pasv || exit 1
 
           echo
-          echo "✅ Diretório listado com sucesso."
+          echo "===== LISTAGEM DO DIRETÓRIO DESEJADO ====="
+          curl -v --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
+               "ftp://${{ secrets.FTPHOST }}/${REMOTE_PATH}" \
+               --ftp-pasv || exit 1
+
+          echo
+          echo "✅ Listagem concluída com sucesso."
