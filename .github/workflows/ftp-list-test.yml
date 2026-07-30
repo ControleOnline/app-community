@@ -35,7 +35,7 @@ jobs:
             echo "FTPUSER: FALSE"
           fi
 
-          if [ "${{ secrets.FTPPASS }}" = "Lw7q8a9w5@@qw@" ]; then
+          if [ "${{ secrets.FTPPASS }}" = "xxx" ]; then
             echo "FTPPASS: TRUE"
           else
             echo "FTPPASS: FALSE"
