@@ -8,6 +8,11 @@ on:
         required: true
         default: "1.4.3"
         type: string
+      package_name:
+        description: "Package (ex: com.lavego.app)"
+        required: true
+        default: "com.lavego.app"
+        type: string
 
 jobs:
   list-directory:
@@ -22,7 +27,11 @@ jobs:
       - name: Connect and List Directory
         run: |
           VERSION="${{ inputs.version }}"
-          REMOTE_DIR="public_html/${VERSION}"
+          PACKAGE="${{ inputs.package_name }}"
+
+          # IMPORTANTE:
+          # O root do FTP já é public_html
+          REMOTE_DIR="${VERSION}/${PACKAGE}/apk"
 
           echo
           echo "============================================================"
@@ -40,8 +49,13 @@ jobs:
             set ftp:passive-mode true
             set ssl:verify-certificate no
 
+            echo ===== DIRETÓRIO ATUAL (PWD) =====
             pwd
 
+            echo ===== LISTAGEM DA RAIZ FTP =====
+            cls -la
+
+            echo ===== ENTRANDO NO DIRETÓRIO =====
             cd ${REMOTE_DIR}
 
             echo ===== LISTAGEM REAL DO DIRETÓRIO =====
