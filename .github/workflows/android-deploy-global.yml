@@ -256,7 +256,7 @@ jobs:
         if: matrix.app_type == 'POS'
         # NÃO ALTERAR O NOME DO YML
         run: |
-          gh workflow run cielo-deploy-pdv-lavego.yml
+          gh workflow run cielo-deploy-pdv-lavego-xxx.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
