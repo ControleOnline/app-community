@@ -1,5 +1,5 @@
 # aplicativo PDV para loja da Cielo
-# usando APINEW
+# usando API
 
 name: Deploy Cielo PDV LAVEGO
 
@@ -48,10 +48,10 @@ jobs:
         run: |
           ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
-          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          API_ENTRYPOINT: 'https://api.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
-          SOCKET: 'wss://apinew.lave-go.com',\
+          SOCKET: 'wss://api.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
           ZOOM: ${ZOOM},\
           NEW_RELIC:{\
