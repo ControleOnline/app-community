@@ -146,9 +146,9 @@ jobs:
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
           localDir: ${{ env.APK_DIR }}
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
@@ -166,7 +166,7 @@ jobs:
           echo "Arquivo esperado: $APK_FILENAME"
           echo "=============================================="
 
-          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" <<EOF
+          lftp -u "${{ secrets.ADMIN_USER }},${{ secrets.ADMIN_PASS }}" "ftp://${{ secrets.ADMIN_HOST }}" <<EOF
           set cmd:fail-exit yes
           set ftp:passive-mode true
           set ssl:verify-certificate no
