@@ -84,7 +84,7 @@ jobs:
       # ── 3. env.local.js ──────────────────────────────────────────────
       - name: Generate Dynamic Configs
         run: |
-          ZOOM=$(node -p "require(q{./config/env.local.sample}).env.ZOOM ?? 100")
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
           API_ENTRYPOINT: 'https://apinew.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\

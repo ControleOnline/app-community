@@ -15,7 +15,7 @@ jobs:
           node-version: "20"
       - name: Creating Config
         run: |
-          ZOOM=$(node -p "require(q{./config/env.local.sample}).env.ZOOM ?? 100")
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
