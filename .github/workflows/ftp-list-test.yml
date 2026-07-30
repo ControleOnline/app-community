@@ -43,6 +43,7 @@ jobs:
           curl --silent --show-error --fail \
                --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
                --ftp-pasv \
+               --list-only \
                "ftp://${{ secrets.FTPHOST }}/" || exit 1
 
           echo
@@ -50,6 +51,7 @@ jobs:
           curl --silent --show-error --fail \
                --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
                --ftp-pasv \
+               --list-only \
                "ftp://${{ secrets.FTPHOST }}/${REMOTE_PATH}" || exit 1
 
           echo
