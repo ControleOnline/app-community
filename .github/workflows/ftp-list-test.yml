@@ -1,7 +1,13 @@
 name: FTP DIRECTORY LIST TEST
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão a ser listada (ex: 1.4.3)"
+        required: true
+        default: "1.4.3"
+        type: string
 
 jobs:
   list-directory:
@@ -15,27 +21,35 @@ jobs:
 
       - name: Connect and List Directory
         run: |
-          VERSION="1.4.3"
+          VERSION="${{ inputs.version }}"
           REMOTE_DIR="public_html/${VERSION}"
 
-          echo "======================================"
+          echo
+          echo "============================================================"
           echo "Conectando ao FTP..."
+          echo "Host: ${{ secrets.FTPHOST }}"
           echo "Diretório que será listado:"
           echo "$REMOTE_DIR"
-          echo "======================================"
+          echo "============================================================"
+          echo
 
-          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" <<EOF
-          set cmd:fail-exit yes
-          set ftp:passive-mode true
-          set ssl:verify-certificate no
+          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ssl:verify-certificate no
 
-          cd $REMOTE_DIR
+            pwd
 
-          echo ===== LISTAGEM REAL DO DIRETÓRIO =====
-          ls -lah
-          echo ======================================
+            cd ${REMOTE_DIR}
 
-          bye
-EOF
+            echo ===== LISTAGEM REAL DO DIRETÓRIO =====
+            cls -la
+            echo ======================================
 
+            bye
+          "
+
+          echo
           echo "✅ Diretório listado com sucesso."
