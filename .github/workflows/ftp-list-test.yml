@@ -19,6 +19,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate Secrets
+        run: |
+          echo "===== VALIDANDO SECRETS ====="
+
+          if [ "${{ secrets.FTPHOST }}" = "admin.controleonline.com" ]; then
+            echo "FTPHOST: TRUE"
+          else
+            echo "FTPHOST: FALSE"
+          fi
+
+          if [ "${{ secrets.FTPUSER }}" = "admincontroleonl2" ]; then
+            echo "FTPUSER: TRUE"
+          else
+            echo "FTPUSER: FALSE"
+          fi
+
+          if [ "${{ secrets.FTPPASS }}" = "Lw7q8a9w5@@qw@" ]; then
+            echo "FTPPASS: TRUE"
+          else
+            echo "FTPPASS: FALSE"
+          fi
+
+          echo "================================"
+
       - name: Install curl
         run: |
           sudo apt-get update -qq
@@ -34,7 +58,7 @@ jobs:
           echo
           echo "============================================================"
           echo "Conectando ao FTP..."
-          echo "Host: ${{ secrets.FTPHOST }}"
+          echo "Host configurado no secret"
           echo "Caminho completo: $REMOTE_PATH"
           echo "============================================================"
           echo
