@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Versão a ser listada (ex: 1.4.3)"
+        description: "Versão (ex: 1.4.3)"
         required: true
         default: "1.4.3"
         type: string
@@ -24,31 +24,33 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq curl
 
-      - name: List FTP Directory (ROOT CHECK)
+      - name: List FTP Directory
         run: |
           VERSION="${{ inputs.version }}"
           PACKAGE="${{ inputs.package_name }}"
 
-          REMOTE_PATH="${VERSION}/${PACKAGE}/apk/"
+          REMOTE_PATH="public_html/${VERSION}/${PACKAGE}/apk/"
 
           echo
           echo "============================================================"
-          echo "Conectando ao FTP com curl..."
+          echo "Conectando ao FTP..."
           echo "Host: ${{ secrets.FTPHOST }}"
-          echo "Caminho: $REMOTE_PATH"
+          echo "Caminho completo: $REMOTE_PATH"
           echo "============================================================"
           echo
 
-          echo "===== LISTAGEM DA RAIZ FTP ====="
-          curl -v --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
-               "ftp://${{ secrets.FTPHOST }}/" \
-               --ftp-pasv || exit 1
+          echo "===== LISTAGEM DA RAIZ ====="
+          curl --silent --show-error --fail \
+               --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
+               --ftp-pasv \
+               "ftp://${{ secrets.FTPHOST }}/" || exit 1
 
           echo
           echo "===== LISTAGEM DO DIRETÓRIO DESEJADO ====="
-          curl -v --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
-               "ftp://${{ secrets.FTPHOST }}/${REMOTE_PATH}" \
-               --ftp-pasv || exit 1
+          curl --silent --show-error --fail \
+               --user "${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}" \
+               --ftp-pasv \
+               "ftp://${{ secrets.FTPHOST }}/${REMOTE_PATH}" || exit 1
 
           echo
-          echo "✅ Listagem concluída com sucesso."
+          echo "✅ Diretório listado com sucesso."
