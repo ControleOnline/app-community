@@ -1,0 +1,41 @@
+name: FTP DIRECTORY LIST TEST
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  list-directory:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install lftp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+
+      - name: Connect and List Directory
+        run: |
+          VERSION="1.4.3"
+          REMOTE_DIR="public_html/${VERSION}"
+
+          echo "======================================"
+          echo "Conectando ao FTP..."
+          echo "Diretório que será listado:"
+          echo "$REMOTE_DIR"
+          echo "======================================"
+
+          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" <<EOF
+          set cmd:fail-exit yes
+          set ftp:passive-mode true
+          set ssl:verify-certificate no
+
+          cd $REMOTE_DIR
+
+          echo ===== LISTAGEM REAL DO DIRETÓRIO =====
+          ls -lah
+          echo ======================================
+
+          bye
+EOF
+
+          echo "✅ Diretório listado com sucesso."

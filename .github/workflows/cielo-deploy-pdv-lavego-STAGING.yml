@@ -47,22 +47,22 @@ jobs:
       - name: Generate Dynamic Configs
         run: |
           ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
-          echo "const env = {\
-          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
-          DOMAIN: 'https://app.lave-go.com',\
-          MANAGER_APP: 'https://app.lave-go.com',\
-          SOCKET: 'wss://apinew.lave-go.com',\
-          APP_TYPE: '${APP_TYPE}',\
-          ZOOM: ${ZOOM},\
-          NEW_RELIC:{\
-            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
-            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
-            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
-            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
-            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
-            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
-          }\
-          };\
+          echo "const env = {
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',
+          DOMAIN: 'https://app.lave-go.com',
+          MANAGER_APP: 'https://app.lave-go.com',
+          SOCKET: 'wss://apinew.lave-go.com',
+          APP_TYPE: '${APP_TYPE}',
+          ZOOM: ${ZOOM},
+          NEW_RELIC:{
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'
+          }
+          };
           module.exports = { env };" > ./config/env.local.js
 
       - name: Install Dependencies
@@ -73,11 +73,11 @@ jobs:
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.name                = 'Lave-Go Staging';
-            app.expo.android.package     = 'com.lavego.staging';
-            app.expo.slug                = 'pos-controle-online';
+            app.expo.name = 'Lave-Go Staging';
+            app.expo.android.package = 'com.lavego.staging';
+            app.expo.slug = 'pos-controle-online';
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "           
+          "
 
       - name: Prebuild
         run: npx expo prebuild --clean
@@ -117,20 +117,16 @@ jobs:
             --info \
             --no-daemon \
             -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" \
-            -Dorg.gradle.parallel=false \
-            2>&1 | tee /tmp/gradle-assemble-release.log | tail -300
+            -Dorg.gradle.parallel=false
 
       - name: Validate generated APK
         run: |
           APK_PATH=$(find ./android/app/build/outputs/apk -type f -name '*.apk' | sort | head -n 1)
           if [ -z "$APK_PATH" ]; then
-            echo "Nenhum APK foi gerado dentro de ./android/app/build/outputs/apk" >&2
-            echo
-            echo "Conteudo disponivel em ./android/app/build/outputs:"
-            find ./android/app/build/outputs -maxdepth 4 -type f | sort || true
+            echo "Nenhum APK foi gerado." >&2
             exit 1
           fi
-  
+
           APK_DIR=$(dirname "$APK_PATH")
           APK_FILENAME=$(basename "$APK_PATH")
 
@@ -141,12 +137,11 @@ jobs:
           ls -lah "$APK_DIR"
           echo "APK localizado: $APK_FILENAME"
 
-          
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
-          echo "App version: $VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "App version: $VERSION"
 
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
@@ -158,37 +153,33 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
-      - name: Verify uploaded APK on FTP
+      - name: Verify uploaded APK on FTP (REAL CHECK)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y lftp
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
 
           REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
-          LOG_FILE="$(mktemp)"
 
-          set +e
-          lftp -d -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" -e "
-            set cmd:fail-exit yes
-            set net:timeout 20
-            set net:max-retries 1
-            set ftp:passive-mode true
-            set ftp:ssl-allow no
-            set ftp:ssl-force no
-            set ssl:verify-certificate no
-            cls -la ${REMOTE_DIR}
-            bye
-          " 2>&1 | tee "$LOG_FILE"
-          LFTP_STATUS=${PIPESTATUS[0]}
-          set -e
+          echo "=============================================="
+          echo "Conectando no FTP..."
+          echo "Diretório esperado: $REMOTE_DIR"
+          echo "Arquivo esperado: $APK_FILENAME"
+          echo "=============================================="
 
-          if [ "$LFTP_STATUS" -ne 0 ]; then
-            echo "Falha ao listar o diretório remoto após o upload." >&2
-            exit "$LFTP_STATUS"
-          fi
+          lftp -u "${{ secrets.FTPUSER }},${{ secrets.FTPPASS }}" "ftp://${{ secrets.FTPHOST }}" <<EOF
+          set cmd:fail-exit yes
+          set ftp:passive-mode true
+          set ssl:verify-certificate no
 
-          if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
-            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${APK_FILENAME}"
-          else
-            echo "O upload terminou sem erro, mas o arquivo ${APK_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
-            exit 1
-          fi
+          cd $REMOTE_DIR
+
+          echo ===== LISTAGEM REAL DO DIRETÓRIO REMOTO =====
+          ls -lah
+          echo =============================================
+
+          ls $APK_FILENAME
+
+          bye
+EOF
+
+          echo "✅ Arquivo confirmado no FTP."
