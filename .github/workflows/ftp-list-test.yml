@@ -19,29 +19,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate Secrets
-        run: |
-          echo "===== VALIDANDO SECRETS ====="
-
-          if [ "${{ secrets.FTPHOST }}" = "admin.controleonline.com" ]; then
-            echo "FTPHOST: TRUE"
-          else
-            echo "FTPHOST: FALSE"
-          fi
-
-          if [ "${{ secrets.FTPUSER }}" = "admincontroleonl2" ]; then
-            echo "FTPUSER: TRUE"
-          else
-            echo "FTPUSER: FALSE"
-          fi
-
-          if [ "${{ secrets.FTPPASS }}" = "xxx" ]; then
-            echo "FTPPASS: TRUE"
-          else
-            echo "FTPPASS: FALSE"
-          fi
-
-          echo "================================"
 
       - name: Install curl
         run: |
