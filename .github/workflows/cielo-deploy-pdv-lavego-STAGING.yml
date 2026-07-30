@@ -19,7 +19,7 @@ jobs:
       APP_TYPE: POS
       APP_DISPLAY_NAME: PDV
       APP_SLUG: pos
-      PACKAGE_NAME: com.lavego.app
+      PACKAGE_NAME: com.lavego.staging
       ASSETS_VARIANT: pos_lavego
       GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
       EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
@@ -73,8 +73,8 @@ jobs:
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.name                = 'Lave-Go';
-            app.expo.android.package     = 'com.lavego.app';
+            app.expo.name                = 'Lave-Go Staging';
+            app.expo.android.package     = 'com.lavego.staging';
             app.expo.slug                = 'pos-controle-online';
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "           
