@@ -1,7 +1,7 @@
 # aplicativo PDV para loja da Cielo
 # usando APINEW
 
-name: Deploy Cielo PDV LAVEGO
+name: DEPLOY CIELO PDV LAVEGO STAGING
 
 on:
   workflow_run:

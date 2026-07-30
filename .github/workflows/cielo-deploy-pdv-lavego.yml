@@ -5,7 +5,7 @@ name: Deploy Cielo PDV LAVEGO
 
 on:
   workflow_run:
-    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
+    workflows: ["Deploy Android Apps xxx"] # NÃO MUDAR ESSE NOME
     types: [completed]
     branches: [production]
   workflow_dispatch: {}
