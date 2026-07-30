@@ -19,7 +19,7 @@ jobs:
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'SHOP',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\

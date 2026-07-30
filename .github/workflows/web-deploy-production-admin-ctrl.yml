@@ -68,7 +68,7 @@ jobs:
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'ADMIN',\
           APP_DISPLAY_NAME: 'Admin',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
