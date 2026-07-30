@@ -60,6 +60,8 @@ jobs:
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
 
+          ZOOM=$(node -p "require(q{./config/env.local.sample}).env.ZOOM ?? 100")
+
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           DOMAIN: 'https://app.controleonline.com',\
