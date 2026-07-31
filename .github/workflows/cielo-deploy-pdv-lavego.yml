@@ -1,13 +1,13 @@
 # aplicativo PDV para loja da Cielo
 # usando API
 
-name: DEPLOY CIELO PDV LAVEGO
+name: DEPLOY CIELO PDV LAVEGO PRODUCTION
 
 on:
   workflow_run:
-    workflows: ["Deploy Android Apps xxx"] # NÃO MUDAR ESSE NOME
+    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
     types: [completed]
-    branches: [xxx]
+    branches: [production]
   workflow_dispatch: {}
 
 jobs:

@@ -1,0 +1,51 @@
+# global-deploy.yml
+# Orquestrador STAGING (execução paralela)
+
+name: Global Deploy (STAGING)
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Android Deploy Global
+        run: |
+          gh workflow run "Deploy Android Apps" --ref "${GITHUB_REF_NAME}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cielo-ctrl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cielo PDV Controle Online
+        run: |
+          gh workflow run cielo-deploy-pdv-ctrl.yml --ref "${GITHUB_REF_NAME}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cielo-lavego-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cielo PDV Lavego STAGING
+        run: |
+          gh workflow run cielo-deploy-pdv-lavego-STAGING.yml --ref "${GITHUB_REF_NAME}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cielo-lavego-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cielo PDV Lavego PRODUCTION
+        run: |
+          gh workflow run cielo-deploy-pdv-lavego.yml --ref "${GITHUB_REF_NAME}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

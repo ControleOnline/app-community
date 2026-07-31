@@ -1,0 +1,126 @@
+# push-to-ftp-server.yml
+# Alexandre
+# 2026-07-31
+# Workflow reutilizável para envio de artifacts ao servidor FTP.
+#
+# Estrutura remota:
+#
+# public_html/
+#   └── {version}/
+#       └── {package_name}/
+#           ├── apk/
+#           ├── aab/
+#           ├── ipk/
+#           ├── web/
+#           └── tests/
+#
+# Exemplo de chamada (workflow_call):
+#
+#   - name: Push AAB to FTP
+#     uses: ./.github/workflows/push-to-ftp-server.yml
+#     with:
+#       source_run_id: ${{ github.run_id }}
+#       artifact_name: android-aab-pos
+#       version: ${{ env.VERSION }}
+#       package_name: com.controleonline.pos
+#       artifact_type: aab
+
+name: Push To FTP Server
+
+on:
+  workflow_call:
+    inputs:
+      source_run_id:
+        description: "Run ID de origem contendo o artifact"
+        required: true
+        type: string
+
+      artifact_name:
+        description: "Nome do artifact gerado no workflow de origem"
+        required: true
+        type: string
+
+      version:
+        description: "Versão usada para criar o diretório remoto"
+        required: true
+        type: string
+
+      package_name:
+        description: "Package name usado no diretório remoto"
+        required: true
+        type: string
+
+      artifact_type:
+        description: "Subdiretório remoto (apk, aab, ipk, web, tests, etc)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  ftp-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact from Source Workflow
+        run: |
+          DOWNLOAD_ROOT="ftp-artifact"
+          mkdir -p "${DOWNLOAD_ROOT}"
+
+          echo "Baixando artifact ${{ inputs.artifact_name }} do run ${{ inputs.source_run_id }}"
+
+          gh run download "${{ inputs.source_run_id }}" \
+            --repo "${GH_REPO}" \
+            --name "${{ inputs.artifact_name }}" \
+            --dir "${DOWNLOAD_ROOT}"
+
+          ARTIFACT_DIR="${DOWNLOAD_ROOT}"
+
+          if [ -d "${DOWNLOAD_ROOT}/${{ inputs.artifact_name }}" ]; then
+            ARTIFACT_DIR="${DOWNLOAD_ROOT}/${{ inputs.artifact_name }}"
+          fi
+
+          if ! find "${ARTIFACT_DIR}" -type f | grep -q .; then
+            echo "Nenhum arquivo encontrado dentro do artifact."
+            exit 1
+          fi
+
+          echo "FTP_LOCAL_DIR=${ARTIFACT_DIR}" >> "${GITHUB_ENV}"
+
+          echo ""
+          echo "Arquivos encontrados:"
+          find "${ARTIFACT_DIR}" -maxdepth 5 -type f -print
+        env:
+          GH_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Files to FTP Server
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: ${{ env.FTP_LOCAL_DIR }}
+          remoteDir: public_html/${{ inputs.version }}/${{ inputs.package_name }}/${{ inputs.artifact_type }}
+          forceSsl: false
+
+      - name: Confirm Upload via lftp
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          REMOTE_DIR="public_html/${{ inputs.version }}/${{ inputs.package_name }}/${{ inputs.artifact_type }}"
+
+          echo "Validando upload em ${REMOTE_DIR}"
+
+          lftp -u "${{ secrets.ADMIN_USER }},${{ secrets.ADMIN_PASS }}" \
+            "ftp://${{ secrets.ADMIN_HOST }}" -e "
+            set ftp:passive-mode true
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          "
+
+          echo "Upload validado com sucesso ✅"

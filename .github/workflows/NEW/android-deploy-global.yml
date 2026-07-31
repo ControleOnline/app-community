@@ -1,7 +1,4 @@
 name: Deploy Android Apps # NÃO MUDAR ESSE NOME!!!
-# caso precise mudar, tem que alterar também dentro do script da Cielo
-# cielo-deploy-pdv-ctrl.yml
-# cielo-deploy-pdv-lavego.yml
 
 on:
   push:
@@ -101,8 +98,6 @@ jobs:
 
       - name: Generate Dynamic Configs
         run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-
           ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
 
           echo "const env = {\
@@ -123,38 +118,11 @@ jobs:
           };\
           module.exports = { env };" > ./config/env.local.js
 
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/controleonline\.manager/controleonline.${APP_LOWER}/g" app.json
-          sed -i "s/manager-controle-online/${APP_LOWER}-controle-online/g" app.json
-      
-      - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets.js
-        env:
-          APP_TYPE: ${{ env.APP_TYPE }}
-
       - name: Install Dependencies
         run: npm install
 
       - name: Fix Expo Dependencies
         run: npx expo install --fix
-
-      - name: Create Firebase Android Config
-        if: matrix.app_type == 'MANAGER'
-        env:
-          FIREBASE_MANAGER_GOOGLE_SERVICES_JSON: ${{ secrets.FIREBASE_MANAGER_GOOGLE_SERVICES_JSON }}
-        run: |
-          if [ -z "${FIREBASE_MANAGER_GOOGLE_SERVICES_JSON}" ]; then
-            echo "Secret FIREBASE_MANAGER_GOOGLE_SERVICES_JSON nao configurado." >&2
-            exit 1
-          fi
-
-          mkdir -p ./config/firebase
-          printf '%s' "${FIREBASE_MANAGER_GOOGLE_SERVICES_JSON}" > ./config/firebase/manager.local.json
-          python3 -m json.tool ./config/firebase/manager.local.json > /dev/null
-          echo "FIREBASE_ANDROID_GOOGLE_SERVICES_FILE=./config/firebase/manager.local.json" >> "$GITHUB_ENV"
 
       - name: Prebuild
         run: npx expo prebuild --clean
@@ -179,10 +147,7 @@ jobs:
           VERSION=$(node -p "require('./app.json').expo.version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Show Version (v.${{ env.VERSION }})
-        run: echo "Compilando versão ${{ env.VERSION }}"
-
-      - name: Upload AAB Artifact for FTP Task
+      - name: Upload AAB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.FTP_ARTIFACT_NAME }}
@@ -190,44 +155,15 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Trigger FTP Upload Task
-        run: |
-          FTP_TRIGGER_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-          gh workflow run android-deploy-global-ftp.yml \
-            --ref "${GITHUB_REF_NAME}" \
-            -f source_run_id="${GITHUB_RUN_ID}" \
-            -f artifact_name="${FTP_ARTIFACT_NAME}" \
-            -f version="${VERSION}" \
-            -f package_name="${PACKAGE_NAME}"
-
-          FTP_RUN_ID=""
-          for attempt in $(seq 1 24); do
-            FTP_RUN_ID=$(
-              gh run list \
-                --workflow android-deploy-global-ftp.yml \
-                --branch "${GITHUB_REF_NAME}" \
-                --limit 10 \
-                --json databaseId,createdAt \
-                --jq ".[] | select(.createdAt >= \"${FTP_TRIGGER_AT}\") | .databaseId" \
-              | head -n 1
-            )
-
-            if [ -n "${FTP_RUN_ID}" ]; then
-              break
-            fi
-
-            sleep 5
-          done
-
-          if [ -z "${FTP_RUN_ID}" ]; then
-            echo "Nao foi possivel localizar a execucao do workflow de FTP." >&2
-            exit 1
-          fi
-
-          gh run watch "${FTP_RUN_ID}" --exit-status
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ✅ NOVO FTP CENTRALIZADO
+      - name: Push AAB to FTP
+        uses: ./.github/workflows/push-to-ftp-server.yml
+        with:
+          source_run_id: ${{ github.run_id }}
+          artifact_name: ${{ env.FTP_ARTIFACT_NAME }}
+          version: ${{ env.VERSION }}
+          package_name: ${{ env.PACKAGE_NAME }}
+          artifact_type: aab
 
       - name: Decode Service Account
         run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
@@ -242,28 +178,20 @@ jobs:
           status: ${{ matrix.release_status }}
           changesNotSentForReview: ${{ matrix.changes_not_sent_for_review }}
 
-      # para executar o script da CIELO para CONTROLE ONLINE, depois que terminar os outros
       - name: Trigger Cielo Deploy PDV / CONTROLE ONLINE
         if: matrix.app_type == 'POS'
-        # NÃO ALTERAR O NOME DO YML
-        run: |
-          gh workflow run cielo-deploy-pdv-ctrl.yml
+        run: gh workflow run cielo-deploy-pdv-ctrl.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # para executar o script da CIELO para LAVE-GO, depois que terminar os outros
       - name: Trigger Cielo Deploy PDV / LAVE-GO
         if: matrix.app_type == 'POS'
-        # NÃO ALTERAR O NOME DO YML
-        run: |
-          gh workflow run cielo-deploy-pdv-lavego.yml
+        run: gh workflow run cielo-deploy-pdv-lavego.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # para executar o script da LG/webOS para PPC
       - name: Trigger LG webOS Deploy PPC
         if: matrix.app_type == 'PPC'
-        run: |
-          gh workflow run lg-webos-deploy-ppc.yml --ref "${GITHUB_REF_NAME}"
+        run: gh workflow run lg-webos-deploy-ppc.yml --ref "${GITHUB_REF_NAME}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
