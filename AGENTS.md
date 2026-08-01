@@ -16,7 +16,7 @@
 
 ## Qualidade de código
 
-- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `skills/shared/code-quality.md`.
+- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
 - Use essa skill como fonte oficial de aprovacao tecnica para qualquer mudanca de codigo no `app-community`.
 
 ## Feedback visual centralizado
