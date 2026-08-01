@@ -14,35 +14,10 @@
 - Contas a receber usam categorias `receive` e contrapartes `client`/`provider`; contas a pagar usam categorias `payer` e todas as pessoas com vinculo ativo na empresa.
 - Opcoes de listas compartilhadas devem permanecer isoladas por coluna, empresa e parametros da tela, inclusive durante respostas concorrentes.
 
-## Qualidade
+## Qualidade de código
 
-- Rodar lint e testes antes de concluir.
-- Não introduzir breaking changes sem destacar.
-- Preferir mudanças pequenas e isoladas.
-- Tudo precisa ser reaproveitável, pequeno e organizado
-- Não misturar responsabilidades entre componentes
-- Componentes devem ser pequenos, o menor possível
-- O CSS deve ficar separado em outro arquivo para facilitar a leitura do código
-- Cada componente deve trabalhar com seus estados de forma separada, podendo ser adicionados em qualquer outro lugar com facilidade e poucos parâmetros, sendo auto-suficientes e desacoplados
-- Leitura de dados em telas e tabs deve vir de stores/actions do modulo; não chamar `api.fetch` diretamente quando houver store correspondente.
-- Normalização de coleção e montagem de payload não devem ficar na tela. Se o backend ou o store já expõem o contrato, a tela consome o contrato direto.
-- Não usar cadeia de fallback com `||` para adivinhar campos de payload quando o contrato do backend já define o valor canônico. Use o campo certo e só mantenha fallback quando ele estiver documentado no contrato.
-- Filtros de selecao curta nao devem usar fileiras longas de chips ocupando a largura da tela. O padrao do sistema agora e seletor compacto com valor atual visivel e modal/lista de opcoes.
-- Sempre que um filtro desse tipo puder ser compartilhado, ele deve nascer em `ui-default` e ser reutilizado pelos apps, evitando recriar chips e modais locais por tela.
-- Filtros de listagem devem seguir o contrato historico de `filters` e `externalFilters`: o estado aplicado fica no store em `filters`, e a exibicao dos campos deve ser decidida pelas configuracoes do store, especialmente `columns`.
-- `configs.filters` habilita/desabilita filtros da listagem. `configs.externalFilters` controla o painel de filtros fora da tabela; quando for `false`, a tela nao deve renderizar esse painel.
-- No Vue legado, `DefaultTable` renderiza `DefaultExternalFilters` apenas quando `configs.filters`, `configs.externalFilters != false`, `configs.headers != false` e a tela e desktop. Esse painel mostra somente colunas incluidas por `shouldIncludeColumn(column)` e marcadas com `column.externalFilter == true`, alem de `configs.components.customFilters`.
-- Filtros inline/de cabecalho no Vue aparecem por coluna quando `configs.filters` esta ativo e `column.filter != false`. Portanto, em React, nao criar filtros fixos por tela quando o store ja descreve as colunas: a tela deve derivar quais filtros aparecem a partir de `columns`, respeitando `visible`, `filter`, `externalFilter`, `filterClass`, `inputType`, `list` e `formatFilter`.
-- Filtros React de periodo/data devem reaproveitar `DateShortcutFilter`; filtros de status e selecoes curtas devem reaproveitar `CompactFilterSelector`. Esses componentes pertencem a `ui-default`, devem receber `store` e `field` e resolver internamente a coluna/label a partir das `columns` do store. A tela nao deve criar arrays locais de colunas para filtros.
-- `DefaultExternalFilters` e filtros de coluna recebem `storeName` e leem `columns` direto do store. Definicoes como `externalFilter`, `inputType`, `label`, `list`, `searchParam`, `listSearchParam` e `listRequestParams` ficam no store. A tela so pode passar estado aplicado, callbacks e opcoes runtime quando a lista nao for remota, como um resumo ja retornado pelo proprio store.
-- Campos `list` e selects compartilhados devem carregar os primeiros registros apenas quando o usuario abrir o campo ou filtro, via `onBeforeOpen`. Nao pre-carregar listas no mount nem ao abrir o modal inteiro.
-- `list: "store/action"` e o contrato para listas remotas. O default deve chamar `store.actions.action` ao abrir e novamente ao digitar no autocomplete. Use `listRequestParams` na coluna para restringir a chamada ao backend, como `{context: "order"}` em status de pedidos ou contextos de categorias. Use `listSearchParam` quando o parametro de autocomplete nao for `searchParam` nem `search`.
-- `list: true` ou `list: [...]` nao e lista remota. Use isso somente para opcoes runtime/locais ja disponíveis; o default pode filtrar localmente, mas nao deve inventar chamada ao backend.
-- Busca textual padrao de listagens React deve ser configurada via `searchProps` do `DefaultTable`, renderizada pequena na toolbar usando `DefaultSearch` de `ui-default`; telas consumidoras nao devem recriar `TextInput` de busca local nem posicionar busca fora da toolbar default.
-- Sempre que uma tela usar `DefaultTable`, o backend e o store tambem precisam sustentar o contrato completo da listagem: ordenacao, pesquisa, filtros e paginação. Ordenacao de campos data precisa respeitar o valor real da data no backend, e a pesquisa deve ser tratada no backend com `CustomOrFilter` ou um mecanismo equivalente para buscar nos campos corretos sem depender de filtro local no front.
-- Em React, `DefaultExternalFilters` deve detectar largura compacta e renderizar apenas um botao de filtros que abre modal com os campos. Telas consumidoras nao devem criar accordion/header mobile paralelo para os filtros default.
-- Resumos de listagens devem vir do mecanismo de `summary` do backend/store, nao de reduce/calculo local sobre a pagina carregada. Quando a tela usa `DefaultTable`, `totalItems` e `summary` pertencem ao rodape sticky interno do componente; telas consumidoras nao devem criar rodapes ou pilulas paralelas, exceto quando o store registrar `summary: false`.
-- Nome da empresa nao deve ser repetido no corpo das paginas so para contextualizacao. Quando a rota usa seletor de empresa no header, a exibicao da empresa pertence ao `CompanyFilter`.
+- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `skills/shared/code-quality.md`.
+- Use essa skill como fonte oficial de aprovacao tecnica para qualquer mudanca de codigo no `app-community`.
 
 ## Feedback visual centralizado
 
