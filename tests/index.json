@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-08-02T02:35:06.571Z",
+  "status": "idle",
+  "progress": 0,
+  "message": "Nenhum relatório publicado ainda.",
+  "lastRunAt": null,
+  "summary": {
+    "types": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "suites": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    },
+    "tests": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0
+    }
+  },
+  "types": [],
+  "suites": [],
+  "links": {
+    "self": "/tests",
+    "artifacts": "/tests/artifacts"
+  }
+}
