@@ -126,3 +126,7 @@
 	path = modules/controleonline/ui-tests
 	url = https://github.com/ControleOnline/ui-tests.git
 	branch = staging
+[submodule "ddd/wiki"]
+	path = ddd/wiki
+	url = https://github.com/ControleOnline/app-community.wiki.git
+	branch = master
