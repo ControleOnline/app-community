@@ -10,10 +10,9 @@ flowchart TD
   B -->|master| M[Workflows de production]
 
   %% STAGING
-  S --> S1[web-deploy-staging-admin-ctrl.yml]
-  S --> S2[web-deploy-staging-manager-ctrl.yml]
-  S --> S3[web-deploy-staging-shop-ctrl.yml]
-  S --> S4[web-deploy-staging-app-lavego.yml.txt]
+  S --> S1[web-deploy-staging-manager-ctrl.yml]
+  S --> S2[web-deploy-staging-shop-ctrl.yml]
+  S --> S3[web-deploy-staging-app-lavego.yml.txt]
 
   S1 --> S1a[Cria env.local.js]
   S1a --> S1b[Atualiza submodules]
@@ -33,16 +32,7 @@ flowchart TD
   S2f --> S2g[smoke tests]
   S2g --> S2h[upload dos resultados]
 
-  S3 --> S3a[Cria env.local.js]
-  S3a --> S3b[Atualiza submodules]
-  S3b --> S3c[npm install]
-  S3c --> S3d[expo export web]
-  S3d --> S3e[FTP deploy]
-  S3e --> S3f[tests automatizados]
-  S3f --> S3g[smoke tests]
-  S3g --> S3h[upload dos resultados]
-
-  S4 --> S4a[Arquivo .txt nao executa como workflow]
+  S3 --> S3a[Arquivo .txt nao executa como workflow]
 
   %% MASTER
   M --> M1[web-deploy-production-admin-ctrl.yml]
@@ -85,5 +75,5 @@ flowchart TD
 Observacoes:
 
 - O workflow `web-deploy-staging-app-lavego.yml.txt` nao executa no GitHub Actions porque esta com extensao `.txt`.
-- No `master`, os workflows web de `admin`, `manager` e `shop` dependem de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
+- No `master`, os workflows web de `manager` e `shop` dependem de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
 - Os workflows Android de `master` podem acionar os workflows da Cielo via `workflow_run`.
