@@ -10,19 +10,9 @@ flowchart TD
   B -->|master| M[Workflows de production]
 
   %% STAGING
-  S --> S1[web-deploy-staging-admin-ctrl.yml]
   S --> S2[web-deploy-staging-manager-ctrl.yml]
   S --> S3[web-deploy-staging-shop-ctrl.yml]
   S --> S4[web-deploy-staging-app-lavego.yml.txt]
-
-  S1 --> S1a[Cria env.local.js]
-  S1a --> S1b[Atualiza submodules]
-  S1b --> S1c[npm install]
-  S1c --> S1d[expo export web]
-  S1d --> S1e[FTP deploy]
-  S1e --> S1f[tests automatizados]
-  S1f --> S1g[smoke tests]
-  S1g --> S1h[upload dos resultados]
 
   S2 --> S2a[Cria env.local.js]
   S2a --> S2b[Atualiza submodules]
@@ -52,26 +42,23 @@ flowchart TD
   M --> M5[cielo-deploy-pdv-ctrl.yml]
   M --> M6[cielo-deploy-pdv-lavego.yml]
 
-  M1 --> M1a[Confirma staging bem-sucedido]
-  M1a --> M1b[Cria env.local.js]
-  M1b --> M1c[Atualiza submodules]
-  M1c --> M1d[npm install]
-  M1d --> M1e[expo export web]
-  M1e --> M1f[FTP deploy]
+  M1 --> M1a[Cria env.local.js]
+  M1a --> M1b[Atualiza submodules]
+  M1b --> M1c[npm install]
+  M1c --> M1d[expo export web]
+  M1d --> M1e[FTP deploy]
 
-  M2 --> M2a[Confirma staging bem-sucedido]
-  M2a --> M2b[Cria env.local.js]
-  M2b --> M2c[Atualiza submodules]
-  M2c --> M2d[npm install]
-  M2d --> M2e[expo export web]
-  M2e --> M2f[FTP deploy]
+  M2 --> M2a[Cria env.local.js]
+  M2a --> M2b[Atualiza submodules]
+  M2b --> M2c[npm install]
+  M2c --> M2d[expo export web]
+  M2d --> M2e[FTP deploy]
 
-  M3 --> M3a[Confirma staging bem-sucedido]
-  M3a --> M3b[Cria env.local.js]
-  M3b --> M3c[Atualiza submodules]
-  M3c --> M3d[npm install]
-  M3d --> M3e[expo export web]
-  M3e --> M3f[FTP deploy]
+  M3 --> M3a[Cria env.local.js]
+  M3a --> M3b[Atualiza submodules]
+  M3b --> M3c[npm install]
+  M3c --> M3d[expo export web]
+  M3d --> M3e[FTP deploy]
 
   M4 --> M4a[Build Android multiplos apps]
   M4a --> M4b[Upload do AAB]
@@ -85,5 +72,5 @@ flowchart TD
 Observacoes:
 
 - O workflow `web-deploy-staging-app-lavego.yml.txt` nao executa no GitHub Actions porque esta com extensao `.txt`.
-- No `master`, os workflows web de `admin`, `manager` e `shop` dependem de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
+- No `master`, os workflows web de `manager` e `shop` continuam dependendo de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
 - Os workflows Android de `master` podem acionar os workflows da Cielo via `workflow_run`.

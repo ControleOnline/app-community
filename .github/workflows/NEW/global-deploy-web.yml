@@ -23,15 +23,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  admin:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Web Admin STAGING
-        run: |
-          gh workflow run web-deploy-staging-admin-ctrl.yml --ref "${GITHUB_REF_NAME}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   shop:
     runs-on: ubuntu-latest
     steps:
