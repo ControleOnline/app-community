@@ -5,7 +5,7 @@ on:
     branches: [production]
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
@@ -77,7 +77,8 @@ jobs:
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
-          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
+          echo "AAB_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
+          echo "APK_ARTIFACT_NAME=android-apk-${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Update Submodules
         run: |
@@ -136,10 +137,10 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
 
-      - name: Build Android Bundle
+      - name: Build Android Release
         run: |
           cd android
-          ./gradlew bundleRelease --init-script ../signing.gradle \
+          ./gradlew bundleRelease assembleRelease --init-script ../signing.gradle \
             -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
 
       - name: Extract App Version
@@ -147,23 +148,26 @@ jobs:
           VERSION=$(node -p "require('./app.json').expo.version")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Upload AAB Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.FTP_ARTIFACT_NAME }}
-          path: ./android/app/build/outputs/bundle/release
-          if-no-files-found: error
-          retention-days: 7
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          RELEASE_TAG="android-${APP_LOWER}-v${VERSION}"
+          RELEASE_TITLE="Android ${APP_DISPLAY_NAME} v${VERSION}"
 
-      # ✅ NOVO FTP CENTRALIZADO
-      - name: Push AAB to FTP
-        uses: ./.github/workflows/push-to-ftp-server.yml
-        with:
-          source_run_id: ${{ github.run_id }}
-          artifact_name: ${{ env.FTP_ARTIFACT_NAME }}
-          version: ${{ env.VERSION }}
-          package_name: ${{ env.PACKAGE_NAME }}
-          artifact_type: aab
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --clobber
+          else
+            gh release create "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --title "${RELEASE_TITLE}" \
+              --notes "Android release for ${APP_DISPLAY_NAME} v${VERSION}."
+          fi
 
       - name: Decode Service Account
         run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json

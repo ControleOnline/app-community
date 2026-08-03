@@ -8,7 +8,7 @@ on:
     branches: [production]
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
@@ -80,7 +80,8 @@ jobs:
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
           echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
-          echo "FTP_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
+          echo "AAB_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
+          echo "APK_ARTIFACT_NAME=android-apk-${APP_LOWER}" >> $GITHUB_ENV
 
       - name: Update Submodules
         run: |
@@ -168,10 +169,10 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
 
-      - name: Build Android Bundle
+      - name: Build Android Release
         run: |
           cd android
-          ./gradlew bundleRelease --init-script ../signing.gradle \
+          ./gradlew bundleRelease assembleRelease --init-script ../signing.gradle \
             -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
 
       - name: Extract App Version
@@ -182,52 +183,26 @@ jobs:
       - name: Show Version (v.${{ env.VERSION }})
         run: echo "Compilando versão ${{ env.VERSION }}"
 
-      - name: Upload AAB Artifact for FTP Task
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.FTP_ARTIFACT_NAME }}
-          path: ./android/app/build/outputs/bundle/release
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Trigger FTP Upload Task
-        run: |
-          FTP_TRIGGER_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-          gh workflow run android-deploy-global-ftp.yml \
-            --ref "${GITHUB_REF_NAME}" \
-            -f source_run_id="${GITHUB_RUN_ID}" \
-            -f artifact_name="${FTP_ARTIFACT_NAME}" \
-            -f version="${VERSION}" \
-            -f package_name="${PACKAGE_NAME}"
-
-          FTP_RUN_ID=""
-          for attempt in $(seq 1 24); do
-            FTP_RUN_ID=$(
-              gh run list \
-                --workflow android-deploy-global-ftp.yml \
-                --branch "${GITHUB_REF_NAME}" \
-                --limit 10 \
-                --json databaseId,createdAt \
-                --jq ".[] | select(.createdAt >= \"${FTP_TRIGGER_AT}\") | .databaseId" \
-              | head -n 1
-            )
-
-            if [ -n "${FTP_RUN_ID}" ]; then
-              break
-            fi
-
-            sleep 5
-          done
-
-          if [ -z "${FTP_RUN_ID}" ]; then
-            echo "Nao foi possivel localizar a execucao do workflow de FTP." >&2
-            exit 1
-          fi
-
-          gh run watch "${FTP_RUN_ID}" --exit-status
+      - name: Publish GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          RELEASE_TAG="android-${APP_LOWER}-v${VERSION}"
+          RELEASE_TITLE="Android ${APP_DISPLAY_NAME} v${VERSION}"
+
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --clobber
+          else
+            gh release create "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --title "${RELEASE_TITLE}" \
+              --notes "Android release for ${APP_DISPLAY_NAME} v${VERSION}."
+          fi
 
       - name: Decode Service Account
         run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
