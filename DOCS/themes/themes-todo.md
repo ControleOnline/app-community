@@ -843,6 +843,27 @@
 - `antes: card/avatar/textos do renderer usavam '#fff', '#F1F5F9', '#1E293B', '#94A3B8' e '#fff' no style estatico`
 - `depois: styles do renderer preservam layout e deixam as cores entrarem pela palette do tema ativo`
 
+### ui-config
+- `src/react/pages/MenuAccessConfigPage.js`
+- `linha 119-152, 584-598, 684-716, 810-827`
+- `antes: botoes Ativo/Inativo e Salvar menu usavam cores hardcoded como '#F1F5F9', '#16A34A', '#64748B', '#FFFFFF' e '#0F766E'`
+- `depois: botoes Ativo/Inativo, Salvar novo menu e Salvar menu usam themeStore.getters.colors com buttonBackground, buttonBackgroundSecondary, buttonBorder, buttonBorderSecondary, buttonIcon, buttonIconSecondary, buttonText e buttonTextSecondary`
+
+- `src/react/pages/MenuAccessConfigPage.styles.js`
+- `linha 244-256, 316-328`
+- `antes: enabledButton/enabledText/saveButton/saveButtonText definiam cores hardcoded`
+- `depois: estilos preservam apenas layout, borda e tipografia; cores entram via palette do tema no JSX`
+
+- `src/react/pages/MenuAccessConfigPage.js`
+- `linha 422-435, 632-660`
+- `antes: Adicionar rota, Adicionar e Salvar categoria usavam '#2563EB', '#FFFFFF', '#EFF6FF' e '#BFDBFE'`
+- `depois: Adicionar rota, Adicionar e Salvar categoria usam buttonBackground/buttonBorder/buttonIcon/buttonText`
+
+- `src/react/pages/MenuAccessConfigPage.styles.js`
+- `linha 285-310`
+- `antes: primaryButton/primaryButtonText/secondaryButton/secondaryButtonText definiam cores hardcoded`
+- `depois: primaryButton/primaryButtonText/categoryButton/categoryButtonText preservam apenas layout, borda e tipografia; cores entram via palette do tema no JSX`
+
 ### ### ### MODULOS / ARQUIVOS PENDENTES ### ### ###
 
 ### ui-accounting

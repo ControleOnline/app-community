@@ -496,3 +496,31 @@ Formato:
 - `ui-manager / src/react/pages/DeviceDetailPage.js / renderHelpButton`
 - `antigo: botoes de ajuda "?" usavam accentColor brandColors.primary e formato padrao pequeno do DefaultTooltip`
 - `novo: botoes de ajuda "?" usam o mesmo formato dos botoes de acao da carteira: 34x34, borderRadius 8, buttonBackground e buttonIcon`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 119-152`
+- `antigo: tela nao lia themeStore.getters.colors para botoes Ativo/Inativo e Salvar menu`
+- `novo: tela monta palette com buttonBackground, buttonBackgroundSecondary, buttonBorder, buttonBorderSecondary, buttonIcon, buttonIconSecondary, buttonText e buttonTextSecondary`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 584-598, 810-827`
+- `antigo: Salvar novo menu e Salvar menu herdavam saveButton com backgroundColor '#0F766E' e icon/text '#FFFFFF'`
+- `novo: Salvar novo menu e Salvar menu usam backgroundColor palette.buttonBackground, borderColor palette.buttonBorder, icon palette.buttonIcon e texto palette.buttonText`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 684-716`
+- `antigo: Ativo/Inativo usava enabledButton com '#F1F5F9', enabledButtonActive '#16A34A', icone '#FFFFFF'/'#64748B' e texto '#64748B'/'#FFFFFF'`
+- `novo: Ativo usa buttonBackground/buttonBorder/buttonIcon/buttonText; Inativo usa buttonBackgroundSecondary/buttonBorderSecondary/buttonIconSecondary/buttonTextSecondary`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.styles.js / 244-256, 316-328`
+- `antigo: enabledButton/enabledText/saveButton/saveButtonText fixavam cores locais`
+- `novo: enabledButton/saveButton preservam layout com borderWidth; enabledText/saveButtonText preservam tipografia e recebem cor do tema no JSX`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 422-435`
+- `antigo: Adicionar rota usava primaryButton com backgroundColor '#2563EB' e icon/text '#FFFFFF'`
+- `novo: Adicionar rota usa backgroundColor palette.buttonBackground, borderColor palette.buttonBorder, icon palette.buttonIcon e texto palette.buttonText`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 632-660`
+- `antigo: Adicionar e Salvar categoria usavam secondaryButton com backgroundColor '#EFF6FF', borderColor '#BFDBFE' e icon/text '#2563EB'`
+- `novo: Adicionar e Salvar categoria usam buttonBackground, buttonBorder, buttonIcon e buttonText`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.styles.js / 285-310`
+- `antigo: primaryButton/primaryButtonText/secondaryButton/secondaryButtonText fixavam cores locais`
+- `novo: primaryButton/primaryButtonText/categoryButton/categoryButtonText preservam apenas layout e tipografia; cores entram por themeStore.getters.colors no JSX`
