@@ -152,21 +152,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          RELEASE_TAG="android-${APP_LOWER}-v${VERSION}"
-          RELEASE_TITLE="Android ${APP_DISPLAY_NAME} v${VERSION}"
+          APP_SLUG=$(echo "${APP_DISPLAY_NAME}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+          RELEASE_TAG="controle-online-v${VERSION}"
+          RELEASE_TITLE="Controle Online v${VERSION}"
+          RELEASE_DIR="${RUNNER_TEMP}/release-assets"
+          AAB_ASSET="${RELEASE_DIR}/${APP_SLUG}-release.aab"
+          APK_ASSET="${RELEASE_DIR}/${APP_SLUG}-release.apk"
+
+          mkdir -p "${RELEASE_DIR}"
+          cp ./android/app/build/outputs/bundle/release/app-release.aab "${AAB_ASSET}"
+          cp ./android/app/build/outputs/apk/release/app-release.apk "${APK_ASSET}"
 
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
             gh release upload "${RELEASE_TAG}" \
-              ./android/app/build/outputs/bundle/release/app-release.aab \
-              ./android/app/build/outputs/apk/release/app-release.apk \
+              "${AAB_ASSET}" \
+              "${APK_ASSET}" \
               --clobber
           else
             gh release create "${RELEASE_TAG}" \
-              ./android/app/build/outputs/bundle/release/app-release.aab \
-              ./android/app/build/outputs/apk/release/app-release.apk \
+              "${AAB_ASSET}" \
+              "${APK_ASSET}" \
               --title "${RELEASE_TITLE}" \
-              --notes "Android release for ${APP_DISPLAY_NAME} v${VERSION}."
+              --notes "Build comum do Controle Online v${VERSION}. Os assets de cada app ficam agrupados neste release."
           fi
 
       - name: Decode Service Account
