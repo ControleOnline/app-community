@@ -173,6 +173,14 @@ Formato:
 - `antigo: colors={resolveThemePalette(colors, runtimeColors)}`
 - `novo: colors={colors}`
 
+- `ui-config / src/react/pages/MenuAccessConfigPage.js / 322-357, 632-650, 881-892`
+- `antigo: chips de perfis de acesso usavam estados visuais com '#2563EB' e '#94A3B8' no JSX`
+- `novo: chips de perfis de acesso usam buttonBackground, buttonBackgroundSecondary, buttonBorder, buttonBorderSecondary, buttonIcon, buttonIconSecondary, buttonText e buttonTextSecondary vindos de themeStore.getters.colors`
+
+- `ui-config / src/react/pages/MenuAccessConfigPage.styles.js / 280-290`
+- `antigo: linkButton/linkText definiam backgroundColor '#F8FAFC', borderColor '#E2E8F0', text '#64748B' e ativos '#EFF6FF/#93C5FD/#1D4ED8'`
+- `novo: linkButton/linkText preservam apenas layout e tipografia; cores entram via palette do tema no JSX`
+
 - `ui-products / src/react/components/products/ProductItem.js / 14-72, 128-223, 235-514`
 - `antigo: PRODUCT_TYPE_CONFIG com color/bg hardcoded por tipo, preco verde local e acao do card dependente de seletor com vermelho/verde/cinza hardcoded`
 - `novo: chips de tipo, preco e acao do card resolvidos por chipSelectedBackground, chipSelectedText, buttonBackgroundSecondary, buttonTextSecondary, chipBackground, textWarning, textSuccess, textMuted, iconDisabled e buttonBackground/buttonText`

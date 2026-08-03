@@ -864,6 +864,16 @@
 - `antes: primaryButton/primaryButtonText/secondaryButton/secondaryButtonText definiam cores hardcoded`
 - `depois: primaryButton/primaryButtonText/categoryButton/categoryButtonText preservam apenas layout, borda e tipografia; cores entram via palette do tema no JSX`
 
+- `src/react/pages/MenuAccessConfigPage.js`
+- `linha 322-357, 632-650, 881-892`
+- `antes: perfis de acesso eram renderizados com check/square e estado ativo/inativo usando cores locais hardcoded como '#2563EB' e '#94A3B8'`
+- `depois: perfis de acesso usam buttonBackground, buttonBackgroundSecondary, buttonBorder, buttonBorderSecondary, buttonIcon, buttonIconSecondary, buttonText e buttonTextSecondary vindos de themeStore.getters.colors`
+
+- `src/react/pages/MenuAccessConfigPage.styles.js`
+- `linha 280-290`
+- `antes: linkButton/linkText definiam backgroundColor '#F8FAFC', borderColor '#E2E8F0', text '#64748B' e estados ativos '#EFF6FF/#93C5FD/#1D4ED8'`
+- `depois: linkButton/linkText preservam apenas layout e tipografia; cores entram via palette do tema no JSX`
+
 ### ### ### MODULOS / ARQUIVOS PENDENTES ### ### ###
 
 ### ui-accounting
