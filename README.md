@@ -8,12 +8,7 @@
 
 
 ### Install
-```bash
-git submodule update --init --recursive
-git submodule update --recursive
-npm install
-npx expo prebuild -p android --clean
-```
+[Instalacao e setup](https://github.com/ControleOnline/app-community/wiki/Instalacao)
 
 ### Run Android
 ```bash
@@ -63,4 +58,9 @@ npm run test:browser:pos
   <img src="https://contrib.rocks/image?repo=ControleOnline/app-community" />
 </a>
 
+## Links obrigatorios
+
+- [Documentacao para clientes](http://ajuda.controleonline.com/)
+- [Site institucional](http://controleonline.com/)
+- [Wiki tecnica](https://github.com/ControleOnline/app-community/wiki)
 
