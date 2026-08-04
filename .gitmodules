@@ -98,10 +98,6 @@
 	path = modules/controleonline/ui-accounting
 	url = https://github.com/ControleOnline/ui-accounting.git
 	branch = staging
-[submodule "modules/controleonline/ui-dashboard"]
-	path = modules/controleonline/ui-dashboard
-	url = https://github.com/ControleOnline/ui-dashboard.git
-	branch = staging
 [submodule "modules/controleonline/ui-config"]
 	path = modules/controleonline/ui-config
 	url = https://github.com/ControleOnline/ui-config.git
