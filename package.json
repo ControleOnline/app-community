@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.4.11",
+  "version": "1.4.14",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -50,7 +50,7 @@
     "expo-video": "~3.0.15",
     "idb": "^8.0.3",
     "md5": "^2.3.0",
-    "mermaid": "^11.16.0",
+    "mermaid": "^11.16.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
