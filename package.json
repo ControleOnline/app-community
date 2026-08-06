@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.3.40",
+  "version": "1.4.11",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -10,13 +10,22 @@
     "start:clear": "expo start -c",
     "lint": "eslint .",
     "test": "jest",
-    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
+    "test:automated": "jest --runInBand",
+    "test:browser": "node scripts/run-browser-smokes.cjs",
+    "test:browser:headed": "node scripts/run-browser-smokes.cjs --headed",
+    "test:browser:manager": "node scripts/run-browser-smokes.cjs manager",
+    "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
+    "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
+    "test:browser:install": "playwright install chromium",
+    "tests:index": "node scripts/build-tests-index.cjs",
+    "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=src/tests/browser/|modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
     "@controleonline/react-native-cielo-payment": "^1.0.5",
     "@controleonline/react-native-infinitepay-payment": "^1.0.5",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "8.4.4",
     "@react-native-picker/picker": "2.11.1",
     "@react-navigation/material-top-tabs": "^7.4.15",
     "@react-navigation/native": "^7.1.28",
@@ -27,6 +36,7 @@
     "expo-asset": "~12.0.12",
     "expo-audio": "~1.1.1",
     "expo-build-properties": "~1.0.10",
+    "expo-camera": "~17.0.10",
     "expo-device": "~8.0.10",
     "expo-document-picker": "~14.0.8",
     "expo-file-system": "~19.0.21",
@@ -40,6 +50,7 @@
     "expo-video": "~3.0.15",
     "idb": "^8.0.3",
     "md5": "^2.3.0",
+    "mermaid": "^11.16.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
@@ -48,6 +59,7 @@
     "react-native-gesture-handler": "~2.28.0",
     "react-native-iap": "^14.7.8",
     "react-native-maps": "1.20.1",
+    "react-native-nfc-manager": "^3.17.2",
     "react-native-pager-view": "6.9.1",
     "react-native-paper": "^5.14.5",
     "react-native-pdf": "^7.0.4",
@@ -56,6 +68,7 @@
     "react-native-render-html": "^6.3.4",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
+    "react-native-svg": "^15.15.5",
     "react-native-tab-view": "^4.2.2",
     "react-native-tcp-socket": "^6.4.1",
     "react-native-vector-icons": "^10.3.0",
@@ -81,6 +94,8 @@
     "metro-config": "*",
     "metro-react-native-babel-preset": "*",
     "metro-transform-worker": "*",
+    "playwright": "1.60.0",
+    "react-refresh": "^0.18.0",
     "react-test-renderer": "19.1.0",
     "typescript": "*"
   },
@@ -88,4 +103,3 @@
     "node": "20"
   }
 }
-

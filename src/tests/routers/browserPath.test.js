@@ -13,6 +13,16 @@ describe('browserPath', () => {
     expect(
       normalizeProductDetailsTabPath('/product-details/123/Dados?foo=1#bar'),
     ).toBe('product-details/123?foo=1#bar')
+
+    expect(
+      normalizeProductDetailsTabPath('/product-details/123/Vendas?foo=1#bar'),
+    ).toBe('product-details/123?foo=1#bar')
+  })
+
+  it('normalizes legacy shop product paths to the shop route', () => {
+    expect(
+      normalizeProductDetailsTabPath('/product/381/details?companyId=1#info'),
+    ).toBe('shop/product/381?companyId=1#info')
   })
 
   it('does not touch history when browser location is unavailable', () => {

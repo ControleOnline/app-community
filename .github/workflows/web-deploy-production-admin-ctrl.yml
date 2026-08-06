@@ -1,0 +1,54 @@
+name: Deploy Project Admin Ctrl
+on:
+  push:
+    branches: [master]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - name: Creating Config
+        run: |
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://api.controleonline.com',\
+          HTACCESS_USER: '${{ secrets.HTACCESS_USER }}',\
+          HTACCESS_PASSWORD: '${{ secrets.HTACCESS_PASSWORD }}',\
+          SOCKET: 'wss://api.controleonline.com',\
+          APP_TYPE: 'ADMIN',\
+          APP_DISPLAY_NAME: 'Admin',\
+          ZOOM: ${ZOOM},\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID: '${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY: '${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON: '${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON: '${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };\
+          " > ./config/env.local.js
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+      - name: Build
+        run: npx expo export --platform web
+      - name: Deploy
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: "./dist"
+          remoteDir: "~/public_html"
+          forceSsl: false

@@ -57,9 +57,9 @@ jobs:
       - name: Upload AAB to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
           localDir: ${{ env.FTP_LOCAL_DIR }}
           remoteDir: public_html/${{ inputs.version }}/${{ inputs.package_name }}/aab
           forceSsl: false

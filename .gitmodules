@@ -74,6 +74,10 @@
 	path = modules/controleonline/ui-professionals
 	url = https://github.com/ControleOnline/ui-professionals.git
 	branch = staging
+[submodule "modules/controleonline/ui-report"]
+	path = modules/controleonline/ui-report
+	url = https://github.com/ControleOnline/ui-report.git
+	branch = staging
 [submodule "modules/controleonline/ui-logistic"]
 	path = modules/controleonline/ui-logistic
 	url = https://github.com/ControleOnline/ui-logistic.git
@@ -93,10 +97,6 @@
 [submodule "modules/controleonline/ui-accounting"]
 	path = modules/controleonline/ui-accounting
 	url = https://github.com/ControleOnline/ui-accounting.git
-	branch = staging
-[submodule "modules/controleonline/ui-dashboard"]
-	path = modules/controleonline/ui-dashboard
-	url = https://github.com/ControleOnline/ui-dashboard.git
 	branch = staging
 [submodule "modules/controleonline/ui-config"]
 	path = modules/controleonline/ui-config
@@ -118,3 +118,11 @@
 	path = modules/modules/controleonline/ui-login
 	url = https://github.com/ControleOnline/ui-login.git
 	branch = staging
+[submodule "modules/controleonline/ui-tests"]
+	path = modules/controleonline/ui-tests
+	url = https://github.com/ControleOnline/ui-tests.git
+	branch = staging
+[submodule "docs/wiki"]
+	path = docs/wiki
+	url = https://github.com/ControleOnline/app-community.wiki.git
+	branch = master

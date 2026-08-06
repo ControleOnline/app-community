@@ -1,0 +1,113 @@
+name: Deploy LG webOS PPC
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-webos:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_TYPE: PPC
+      APP_DISPLAY_NAME: PCP
+      APP_SLUG: ppc-controle-online
+      PACKAGE_NAME: com.controleonline.ppc
+      ASSETS_VARIANT: ppc
+      EXPO_OS: web
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - name: Generate Dynamic Configs
+        run: |
+          mkdir -p ./config
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://api.controleonline.com',\
+          DOMAIN: 'https://app.controleonline.com',\
+          MANAGER_APP: 'https://app.controleonline.com',\
+          SOCKET: 'wss://api.controleonline.com',\
+          APP_TYPE: '${APP_TYPE}',\
+          ZOOM: ${ZOOM},\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
+      - name: Build Expo Web
+        run: |
+          EXPO_OS=web npx expo export --platform web
+
+      - name: Prepare webOS icon
+        run: |
+          ASSET_TYPE=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          cp ./src/assets/${ASSET_TYPE}/favicon.png ./dist/favicon.png
+          
+      - name: Create webOS appinfo.json
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+          cat > ./dist/appinfo.json <<EOF
+          {
+            "id": "${PACKAGE_NAME}",
+            "version": "${VERSION}",
+            "vendor": "Controle Online",
+            "type": "web",
+            "main": "index.html",
+            "title": "On ${APP_DISPLAY_NAME}",
+            "icon": "favicon.png",
+            "largeIcon": "favicon.png"
+          }
+          EOF
+
+      - name: Install webOS CLI
+        run: npm install -g @webosose/ares-cli
+
+      - name: Package IPK
+        run: |
+          mkdir -p ./webos-build
+          ares-package --no-minify ./dist -o ./webos-build
+          ls -la ./webos-build
+
+      - name: Upload IPK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lg-webos-ppc-ipk
+          path: ./webos-build/*.ipk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload IPK to Website FTP
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./webos-build"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/ipk"
+          forceSsl: false

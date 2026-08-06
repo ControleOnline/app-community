@@ -1,0 +1,87 @@
+package __PACKAGE__.launcher
+
+import android.app.Activity
+import android.view.View
+import android.view.WindowManager
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.UiThreadUtil
+import com.facebook.react.bridge.WritableMap
+
+class LauncherModeModule(
+  private val reactApplicationContext: ReactApplicationContext,
+) : ReactContextBaseJavaModule(reactApplicationContext) {
+  override fun getName(): String = "LauncherMode"
+
+  @ReactMethod
+  fun setLauncherMode(enabled: Boolean, promise: Promise) {
+    LauncherModeState.launcherEnabled = enabled
+    updateModeState(enabled, promise)
+  }
+
+  @ReactMethod
+  fun getStatus(promise: Promise) {
+    try {
+      promise.resolve(buildStatus(null, "ok"))
+    } catch (error: Exception) {
+      promise.reject("LAUNCHER_MODE_STATUS_FAILED", error)
+    }
+  }
+
+  private fun updateModeState(enabled: Boolean, promise: Promise) {
+    val activity = reactApplicationContext.currentActivity
+
+    if (activity == null) {
+      promise.resolve(buildStatus(enabled, "no_activity"))
+      return
+    }
+
+    UiThreadUtil.runOnUiThread {
+      try {
+        applyCurrentMode(activity)
+        promise.resolve(buildStatus(enabled, "ok"))
+      } catch (error: Exception) {
+        promise.reject("LAUNCHER_MODE_UPDATE_FAILED", error)
+      }
+    }
+  }
+
+  private fun applyCurrentMode(activity: Activity) {
+    if (LauncherModeState.launcherEnabled) {
+      activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      applyImmersiveMode(activity)
+    } else {
+      activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      activity.window.decorView.systemUiVisibility = 0
+    }
+  }
+
+  private fun applyImmersiveMode(activity: Activity) {
+    activity.window.decorView.systemUiVisibility =
+      View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+        View.SYSTEM_UI_FLAG_FULLSCREEN or
+        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+  }
+
+  private fun buildStatus(
+    requestedEnabled: Boolean?,
+    reason: String,
+  ): WritableMap {
+    val status = Arguments.createMap()
+
+    if (requestedEnabled != null) {
+      status.putBoolean("requestedEnabled", requestedEnabled)
+    }
+
+    status.putString("reason", reason)
+    status.putBoolean("launcherModeEnabled", LauncherModeState.launcherEnabled)
+
+    return status
+  }
+}

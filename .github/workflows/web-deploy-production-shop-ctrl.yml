@@ -2,10 +2,12 @@ name: Deploy Project Shop Ctrl
 on:
   push:
     branches: [master]
-  workflow_dispatch:
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -13,11 +15,12 @@ jobs:
           node-version: "20"
       - name: Creating Config
         run: |
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: 'SHOP',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
@@ -34,18 +37,17 @@ jobs:
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps   
+        run: npm install --legacy-peer-deps
       - name: Fix Expo Dependencies
         run: npx expo install --fix
       - name: Build
-        run: |
-          npx expo export --platform web
+        run: npx expo export --platform web
       - name: Deploy
         uses: locaweb/ftp-deploy@1.0.0
         with:
           host: ${{ secrets.SHOP_HOST }}
           user: ${{ secrets.SHOP_USER }}
-          password: ${{ secrets.SHOP_PASSWORD }}
+          password: ${{ secrets.SHOP_PASS }}
           localDir: "./dist"
           remoteDir: "~/public_html"
           forceSsl: false

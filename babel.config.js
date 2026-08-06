@@ -4,8 +4,10 @@ module.exports = {
     [
       'module-resolver',
       {
+        cwd: 'babelrc',
         alias: {
           '@assets': './src/assets',
+          '@appType': './src/appType.js',
           '@controleonline': './modules/controleonline',
           '@controleonline-rn': './node_modules/@controleonline',
           '@env': './config/env.local.js',

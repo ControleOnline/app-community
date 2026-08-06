@@ -1,10 +1,13 @@
-name: Deploy Cielo PDV LAVEGO
+# aplicativo PDV para loja da Cielo
+# usando API
+
+name: DEPLOY CIELO PDV LAVEGO PRODUCTION
 
 on:
   workflow_run:
     workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
     types: [completed]
-    branches: [staging]
+    branches: [production]
   workflow_dispatch: {}
 
 jobs:
@@ -12,10 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      EXPO_IDENTITY_SOURCE: app-json
       APP_TYPE: POS
       APP_DISPLAY_NAME: PDV
+      APP_SLUG: pos
       PACKAGE_NAME: com.lavego.app
       ASSETS_VARIANT: pos_lavego
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
 
     steps:
       - uses: actions/checkout@v5
@@ -39,13 +46,14 @@ jobs:
 
       - name: Generate Dynamic Configs
         run: |
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
           SOCKET: 'wss://api.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
@@ -57,35 +65,25 @@ jobs:
           };\
           module.exports = { env };" > ./config/env.local.js
 
-      - name: Configure Assets
-        run: node scripts/configure-assets.js
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Update app.json (name + package + slug)
+      - name: Update app.json dynamically
         run: |
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.name = 'On ${{ env.APP_DISPLAY_NAME }}';
-            app.expo.slug = '${{ env.APP_TYPE }}'.toLowerCase();
-            app.expo.android = app.expo.android || {};
-            app.expo.android.package = '${{ env.PACKAGE_NAME }}';
-            if (app.expo.ios) {
-              app.expo.ios.bundleIdentifier = '${{ env.PACKAGE_NAME }}';
-            }
+            app.expo.name                = 'Lave-Go';
+            app.expo.android.package     = 'com.lavego.app';
+            app.expo.slug                = 'pos-controle-online';
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-            console.log('✓ name:', app.expo.name);
-            console.log('✓ slug:', app.expo.slug);
-            console.log('✓ package:', app.expo.android.package);
-          "
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Fix Expo Dependencies
-        run: npx expo install --fix
+          "           
 
       - name: Prebuild
         run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
 
       - name: Create Android Signing Files
         run: |
@@ -111,20 +109,86 @@ jobs:
 
       - name: Build Android APK
         run: |
+          set -o pipefail
           cd android
-          ./gradlew assembleRelease --init-script ../signing.gradle
+          ./gradlew assembleRelease \
+            --init-script ../signing.gradle \
+            --stacktrace \
+            --info \
+            --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" \
+            -Dorg.gradle.parallel=false \
+            2>&1 | tee /tmp/gradle-assemble-release.log | tail -300
+
+      - name: Validate generated APK
+        run: |
+          APK_PATH=$(find ./android/app/build/outputs/apk -type f -name '*.apk' | sort | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "Nenhum APK foi gerado dentro de ./android/app/build/outputs/apk" >&2
+            echo
+            echo "Conteudo disponivel em ./android/app/build/outputs:"
+            find ./android/app/build/outputs -maxdepth 4 -type f | sort || true
+            exit 1
+          fi
+  
+          APK_DIR=$(dirname "$APK_PATH")
+          APK_FILENAME=$(basename "$APK_PATH")
+
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          echo "APK_DIR=$APK_DIR" >> "$GITHUB_ENV"
+          echo "APK_FILENAME=$APK_FILENAME" >> "$GITHUB_ENV"
+
+          ls -lah "$APK_DIR"
+          echo "APK localizado: $APK_FILENAME"
+
           
       - name: Extract App Version
         run: |
           VERSION=$(node -p "require('./app.json').expo.version")
+          echo "App version: $VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
-          localDir: "./android/app/build/outputs/apk/release"
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: ${{ env.APK_DIR }}
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
+
+      - name: Verify uploaded APK on FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
+          LOG_FILE="$(mktemp)"
+
+          set +e
+          lftp -d -u "${{ secrets.ADMIN_USER }},${{ secrets.ADMIN_PASS }}" "ftp://${{ secrets.ADMIN_HOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ftp:ssl-allow no
+            set ftp:ssl-force no
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          " 2>&1 | tee "$LOG_FILE"
+          LFTP_STATUS=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$LFTP_STATUS" -ne 0 ]; then
+            echo "Falha ao listar o diretório remoto após o upload." >&2
+            exit "$LFTP_STATUS"
+          fi
+
+          if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${APK_FILENAME}"
+          else
+            echo "O upload terminou sem erro, mas o arquivo ${APK_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
+            exit 1
+          fi

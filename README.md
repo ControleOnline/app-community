@@ -8,12 +8,7 @@
 
 
 ### Install
-```bash
-git submodule update --init --recursive
-git submodule update --recursive
-npm install
-npx expo prebuild -p android --clean
-```
+[Instalacao e setup](https://github.com/ControleOnline/app-community/wiki/Instalacao)
 
 ### Run Android
 ```bash
@@ -24,6 +19,21 @@ npx expo run:android
 ```bash
 cd android
 ./gradlew bundleRelease --init-script ../signing.gradle
+```
+
+### Browser smoke tests
+```bash
+npm run test:browser:install
+npm run test:browser
+```
+
+The browser suite now exports the web app once per `APP_TYPE`, serves each export with a tiny static server, and runs the grouped Playwright smoke tests from `src/tests/browser/<app_type>/`.
+
+To run a single group:
+```bash
+npm run test:browser:manager
+npm run test:browser:delivery
+npm run test:browser:pos
 ```
 
 
@@ -48,4 +58,9 @@ cd android
   <img src="https://contrib.rocks/image?repo=ControleOnline/app-community" />
 </a>
 
+## Links obrigatorios
+
+- [Documentacao para clientes](http://ajuda.controleonline.com/)
+- [Site institucional](http://controleonline.com/)
+- [Wiki tecnica](https://github.com/ControleOnline/app-community/wiki)
 

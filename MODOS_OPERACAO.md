@@ -7,14 +7,15 @@
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP` e `DELIVERY`.
-- `DELIVERY` e um `APP_TYPE`, no mesmo nivel de `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
+- `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
-- `DELIVERY` hoje reaproveita a mesma home de `POS`, mas isso e compartilhamento de implementacao, nao hierarquia funcional.
+- `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional com gate de onboarding do motoboy. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis, a listagem de empresas homologadas e as tabelas de entrega imutaveis.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
 - `POS` e a visao operacional de venda.
 - `PPC` e a visao operacional de producao e exibicao.
-- `MANAGER` e a visao administrativa.
+- `MANAGER` e a visao administrativa operacional.
+- `ADMIN` e a visao administrativa inicial para menus, acessos e cadastros super.
 - `CRM` e a visao comercial.
 - `SHOP` e a visao cliente-facing.
 
@@ -35,6 +36,25 @@
 - Nao deve virar uma copia do `POS`.
 - Mesmo quando abrir a tela de PDV, em `APP_TYPE=MANAGER` o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
 - Nao deve concentrar responsabilidades de atendimento comercial do `CRM` nem fluxo cliente-facing do `SHOP`.
+- O cadastro de menus por perfil nao pertence mais ao `MANAGER`; ele foi movido para o `ADMIN`.
+
+### ADMIN
+- Publico: owner, super admin e backoffice responsavel por governanca de menus.
+- Missao: entrada inicial para cadastrar menus, rotas e permissões da nova visao web.
+- Modulos mais envolvidos: `ui-manager` e `ui-common`.
+- Responsabilidades:
+- Cadastro e manutencao de menus por perfil.
+- Entrada inicial da home com o atalho de `MenuAccessConfigPage`.
+- Leitura de fluxogramas administrativos versionados em Mermaid.
+- Limites:
+- Nao deve carregar por padrao os fluxos operacionais amplos do `MANAGER`.
+- Nao deve disputar o mesmo atalho principal do `MANAGER` para configuracao de menus.
+
+### SERVICE
+- Publico: `employee` e `owner` da operacao.
+- Missao: app operacional separado com foco em etiquetas, insumos e apoio ao atendimento.
+- Regras: nao assumir comportamento do `MANAGER` e nao incluir checklist no escopo atual.
+- Implementacao React: `ui-support`.
 
 ### CRM
 - Publico: vendedor, consultor comercial, pre-venda e pos-venda comercial.
@@ -99,11 +119,43 @@
 - Publico: operacao de entrega/retirada quando a empresa quiser abrir um app focado nisso.
 - Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
-- Hoje usa a mesma home do `POS`.
-- Ainda nao existe modulo proprio; a home e reaproveitada por implementacao.
+- Usa `ui-logistic` como home dedicada, com menu operacional.
+- A entrada do app fica travada ate existir pelo menos um veiculo completo na tabela propria de veiculos do courier.
+- O cadastro de veiculo e separado do cadastro de tabela: `DeliveryVehicleSetupPage` cuida apenas do veiculo e `DeliveryRateTableFormPage` cuida das versoes de tabela de entrega.
+- O veiculo do courier precisa guardar um snapshot rico com `vehicleType`, `brand`, `model`, `year`, `plate` e `color` opcional.
+- O cadastro do veiculo e permitido para pessoa fisica autenticada; contas juridicas nao registram nem alteram esse registro.
+- A home deve exibir menus para:
+- pedidos de entrega;
+- recebiveis do motoboy logado, considerando invoices em que ele e o `receiver`;
+- empresas homologadas do motoboy logado, derivadas de `people_link` com `link_type=courier`;
+- tabelas de entrega do motoboy, que abrem a lista imutavel de versoes.
+- O fluxo de tabelas de entrega e composto por:
+- `DeliveryVehicleSetupPage` para o primeiro cadastro bloqueante e completo do veiculo;
+- `DeliveryRateTablesPage` para a lista de versoes do courier;
+- `DeliveryRateTableFormPage` para criar nova versao a partir de um snapshot;
+- `DeliveryRateTableCompaniesPage` para associar empresas a uma versao;
+- `DeliveryRatesInboxPage` para o manager revisar as versoes visiveis;
+- `DeliveryRateVersionPage` para a leitura detalhada da versao;
+- `DeliveryRateHistoryPage` para consultar o historico imutavel da tabela;
+- `DeliveryRateCompanyPage` para ativar ou desativar a tabela por empresa associada.
+- A camada de presenca do motoboy usa outro conjunto de telas:
+- `DeliveryCourierSchedulesPage` para horarios reutilizaveis;
+- `DeliveryCourierScheduleFormPage` para criar ou editar uma janela semanal;
+- `DeliveryCourierPresencePage` para ligar, desligar e associar horarios por empresa;
+- `DeliveryPresenceInboxPage` para o manager ler a presenca por empresa;
+- `DeliveryPresenceDetailPage` para o detalhe somente leitura no manager;
+- o historico de conexao e desconexao sempre aparece na tela de detalhe via `EntityLogPage`.
+- A tabela de veiculos do courier e propria, com um unico registro principal por courier, e nao deve ser confundida com tabela de frete.
+- O modo manual exige motivo para conectar ou desconectar e cada evento gera log na tabela `log`.
+- As migrations desse slice precisam rodar no tenant `admin.controleonline.com` via `tenant:migrations:migrate`, nao no banco base direto.
+- O courier continua dono da criacao/associacao e o manager apenas alterna o estado `enabled` da empresa vinculada.
+- A tela de pedidos continua saindo da colecao padrao `/orders`, filtrando `orderType=delivery` e `provider` do motoboy logado.
+- No fluxo de delivery o contexto de status e `delivery`: o aceite materializa `aceito`, a corrida usa `way`/`away`, a conclusao usa `closed` e o cancelamento usa `canceled`; `rejected` e a recusa de aceite e nao pode ser usado como sinônimo de cancelamento. `preparando` nao pertence a esse contexto e nao deve aparecer como opcao, filtro ou transicao operacional.
+- Depois de aceitar todas as corridas, o app deve ficar preso na corrida ativa, mostrar o botao `Marcar como entregue` em cada parada aceita e so liberar a tela quando a fila terminar.
 - Leitura correta:
 - Nao deve ser tratado como modo operacional do `POS`.
 - Nao deve ser usado como tipo de device.
+- `provider_id`/`provider` identifica o motoboy da lista; `delivery_people_id` segue sendo a pessoa que recebe a entrega.
 - Fluxos de entrega, retirada, codigos de handover e acompanhamento podem reaproveitar `ui-orders`, mas o recorte `DELIVERY` continua sendo uma visao de app.
 - Quando o assunto for canal de venda, pagamento na entrega ou logistica, usar nomes especificos para evitar confusao com `APP_TYPE=DELIVERY`.
 
@@ -186,8 +238,11 @@
 - O backend deve receber informacao suficiente para resolver o produto pelo SKU lido e para entender a quantidade vendida quando o SKU representar pack. O contrato do item nao deve depender apenas de nome do produto ou ids visuais da interface.
 - Produtos sem codigo lido ainda precisam poder ser encontrados manualmente por busca textual ou por categoria, porque nem toda operacao de mercado autonomo depende exclusivamente do scanner.
 - O modo nao possui abertura de caixa, fechamento de caixa, sangria, suprimento ou conferencia manual local. Se houver conciliacao financeira, ela pertence ao fluxo administrativo/financeiro fora do equipamento do cliente.
-- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo, candidatura a launcher/Home e retomada no boot.
-- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV. O primeiro modo especializado dessa familia sera o `TOTEM` de mercado autonomo.
+- Em Android dedicado, o totem pode acionar a camada nativa de kiosk para `Lock Task Mode`, tela acordada, modo imersivo e retomada no boot.
+- A candidatura a launcher/Home deve ficar em configuracao separada do device, como `android-launcher-enabled`, e nao deve ser acoplada ao totem.
+- A ativacao do kiosk deve ser controlada por uma configuracao separada do device, como `android-kiosk-enabled`, independente do `pos-operation-mode`.
+- O `MANAGER` deve manter a configuracao do modo operacional em `pos-operation-mode=totem`, a configuracao separada do kiosk do Android em `android-kiosk-enabled` e a configuracao separada do launcher/home em `android-launcher-enabled`.
+- No `MANAGER`, deve existir configuracao para escolher o modo operacional do device/PDV, outra configuracao separada para ligar ou desligar o kiosk do Android e outra para o launcher/home.
 - A configuracao do `MANAGER` deve deixar claro quais devices estao em modo totem e quais continuam como `BALCAO`, `GARCON`, `PDV` ou outros modos operacionais futuros.
 
 ### PDV
@@ -203,6 +258,20 @@
 - O device precisa respeitar o gateway local configurado e as regras da barra unica de pagamento.
 - Em web/manager, o mesmo fluxo nao pode burlar a restricao de cobranca local do `MANAGER`.
 - Quando o pedido vier de outra atividade, o PDV nao deve perder o contexto operacional original; ele apenas assume a etapa de caixa e conclusao.
+
+### VENDA UNITARIA
+- Visao:
+- Variante de `POS` para venda unitária, ao lado de totem, garcom, mesa e balcao.
+- Nao e um novo `APP_TYPE`; e apenas um modo operacional do `PDV`.
+- Modulos base:
+- `ui-orders` para pedido, checkout e retorno para a lista de pedidos.
+- `ui-products` para o catalogo direto, sem tela de categoria intermediaria.
+- Regras de negocio iniciais:
+- O catalogo abre em lista de produtos e servicos sem categoria.
+- O carrinho aceita apenas um produto principal por vez; ao selecionar outro item, o anterior e substituido.
+- O endpoint de persistencia do pedido deve trocar os produtos do pedido em vez de acumular itens.
+- Ao finalizar a venda, o fluxo volta para `OrderHistoryPage`.
+- O checkout precisa exibir as carteiras de dinheiro e, no browser/web, tratar Cielo como cobranca remota para uma maquina Cielo via websocket; somente em device nativo Cielo a cobranca local pode redirecionar para o app Cielo.
 
 ## Regras transversais do POS
 - Todo tipo de atividade do POS deve continuar usando o mesmo fluxo unificado de pedido e checkout.

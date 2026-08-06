@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
@@ -24,6 +25,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -58,7 +60,9 @@ private const val SPOOL_POLL_INTERVAL_MS = 10000L
 private const val FAILED_SPOOL_RETRY_MS = 30000L
 private const val LOCAL_EVENT_PORT = 41572
 private const val REGISTRATION_TTL_MS = 7L * 24L * 60L * 60L * 1000L
+private const val DEFAULT_ALERT_SOUND_RESOURCE_NAME = "caixa"
 private const val JSON_MIME_TYPE = "application/ld+json"
+private const val FRONTEND_DEBUG_LOG_PATH = "logs/frontend-debug"
 private val EMPTY_REQUEST_BODY = ByteArray(0).toRequestBody(null, 0, 0)
 private val BASE64_REGEX =
   Regex("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
@@ -78,6 +82,16 @@ private fun normalizeOrderId(value: Any?): String {
 
     else -> safeTrim(value).replace(Regex("\\D+"), "")
   }
+}
+
+private fun buildDefaultAlertSoundUri(packageName: String): String {
+  return Uri.Builder()
+    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+    .authority(packageName)
+    .appendPath("raw")
+    .appendPath(DEFAULT_ALERT_SOUND_RESOURCE_NAME)
+    .build()
+    .toString()
 }
 
 private fun parseNumericValue(value: Any?): Double? {
@@ -154,6 +168,89 @@ private fun parseStringArray(values: JSONArray?): List<String> {
       }
     }
   }
+}
+
+private fun jsonCompatibleValue(value: Any?): Any? {
+  if (value == null || value == JSONObject.NULL) {
+    return JSONObject.NULL
+  }
+
+  return when (value) {
+    is JSONObject,
+    is JSONArray,
+    is Boolean,
+    is Int,
+    is Long,
+    is Double,
+    is Float,
+    is Short,
+    is Byte,
+    is Number,
+    is String -> value
+
+    is Map<*, *> -> buildJsonObject(
+      value.entries
+        .mapNotNull { entry ->
+          val key = safeTrim(entry.key)
+          if (key.isEmpty()) {
+            return@mapNotNull null
+          }
+
+          key to entry.value
+        }
+        .toMap(),
+    )
+
+    is Iterable<*> -> JSONArray().apply {
+      value.forEach { put(jsonCompatibleValue(it)) }
+    }
+
+    is Array<*> -> JSONArray().apply {
+      value.forEach { put(jsonCompatibleValue(it)) }
+    }
+
+    else -> value.toString()
+  }
+}
+
+private fun buildJsonObject(values: Map<String, Any?>): JSONObject {
+  val json = JSONObject()
+
+  values.forEach { (key, value) ->
+    if (key.isBlank() || value == null) {
+      return@forEach
+    }
+
+    json.put(key, jsonCompatibleValue(value))
+  }
+
+  return json
+}
+
+private fun buildRuntimeDebugContext(
+  registration: RuntimeRegistration,
+  context: Map<String, Any?> = emptyMap(),
+): JSONObject {
+  val payload = linkedMapOf<String, Any?>(
+    "runtimeSource" to "background-runtime",
+    "registrationId" to registration.registrationId,
+    "packageName" to registration.packageName,
+    "companyId" to registration.companyId,
+    "deviceId" to registration.deviceId,
+    "appType" to registration.appType,
+    "deviceType" to registration.deviceType,
+    "backgroundEnabled" to registration.backgroundEnabled,
+    "notificationEnabled" to registration.notificationEnabled,
+    "runtimeDebugInfoEnabled" to registration.runtimeDebugInfoEnabled,
+  )
+
+  context.forEach { (key, value) ->
+    if (key.isNotBlank() && value != null) {
+      payload[key] = value
+    }
+  }
+
+  return buildJsonObject(payload)
 }
 
 internal data class RuntimeRegistrationScopeKey(
@@ -266,6 +363,7 @@ internal data class RuntimeRegistration(
   val spoolDeviceIds: List<String>,
   val token: String,
   val apiBaseUrl: String,
+  val runtimeDebugInfoEnabled: Boolean,
   val updatedAt: Long,
 ) {
   fun toJson(): JSONObject {
@@ -298,6 +396,7 @@ internal data class RuntimeRegistration(
       .put("spoolDeviceIds", spoolDeviceArray)
       .put("token", token)
       .put("apiBaseUrl", apiBaseUrl)
+      .put("runtimeDebugInfoEnabled", runtimeDebugInfoEnabled)
       .put("updatedAt", updatedAt)
   }
 
@@ -341,16 +440,29 @@ internal data class RuntimeRegistration(
   }
 
   fun resolveAlertSoundUrl(): String {
-    if (userAlertSoundEnabled && userAlertSoundUrl.isNotEmpty()) {
-      return userAlertSoundUrl
+    if (userAlertSoundEnabled) {
+      if (userAlertSoundUrl.isNotEmpty()) {
+        return userAlertSoundUrl
+      }
+
+      // A configuracao do usuario sempre vence e, vazia, usa o som embutido.
+      return buildDefaultAlertSoundUri(packageName)
     }
 
-    if (deviceAlertSoundEnabled && deviceAlertSoundUrl.isNotEmpty()) {
-      return deviceAlertSoundUrl
+    if (deviceAlertSoundEnabled) {
+      if (deviceAlertSoundUrl.isNotEmpty()) {
+        return deviceAlertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
     }
 
-    if (alertSoundEnabled && alertSoundUrl.isNotEmpty()) {
-      return alertSoundUrl
+    if (alertSoundEnabled) {
+      if (alertSoundUrl.isNotEmpty()) {
+        return alertSoundUrl
+      }
+
+      return buildDefaultAlertSoundUri(packageName)
     }
 
     return ""
@@ -402,6 +514,8 @@ internal data class RuntimeRegistration(
         spoolDeviceIds = parseStringArray(json.optJSONArray("spoolDeviceIds")),
         token = safeTrim(json.opt("token")),
         apiBaseUrl = safeTrim(json.opt("apiBaseUrl")),
+        runtimeDebugInfoEnabled =
+          json.optBoolean("runtimeDebugInfoEnabled", false),
         updatedAt = json.optLong("updatedAt", fallbackUpdatedAt),
       )
     }
@@ -715,34 +829,128 @@ class BackgroundRuntimeService : Service() {
     serviceScope.cancel()
   }
 
-  private suspend fun refreshRuntime() = refreshMutex.withLock {
-    val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
-    val nextActiveRegistrations = storedRegistrations.values
-      .filter { it.backgroundEnabled && !it.isExpired() }
-      .associateBy { it.registrationId }
+  private fun shouldSendRuntimeDebugLog(registration: RuntimeRegistration): Boolean {
+    return registration.runtimeDebugInfoEnabled &&
+      registration.apiBaseUrl.isNotBlank() &&
+      registration.token.isNotBlank() &&
+      registration.deviceId.isNotBlank()
+  }
 
-    if (nextActiveRegistrations.isEmpty()) {
-      activeRegistrations.clear()
-      shutdownRuntime()
-      stopSelfSafely()
+  private fun logRuntimeDebugAsync(
+    registration: RuntimeRegistration,
+    message: String,
+    level: String = "info",
+    context: Map<String, Any?> = emptyMap(),
+    entityClass: String? = null,
+    entityRow: Int? = null,
+  ) {
+    if (!shouldSendRuntimeDebugLog(registration)) {
       return
     }
 
-    if (!ensureLeaderServer()) {
-      nextActiveRegistrations.values.forEach { registration ->
-        BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+    serviceScope.launch {
+      logRuntimeDebug(
+        registration = registration,
+        message = message,
+        level = level,
+        context = context,
+        entityClass = entityClass,
+        entityRow = entityRow,
+      )
+    }
+  }
+
+  private suspend fun logRuntimeDebug(
+    registration: RuntimeRegistration,
+    message: String,
+    level: String = "info",
+    context: Map<String, Any?> = emptyMap(),
+    entityClass: String? = null,
+    entityRow: Int? = null,
+  ) {
+    if (!shouldSendRuntimeDebugLog(registration)) {
+      return
+    }
+
+    val normalizedMessage = safeTrim(message).ifEmpty {
+      "Background runtime debug log"
+    }
+    val normalizedLevel = safeTrim(level).lowercase().ifEmpty { "info" }
+    val payload = JSONObject()
+      .put("channel", "frontend-debug")
+      .put("level", normalizedLevel)
+      .put("message", normalizedMessage)
+      .put(
+        "context",
+        buildRuntimeDebugContext(
+          registration = registration,
+          context = context,
+        ),
+      )
+
+    if (entityClass != null && entityClass.isNotBlank()) {
+      payload.put("entityClass", entityClass.trim())
+    }
+
+    if (entityRow != null) {
+      payload.put("entityRow", entityRow)
+    }
+
+    runCatching {
+      executeRequest(
+        registration = registration,
+        path = FRONTEND_DEBUG_LOG_PATH,
+        method = "POST",
+        body = payload.toString().toRequestBody(
+          JSON_MIME_TYPE.toMediaTypeOrNull(),
+        ),
+      )
+    }
+  }
+
+  private suspend fun refreshRuntime() {
+    refreshMutex.withLock {
+      val storedRegistrations = BackgroundRuntimeStore.loadRegistrations(this)
+      val nextActiveRegistrations = storedRegistrations.values
+        .filter { it.backgroundEnabled && !it.isExpired() }
+        .associateBy { it.registrationId }
+
+      if (nextActiveRegistrations.isEmpty()) {
+        activeRegistrations.clear()
+        shutdownRuntime()
+        stopSelfSafely()
+        return
       }
-      stopSelfSafely()
-      return
+
+      if (!ensureLeaderServer()) {
+        nextActiveRegistrations.values.forEach { registration ->
+          BackgroundRuntimeLeaderBridge.sendRegistration(registration)
+        }
+        stopSelfSafely()
+        return
+      }
+
+      activeRegistrations.clear()
+      activeRegistrations.putAll(nextActiveRegistrations)
+
+      ensureLocalEventServer()
+      syncSocketConnection()
+      syncSpoolPolling()
+      updateServiceNotification(nextActiveRegistrations.size)
+
+      selectSocketOwnerRegistration()?.let { socketOwner ->
+        logRuntimeDebugAsync(
+          registration = socketOwner,
+          message = "Background runtime synced",
+          context = mapOf(
+            "activeRegistrationCount" to nextActiveRegistrations.size,
+            "ownerRegistrationId" to socketOwner.registrationId,
+            "ownerPackageName" to socketOwner.packageName,
+          ),
+          entityClass = "BackgroundRuntime",
+        )
+      }
     }
-
-    activeRegistrations.clear()
-    activeRegistrations.putAll(nextActiveRegistrations)
-
-    ensureLocalEventServer()
-    syncSocketConnection()
-    syncSpoolPolling()
-    updateServiceNotification(nextActiveRegistrations.size)
   }
 
   private fun ensureLeaderServer(): Boolean {
@@ -1203,6 +1411,15 @@ class BackgroundRuntimeService : Service() {
             )
           }
 
+          logRuntimeDebugAsync(
+            registration = registration,
+            message = "Background runtime socket connected",
+            context = mapOf(
+              "status" to "open",
+              "attempts" to reconnectAttempt,
+            ),
+          )
+
           val payload = JSONObject()
             .put("command", "identify")
             .put("device", registration.deviceId)
@@ -1298,6 +1515,25 @@ class BackgroundRuntimeService : Service() {
         ownerRegistrationId = registration?.registrationId ?: current.ownerRegistrationId,
         ownerPackageName = registration?.packageName ?: current.ownerPackageName,
         ownerCompanyId = registration?.companyId ?: current.ownerCompanyId,
+      )
+    }
+
+    registration?.let { runtimeRegistration ->
+      logRuntimeDebugAsync(
+        registration = runtimeRegistration,
+        message = if (errorMessage.isNotBlank()) {
+          "Background runtime socket failed"
+        } else {
+          "Background runtime socket disconnected"
+        },
+        level = if (errorMessage.isNotBlank()) "error" else "debug",
+        context = mapOf(
+          "code" to code,
+          "reason" to reason.ifBlank { null },
+          "error" to errorMessage.ifBlank { null },
+          "status" to nextStatus,
+        ),
+        entityClass = "BackgroundRuntime",
       )
     }
 
@@ -1506,22 +1742,84 @@ class BackgroundRuntimeService : Service() {
     val action = safeTrim(event.opt("action")).lowercase()
     val eventName = safeTrim(event.opt("event")).lowercase()
     val realStatus = safeTrim(event.opt("realStatus")).lowercase()
-
-    if (
+    val orderId = normalizeOrderId(event.opt("order"))
+    val shouldNotifyOrder =
       registration.notificationEnabled &&
-      store == "orders" &&
-      (
-        eventName == "order.created" && realStatus == "open" ||
-          eventName == "store.opened" && realStatus == "open" ||
-          eventName == "store.closed" && realStatus == "closed" ||
-          eventName == "cash.closed" && realStatus == "closed"
-        )
-    ) {
+        store == "orders" &&
+        (
+          eventName == "order.created" && realStatus == "open" ||
+            eventName == "store.opened" && realStatus == "open" ||
+            eventName == "store.closed" && realStatus == "closed" ||
+            eventName == "cash.closed" && realStatus == "closed"
+          )
+
+    if (registration.runtimeDebugInfoEnabled && store == "orders") {
+      logRuntimeDebugAsync(
+        registration = registration,
+        message = if (shouldNotifyOrder) {
+          "Order event matched notification rules"
+        } else {
+          "Order event skipped by notification rules"
+        },
+        level = if (shouldNotifyOrder) "info" else "debug",
+        context = mapOf(
+          "store" to store,
+          "action" to action,
+          "event" to eventName,
+          "realStatus" to realStatus,
+          "orderId" to orderId.ifEmpty { null },
+          "matchesNotificationRules" to shouldNotifyOrder,
+          "notificationEnabled" to registration.notificationEnabled,
+        ),
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+    }
+
+    if (shouldNotifyOrder) {
       serviceScope.launch {
-        playAlertSound(registration)
+        val enrichedEvent = runCatching {
+          enrichOrderNotificationEvent(registration, event)
+        }.getOrElse { error ->
+          logRuntimeDebug(
+            registration = registration,
+            message = "Failed to enrich order notification",
+            level = "error",
+            context = mapOf(
+              "store" to store,
+              "event" to eventName,
+              "realStatus" to realStatus,
+              "orderId" to orderId.ifEmpty { null },
+              "error" to error.message.orEmpty(),
+            ),
+            entityClass = "Order",
+            entityRow = orderId.toIntOrNull(),
+          )
+          event
+        }
+
+        runCatching {
+          playAlertSound(registration)
+        }.onFailure { error ->
+          logRuntimeDebug(
+            registration = registration,
+            message = "Failed to play alert sound",
+            level = "error",
+            context = mapOf(
+              "store" to store,
+              "event" to eventName,
+              "realStatus" to realStatus,
+              "orderId" to orderId.ifEmpty { null },
+              "error" to error.message.orEmpty(),
+            ),
+            entityClass = "Order",
+            entityRow = orderId.toIntOrNull(),
+          )
+        }
+
         showOrderNotification(
           registration,
-          enrichOrderNotificationEvent(registration, event),
+          enrichedEvent,
         )
       }
     }
@@ -2017,10 +2315,10 @@ class BackgroundRuntimeService : Service() {
     )
   }
 
-  private fun showOrderNotification(
+  private suspend fun showOrderNotification(
     registration: RuntimeRegistration,
     event: JSONObject,
-  ) {
+  ): Boolean {
     val orderId = normalizeOrderId(event.opt("order"))
     val statusLabel = safeTrim(
       event.opt("notificationStatusLabel").takeIf { it != null }
@@ -2089,23 +2387,85 @@ class BackgroundRuntimeService : Service() {
     } else {
       null
     }
-
-    val notification = NotificationCompat.Builder(this, ORDER_CHANNEL_ID)
-      .setContentTitle(title)
-      .setContentText(body)
-      .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-      .setSmallIcon(android.R.drawable.stat_notify_more)
-      .setAutoCancel(true)
-      .setContentIntent(pendingIntent)
-      .setPriority(NotificationCompat.PRIORITY_HIGH)
-      .build()
-
     val notificationManager =
       getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(
-      (registration.registrationId + orderId).hashCode(),
-      notification,
+    val notificationsEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      notificationManager.areNotificationsEnabled()
+    } else {
+      true
+    }
+    val channelImportance = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      notificationManager.getNotificationChannel(ORDER_CHANNEL_ID)?.importance
+    } else {
+      null
+    }
+    val notificationId = (registration.registrationId + orderId).hashCode()
+    val debugContext = linkedMapOf<String, Any?>(
+      "orderId" to orderId.ifEmpty { null },
+      "title" to title,
+      "body" to body,
+      "statusLabel" to statusLabel,
+      "subtitle" to subtitle.ifEmpty { null },
+      "customerName" to customerName.ifEmpty { null },
+      "priceLabel" to priceLabel.ifEmpty { null },
+      "notificationId" to notificationId,
+      "channelId" to ORDER_CHANNEL_ID,
+      "notificationsEnabled" to notificationsEnabled,
+      "channelImportance" to channelImportance,
+      "pendingIntentAvailable" to (pendingIntent != null),
+      "launchPackage" to launchPackage,
     )
+
+    return runCatching {
+      logRuntimeDebug(
+        registration = registration,
+        message = "Posting order notification",
+        context = debugContext,
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      val notification = NotificationCompat.Builder(this, ORDER_CHANNEL_ID)
+        .setContentTitle(title)
+        .setContentText(body)
+        .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+        .setSmallIcon(android.R.drawable.stat_notify_more)
+        .setAutoCancel(true)
+        .setContentIntent(pendingIntent)
+        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setPriority(NotificationCompat.PRIORITY_MAX)
+        .build()
+
+      notificationManager.notify(
+        notificationId,
+        notification,
+      )
+
+      logRuntimeDebug(
+        registration = registration,
+        message = "Order notification posted",
+        context = debugContext,
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      true
+    }.getOrElse { error ->
+      logRuntimeDebug(
+        registration = registration,
+        message = "Failed to show order notification",
+        level = "error",
+        context = debugContext + mapOf(
+          "error" to error.message.orEmpty(),
+          "exception" to error::class.java.simpleName,
+        ),
+        entityClass = "Order",
+        entityRow = orderId.toIntOrNull(),
+      )
+
+      false
+    }
   }
 
   private fun shutdownRuntime() {

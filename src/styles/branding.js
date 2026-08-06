@@ -1,8 +1,9 @@
 import {colors as defaultColors} from './colors';
 
 const CSS_VAR_FALLBACK_HEX_REGEX =
-  /^var\([^,]+,\s*(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})\s*\)$/;
-const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+  /^var\([^,]+,\s*(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8})\s*\)$/;
+const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+const TRANSPARENT_COLOR_VALUE = 'transparent';
 
 const normalizeHex = value => {
   if (typeof value !== 'string') {
@@ -21,7 +22,15 @@ const normalizeHex = value => {
     return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
   }
 
+  if (color.length === 5) {
+    return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}${color[4]}${color[4]}`;
+  }
+
   return color;
+};
+
+const isTransparentColor = value => {
+  return typeof value === 'string' && value.trim().toLowerCase() === TRANSPARENT_COLOR_VALUE;
 };
 
 export const withOpacity = (hexColor, opacity = 1) => {
@@ -31,7 +40,8 @@ export const withOpacity = (hexColor, opacity = 1) => {
   }
 
   const clamped = Math.max(0, Math.min(1, opacity));
-  const intValue = parseInt(normalized.slice(1), 16);
+  const rgbHex = normalized.slice(1, 7);
+  const intValue = parseInt(rgbHex, 16);
   const r = (intValue >> 16) & 255;
   const g = (intValue >> 8) & 255;
   const b = intValue & 255;
@@ -50,9 +60,29 @@ export const resolveThemePalette = (
     }),
     {},
   );
+  const extraThemeTokens = Object.keys(themeColors || {}).reduce(
+    (palette, key) => {
+      if (Object.prototype.hasOwnProperty.call(normalizedFallback, key)) {
+        return palette;
+      }
+
+      const normalized = normalizeHex(themeColors[key]);
+      const value = normalized || themeColors[key];
+      if (value) {
+        palette[key] = value;
+      }
+
+      return palette;
+    },
+    {},
+  );
 
   const firstThemeColor = (...keys) => {
     for (const key of keys) {
+      if (isTransparentColor(themeColors[key])) {
+        return TRANSPARENT_COLOR_VALUE;
+      }
+
       const value = normalizeHex(themeColors[key]);
       if (value) {
         return value;
@@ -101,7 +131,11 @@ export const resolveThemePalette = (
       'q-text-secondary',
     ) || normalizedFallback.textSecondary;
 
-  if (textSecondary.toLowerCase() === background.toLowerCase()) {
+  if (
+    typeof textSecondary === 'string' &&
+    typeof background === 'string' &&
+    textSecondary.toLowerCase() === background.toLowerCase()
+  ) {
     textSecondary = text;
   }
 
@@ -111,6 +145,7 @@ export const resolveThemePalette = (
 
   return {
     ...normalizedFallback,
+    ...extraThemeTokens,
     primary,
     secondary,
     background,
@@ -148,14 +183,15 @@ export const applyThemeCssVariables = ({
 
   Object.keys(themeColors || {}).forEach(key => {
     const normalized = normalizeHex(themeColors[key]);
-    if (!normalized) {
+    const transparent = isTransparentColor(themeColors[key]);
+    if (!normalized && !transparent) {
       return;
     }
 
-    root.style.setProperty(`--${key}`, normalized);
+    root.style.setProperty(`--${key}`, normalized || TRANSPARENT_COLOR_VALUE);
 
     if (key.startsWith('q-')) {
-      root.style.setProperty(`--${key.slice(2)}`, normalized);
+      root.style.setProperty(`--${key.slice(2)}`, normalized || TRANSPARENT_COLOR_VALUE);
     }
   });
 
@@ -175,8 +211,8 @@ export const applyThemeCssVariables = ({
 
   Object.keys(paletteVars).forEach(key => {
     const value = normalizeHex(paletteVars[key]);
-    if (value) {
-      root.style.setProperty(`--${key}`, value);
+    if (value || isTransparentColor(paletteVars[key])) {
+      root.style.setProperty(`--${key}`, value || TRANSPARENT_COLOR_VALUE);
     }
   });
 };

@@ -1,15 +1,23 @@
 const PRODUCT_DETAILS_TAB_PATH_REGEX =
-  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque)([?#].*)?$/i
+  /^\/?product-details\/([^/?#]+)\/(?:Dados|Fornecedores|Insumos|Grupos|Estoque|Vendas)([?#].*)?$/i
+const LEGACY_SHOP_PRODUCT_PATH_REGEX =
+  /^\/?product\/([^/?#]+)\/details([?#].*)?$/i
 
 export const normalizeProductDetailsTabPath = path => {
   const normalizedPath = String(path || '')
   const productDetailsTabMatch = normalizedPath.match(PRODUCT_DETAILS_TAB_PATH_REGEX)
 
-  if (!productDetailsTabMatch?.[1]) {
-    return normalizedPath
+  if (productDetailsTabMatch?.[1]) {
+    return `product-details/${productDetailsTabMatch[1]}${productDetailsTabMatch[2] || ''}`
   }
 
-  return `product-details/${productDetailsTabMatch[1]}${productDetailsTabMatch[2] || ''}`
+  const legacyShopProductMatch = normalizedPath.match(LEGACY_SHOP_PRODUCT_PATH_REGEX)
+
+  if (legacyShopProductMatch?.[1]) {
+    return `shop/product/${legacyShopProductMatch[1]}${legacyShopProductMatch[2] || ''}`
+  }
+
+  return normalizedPath
 }
 
 export const getCurrentBrowserPath = currentWindow => {

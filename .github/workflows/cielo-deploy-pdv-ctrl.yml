@@ -3,7 +3,7 @@ name: Deploy Cielo PDV CONTROLE ONLINE
 # para executar sempre que subir um branch do tipo production    
 #on:
 #  push:
-#    branches: [master]
+#    branches: [production]
 
 # executa quando é chamado por outro workflow
 on:
@@ -13,7 +13,7 @@ on:
 # android-deploy-global.yml
 
     types: [completed]
-    branches: [master]
+    branches: [production]
   workflow_dispatch:
 
 jobs:
@@ -26,13 +26,15 @@ jobs:
         include:
           - app_type: POS
             display_name: "PDV"
-            track: internal
+            tracks: internal
             release_status: completed
             changes_not_sent_for_review: false
 
     env:
       APP_TYPE: ${{ matrix.app_type }}
       APP_DISPLAY_NAME: ${{ matrix.display_name }}
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
 
     steps:
       - uses: actions/checkout@v5
@@ -58,13 +60,15 @@ jobs:
         run: |
           APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
 
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           DOMAIN: 'https://app.controleonline.com',\
           MANAGER_APP: 'https://app.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: '${APP_TYPE}',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
@@ -79,23 +83,22 @@ jobs:
       - name: Backup app.json
         run: cp app.json app.json.backup
 
-      - name: Update app.json dynamically
-        run: |
-          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
-          sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
-          sed -i "s/manager/${APP_LOWER}/g" app.json
-
-      - name: Configure Assets by APP_TYPE
-        run: node scripts/configure-assets.js
-        env:
-          APP_TYPE: ${{ env.APP_TYPE }}
-
       - name: Install Dependencies
         run: npm install
-      - name: Fix Expo Dependencies
-        run: npx expo install --fix
+#
+#      - name: Fix Expo Dependencies
+#        run: npx expo install --fix
+#
+#      - name: Prebuild
+#        run: npx expo prebuild --clean
+#
       - name: Prebuild
         run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
+
+
 
       - name: Create Android Signing Files
         run: |
@@ -142,21 +145,5 @@ jobs:
           remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
-      - name: Restore app.json (revert dynamic changes)
-        run: |
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          cp app.json.backup app.json
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            app.expo.android.versionCode = $VERSION_CODE;
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
-
-      - name: Commit app.json changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.json
-          git commit -m "chore: update versionCode to ${{ env.VERSION }}"
-          git push
+      - name: Restore app.json
+        run: cp app.json.backup app.json

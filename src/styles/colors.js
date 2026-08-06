@@ -11,9 +11,9 @@ export const colors = {
     text: varColor('--text', '#0F172A'),
     textSecondary: varColor('--text-secondary', '#64748B'),
     border: varColor('--border', '#F1F5F9'),
-    error: varColor('--negative', '#EF4444'),
-    success: varColor('--positive', '#22C55E'),
-    warning: varColor('--warning', '#F59E0B'),
+    success: varColor('--positive', '#10b981'),
+    warning: varColor('--warning', '#e67e22'),
+    error: varColor('--negative', '#c10015'),
     info: varColor('--info', '#3B82F6'),
 };
 
