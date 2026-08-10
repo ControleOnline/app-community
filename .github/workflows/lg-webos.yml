@@ -1,4 +1,4 @@
-name: Deploy LG webOS PPC
+name: LG webOS
 
 on:
   workflow_dispatch:
@@ -33,13 +33,14 @@ jobs:
       - name: Generate Dynamic Configs
         run: |
           mkdir -p ./config
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
           API_ENTRYPOINT: 'https://api.controleonline.com',\
           DOMAIN: 'https://app.controleonline.com',\
           MANAGER_APP: 'https://app.controleonline.com',\
           SOCKET: 'wss://api.controleonline.com',\
           APP_TYPE: '${APP_TYPE}',\
-          ZOOM: 0.80,\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
