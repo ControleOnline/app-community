@@ -1,0 +1,357 @@
+# Reusable Android build for all app_types / channels.
+# Android Play = AAB (+ optional APK). Cielo = APK via FTP.
+# Callers only pass product config + publish flags.
+name: Android Build (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      app_type:
+        description: "APP_TYPE (POS, MANAGER, ...)"
+        required: true
+        type: string
+      display_name:
+        description: "UI display name"
+        required: true
+        type: string
+      package_name:
+        description: "Android applicationId (empty = com.controleonline.<app_type_lower>)"
+        required: false
+        type: string
+        default: ""
+      expo_name:
+        description: "expo.name override (empty = On <display_name>)"
+        required: false
+        type: string
+        default: ""
+      expo_slug:
+        description: "expo.slug override"
+        required: false
+        type: string
+        default: ""
+      api_entrypoint:
+        required: false
+        type: string
+        default: "https://api.controleonline.com"
+      domain:
+        required: false
+        type: string
+        default: "https://app.controleonline.com"
+      manager_app:
+        required: false
+        type: string
+        default: "https://app.controleonline.com"
+      socket:
+        required: false
+        type: string
+        default: "wss://api.controleonline.com"
+      build_aab:
+        required: false
+        type: boolean
+        default: true
+      build_apk:
+        required: false
+        type: boolean
+        default: true
+      publish_play:
+        required: false
+        type: boolean
+        default: false
+      publish_ftp:
+        required: false
+        type: boolean
+        default: false
+      publish_github:
+        required: false
+        type: boolean
+        default: false
+      play_track:
+        required: false
+        type: string
+        default: "internal"
+      play_status:
+        required: false
+        type: string
+        default: "completed"
+      play_changes_not_sent_for_review:
+        required: false
+        type: boolean
+        default: true
+      bump_version_code_from_package:
+        description: "Set android.versionCode from package.json version digits (Cielo)"
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      CERT:
+        required: true
+      ANDROID_KEYSTORE_PASSWORD:
+        required: true
+      GMAPS_GOOGLE_CLIENT_ID:
+        required: false
+      NEW_RELIC_LICENSE_KEY:
+        required: false
+      NEW_RELIC_APPLICATION_ID:
+        required: false
+      NEW_RELIC_ACCOUNT_ID:
+        required: false
+      NEW_RELIC_TRUST_KEY:
+        required: false
+      NEW_RELIC_BEACON:
+        required: false
+      NEW_RELIC_ERROR_BEACON:
+        required: false
+      ANDROID_SERVICE_ACCOUNT_JSON:
+        required: false
+      FTPHOST:
+        required: false
+      FTPUSER:
+        required: false
+      FTPPASS:
+        required: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      APP_TYPE: ${{ inputs.app_type }}
+      APP_DISPLAY_NAME: ${{ inputs.display_name }}
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve package / slug / name
+        run: |
+          set -e
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          PACKAGE_NAME="${{ inputs.package_name }}"
+          if [ -z "$PACKAGE_NAME" ]; then
+            PACKAGE_NAME="com.controleonline.${APP_LOWER}"
+          fi
+          EXPO_NAME="${{ inputs.expo_name }}"
+          if [ -z "$EXPO_NAME" ]; then
+            EXPO_NAME="On ${APP_DISPLAY_NAME}"
+          fi
+          EXPO_SLUG="${{ inputs.expo_slug }}"
+          if [ -z "$EXPO_SLUG" ]; then
+            EXPO_SLUG="${APP_LOWER}-controle-online"
+          fi
+          {
+            echo "APP_LOWER=${APP_LOWER}"
+            echo "PACKAGE_NAME=${PACKAGE_NAME}"
+            echo "EXPO_NAME=${EXPO_NAME}"
+            echo "EXPO_SLUG=${EXPO_SLUG}"
+            echo "AAB_ARTIFACT_NAME=android-aab-${APP_LOWER}"
+            echo "APK_ARTIFACT_NAME=android-apk-${APP_LOWER}"
+          } >> "$GITHUB_ENV"
+          echo "Resolved package=${PACKAGE_NAME} slug=${EXPO_SLUG} name=${EXPO_NAME}"
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          set -e
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          cat > ./config/env.local.js << ENVEOF
+          const env = {
+            API_ENTRYPOINT: '${{ inputs.api_entrypoint }}',
+            DOMAIN: '${{ inputs.domain }}',
+            MANAGER_APP: '${{ inputs.manager_app }}',
+            SOCKET: '${{ inputs.socket }}',
+            APP_TYPE: '${APP_TYPE}',
+            ZOOM: ${ZOOM},
+            NEW_RELIC: {
+              LICENSE_KEY: '${{ secrets.NEW_RELIC_LICENSE_KEY }}',
+              APPLICATION_ID: '${{ secrets.NEW_RELIC_APPLICATION_ID }}',
+              ACCOUNT_ID: '${{ secrets.NEW_RELIC_ACCOUNT_ID }}',
+              TRUST_KEY: '${{ secrets.NEW_RELIC_TRUST_KEY }}',
+              BEACON: '${{ secrets.NEW_RELIC_BEACON }}',
+              ERROR_BEACON: '${{ secrets.NEW_RELIC_ERROR_BEACON }}'
+            }
+          };
+          module.exports = { env };
+          ENVEOF
+
+      - name: Backup app.json
+        run: cp app.json app.json.backup
+
+      - name: Update app.json dynamically
+        run: |
+          set -e
+          node << 'NODE'
+          const fs = require('fs');
+          const app = require('./app.json');
+          const name = process.env.EXPO_NAME;
+          const pkg = process.env.PACKAGE_NAME;
+          const slug = process.env.EXPO_SLUG;
+          app.expo = app.expo || {};
+          app.expo.name = name;
+          app.expo.slug = slug;
+          app.expo.android = app.expo.android || {};
+          app.expo.android.package = pkg;
+          fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          console.log('app.json →', name, pkg, slug);
+          NODE
+
+      - name: Configure Assets by APP_TYPE
+        run: |
+          set -e
+          # Best-effort asset swap if project scripts exist
+          if [ -f scripts/configure-assets.js ]; then
+            node scripts/configure-assets.js "$APP_TYPE"
+          elif [ -d "assets/${APP_LOWER}" ]; then
+            cp -R "assets/${APP_LOWER}/." assets/ 2>/dev/null || true
+          fi
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
+      - name: Create Firebase Android Config
+        run: |
+          if [ -f "config/firebase/${APP_LOWER}/google-services.json" ]; then
+            mkdir -p android/app
+            cp "config/firebase/${APP_LOWER}/google-services.json" android/app/google-services.json 2>/dev/null || true
+          fi
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle || echo "warn: fonts.gradle hook missing"
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+
+      - name: Bump versionCode from package.json
+        if: inputs.bump_version_code_from_package
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo "$VERSION" | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Build Android (AAB and/or APK)
+        run: |
+          set -e
+          cd android
+          TASKS=""
+          if [ "${{ inputs.build_aab }}" = "true" ]; then TASKS="$TASKS bundleRelease"; fi
+          if [ "${{ inputs.build_apk }}" = "true" ]; then TASKS="$TASKS assembleRelease"; fi
+          if [ -z "$TASKS" ]; then echo "No build targets"; exit 1; fi
+          # shellcheck disable=SC2086
+          ./gradlew $TASKS --init-script ../signing.gradle \
+            -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
+
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Version: $VERSION"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ env.APP_LOWER }}-${{ env.VERSION }}
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+            android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: warn
+
+      - name: Publish GitHub Release
+        if: inputs.publish_github
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          VERSION="${VERSION}"
+          APP_SLUG="${EXPO_SLUG}"
+          RELEASE_TAG="v${VERSION}"
+          RELEASE_TITLE="Controle Online ${VERSION}"
+          RELEASE_DIR="${RUNNER_TEMP}/release-assets"
+          mkdir -p "${RELEASE_DIR}"
+          AAB_SRC=$(find ./android/app/build/outputs/bundle/release -name '*.aab' 2>/dev/null | head -n1 || true)
+          APK_SRC=$(find ./android/app/build/outputs/apk/release -name '*.apk' 2>/dev/null | head -n1 || true)
+          ASSETS=""
+          if [ -n "$AAB_SRC" ]; then
+            cp "$AAB_SRC" "${RELEASE_DIR}/${APP_SLUG}-release.aab"
+            ASSETS="$ASSETS ${RELEASE_DIR}/${APP_SLUG}-release.aab"
+          fi
+          if [ -n "$APK_SRC" ]; then
+            cp "$APK_SRC" "${RELEASE_DIR}/${APP_SLUG}-release.apk"
+            ASSETS="$ASSETS ${RELEASE_DIR}/${APP_SLUG}-release.apk"
+          fi
+          if [ -z "$ASSETS" ]; then echo "No assets to publish"; exit 0; fi
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            # shellcheck disable=SC2086
+            gh release upload "${RELEASE_TAG}" $ASSETS --clobber
+          else
+            # shellcheck disable=SC2086
+            gh release create "${RELEASE_TAG}" $ASSETS \
+              --title "${RELEASE_TITLE}" \
+              --notes "Build Controle Online v${VERSION} (${APP_TYPE})."
+          fi
+
+      - name: Decode Service Account
+        if: inputs.publish_play
+        run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
+
+      - name: Upload AAB to Play Store
+        if: inputs.publish_play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: /tmp/service_account.json
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: ${{ inputs.play_track }}
+          status: ${{ inputs.play_status }}
+          changesNotSentForReview: ${{ inputs.play_changes_not_sent_for_review }}
+
+      - name: Upload APK to Website (FTP)
+        if: inputs.publish_ftp
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/apk/release"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          forceSsl: false
+
+      - name: Restore app.json
+        if: always()
+        run: |
+          if [ -f app.json.backup ]; then cp app.json.backup app.json; fi
