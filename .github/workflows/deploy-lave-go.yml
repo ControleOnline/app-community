@@ -1,0 +1,99 @@
+# Whitelabel Lave-Go (exceção). Android APK → FTP.
+name: Deploy Lave-Go
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "production ou staging endpoints"
+        type: choice
+        options: [production, staging]
+        default: production
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  configure:
+    name: "1 · Configure"
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.set.outputs.api }}
+      domain: ${{ steps.set.outputs.domain }}
+      socket: ${{ steps.set.outputs.socket }}
+    steps:
+      - id: set
+        run: |
+          if [ "${{ inputs.target }}" = "staging" ]; then
+            echo "api=https://s.controleonline.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://staging.controleonline.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://s.controleonline.com" >> "$GITHUB_OUTPUT"
+          else
+            echo "api=https://api.lavego.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://app.lavego.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://api.lavego.com" >> "$GITHUB_OUTPUT"
+          fi
+
+  android:
+    name: "2 · Android APK → FTP"
+    needs: configure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/android-build
+        with:
+          app_type: POS
+          display_name: PDV
+          package_name: com.lavego.app
+          expo_name: Lave-Go
+          expo_slug: pos-controle-online
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          domain: ${{ needs.configure.outputs.domain }}
+          manager_app: ${{ needs.configure.outputs.domain }}
+          socket: ${{ needs.configure.outputs.socket }}
+          build_aab: "false"
+          build_apk: "true"
+          publish_play: "false"
+          publish_github: "false"
+          publish_ftp: "true"
+          bump_version_code_from_package: "true"
+        env:
+          CERT: ${{ secrets.CERT }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          FTPHOST: ${{ secrets.FTPHOST }}
+          FTPUSER: ${{ secrets.FTPUSER }}
+          FTPPASS: ${{ secrets.FTPPASS }}
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+  web:
+    name: "2 · Web"
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - name: FTP
+        run: |
+          echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
+          echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
+          echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/web-export-deploy
+        with:
+          app_type: MANAGER
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          socket: ${{ needs.configure.outputs.socket }}
+          domain: ${{ needs.configure.outputs.domain }}
+          remote_dir: "~/public_html"
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
