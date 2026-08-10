@@ -2,25 +2,23 @@
 
 ## Core
 
-`.github/workflows/android-build.yml` — **único** pipeline de build (Expo prebuild + Gradle).
+`.github/workflows/android-build.yml` — pipeline único (prebuild → gradle → publish).
 
-| Input | Uso |
-|-------|-----|
-| `app_type` | CHECKOUT, CRM, POS, … |
-| `build_aab` / `build_apk` | Play Store vs Cielo |
-| `publish_play` / `publish_ftp` / `publish_github` | canais |
-| `package_name`, `expo_name`, `api_*` | whitelabel (Lave-Go) |
+## Destinos
+
+| Produto | AAB | APK | Destino |
+|---------|-----|-----|---------|
+| Controle Online (todos app_types) | sim | sim | [GitHub Releases](https://github.com/ControleOnline/app-community/releases) + Play Store (AAB) |
+| Cielo PDV Ctrl | sim | sim | [GitHub Releases](https://github.com/ControleOnline/app-community/releases) |
+| **Lave-Go** (whitelabel) | não | sim | **FTP apenas** |
+
+FTP **não** é mais usado para Controle Online — só Lave-Go.
 
 ## Callers
 
-| Workflow | Artefato | Destino |
-|----------|----------|---------|
-| `android-deploy-global.yml` | AAB + APK | Play + GitHub Release |
-| `cielo-deploy-pdv-ctrl.yml` | APK | FTP |
-| `cielo-deploy-pdv-lavego.yml` | APK | FTP (Lave-Go) |
-
-## Por que ainda há um prebuild por app_type?
-
-`applicationId`, nome, assets e `google-services.json` mudam por produto — o prebuild nativo **não** é compartilhado entre POS e MANAGER. O que unificamos é o **processo** (um script), não um único artefato intermediário para todos os tipos.
-
-Cielo ≠ Android Play só no **formato** (APK vs AAB) e **publicação** (FTP vs Play).
+| Workflow | publish |
+|----------|---------|
+| `android-deploy-global.yml` | Play + GitHub Releases |
+| `cielo-deploy-pdv-ctrl.yml` | GitHub Releases |
+| `cielo-deploy-pdv-lavego.yml` | FTP |
+| `cielo-deploy-pdv-lavego-STAGING.yml` | FTP |
