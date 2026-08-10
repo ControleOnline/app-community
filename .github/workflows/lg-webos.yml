@@ -1,4 +1,4 @@
-name: Deploy LG webOS PPC
+name: LG webOS
 
 on:
   workflow_dispatch:

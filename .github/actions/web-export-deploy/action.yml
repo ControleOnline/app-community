@@ -1,0 +1,78 @@
+name: Web Export Deploy
+description: Configure env, expo export web, deploy via FTP
+
+inputs:
+  app_type:
+    required: true
+  api_entrypoint:
+    required: true
+  socket:
+    required: true
+  domain:
+    required: false
+    default: ""
+  remote_dir:
+    required: false
+    default: "~/public_html"
+  ftp_host_secret_env:
+    description: "Name of env var holding FTP host (set by caller)"
+    required: false
+    default: "FTP_HOST"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: "20"
+
+    - name: Creating Config
+      shell: bash
+      run: |
+        set -e
+        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        DOMAIN_LINE=""
+        if [ -n "${{ inputs.domain }}" ]; then
+          DOMAIN_LINE="DOMAIN: '${{ inputs.domain }}',"
+        fi
+        cat > ./config/env.local.js << ENVEOF
+        const env = {
+          API_ENTRYPOINT: '${{ inputs.api_entrypoint }}',
+          SOCKET: '${{ inputs.socket }}',
+          ${DOMAIN_LINE}
+          APP_TYPE: '${{ inputs.app_type }}',
+          ZOOM: ${ZOOM},
+          NEW_RELIC: {
+            LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
+            APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
+            ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
+            TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
+            BEACON: process.env.NEW_RELIC_BEACON || '',
+            ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
+          }
+        };
+        module.exports = { env };
+        ENVEOF
+
+    - name: Update Submodules
+      shell: bash
+      run: |
+        git submodule sync --recursive
+        git submodule update --recursive --init --checkout
+
+    - name: Install & build
+      shell: bash
+      run: |
+        npm install --legacy-peer-deps
+        npx expo install --fix
+        npx expo export --platform web
+
+    - name: Deploy FTP
+      uses: locaweb/ftp-deploy@1.0.0
+      with:
+        host: ${{ env.FTP_HOST }}
+        user: ${{ env.FTP_USER }}
+        password: ${{ env.FTP_PASS }}
+        localDir: "./dist"
+        remoteDir: ${{ inputs.remote_dir }}
+        forceSsl: false
