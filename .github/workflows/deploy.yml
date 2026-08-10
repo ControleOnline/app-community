@@ -1,3 +1,4 @@
+# Controle Online — deploy pipeline (web + android + lg-webOS).
 # Único pipeline Controle Online.
 # 1) configure → ambiente
 # 2) web (dev / staging / master)
@@ -217,7 +218,6 @@ jobs:
           build_apk: "true"
           publish_play: "true"
           publish_github: "true"
-          publish_ftp: "false"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
         env:

@@ -1,4 +1,4 @@
-# Whitelabel Lave-Go (exceção). Android APK → FTP.
+# Whitelabel Lave-Go ONLY. Does not run as part of Controle Online deploy.yml.
 name: Deploy Lave-Go
 
 on:
@@ -36,7 +36,7 @@ jobs:
           fi
 
   android:
-    name: "2 · Android APK → FTP"
+    name: "2 · Android APK"
     needs: configure
     runs-on: ubuntu-latest
     steps:
@@ -56,20 +56,32 @@ jobs:
           build_apk: "true"
           publish_play: "false"
           publish_github: "false"
-          publish_ftp: "true"
           bump_version_code_from_package: "true"
         env:
           CERT: ${{ secrets.CERT }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          FTPHOST: ${{ secrets.FTPHOST }}
-          FTPUSER: ${{ secrets.FTPUSER }}
-          FTPPASS: ${{ secrets.FTPPASS }}
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
           NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
           NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+      - name: Extract version for FTP path
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "PACKAGE_NAME=com.lavego.app" >> "$GITHUB_ENV"
+
+      - name: Upload APK to Lave-Go FTP
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/apk/release"
+          remoteDir: "public_html/${{ env.VERSION }}/com.lavego.app/apk"
+          forceSsl: false
 
   web:
     name: "2 · Web"

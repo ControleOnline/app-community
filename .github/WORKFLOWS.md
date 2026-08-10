@@ -1,30 +1,30 @@
 # CI/CD (app-community)
 
-| Arquivo | Uso |
-|---------|-----|
-| `deploy.yml` | Controle Online |
-| `deploy-lave-go.yml` | Whitelabel Lave-Go |
+Dois deploys **independentes** — não se chamam.
+
+| Arquivo | Produto |
+|---------|---------|
+| `deploy.yml` | **Controle Online** |
+| `deploy-lave-go.yml` | **Lave-Go** (whitelabel) |
 | `pull-request-checks.yml` | CI de PR |
 
-## Fluxo `deploy.yml`
+## `deploy.yml` (Controle Online)
 
 ```
 1 · Configure (dev | staging | master)
-2 · Web matrix: MANAGER + SHOP + ADMIN  → cada um no seu FTP
-3 · Android matrix (só master) → AAB+APK → Releases + Play
-4 · LG webOS (só master) → IPK → Releases
+2 · Web: MANAGER + SHOP + ADMIN (FTP de cada produto)
+3 · Android AAB+APK (só master) → GitHub Releases + Play
+4 · LG webOS (só master) → GitHub Releases
 ```
 
-### Web FTP (produção / master)
+Sem Lave-Go, sem trigger cruzado.
 
-| app_type | Secrets |
-|----------|---------|
-| MANAGER | `FTPHOST`, `FTPUSER`, `FTPPASS` |
-| SHOP | `SHOP_HOST`, `SHOP_USER`, `SHOP_PASS` |
-| ADMIN | `ADMIN_HOST`, `ADMIN_USER`, `ADMIN_PASS` |
+## `deploy-lave-go.yml` (Lave-Go)
 
-dev/staging usam `DEV_*` / `STAGING_*` (mesmo host de ambiente para os três builds).
+```
+1 · Configure
+2 · Android APK → FTP Lave-Go
+2 · Web → FTP Lave-Go
+```
 
-### Nativo
-
-Só **`master`** (sem staging): Android + LG.
+Só `workflow_dispatch`. Não entra no pipeline Controle Online.
