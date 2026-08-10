@@ -39,9 +39,6 @@ inputs:
   publish_github:
     required: false
     default: "false"
-  publish_ftp:
-    required: false
-    default: "false"
   play_track:
     required: false
     default: "internal"
@@ -261,16 +258,6 @@ runs:
         status: ${{ inputs.play_status }}
         changesNotSentForReview: ${{ inputs.play_changes_not_sent_for_review }}
 
-    - name: FTP upload (Lave-Go only)
-      if: inputs.publish_ftp == 'true'
-      uses: locaweb/ftp-deploy@1.0.0
-      with:
-        host: ${{ env.FTPHOST }}
-        user: ${{ env.FTPUSER }}
-        password: ${{ env.FTPPASS }}
-        localDir: "./android/app/build/outputs/apk/release"
-        remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
-        forceSsl: false
 
     - name: Restore app.json
       if: always()
