@@ -1,10 +1,8 @@
-# Cielo PDV — Controle Online (APK → FTP). Same build core as Android Play.
-# Filename kept for: gh workflow run cielo-deploy-pdv-ctrl.yml
-name: Cielo Deploy PDV Ctrl
+# Cielo PDV Lave-Go STAGING — same core, staging endpoints if needed.
+name: Cielo Deploy PDV LaveGo Staging
 
 on:
   workflow_dispatch:
-  # also triggered by Deploy Android Apps after POS matrix
 
 permissions:
   contents: write
@@ -16,7 +14,13 @@ jobs:
     with:
       app_type: POS
       display_name: "PDV"
-      package_name: "com.controleonline.pos"
+      package_name: "com.lavego.app"
+      expo_name: "Lave-Go"
+      expo_slug: "pos-controle-online"
+      api_entrypoint: "https://s.controleonline.com"
+      domain: "https://staging.controleonline.com"
+      manager_app: "https://staging.controleonline.com"
+      socket: "wss://s.controleonline.com"
       build_aab: false
       build_apk: true
       publish_play: false
