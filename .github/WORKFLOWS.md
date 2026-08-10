@@ -1,29 +1,30 @@
 # CI/CD (app-community)
 
-Só **dois** workflows de deploy na raiz. Lógica em `.github/actions/`.
-
 | Arquivo | Uso |
 |---------|-----|
-| `deploy.yml` | Controle Online — fluxo por ambiente |
-| `deploy-lave-go.yml` | Whitelabel Lave-Go (FTP) |
-| `pull-request-checks.yml` | CI de PR (não é deploy) |
+| `deploy.yml` | Controle Online |
+| `deploy-lave-go.yml` | Whitelabel Lave-Go |
+| `pull-request-checks.yml` | CI de PR |
 
 ## Fluxo `deploy.yml`
 
 ```
-configure (dev | staging | master)
-    │
-    ├─► web          (sempre)
-    │
-    └─► se master:
-          ├─► android matrix (AAB + APK → Releases + Play)
-          └─► lg-webos (IPK → Releases)
+1 · Configure (dev | staging | master)
+2 · Web matrix: MANAGER + SHOP + ADMIN  → cada um no seu FTP
+3 · Android matrix (só master) → AAB+APK → Releases + Play
+4 · LG webOS (só master) → IPK → Releases
 ```
 
-| Ambiente | Web | Android / LG |
-|----------|-----|----------------|
-| `dev` | sim | **não** |
-| `staging` | sim | **não** |
-| `master` | sim | **sim** (não existe staging nativo) |
+### Web FTP (produção / master)
 
-Branch de produção nativa = **`master`** (não `production`).
+| app_type | Secrets |
+|----------|---------|
+| MANAGER | `FTPHOST`, `FTPUSER`, `FTPPASS` |
+| SHOP | `SHOP_HOST`, `SHOP_USER`, `SHOP_PASS` |
+| ADMIN | `ADMIN_HOST`, `ADMIN_USER`, `ADMIN_PASS` |
+
+dev/staging usam `DEV_*` / `STAGING_*` (mesmo host de ambiente para os três builds).
+
+### Nativo
+
+Só **`master`** (sem staging): Android + LG.

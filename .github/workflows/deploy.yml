@@ -79,47 +79,75 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "env=$ENV native=$NATIVE api=$API"
 
-  # ─── 2. Web (todos os ambientes) ───────────────────────────────────────────
+  # ─── 2. Web: MANAGER + SHOP + ADMIN (cada um no seu FTP) ───────────────────
   web:
-    name: "2 · Web (${{ needs.configure.outputs.env }})"
+    name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
     needs: configure
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_type: MANAGER
+            ftp_product: manager
+          - app_type: SHOP
+            ftp_product: shop
+          - app_type: ADMIN
+            ftp_product: admin
     steps:
       - uses: actions/checkout@v5
 
-      - name: FTP credentials
+      - name: FTP credentials (env × product)
         run: |
           set -e
-          case "${{ needs.configure.outputs.ftp_profile }}" in
-            dev)
-              echo "FTP_HOST=${{ secrets.DEV_HOST }}" >> "$GITHUB_ENV"
-              echo "FTP_USER=${{ secrets.DEV_USER }}" >> "$GITHUB_ENV"
-              echo "FTP_PASS=${{ secrets.DEV_PASS }}" >> "$GITHUB_ENV"
-              ;;
-            staging)
-              HOST="${{ secrets.STAGING_HOST }}"
-              USER="${{ secrets.STAGING_USER }}"
-              PASS="${{ secrets.STAGING_PASS }}"
-              if [ -z "$HOST" ]; then
-                HOST="${{ secrets.DEV_HOST }}"
-                USER="${{ secrets.DEV_USER }}"
-                PASS="${{ secrets.DEV_PASS }}"
-              fi
-              echo "FTP_HOST=$HOST" >> "$GITHUB_ENV"
-              echo "FTP_USER=$USER" >> "$GITHUB_ENV"
-              echo "FTP_PASS=$PASS" >> "$GITHUB_ENV"
-              ;;
-            production)
-              echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
-              echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
-              echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
-              ;;
-          esac
+          ENV_PROFILE="${{ needs.configure.outputs.ftp_profile }}"
+          PRODUCT="${{ matrix.ftp_product }}"
+          # Production: cada app_type tem host próprio
+          # dev/staging: secrets de ambiente (STAGING_* / DEV_*)
+          if [ "$ENV_PROFILE" = "production" ]; then
+            case "$PRODUCT" in
+              manager)
+                echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
+                ;;
+              shop)
+                echo "FTP_HOST=${{ secrets.SHOP_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.SHOP_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.SHOP_PASS }}" >> "$GITHUB_ENV"
+                ;;
+              admin)
+                echo "FTP_HOST=${{ secrets.ADMIN_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.ADMIN_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.ADMIN_PASS }}" >> "$GITHUB_ENV"
+                ;;
+            esac
+          elif [ "$ENV_PROFILE" = "staging" ]; then
+            HOST="${{ secrets.STAGING_HOST }}"
+            USER="${{ secrets.STAGING_USER }}"
+            PASS="${{ secrets.STAGING_PASS }}"
+            if [ -z "$HOST" ]; then
+              HOST="${{ secrets.DEV_HOST }}"
+              USER="${{ secrets.DEV_USER }}"
+              PASS="${{ secrets.DEV_PASS }}"
+            fi
+            echo "FTP_HOST=$HOST" >> "$GITHUB_ENV"
+            echo "FTP_USER=$USER" >> "$GITHUB_ENV"
+            echo "FTP_PASS=$PASS" >> "$GITHUB_ENV"
+          else
+            # dev
+            echo "FTP_HOST=${{ secrets.DEV_HOST }}" >> "$GITHUB_ENV"
+            echo "FTP_USER=${{ secrets.DEV_USER }}" >> "$GITHUB_ENV"
+            echo "FTP_PASS=${{ secrets.DEV_PASS }}" >> "$GITHUB_ENV"
+          fi
+          if [ -z "${FTP_HOST:-}" ] && [ -z "$(grep FTP_HOST "$GITHUB_ENV" | cut -d= -f2-)" ]; then
+            echo "Missing FTP secrets for product=$PRODUCT env=$ENV_PROFILE"
+          fi
 
       - uses: ./.github/actions/web-export-deploy
         with:
-          app_type: ${{ needs.configure.outputs.web_app_type }}
+          app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain }}
