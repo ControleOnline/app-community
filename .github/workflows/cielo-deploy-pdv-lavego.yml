@@ -1,4 +1,5 @@
-# Cielo PDV — Lave-Go whitelabel (APK → FTP). Same build core; product config only.
+# Cielo PDV — Lave-Go whitelabel.
+# Único fluxo que ainda publica APK via FTP.
 # Filename kept for: gh workflow run cielo-deploy-pdv-lavego.yml
 name: Cielo Deploy PDV LaveGo
 

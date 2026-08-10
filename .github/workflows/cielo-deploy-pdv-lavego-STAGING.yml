@@ -1,4 +1,4 @@
-# Cielo PDV Lave-Go STAGING — same core, staging endpoints if needed.
+# Cielo PDV Lave-Go STAGING — APK via FTP (whitelabel only).
 name: Cielo Deploy PDV LaveGo Staging
 
 on:

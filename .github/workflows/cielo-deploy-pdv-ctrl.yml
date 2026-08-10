@@ -1,10 +1,10 @@
-# Cielo PDV — Controle Online (APK → FTP). Same build core as Android Play.
+# Cielo PDV — Controle Online.
+# Artefatos (AAB + APK) → GitHub Releases (sem FTP).
 # Filename kept for: gh workflow run cielo-deploy-pdv-ctrl.yml
 name: Cielo Deploy PDV Ctrl
 
 on:
   workflow_dispatch:
-  # also triggered by Deploy Android Apps after POS matrix
 
 permissions:
   contents: write
@@ -17,11 +17,11 @@ jobs:
       app_type: POS
       display_name: "PDV"
       package_name: "com.controleonline.pos"
-      build_aab: false
+      build_aab: true
       build_apk: true
       publish_play: false
-      publish_github: false
-      publish_ftp: true
+      publish_github: true
+      publish_ftp: false
       bump_version_code_from_package: true
     secrets:
       CERT: ${{ secrets.CERT }}
@@ -33,6 +33,3 @@ jobs:
       NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
       NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
       NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
-      FTPHOST: ${{ secrets.FTPHOST }}
-      FTPUSER: ${{ secrets.FTPUSER }}
-      FTPPASS: ${{ secrets.FTPPASS }}
