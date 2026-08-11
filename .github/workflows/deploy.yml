@@ -151,7 +151,7 @@ jobs:
           app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ needs.configure.outputs.domain }}
+          # DOMAIN omitido de propósito: web multi-tenant usa window.location.host no App-Domain
           remote_dir: "~/public_html"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}

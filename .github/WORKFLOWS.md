@@ -28,3 +28,7 @@ Sem Lave-Go, sem trigger cruzado.
 ```
 
 Só `workflow_dispatch`. Não entra no pipeline Controle Online.
+
+### Web `App-Domain`
+
+O deploy **não** grava `DOMAIN` no `env.local.js`. O front usa `window.location.host` (ex.: `erpjaguncos.com.br`).
