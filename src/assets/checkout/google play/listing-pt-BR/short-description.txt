@@ -1,0 +1,1 @@
+Checkout e PDV mobile: carrinho, entrega, pagamento e fechamento de pedido em português.

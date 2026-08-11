@@ -1,0 +1,11 @@
+On Checkout é o aplicativo de checkout e PDV do ecossistema Controle Online.
+
+Com ele você:
+• monta o pedido com produtos e quantidades
+• informa endereço e opções de entrega
+• escolhe a forma de pagamento (incluindo cobrança na entrega)
+• revisa o resumo e conclui a venda
+
+As imagens desta listagem mostram o fluxo real do app em português (pt-BR): resumo do pedido, entrega e modal de pagamento — alinhadas ao uso operacional do checkout, sem conteúdo genérico ou irrelevante.
+
+Suporte e operação fazem parte da plataforma Controle Online.
