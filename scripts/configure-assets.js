@@ -26,7 +26,6 @@ const updateAssetPath = (currentPath) => {
   return currentPath;
 };
 */
-// 18/05/2026 // para ler os ícones da lave-go
 const updateAssetPath = (currentPath) => {
   if (typeof currentPath === 'string' && currentPath.startsWith('./src/assets/')) {
     return currentPath.replace(

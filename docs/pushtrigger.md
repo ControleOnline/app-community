@@ -12,7 +12,6 @@ flowchart TD
   %% STAGING
   S --> S2[web-deploy-staging-manager-ctrl.yml]
   S --> S3[web-deploy-staging-shop-ctrl.yml]
-  S --> S4[web-deploy-staging-app-lavego.yml.txt]
 
   S2 --> S2a[Cria env.local.js]
   S2a --> S2b[Atualiza submodules]
@@ -32,15 +31,12 @@ flowchart TD
   S3f --> S3g[smoke tests]
   S3g --> S3h[upload dos resultados]
 
-  S4 --> S4a[Arquivo .txt nao executa como workflow]
-
   %% MASTER
   M --> M1[web-deploy-production-admin-ctrl.yml]
   M --> M2[web-deploy-production-manager-ctrl.yml]
   M --> M3[web-deploy-production-shop-ctrl.yml]
   M --> M4[android-deploy-global.yml]
   M --> M5[cielo-deploy-pdv-ctrl.yml]
-  M --> M6[cielo-deploy-pdv-lavego.yml]
 
   M1 --> M1a[Cria env.local.js]
   M1a --> M1b[Atualiza submodules]
@@ -63,14 +59,11 @@ flowchart TD
   M4 --> M4a[Build Android multiplos apps]
   M4a --> M4b[Upload do AAB]
   M4b --> M5
-  M4b --> M6
 
   M5 --> M5a[Dispara por workflow_run do Android Apps]
-  M6 --> M6a[Dispara por workflow_run do Android Apps]
 ```
 
 Observacoes:
 
-- O workflow `web-deploy-staging-app-lavego.yml.txt` nao executa no GitHub Actions porque esta com extensao `.txt`.
 - No `master`, os workflows web de `manager` e `shop` continuam dependendo de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
 - Os workflows Android de `master` podem acionar os workflows da Cielo via `workflow_run`.

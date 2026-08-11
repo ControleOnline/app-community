@@ -1,0 +1,92 @@
+name: LG webOS Build
+description: Build PPC webOS IPK and upload artifact / optional GitHub Release
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: "20"
+
+    - name: Update Submodules
+      shell: bash
+      run: |
+        git submodule sync --recursive
+        git submodule update --recursive --init --checkout
+
+    - name: Generate env.local.js
+      shell: bash
+      run: |
+        set -e
+        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        cat > ./config/env.local.js << ENVEOF
+        const env = {
+          API_ENTRYPOINT: 'https://api.controleonline.com',
+          DOMAIN: 'https://app.controleonline.com',
+          MANAGER_APP: 'https://app.controleonline.com',
+          SOCKET: 'wss://api.controleonline.com',
+          APP_TYPE: 'PPC',
+          ZOOM: ${ZOOM},
+          NEW_RELIC: {
+            LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
+            APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
+            ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
+            TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
+            BEACON: process.env.NEW_RELIC_BEACON || '',
+            ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
+          }
+        };
+        module.exports = { env };
+        ENVEOF
+
+    - name: Install & export web
+      shell: bash
+      run: |
+        npm install --legacy-peer-deps
+        npx expo install --fix
+        EXPO_OS=web npx expo export --platform web
+
+    - name: Package IPK
+      shell: bash
+      run: |
+        set -e
+        ASSET_TYPE=ppc
+        cp ./src/assets/${ASSET_TYPE}/favicon.png ./dist/favicon.png || true
+        VERSION=$(node -p "require('./app.json').expo.version")
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        cat > ./dist/appinfo.json <<EOF
+        {
+          "id": "com.controleonline.ppc",
+          "version": "${VERSION}",
+          "vendor": "Controle Online",
+          "type": "web",
+          "main": "index.html",
+          "title": "On PCP",
+          "icon": "favicon.png",
+          "largeIcon": "favicon.png"
+        }
+        EOF
+        npm install -g @webosose/ares-cli
+        mkdir -p ./webos-build
+        ares-package --no-minify ./dist -o ./webos-build
+
+    - name: Upload IPK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lg-webos-ppc-ipk
+        path: webos-build/*.ipk
+
+    - name: Attach IPK to GitHub Release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -e
+        IPK=$(find ./webos-build -name '*.ipk' | head -n1)
+        [ -z "$IPK" ] && exit 0
+        TAG="v${VERSION}"
+        if gh release view "$TAG" >/dev/null 2>&1; then
+          gh release upload "$TAG" "$IPK" --clobber
+        else
+          gh release create "$TAG" "$IPK" --title "Controle Online ${VERSION}" --notes "webOS PPC IPK"
+        fi
