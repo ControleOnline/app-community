@@ -99,7 +99,7 @@ runs:
       shell: bash
       run: |
         set -e
-        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 70")
         DOMAIN="${{ inputs.domain }}"
         if [ -z "$DOMAIN" ]; then
           DOMAIN=$(node scripts/resolve-app-domain.cjs "${{ inputs.app_type }}" "${GITHUB_REF_NAME:-master}")
