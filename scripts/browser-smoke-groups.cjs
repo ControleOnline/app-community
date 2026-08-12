@@ -12,6 +12,11 @@ module.exports = [
     ],
   },
   {
+    name: 'crm',
+    appType: 'CRM',
+    testPaths: ['modules/controleonline/ui-crm/src/tests/browser/crm'],
+  },
+  {
     name: 'admin',
     appType: 'ADMIN',
     testPaths: [
