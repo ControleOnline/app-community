@@ -29,6 +29,10 @@ Sem Lave-Go, sem trigger cruzado.
 
 Só `workflow_dispatch`. Não entra no pipeline Controle Online.
 
-### Web `App-Domain`
+### `App-Domain`
 
-O deploy **não** grava `DOMAIN` no `env.local.js`. O front usa `window.location.host` (ex.: `erpjaguncos.com.br`).
+Deploys Android gravam `DOMAIN` no `env.local.js`.
+
+- No web, o deploy não grava `DOMAIN`; o front usa `window.location.host` para preservar domínios customizados e multi-tenant.
+- No Android, cada app em `master` usa seu namespace direto: `crm.controleonline.com`, `pos.controleonline.com`, `checkout.controleonline.com`, etc.
+- No Android, onde não existe `window.location.host`, o `DOMAIN` do build define o `App-Domain` e o tema retornado por `/themes-colors.css`.
