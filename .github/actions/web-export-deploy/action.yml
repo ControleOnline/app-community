@@ -31,15 +31,10 @@ runs:
       run: |
         set -e
         ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
-        DOMAIN_LINE=""
-        if [ -n "${{ inputs.domain }}" ]; then
-          DOMAIN_LINE="DOMAIN: '${{ inputs.domain }}',"
-        fi
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: '${{ inputs.api_entrypoint }}',
           SOCKET: '${{ inputs.socket }}',
-          ${DOMAIN_LINE}
           APP_TYPE: '${{ inputs.app_type }}',
           ZOOM: ${ZOOM},
           NEW_RELIC: {

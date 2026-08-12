@@ -20,10 +20,10 @@ inputs:
     default: "https://api.controleonline.com"
   domain:
     required: false
-    default: "https://app.controleonline.com"
+    default: ""
   manager_app:
     required: false
-    default: "https://app.controleonline.com"
+    default: ""
   socket:
     required: false
     default: "wss://api.controleonline.com"
@@ -100,11 +100,19 @@ runs:
       run: |
         set -e
         ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        DOMAIN="${{ inputs.domain }}"
+        if [ -z "$DOMAIN" ]; then
+          DOMAIN=$(node scripts/resolve-app-domain.cjs "${{ inputs.app_type }}" "${GITHUB_REF_NAME:-master}")
+        fi
+        MANAGER_APP="${{ inputs.manager_app }}"
+        if [ -z "$MANAGER_APP" ]; then
+          MANAGER_APP=$(node scripts/resolve-app-domain.cjs MANAGER "${GITHUB_REF_NAME:-master}")
+        fi
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: '${{ inputs.api_entrypoint }}',
-          DOMAIN: '${{ inputs.domain }}',
-          MANAGER_APP: '${{ inputs.manager_app }}',
+          DOMAIN: '${DOMAIN}',
+          MANAGER_APP: '${MANAGER_APP}',
           SOCKET: '${{ inputs.socket }}',
           APP_TYPE: '${{ inputs.app_type }}',
           ZOOM: ${ZOOM},
