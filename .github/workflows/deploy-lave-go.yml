@@ -26,13 +26,13 @@ jobs:
       - id: set
         run: |
           if [ "${{ inputs.target }}" = "staging" ]; then
-            echo "api=https://s.controleonline.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://staging.controleonline.com" >> "$GITHUB_OUTPUT"
-            echo "socket=wss://s.controleonline.com" >> "$GITHUB_OUTPUT"
+            echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
           else
-            echo "api=https://api.lavego.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://app.lavego.com" >> "$GITHUB_OUTPUT"
-            echo "socket=wss://api.lavego.com" >> "$GITHUB_OUTPUT"
+            echo "api=https://api.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://app.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://api.lave-go.com" >> "$GITHUB_OUTPUT"
           fi
 
   android:
