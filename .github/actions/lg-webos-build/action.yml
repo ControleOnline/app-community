@@ -22,7 +22,7 @@ runs:
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: 'https://api.controleonline.com',
-          DOMAIN: 'https://app.controleonline.com',
+          DOMAIN: 'https://ppc.controleonline.com',
           MANAGER_APP: 'https://app.controleonline.com',
           SOCKET: 'wss://api.controleonline.com',
           APP_TYPE: 'PPC',
