@@ -134,6 +134,8 @@
 - `src/react/components/filters/DefaultSearch.styles.js`
 - `src/react/components/form/DefaultForm.js`
 - `src/react/components/form/DefaultForm.styles.js`
+- `src/react/components/help/DefaultTooltip.js`
+- `src/react/components/help/DefaultTooltip.styles.js`
 - `src/react/components/errors/DefaultErrors.js`
 - `src/react/components/inputs/DefaultInput.js`
 - `src/react/components/inputs/DefaultInput.styles.js`
@@ -163,6 +165,12 @@
 - `linha 3-75`
 - `antes: emptyText, actions, secondaryButton e primaryButtonText usavam '#64748B', '#E2E8F0', '#CBD5E1', '#FFFFFF', '#334155' e opacity fixa 0.62`
 - `depois: createStyles(palette) usa textSecondary, dividerBorder, buttonBorderSecondary, buttonBackgroundSecondary, buttonTextSecondary, buttonDisabledBackground, buttonDisabledText e buttonText`
+
+- `src/react/components/help/DefaultTooltip.js`
+- `src/react/components/help/DefaultTooltip.styles.js`
+- `linha DefaultTooltip 8-43, 64-95; DefaultTooltip.styles 3-59`
+- `antes: tooltip usava accentColor com fallback '#0EA5E9', background derivado por transparencia local, overlay 'rgba(15, 23, 42, 0.55)', card '#FFFFFF' e mensagem '#334155'`
+- `depois: tooltip monta palette via themeStore.getters.colors e usa iconInfo, iconBackground, iconDisabled, buttonBackground, buttonBorder, buttonDisabledBackground, buttonIcon, modalBackground, modalBorder, modalHeaderText, modalOverlay e modalText; fechamento da janela usa Feather x`
 
 - `src/react/components/table/DefaultTable.styles.js`
 - `linha 531-537`
@@ -325,6 +333,7 @@
 ### ui-people
 - `src/react/components/AddCompanyModal.js`
 - `src/react/components/AddCompanyModal.styles.js`
+- `src/react/components/address/PeopleAddressesPanel.js`
 - `src/react/pages/People.js`
 - `src/react/pages/People.styles.js`
 - `src/react/css/people.js`
@@ -842,6 +851,11 @@
 - `linha 76-114, 144`
 - `antes: card/avatar/textos do renderer usavam '#fff', '#F1F5F9', '#1E293B', '#94A3B8' e '#fff' no style estatico`
 - `depois: styles do renderer preservam layout e deixam as cores entrarem pela palette do tema ativo`
+
+- `src/react/components/address/PeopleAddressesPanel.js`
+- `linha 22-43, 104-139, 146-181, 220-267`
+- `antes: botao Novo e painel de enderecos usavam '#1D4ED8', '#fff', '#E2E8F0', '#0F172A', '#64748B', '#B91C1C', 'rgba(15,23,42,0.45)' e '#F8FAFC'`
+- `depois: botao de criar endereco usa Feather plus igual telefone/email, cards ganham lixeira trash-2 para apagar endereco, e o painel usa buttonBackground, buttonIcon, cardBackground, cardBorder, cardText, loadingSpinner, modalBackground, modalOverlay, textDanger, textPrimary e textSecondary vindos de themeStore.getters.colors`
 
 ### ui-config
 - `src/react/pages/MenuAccessConfigPage.js`
