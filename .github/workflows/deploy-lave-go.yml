@@ -7,8 +7,8 @@ on:
       target:
         description: "production ou staging endpoints"
         type: choice
-        options: [production, staging]
-        default: production
+        options: [master, staging]
+        default: master
 
 permissions:
   contents: write
