@@ -7,8 +7,8 @@ on:
       target:
         description: "production ou staging endpoints"
         type: choice
-        options: [production, staging]
-        default: production
+        options: [master]
+        default: master
 
 permissions:
   contents: write
@@ -25,15 +25,9 @@ jobs:
     steps:
       - id: set
         run: |
-          if [ "${{ inputs.target }}" = "staging" ]; then
-            echo "api=https://s.controleonline.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://staging.controleonline.com" >> "$GITHUB_OUTPUT"
-            echo "socket=wss://s.controleonline.com" >> "$GITHUB_OUTPUT"
-          else
-            echo "api=https://api.lavego.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://app.lavego.com" >> "$GITHUB_OUTPUT"
-            echo "socket=wss://api.lavego.com" >> "$GITHUB_OUTPUT"
-          fi
+            echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
 
   android:
     name: "2 · Android APK"
@@ -47,7 +41,7 @@ jobs:
           display_name: PDV
           package_name: com.lavego.app
           expo_name: Lave-Go
-          expo_slug: pos-controle-online
+          expo_slug: pos-lave-go
           api_entrypoint: ${{ needs.configure.outputs.api }}
           domain: ${{ needs.configure.outputs.domain }}
           manager_app: ${{ needs.configure.outputs.domain }}
@@ -76,9 +70,9 @@ jobs:
       - name: Upload APK to Lave-Go FTP
         uses: locaweb/ftp-deploy@1.0.0
         with:
-          host: ${{ secrets.FTPHOST }}
-          user: ${{ secrets.FTPUSER }}
-          password: ${{ secrets.FTPPASS }}
+          host: ${{ secrets.FTPHOST_APPLAVEGO }}
+          user: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
           localDir: "./android/app/build/outputs/apk/release"
           remoteDir: "public_html/${{ env.VERSION }}/com.lavego.app/apk"
           forceSsl: false
@@ -92,9 +86,9 @@ jobs:
       - uses: actions/checkout@v5
       - name: FTP
         run: |
-          echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
-          echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
-          echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
+          echo "FTP_HOST=${{ secrets.FTPHOST_APPLAVEGO }}" >> "$GITHUB_ENV"
+          echo "FTP_USER=${{ secrets.FTPUSER_APPLAVEGO }}" >> "$GITHUB_ENV"
+          echo "FTP_PASS=${{ secrets.FTPPASS_APPLAVEGO }}" >> "$GITHUB_ENV"
       - uses: ./.github/actions/web-export-deploy
         with:
           app_type: MANAGER

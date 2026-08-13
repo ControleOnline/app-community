@@ -18,11 +18,11 @@ runs:
       shell: bash
       run: |
         set -e
-        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 70")
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: 'https://api.controleonline.com',
-          DOMAIN: 'https://app.controleonline.com',
+          DOMAIN: 'https://ppc.controleonline.com',
           MANAGER_APP: 'https://app.controleonline.com',
           SOCKET: 'wss://api.controleonline.com',
           APP_TYPE: 'PPC',
