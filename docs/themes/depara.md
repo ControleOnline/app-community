@@ -53,6 +53,10 @@ Formato:
 - `antigo: emptyText '#64748B', actions '#E2E8F0', secondaryButton '#CBD5E1/#FFFFFF/#334155', primaryButtonText '#FFFFFF' e disabled opacity 0.62`
 - `novo: styles usam textSecondary, dividerBorder, buttonBorderSecondary, buttonBackgroundSecondary, buttonTextSecondary, buttonDisabledBackground, buttonDisabledText e buttonText`
 
+- `ui-default / src/react/components/help/DefaultTooltip.js, src/react/components/help/DefaultTooltip.styles.js / DefaultTooltip 8-43, 64-95; DefaultTooltip.styles 3-59`
+- `antigo: tooltip usava accentColor com fallback '#0EA5E9', background derivado por transparencia local, overlay 'rgba(15, 23, 42, 0.55)', card '#FFFFFF' e mensagem '#334155'`
+- `novo: tooltip usa themeStore.getters.colors com iconInfo, iconBackground, iconDisabled, buttonBackground, buttonBorder, buttonDisabledBackground, buttonIcon, modalBackground, modalBorder, modalHeaderText, modalOverlay e modalText; fechamento da janela usa Feather x`
+
 - `ui-manager / src/react/pages/PdvPage.js / 12-87`
 - `antigo: headerRight da liquidacao com borderColor '#BFDBFE', backgroundColor '#EFF6FF' e icon/text '#0369A1'`
 - `novo: headerRight da liquidacao com buttonBackgroundSecondary, buttonBorderSecondary, buttonIconSecondary e buttonTextSecondary vindos de themeStore.getters.colors`
@@ -236,6 +240,10 @@ Formato:
 - `ui-people / src/react/pages/People.styles.js / 76-114, 144`
 - `antigo: card, avatar e textos do renderClientCard traziam '#fff', '#F1F5F9', '#64748B', '#1E293B' e '#94A3B8' no style estatico`
 - `novo: styles preservam apenas layout/espacamento do card e deixam as cores do renderClientCard entrarem pela palette do tema ativo`
+
+- `ui-people / src/react/components/address/PeopleAddressesPanel.js / 22-43, 104-139, 146-181, 220-267`
+- `antigo: botao Novo textual e painel com '#1D4ED8', '#fff', '#E2E8F0', '#0F172A', '#64748B', '#B91C1C', 'rgba(15,23,42,0.45)' e '#F8FAFC'`
+- `novo: botao de adicionar com Feather plus, acao de apagar endereco com trash-2 e cores via buttonBackground, buttonIcon, cardBackground, cardBorder, cardText, loadingSpinner, modalBackground, modalOverlay, textDanger, textPrimary e textSecondary`
 
 - `ui-crm / src/react/pages/settings/GeneralSettings.js / 11-15, 138-155, 254-294`
 - `antigo: tela resolvia palette com resolveThemePalette + defaultThemeColors + currentCompany.theme.colors e usava styles estaticos`
