@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: |
         set -e
-        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 70")
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: 'https://api.controleonline.com',
