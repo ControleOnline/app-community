@@ -7,7 +7,7 @@ on:
       target:
         description: "production ou staging endpoints"
         type: choice
-        options: [master, staging]
+        options: [master]
         default: master
 
 permissions:
@@ -25,15 +25,9 @@ jobs:
     steps:
       - id: set
         run: |
-          if [ "${{ inputs.target }}" = "staging" ]; then
             echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
             echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
             echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
-          else
-            echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
-            echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
-          fi
 
   android:
     name: "2 · Android APK"
