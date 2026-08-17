@@ -68,4 +68,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run translations review browser smoke
-        run: npm run test:browser:manager -- --grep "translations review smoke"
+        run: npm run test:browser:manager -- --grep=translations.review.smoke
