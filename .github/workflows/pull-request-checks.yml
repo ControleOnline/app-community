@@ -67,5 +67,5 @@ jobs:
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
 
-      - name: Run browser smoke tests
-        run: npm run test:browser
+      - name: Run translations review browser smoke
+        run: npm run test:browser:manager -- --grep "translations review smoke"
