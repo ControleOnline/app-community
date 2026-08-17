@@ -9,6 +9,7 @@ module.exports = [
       'modules/controleonline/ui-customers/src/tests/browser/manager',
       'modules/controleonline/ui-products/src/tests/browser/manager',
       'modules/controleonline/ui-shop/src/tests/browser/manager',
+      'modules/controleonline/ui-translate/src/tests/browser/manager',
     ],
   },
   {
