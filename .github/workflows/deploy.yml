@@ -34,6 +34,7 @@ jobs:
       api: ${{ steps.set.outputs.api }}
       socket: ${{ steps.set.outputs.socket }}
       domain: ${{ steps.set.outputs.domain }}
+      manager_domain: ${{ steps.set.outputs.manager_domain }}
       ftp_profile: ${{ steps.set.outputs.ftp_profile }}
       publish_native: ${{ steps.set.outputs.publish_native }}
       web_app_type: ${{ steps.set.outputs.web_app_type }}
@@ -48,25 +49,28 @@ jobs:
               API=https://d.controleonline.com
               SOCK=wss://d.controleonline.com
               DOMAIN=https://d.controleonline.com
+              MANAGER_DOMAIN=https://d.controleonline.com
               FTP=dev
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://d.controleonline.com"}]}'
               ;;
             staging)
               API=https://s.controleonline.com
               SOCK=wss://s.controleonline.com
               DOMAIN=https://staging.controleonline.com
+              MANAGER_DOMAIN=https://staging.controleonline.com
               FTP=staging
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://staging.controleonline.com"}]}'
               ;;
             master)
               API=https://api.controleonline.com
               SOCK=wss://api.controleonline.com
-              DOMAIN=https://app.controleonline.com
+              DOMAIN=https://manager.controleonline.com
+              MANAGER_DOMAIN=https://manager.controleonline.com
               FTP=production
               NATIVE=true
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager"},{"app_type":"SHOP","ftp_product":"shop"},{"app_type":"ADMIN","ftp_product":"admin"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"}]}'
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -78,6 +82,7 @@ jobs:
             echo "api=$API"
             echo "socket=$SOCK"
             echo "domain=$DOMAIN"
+            echo "manager_domain=$MANAGER_DOMAIN"
             echo "ftp_profile=$FTP"
             echo "publish_native=$NATIVE"
             echo "web_app_type=MANAGER"
@@ -141,7 +146,7 @@ jobs:
           app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ needs.configure.outputs.domain }}
+          domain: ${{ matrix.app_domain }}
           remote_dir: "~/public_html"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
@@ -163,34 +168,42 @@ jobs:
         include:
           - app_type: CHECKOUT
             display_name: Checkout
+            app_domain: https://checkout.controleonline.com
             track: internal
             release_status: draft
           - app_type: CRM
             display_name: CRM
+            app_domain: https://crm.controleonline.com
             track: internal
             release_status: completed
           - app_type: DELIVERY
             display_name: Delivery
+            app_domain: https://delivery.controleonline.com
             track: internal
             release_status: draft
           - app_type: MANAGER
             display_name: Gestor
+            app_domain: https://manager.controleonline.com
             track: internal
             release_status: completed
           - app_type: MENU
             display_name: Menu
+            app_domain: https://menu.controleonline.com
             track: internal
             release_status: completed
           - app_type: POS
             display_name: PDV
+            app_domain: https://pos.controleonline.com
             track: internal
             release_status: completed
           - app_type: PPC
             display_name: PCP
+            app_domain: https://ppc.controleonline.com
             track: internal
             release_status: completed
           - app_type: SERVICE
             display_name: Service
+            app_domain: https://service.controleonline.com
             track: internal
             release_status: completed
     steps:
@@ -201,8 +214,8 @@ jobs:
           app_type: ${{ matrix.app_type }}
           display_name: ${{ matrix.display_name }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
-          domain: ${{ needs.configure.outputs.domain }}
-          manager_app: ${{ needs.configure.outputs.domain }}
+          domain: ${{ matrix.app_domain }}
+          manager_app: ${{ needs.configure.outputs.manager_domain }}
           socket: ${{ needs.configure.outputs.socket }}
           build_aab: "true"
           build_apk: "true"
