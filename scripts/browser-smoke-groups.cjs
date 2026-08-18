@@ -18,6 +18,7 @@ module.exports = [
     testPaths: [
       'modules/controleonline/ui-manager/src/tests/browser/admin',
       'modules/controleonline/ui-employee/src/tests/browser/admin',
+      'modules/controleonline/ui-tests/src/tests/browser/admin',
     ],
   },
   {
