@@ -1,7 +1,7 @@
 name: Deploy Project app.lave-go.com
 on:
   push:
-    branches: [staging]
+    branches: [master]
   workflow_dispatch:
 jobs:
   build:
@@ -15,33 +15,35 @@ jobs:
           node-version: "20"
       - name: Creating Config
         run: |
-          echo "const env = {\
-          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
-          SOCKET: 'wss://apinew.lave-go.com',\
-          APP_TYPE: 'MANAGER',\
-          ZOOM: 0.90,\
-          NEW_RELIC:{\
-            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
-            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
-            ACCOUNT_ID: '${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
-            TRUST_KEY: '${{ secrets.NEW_RELIC_TRUST_KEY }}',\
-            BEACON: '${{ secrets.NEW_RELIC_BEACON }}',\
-            ERROR_BEACON: '${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
-          }\
-          };\
-          module.exports = { env };\
-          " > ./config/env.local.js
+          set -e
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          cat > ./config/env.local.js << ENVEOF
+          const env = {
+            API_ENTRYPOINT: 'https://apinew.lave-go.com',
+            SOCKET: 'wss://apinew.lave-go.com',
+            APP_TYPE: 'MANAGER',
+            ZOOM: ${ZOOM},
+            NEW_RELIC: {
+              LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
+              APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
+              ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
+              TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
+              BEACON: process.env.NEW_RELIC_BEACON || '',
+              ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
+            }
+          };
+          module.exports = { env };
+          ENVEOF
       - name: Update Submodules
         run: |
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps   
+        run: npm install --legacy-peer-deps
       - name: Fix Expo Dependencies
         run: npx expo install --fix
       - name: Build
-        run: |
-          npx expo export --platform web
+        run: npx expo export --platform web
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
