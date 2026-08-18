@@ -1,5 +1,5 @@
 name: Web Export Deploy
-description: Configure env, expo export web, deploy via FTP
+description: Configure env, expo export web, optional FTP deploy (SamKirkland — sem locaweb)
 
 inputs:
   app_type:
@@ -13,19 +13,15 @@ inputs:
     default: ""
   remote_dir:
     required: false
-    default: "~/public_html"
-  ftp_host_secret_env:
-    description: "Name of env var holding FTP host (set by caller)"
-    required: false
-    default: "FTP_HOST"
+    default: "public_html/"
   skip_ftp:
-    description: "If true, only export web (caller runs FTP)"
+    description: "If true, only export web (caller runs deploy)"
     required: false
     default: "false"
-  force_ssl:
-    description: "Passed to locaweb/ftp-deploy forceSsl when skip_ftp=false"
+  ftp_protocol:
+    description: "ftp | ftps | ftps-legacy (SamKirkland)"
     required: false
-    default: "false"
+    default: "ftp"
 
 runs:
   using: composite
@@ -75,13 +71,21 @@ runs:
         npx expo install --fix
         npx expo export --platform web
 
-    - name: Deploy FTP
+    # Sem locaweb/ftp-deploy. SamKirkland (basic-ftp).
+    - name: Deploy FTP (SamKirkland)
       if: ${{ inputs.skip_ftp != 'true' }}
-      uses: locaweb/ftp-deploy@1.0.0
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
-        host: ${{ env.FTP_HOST }}
-        user: ${{ env.FTP_USER }}
+        server: ${{ env.FTP_HOST }}
+        username: ${{ env.FTP_USER }}
         password: ${{ env.FTP_PASS }}
-        localDir: "./dist"
-        remoteDir: ${{ inputs.remote_dir }}
-        forceSsl: ${{ inputs.force_ssl }}
+        protocol: ${{ inputs.ftp_protocol }}
+        security: loose
+        local-dir: ./dist/
+        server-dir: ${{ inputs.remote_dir }}
+        state-name: .ftp-deploy-state.json
+        log-level: standard
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
