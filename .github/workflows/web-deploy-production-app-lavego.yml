@@ -22,7 +22,7 @@ jobs:
             API_ENTRYPOINT: 'https://apinew.lave-go.com',
             SOCKET: 'wss://apinew.lave-go.com',
             APP_TYPE: 'MANAGER',
-            ZOOM: ${ZOOM},
+            ZOOM: 100,
             NEW_RELIC: {
               LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
               APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
