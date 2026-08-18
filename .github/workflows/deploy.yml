@@ -15,10 +15,15 @@ on:
         required: true
         type: choice
         options: [dev, staging, master]
+      web_only:
+        description: "Apenas web (pula Android/LG)"
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-${{ github.event.inputs.environment || github.ref_name }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -73,6 +78,10 @@ jobs:
               exit 1
               ;;
           esac
+          if [ "${{ github.event.inputs.web_only }}" = "true" ]; then
+            NATIVE=false
+            echo "web_only=true → native disabled"
+          fi
           {
             echo "env=$ENV"
             echo "api=$API"
