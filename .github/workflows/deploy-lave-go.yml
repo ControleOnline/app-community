@@ -67,15 +67,25 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "PACKAGE_NAME=com.lavego.app" >> "$GITHUB_ENV"
 
-      - name: Upload APK to Lave-Go FTP
-        uses: locaweb/ftp-deploy@1.0.0
-        with:
-          host: ${{ secrets.FTPHOST_APPLAVEGO }}
-          user: ${{ secrets.FTPUSER_APPLAVEGO }}
-          password: ${{ secrets.FTPPASS_APPLAVEGO }}
-          localDir: "./android/app/build/outputs/apk/release"
-          remoteDir: "public_html/${{ env.VERSION }}/com.lavego.app/apk"
-          forceSsl: false
+      - name: Upload APK via SFTP
+        env:
+          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
+          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
+          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          REMOTE="public_html/${VERSION}/${PACKAGE_NAME}/apk"
+          lftp -c "
+            set cmd:fail-exit yes;
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:timeout 20;
+            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
+            mirror --reverse --continue --dereference ./android/app/build/outputs/apk/release ${REMOTE};
+            quit
+          "
 
   web:
     name: "2 · Web"
@@ -84,18 +94,13 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
-      - name: FTP
-        run: |
-          echo "FTP_HOST=${{ secrets.FTPHOST_APPLAVEGO }}" >> "$GITHUB_ENV"
-          echo "FTP_USER=${{ secrets.FTPUSER_APPLAVEGO }}" >> "$GITHUB_ENV"
-          echo "FTP_PASS=${{ secrets.FTPPASS_APPLAVEGO }}" >> "$GITHUB_ENV"
       - uses: ./.github/actions/web-export-deploy
         with:
           app_type: MANAGER
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain }}
-          remote_dir: "~/public_html"
+          skip_ftp: "true"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
@@ -103,3 +108,25 @@ jobs:
           NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+      # Host Lave-Go: FTP/FTPS → 521 PROT; plain FTP → connect fail.
+      # SamKirkland sugeriu SFTP. Upload via lftp sftp://
+      - name: Deploy web via SFTP
+        env:
+          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
+          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
+          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          test -d ./dist
+          lftp -c "
+            set cmd:fail-exit yes;
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:timeout 20;
+            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
+            mirror --reverse --continue --dereference -x ^\\.git/$ ./dist public_html;
+            quit
+          "
