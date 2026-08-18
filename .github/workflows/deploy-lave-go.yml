@@ -67,29 +67,19 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "PACKAGE_NAME=com.lavego.app" >> "$GITHUB_ENV"
 
-      # Host Lave-Go rejeita PROT P no data channel (521). lftp com protect-data no.
+      # SamKirkland: basic-ftp (Node), protocol ftp — evita 521 PROT do lftp/locaweb
       - name: Upload APK to Lave-Go FTP
-        env:
-          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
-          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
-          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
-          REMOTE="public_html/${VERSION}/${PACKAGE_NAME}/apk"
-          lftp -c "
-            set cmd:fail-exit yes;
-            set ssl:verify-certificate no;
-            set ftp:passive-mode yes;
-            set ftp:ssl-allow no;
-            set ftp:ssl-force no;
-            set ftp:ssl-protect-data no;
-            set ftp:ssl-protect-list no;
-            open -u \"${FTP_USER}\",\"${FTP_PASS}\" ${FTP_HOST};
-            mirror --reverse --continue --dereference ./android/app/build/outputs/apk/release ${REMOTE};
-            quit
-          "
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftp
+          security: loose
+          local-dir: ./android/app/build/outputs/apk/release/
+          server-dir: ./public_html/${{ env.VERSION }}/com.lavego.app/apk/
+          state-name: .ftp-deploy-apk-state.json
+          log-level: standard
 
   web:
     name: "2 · Web"
@@ -98,7 +88,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
-      - name: FTP env
+      - name: FTP env (kept for compatibility)
         run: |
           echo "FTP_HOST=${{ secrets.FTPHOST_APPLAVEGO }}" >> "$GITHUB_ENV"
           echo "FTP_USER=${{ secrets.FTPUSER_APPLAVEGO }}" >> "$GITHUB_ENV"
@@ -119,27 +109,20 @@ jobs:
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
 
-      # Host Lave-Go: 521 Data connection cannot be opened with this PROT setting
-      # (locaweb/ftp-deploy só expõe forceSsl; default PROT no data channel quebra).
-      - name: Deploy FTP Lave-Go (PROT clear)
-        env:
-          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
-          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
-          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
-          test -d ./dist
-          lftp -c "
-            set cmd:fail-exit yes;
-            set ssl:verify-certificate no;
-            set ftp:passive-mode yes;
-            set ftp:ssl-allow no;
-            set ftp:ssl-force no;
-            set ftp:ssl-protect-data no;
-            set ftp:ssl-protect-list no;
-            open -u \"${FTP_USER}\",\"${FTP_PASS}\" ${FTP_HOST};
-            mirror --reverse --continue --dereference -x ^\\.git/$ ./dist ~/public_html;
-            quit
-          "
+      - name: Deploy web to Lave-Go FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftp
+          security: loose
+          local-dir: ./dist/
+          server-dir: ./public_html/
+          state-name: .ftp-deploy-web-state.json
+          log-level: standard
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.ftp-deploy-*.json
