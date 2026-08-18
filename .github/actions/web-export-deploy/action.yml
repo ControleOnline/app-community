@@ -18,6 +18,14 @@ inputs:
     description: "Name of env var holding FTP host (set by caller)"
     required: false
     default: "FTP_HOST"
+  skip_ftp:
+    description: "If true, only export web (caller runs FTP)"
+    required: false
+    default: "false"
+  force_ssl:
+    description: "Passed to locaweb/ftp-deploy forceSsl when skip_ftp=false"
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -68,6 +76,7 @@ runs:
         npx expo export --platform web
 
     - name: Deploy FTP
+      if: ${{ inputs.skip_ftp != 'true' }}
       uses: locaweb/ftp-deploy@1.0.0
       with:
         host: ${{ env.FTP_HOST }}
@@ -75,4 +84,4 @@ runs:
         password: ${{ env.FTP_PASS }}
         localDir: "./dist"
         remoteDir: ${{ inputs.remote_dir }}
-        forceSsl: false
+        forceSsl: ${{ inputs.force_ssl }}
