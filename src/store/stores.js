@@ -44,6 +44,7 @@ import people_export_jobs from '@controleonline/ui-employee/src/store/people_exp
 import people_absences from '@controleonline/ui-employee/src/store/people_absences';
 import people_schedules from '@controleonline/ui-employee/src/store/people_schedules';
 import people from '@controleonline/ui-people/src/store/people';
+import people_category from '@controleonline/ui-people/src/store/people_category';
 import people_link from '@controleonline/ui-people/src/store/people_link';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
@@ -132,6 +133,7 @@ export default {
   attendance_reports,
   paymentType,
   people,
+  people_category,
   people_access_events,
   people_absences,
   people_export_jobs,
