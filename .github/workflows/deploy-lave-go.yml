@@ -82,7 +82,7 @@ jobs:
             set cmd:fail-exit yes;
             set ssl:verify-certificate no;
             set ftp:passive-mode yes;
-            set ftp:ssl-allow yes;
+            set ftp:ssl-allow no;
             set ftp:ssl-force no;
             set ftp:ssl-protect-data no;
             set ftp:ssl-protect-list no;
@@ -135,7 +135,7 @@ jobs:
             set cmd:fail-exit yes;
             set ssl:verify-certificate no;
             set ftp:passive-mode yes;
-            set ftp:ssl-allow yes;
+            set ftp:ssl-allow no;
             set ftp:ssl-force no;
             set ftp:ssl-protect-data no;
             set ftp:ssl-protect-list no;
