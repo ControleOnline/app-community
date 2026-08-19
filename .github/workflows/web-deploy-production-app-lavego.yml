@@ -1,7 +1,7 @@
-name: Deploy Project app.lave-go.com
+name: Deploy Project app.lave-go.com (LEGACY — deprecated)
+# DEPRECATED: use workflow_dispatch only. Prefer deploy-lave-go.yml for Lave-Go pipeline.
+# Push trigger removed to avoid dual-fire with the new deploy-lave-go.yml after staging→master.
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 jobs:
   build:
@@ -58,3 +58,4 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
+            **/node_modules/**
