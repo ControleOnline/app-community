@@ -1,14 +1,26 @@
-name: Deploy Project app.lave-go.com
+# LEGACY — desativado. Use workflow "Deploy Lave-Go" (deploy-lave-go.yml).
+# Mantido apenas como referência histórica; push em master não dispara mais este job.
+name: Deploy Project app.lave-go.com (LEGACY)
+
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
+    inputs:
+      note:
+        description: "DEPRECATED — prefer Actions → Deploy Lave-Go"
+        required: false
+        default: "use deploy-lave-go.yml"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       EXPO_IDENTITY_SOURCE: app-json
     steps:
+      - name: Deprecated notice
+        run: |
+          echo "::warning::Este workflow é legado. Use 'Deploy Lave-Go' (deploy-lave-go.yml)."
+          echo "Continuando apenas se disparado manualmente para emergência."
+
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
