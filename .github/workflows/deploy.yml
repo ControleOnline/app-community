@@ -147,7 +147,7 @@ jobs:
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ matrix.app_domain }}
-          remote_dir: "~/public_html"
+          remote_dir: "~/public_html/"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
