@@ -18,6 +18,7 @@ import display_queues from '@controleonline/ui-ppc/src/store/modules/display_que
 import displays from '@controleonline/ui-ppc/src/store/modules/displays';
 import documents from '@controleonline/ui-people/src/store/documents';
 import documentsTypes from '@controleonline/ui-people/src/store/documents/documentsTypes';
+import document_file from '@controleonline/ui-people/src/store/documents/document_file';
 import emails from '@controleonline/ui-people/src/store/emails';
 import expanded_order_products from '@controleonline/ui-orders/src/store/expanded_order_products';
 import file from '@controleonline/ui-common/src/store/file';
@@ -107,6 +108,7 @@ export default {
   entity_log,
   display_queues,
   displays,
+  document_file,
   documents,
   documentsTypes,
   emails,
