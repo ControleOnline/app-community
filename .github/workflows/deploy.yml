@@ -48,11 +48,11 @@ jobs:
             dev)
               API=https://d.controleonline.com
               SOCK=wss://d.controleonline.com
-              DOMAIN=https://d.controleonline.com
-              MANAGER_DOMAIN=https://d.controleonline.com
+              DOMAIN=https://dev.controleonline.com
+              MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://d.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://dev.controleonline.com"}]}'
               ;;
             staging)
               API=https://s.controleonline.com
