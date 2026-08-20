@@ -11,6 +11,7 @@ import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
 import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
+import MarketingDashboard from '../pages/mkt/MarketingDashboard'
 import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
@@ -142,6 +143,7 @@ const homeByType = {
   SHOP: ShopHomePage,
   POS: POSHomePage,
   PPC: PPCHomePage,
+  MKT: MarketingDashboard,
 }
 
 const normalizedAppType = app_type

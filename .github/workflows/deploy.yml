@@ -71,7 +71,7 @@ jobs:
               DOMAIN=https://app.controleonline.com
               FTP=production
               NATIVE=true
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager"},{"app_type":"SHOP","ftp_product":"shop"},{"app_type":"ADMIN","ftp_product":"admin"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager"},{"app_type":"SHOP","ftp_product":"shop"},{"app_type":"ADMIN","ftp_product":"admin"},{"app_type":"MKT","ftp_product":"mkt"}]}'
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -129,6 +129,11 @@ jobs:
                 echo "FTP_HOST=${{ secrets.ADMIN_HOST }}" >> "$GITHUB_ENV"
                 echo "FTP_USER=${{ secrets.ADMIN_USER }}" >> "$GITHUB_ENV"
                 echo "FTP_PASS=${{ secrets.ADMIN_PASS }}" >> "$GITHUB_ENV"
+                ;;
+              mkt)
+                echo "FTP_HOST=${{ secrets.MKT_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.MKT_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.MKT_PASS }}" >> "$GITHUB_ENV"
                 ;;
             esac
           elif [ "$ENV_PROFILE" = "staging" ]; then
@@ -202,6 +207,10 @@ jobs:
             display_name: Service
             track: internal
             release_status: completed
+          - app_type: MKT
+            display_name: Marketing
+            track: internal
+            release_status: draft
     steps:
       - uses: actions/checkout@v5
 
