@@ -20,6 +20,8 @@ jobs:
           cat > ./config/env.local.js << ENVEOF
           const env = {
             API_ENTRYPOINT: 'https://apinew.lave-go.com',
+            DOMAIN: 'https://app.lave-go.com',
+            MANAGER_APP: 'https://app.lave-go.com',
             SOCKET: 'wss://apinew.lave-go.com',
             APP_TYPE: 'MANAGER',
             ZOOM: 100,
