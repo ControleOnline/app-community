@@ -1,0 +1,16 @@
+{
+  "flowKey": "agents-mcp-workflow",
+  "appType": "ADMIN",
+  "title": "Agents-MCP — workflow completo",
+  "summary": "Fluxo ponta a ponta dos agents ControleOnline: captura, Developer (task→dev), dual-gate QA/Security, DevOps RC (staging→master) e hotfix.",
+  "sortOrder": 10,
+  "enabled": true,
+  "checkpoints": [
+    {"id": "capture", "label": "Captura por labels/Project #1"},
+    {"id": "dev-merge", "label": "Merge task-{id} → dev"},
+    {"id": "dual-gate", "label": "QA + Security accepted"},
+    {"id": "rc-staging", "label": "RC em staging + In Review"},
+    {"id": "deploy-master", "label": "Deploy humano → master → Done"}
+  ],
+  "mermaid": "flowchart TD\n  subgraph Entry[\"Entrada\"]\n    Prompt[\"Prompt / runner / Copilot\"]\n    Discover[\"issue-queue-discovery.md<br/>labels + Project #1\"]\n    Capture[\"Captura 1 issue elegível<br/>por papel\"]\n  end\n\n  subgraph Roles[\"Papéis\"]\n    Dev[\"Developer\"]\n    QA[\"QA\"]\n    Sec[\"Security\"]\n    DevOps[\"DevOps\"]\n    Mgr[\"Manager\"]\n    Docs[\"Technical Documenter<br/>+ Tutorial Assistant\"]\n  end\n\n  subgraph DevFlow[\"Developer — github-flow\"]\n    Branch[\"Branch task-id<br/>a partir de master\"]\n    Impl[\"Implementar + testar<br/>code-quality ≤500 linhas\"]\n    Sync[\"Sincronizar origin/master\"]\n    MergeDev[\"Merge task-id → dev<br/>SEM PR\"]\n    Handoff[\"Labels agent:qa<br/>+ agent:security\"]\n  end\n\n  subgraph Review[\"Revisão dual-gate\"]\n    QADecide{\"QA: accepted<br/>ou rejected?\"}\n    SecDecide{\"Security: accepted<br/>ou rejected?\"}\n    Reject[\"rejected → Developer<br/>corrige e re-merge em dev\"]\n    DualOK[\"agent:qa:accepted<br/>+ agent:security:accepted\"]\n  end\n\n  subgraph RC[\"DevOps RC\"]\n    Pack[\"Empacota tasks dual-accepted<br/>merge task-id → staging\"]\n    Semver[\"Versão numérica package.json<br/>app.json versionCode\"]\n    Parent[\"Task pai RC X.Y.Z-rc.N<br/>filhas + coluna In Review\"]\n    Human[\"Humano confere staging\"]\n    DeployCol[\"Coluna Deploy\"]\n    ToMaster[\"Merge staging → master<br/>pai+filhas → Done\"]\n    DocHandoff[\"Labels documentadores<br/>nas filhas\"]\n  end\n\n  subgraph Hotfix[\"Hotfix prioridade absoluta\"]\n    HF[\"label hotfix\"]\n    HFDev[\"Developer merge → dev\"]\n    HFStg[\"task-id → staging<br/>sem dual-gate prévio\"]\n    HFReview[\"In Review → Deploy humano\"]\n  end\n\n  Prompt --> Discover --> Capture\n  Capture -->|agent:developer / Ready| Dev\n  Capture -->|agent:qa| QA\n  Capture -->|agent:security| Sec\n  Capture -->|agent:devops / Deploy| DevOps\n  Capture -->|higiene board| Mgr\n  Capture -->|agent:technical-documenter| Docs\n\n  Dev --> Branch --> Impl --> Sync --> MergeDev --> Handoff\n  Handoff --> QA\n  Handoff --> Sec\n  QA --> QADecide\n  Sec --> SecDecide\n  QADecide -->|rejected| Reject\n  SecDecide -->|rejected| Reject\n  Reject --> Dev\n  QADecide -->|accepted| DualOK\n  SecDecide -->|accepted| DualOK\n  DualOK --> Pack\n  Pack --> Semver --> Parent --> Human --> DeployCol --> ToMaster --> DocHandoff\n\n  HF --> HFDev --> HFStg --> HFReview --> DeployCol"
+}
