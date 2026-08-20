@@ -46,7 +46,7 @@ jobs:
           fi
           {
             echo "api=https://apinew.lave-go.com"
-            echo "domain=https://apinew.lave-go.com"
+            echo "domain=https://app.lave-go.com"
             echo "socket=wss://apinew.lave-go.com"
             echo "publish_native=$NATIVE"
           } >> "$GITHUB_OUTPUT"
