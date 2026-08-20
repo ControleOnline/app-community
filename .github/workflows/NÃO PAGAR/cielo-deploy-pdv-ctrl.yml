@@ -1,0 +1,149 @@
+name: Deploy Cielo PDV CONTROLE ONLINE
+
+# para executar sempre que subir um branch do tipo production    
+#on:
+#  push:
+#    branches: [production]
+
+# executa quando é chamado por outro workflow
+on:
+  workflow_run:
+    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
+# caso precise mudar, tem que alterar também dentro do script do Google
+# android-deploy-global.yml
+
+    types: [completed]
+    branches: [production]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_type: POS
+            display_name: "PDV"
+            tracks: internal
+            release_status: completed
+            changes_not_sent_for_review: false
+
+    env:
+      APP_TYPE: ${{ matrix.app_type }}
+      APP_DISPLAY_NAME: ${{ matrix.display_name }}
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://api.controleonline.com',\
+          DOMAIN: 'https://app.controleonline.com',\
+          MANAGER_APP: 'https://app.controleonline.com',\
+          SOCKET: 'wss://api.controleonline.com',\
+          APP_TYPE: '${APP_TYPE}',\
+          ZOOM: ${ZOOM},\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Backup app.json
+        run: cp app.json app.json.backup
+
+      - name: Install Dependencies
+        run: npm install
+#
+#      - name: Fix Expo Dependencies
+#        run: npx expo install --fix
+#
+#      - name: Prebuild
+#        run: npx expo prebuild --clean
+#
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
+
+
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
+
+      - name: Update versionCode in app.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo $VERSION | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE');
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleRelease --init-script ../signing.gradle
+
+      - name: Set Dynamic Package Name
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          echo "PACKAGE_NAME=com.controleonline.${APP_LOWER}" >> $GITHUB_ENV
+
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Upload APK to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.FTPHOST }}
+          user: ${{ secrets.FTPUSER }}
+          password: ${{ secrets.FTPPASS }}
+          localDir: "./android/app/build/outputs/apk/release"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          forceSsl: false
+
+      - name: Restore app.json
+        run: cp app.json.backup app.json
