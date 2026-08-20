@@ -1,0 +1,167 @@
+# esse é o aplicativo para lave-go, de localização de franquias, 
+# é publicado na loja google -> lave-go
+
+name: Deploy Android Lave-Go Shop
+
+on:
+  push:
+    branches: [production]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
+      APP_DISPLAY_NAME: "Shop"
+      PACKAGE_NAME: com.lavego.shop
+      FTP_ARTIFACT_NAME: android-aab-shop
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          DOMAIN: 'https://shop.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          APP_TYPE: 'shop',\
+          ZOOM: ${ZOOM},\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Update app.json dynamically
+        run: |
+          sed -i "s/On Manager/Lave-Go/g" app.json
+          sed -i "s/manager-controle-online/shop-lavego/g" app.json
+          sed -i "s/com\.controleonline\.manager/com.lavego.shop/g" app.json
+
+      - name: Configure Assets by APP_TYPE
+        run: node scripts/configure-assets-lavego2.js
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.LAVEGO_SHOP_KEYSTORE_CERT }}" | base64 -d > ./config/android/lave-go.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/lave-go.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=lave-go" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.LAVEGO_SHOP_KEYSTORE_PASS }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.LAVEGO_SHOP_KEYSTORE_PASS }}" >> ./config/android/env.properties
+
+      - name: Build Android Bundle
+        run: |
+          cd android
+          ./gradlew bundleRelease --init-script ../signing.gradle \
+            -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
+
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Show Version (v.${{ env.VERSION }})
+        run: echo "Compilando versão ${{ env.VERSION }}"
+
+      - name: Upload AAB Artifact for FTP Task
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FTP_ARTIFACT_NAME }}
+          path: ./android/app/build/outputs/bundle/release
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Trigger FTP Upload Task
+        run: |
+          FTP_TRIGGER_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          gh workflow run android-deploy-global-ftp.yml \
+            --ref "${GITHUB_REF_NAME}" \
+            -f source_run_id="${GITHUB_RUN_ID}" \
+            -f artifact_name="${FTP_ARTIFACT_NAME}" \
+            -f version="${VERSION}" \
+            -f package_name="${PACKAGE_NAME}"
+
+          FTP_RUN_ID=""
+          for attempt in $(seq 1 24); do
+            FTP_RUN_ID=$(
+              gh run list \
+                --workflow android-deploy-global-ftp.yml \
+                --branch "${GITHUB_REF_NAME}" \
+                --limit 10 \
+                --json databaseId,createdAt \
+                --jq ".[] | select(.createdAt >= \"${FTP_TRIGGER_AT}\") | .databaseId" \
+              | head -n 1
+            )
+
+            if [ -n "${FTP_RUN_ID}" ]; then
+              break
+            fi
+
+            sleep 5
+          done
+
+          if [ -z "${FTP_RUN_ID}" ]; then
+            echo "Nao foi possivel localizar a execucao do workflow de FTP." >&2
+            exit 1
+          fi
+
+          gh run watch "${FTP_RUN_ID}" --exit-status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Decode Service Account
+        run: echo "${{ secrets.LAVEGO_SHOP_SERVICE_ACCOUNT }}" | base64 -d > /tmp/service_account.json
+
+      - name: Upload .aab to Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJson: /tmp/service_account.json
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          changesNotSentForReview: true
