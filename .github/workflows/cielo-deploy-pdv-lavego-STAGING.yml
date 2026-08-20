@@ -8,7 +8,8 @@ on:
    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
    types: [completed]
    branches: [master]
-  workflow_dispatch:
+
+ workflow_dispatch:
 
 jobs:
   build:

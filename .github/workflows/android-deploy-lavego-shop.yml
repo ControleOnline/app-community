@@ -5,7 +5,7 @@ name: Deploy Android Lave-Go Shop
 
 on:
   push:
-    branches: [production]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
