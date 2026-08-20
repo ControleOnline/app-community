@@ -1,60 +1,134 @@
-name: Deploy Project app.lave-go.com
+# versão para testarmos e tentar usar esse novo padrão
+
+# Whitelabel Lave-Go ONLY. Does not run as part of Controle Online deploy.yml.
+name: Deploy Lave-Go
+
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
+    inputs:
+      target:
+        description: "production ou staging endpoints"
+        type: choice
+        options: [master]
+        default: master
+
+permissions:
+  contents: write
+  actions: write
+
 jobs:
-  build:
+  configure:
+    name: "1 · Configure"
     runs-on: ubuntu-latest
-    env:
-      EXPO_IDENTITY_SOURCE: app-json
+    outputs:
+      api: ${{ steps.set.outputs.api }}
+      domain: ${{ steps.set.outputs.domain }}
+      socket: ${{ steps.set.outputs.socket }}
+    steps:
+      - id: set
+        run: |
+            echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+
+  android:
+    name: "2 · Android APK"
+    needs: configure
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/android-build
         with:
-          node-version: "20"
-      - name: Creating Config
+          app_type: POS
+          display_name: PDV
+          package_name: com.lavego.app
+          expo_name: Lave-Go
+          expo_slug: pos-lave-go
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          domain: ${{ needs.configure.outputs.domain }}
+          manager_app: ${{ needs.configure.outputs.domain }}
+          socket: ${{ needs.configure.outputs.socket }}
+          build_aab: "false"
+          build_apk: "true"
+          publish_play: "false"
+          publish_github: "false"
+          bump_version_code_from_package: "true"
+        env:
+          CERT: ${{ secrets.CERT }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+      - name: Extract version for FTP path
         run: |
-          set -e
-          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
-          cat > ./config/env.local.js << ENVEOF
-          const env = {
-            API_ENTRYPOINT: 'https://apinew.lave-go.com',
-            SOCKET: 'wss://apinew.lave-go.com',
-            APP_TYPE: 'MANAGER',
-            ZOOM: 100,
-            NEW_RELIC: {
-              LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
-              APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
-              ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
-              TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
-              BEACON: process.env.NEW_RELIC_BEACON || '',
-              ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
-            }
-          };
-          module.exports = { env };
-          ENVEOF
-      - name: Update Submodules
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "PACKAGE_NAME=com.lavego.app" >> "$GITHUB_ENV"
+
+      - name: Upload APK via SFTP
+        env:
+          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
+          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
+          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
         run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-      - name: Fix Expo Dependencies
-        run: npx expo install --fix
-      - name: Build
-        run: npx expo export --platform web
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          REMOTE="public_html/${VERSION}/${PACKAGE_NAME}/apk"
+          lftp -c "
+            set cmd:fail-exit yes;
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:timeout 20;
+            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
+            mirror --reverse --continue --dereference ./android/app/build/outputs/apk/release ${REMOTE};
+            quit
+          "
+
+  web:
+    name: "2 · Web"
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/web-export-deploy
         with:
-          server: ${{ secrets.FTPHOST_APPLAVEGO }}
-          username: ${{ secrets.FTPUSER_APPLAVEGO }}
-          password: ${{ secrets.FTPPASS_APPLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ./dist/
-          server-dir: /
-          exclude: |
-            **/.git*
-            **/.git*/**
+          app_type: MANAGER
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          socket: ${{ needs.configure.outputs.socket }}
+          domain: ${{ needs.configure.outputs.domain }}
+          skip_ftp: "true"
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+      # Host Lave-Go: FTP/FTPS → 521 PROT; plain FTP → connect fail.
+      # SamKirkland sugeriu SFTP. Upload via lftp sftp://
+      - name: Deploy web via SFTP
+        env:
+          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
+          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
+          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          test -d ./dist
+          lftp -c "
+            set cmd:fail-exit yes;
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:timeout 20;
+            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
+            mirror --reverse --continue --dereference -x ^\\.git/$ ./dist public_html;
+            quit
+          "
