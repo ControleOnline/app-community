@@ -1,159 +1,60 @@
-# Whitelabel Lave-Go ONLY. Does not run as part of Controle Online deploy.yml.
-# Espelha a estrutura do deploy principal, sem compartilhar jobs/matriz/secrets de produto.
-# Ordem: 1) web  2) Android AAB+APK via SFTP  3) Google Play
-name: Deploy Lave-Go
-
+name: Deploy Project app.lave-go.com
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
-    inputs:
-      target:
-        description: "production endpoints (Lave-Go)"
-        type: choice
-        options: [master]
-        default: master
-      web_only:
-        description: "Apenas web (pula Android/Play)"
-        required: false
-        type: boolean
-        default: false
-
-concurrency:
-  group: deploy-lave-go-${{ github.event.inputs.target || 'master' }}
-  cancel-in-progress: true
-
-permissions:
-  contents: write
-  actions: write
-
 jobs:
-  configure:
-    name: "1 · Configure"
+  build:
     runs-on: ubuntu-latest
-    outputs:
-      api: ${{ steps.set.outputs.api }}
-      domain: ${{ steps.set.outputs.domain }}
-      socket: ${{ steps.set.outputs.socket }}
-      publish_native: ${{ steps.set.outputs.publish_native }}
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
     steps:
-      - id: set
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - name: Creating Config
         run: |
           set -e
-          NATIVE=true
-          if [ "${{ github.event.inputs.web_only }}" = "true" ]; then
-            NATIVE=false
-            echo "web_only=true → native/Play disabled"
-          fi
-          {
-            echo "api=https://apinew.lave-go.com"
-            echo "domain=https://apinew.lave-go.com"
-            echo "socket=wss://apinew.lave-go.com"
-            echo "publish_native=$NATIVE"
-          } >> "$GITHUB_OUTPUT"
-
-  web:
-    name: "2 · Web"
-    needs: configure
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/web-export-deploy
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          cat > ./config/env.local.js << ENVEOF
+          const env = {
+            API_ENTRYPOINT: 'https://apinew.lave-go.com',
+            SOCKET: 'wss://apinew.lave-go.com',
+            APP_TYPE: 'MANAGER',
+            ZOOM: 100,
+            NEW_RELIC: {
+              LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
+              APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
+              ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
+              TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
+              BEACON: process.env.NEW_RELIC_BEACON || '',
+              ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
+            }
+          };
+          module.exports = { env };
+          ENVEOF
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+      - name: Build
+        run: npx expo export --platform web
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          app_type: MANAGER
-          api_entrypoint: ${{ needs.configure.outputs.api }}
-          socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ needs.configure.outputs.domain }}
-          skip_ftp: "true"
-        env:
-          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
-          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
-          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
-          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
-          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
-
-      - name: Deploy web via SFTP
-        env:
-          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
-          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
-          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
-          test -d ./dist
-          lftp -c "
-            set cmd:fail-exit yes;
-            set sftp:auto-confirm yes;
-            set net:max-retries 3;
-            set net:timeout 20;
-            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
-            mirror --reverse --continue --dereference -x ^\\.git/$ ./dist public_html;
-            quit
-          "
-
-  android:
-    name: "3 · Android AAB+APK + Play"
-    needs: [configure, web]
-    if: needs.configure.outputs.publish_native == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: ./.github/actions/android-build
-        with:
-          app_type: POS
-          display_name: PDV
-          package_name: com.lavego.app
-          expo_name: Lave-Go
-          expo_slug: pos-lave-go
-          api_entrypoint: ${{ needs.configure.outputs.api }}
-          domain: ${{ needs.configure.outputs.domain }}
-          manager_app: ${{ needs.configure.outputs.domain }}
-          socket: ${{ needs.configure.outputs.socket }}
-          build_aab: "true"
-          build_apk: "true"
-          publish_play: "true"
-          publish_github: "false"
-          play_track: internal
-          play_status: completed
-          bump_version_code_from_package: "true"
-        env:
-          CERT: ${{ secrets.CERT }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_SERVICE_ACCOUNT_JSON: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
-          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
-          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
-          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
-          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
-          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
-
-      - name: Extract version for FTP paths
-        run: |
-          VERSION=$(node -p "require('./app.json').expo.version")
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "PACKAGE_NAME=com.lavego.app" >> "$GITHUB_ENV"
-
-      - name: Upload AAB + APK via SFTP
-        env:
-          FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
-          FTP_USER: ${{ secrets.FTPUSER_APPLAVEGO }}
-          FTP_PASS: ${{ secrets.FTPPASS_APPLAVEGO }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lftp
-          APK_DIR="./android/app/build/outputs/apk/release"
-          AAB_DIR="./android/app/build/outputs/bundle/release"
-          REMOTE_BASE="public_html/${VERSION}/${PACKAGE_NAME}"
-          lftp -c "
-            set cmd:fail-exit yes;
-            set sftp:auto-confirm yes;
-            set net:max-retries 3;
-            set net:timeout 20;
-            open -u \"${FTP_USER}\",\"${FTP_PASS}\" sftp://${FTP_HOST};
-            mirror --reverse --continue --dereference ${APK_DIR} ${REMOTE_BASE}/apk;
-            mirror --reverse --continue --dereference ${AAB_DIR} ${REMOTE_BASE}/aab;
-            quit
-          "
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          username: ${{ secrets.FTPUSER_APPLAVEGO }}
+          password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist/
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
