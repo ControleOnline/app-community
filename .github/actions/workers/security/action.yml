@@ -19,26 +19,21 @@ runs:
         BASE: ${{ inputs.base_branch }}
       run: |
         set -euo pipefail
-        CUSTOM_INSTRUCTIONS='Atue 100% como Security do ControleOnline.
-Leia e siga OBRIGATORIAMENTE a fonte canônica única:
-https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/security/agent.md'
+        CUSTOM_INSTRUCTIONS='Atue 100% como Security do ControleOnline. Leia e siga OBRIGATORIAMENTE a fonte canônica única: https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/security/agent.md'
 
         gh issue edit "$ISSUE" --repo "$REPO" --add-label "agent:security" || true
+
+        BODY=$(jq -n \
+          --arg repo "$REPO" \
+          --arg base "$BASE" \
+          --arg instructions "$CUSTOM_INSTRUCTIONS" \
+          '{assignees: ["copilot-swe-agent[bot]"], agent_assignment: {target_repo: $repo, base_branch: $base, custom_instructions: $instructions}}')
 
         gh api --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           "/repos/${REPO}/issues/${ISSUE}/assignees" \
-          --input - <<EOFINNER
-        {
-          "assignees": ["copilot-swe-agent[bot]"],
-          "agent_assignment": {
-            "target_repo": "${REPO}",
-            "base_branch": "${BASE}",
-            "custom_instructions": $(echo "$CUSTOM_INSTRUCTIONS" | jq -Rs .)
-          }
-        }
-        EOFINNER
+          --input - <<<"$BODY"
 
         gh issue comment "$ISSUE" --repo "$REPO" --body \
           "Manager Worker → **Security**. Fonte: agents-mcp/agents/roles/security/agent.md"
