@@ -1,70 +1,29 @@
 flowchart TD
-  subgraph Entry["Entrada"]
-    Prompt["Prompt / runner / Copilot"]
-    Discover["issue-queue-discovery.md<br/>labels + Project #1"]
-    Capture["Captura 1 issue elegível<br/>por papel"]
-  end
-
-  subgraph Roles["Papéis"]
-    Dev["Developer"]
-    QA["QA"]
-    Sec["Security"]
-    DevOps["DevOps"]
-    Mgr["Manager"]
-    Docs["Technical Documenter<br/>+ Tutorial Assistant"]
-  end
-
-  subgraph DevFlow["Developer — github-flow"]
-    Branch["Branch task-id<br/>a partir de master"]
-    Impl["Implementar + testar<br/>code-quality ≤500 linhas"]
-    Sync["Sincronizar origin/master"]
-    MergeDev["Merge task-id → dev<br/>SEM PR"]
-    Handoff["Labels agent:qa<br/>+ agent:security"]
-  end
-
-  subgraph Review["Revisão dual-gate"]
-    QADecide{"QA: accepted<br/>ou rejected?"}
-    SecDecide{"Security: accepted<br/>ou rejected?"}
-    Reject["rejected → Developer<br/>corrige e re-merge em dev"]
-    DualOK["agent:qa:accepted<br/>+ agent:security:accepted"]
-  end
-
-  subgraph RC["DevOps RC"]
-    Pack["Empacota tasks dual-accepted<br/>merge task-id → staging"]
-    Semver["Versão numérica package.json<br/>app.json versionCode"]
-    Parent["Task pai RC X.Y.Z-rc.N<br/>filhas + coluna In Review"]
-    Human["Humano confere staging"]
-    DeployCol["Coluna Deploy"]
-    ToMaster["Merge staging → master<br/>pai+filhas → Done"]
-    DocHandoff["Labels documentadores<br/>nas filhas"]
-  end
-
-  subgraph Hotfix["Hotfix prioridade absoluta"]
-    HF["label hotfix"]
-    HFDev["Developer merge → dev"]
-    HFStg["task-id → staging<br/>sem dual-gate prévio"]
-    HFReview["In Review → Deploy humano"]
-  end
-
-  Prompt --> Discover --> Capture
-  Capture -->|agent:developer / Ready| Dev
-  Capture -->|agent:qa| QA
-  Capture -->|agent:security| Sec
-  Capture -->|agent:devops / Deploy| DevOps
-  Capture -->|higiene board| Mgr
-  Capture -->|agent:technical-documenter| Docs
-
-  Dev --> Branch --> Impl --> Sync --> MergeDev --> Handoff
-  Handoff --> QA
-  Handoff --> Sec
-  QA --> QADecide
-  Sec --> SecDecide
-  QADecide -->|rejected| Reject
-  SecDecide -->|rejected| Reject
-  Reject --> Dev
-  QADecide -->|accepted| DualOK
-  SecDecide -->|accepted| DualOK
-  DualOK --> Pack
-  Pack --> Semver --> Parent --> Human --> DeployCol --> ToMaster --> DocHandoff
-
-  HF --> HFDev --> HFStg --> HFReview --> DeployCol
+  Start([Entrada: prompt ou captura autonoma]) --> Discover[issue-queue-discovery]
+  Discover --> Type{Tipo prioritario?}
+  Type -->|hotfix| P1[P1 hotfix]
+  Type -->|qa ou security rejected| P2[P2 retomada]
+  Type -->|bug| P3[P3 bug]
+  Type -->|feature enhancement| P4[P4 demais]
+  P1 --> Branch
+  P2 --> Branch
+  P3 --> Branch
+  P4 --> Branch
+  Branch[Branch task-id a partir de master] --> Impl[Implementar e testar]
+  Impl --> Sync[Sincronizar origin/master]
+  Sync --> MergeDev[Merge task-id em dev sem PR]
+  MergeDev --> Handoff[Labels agent:qa e agent:security]
+  Handoff --> Review{QA e Security}
+  Review -->|rejected| Fix[Corrigir na mesma task-id]
+  Fix --> Impl
+  Review -->|dual accepted| Dual[agent:qa:accepted + agent:security:accepted]
+  Dual --> Pack[DevOps empacota RC em staging]
+  Pack --> InReview[Coluna In Review]
+  InReview --> Human{Humano aprova?}
+  Human -->|Deploy| Publish[staging para master e Done]
+  Human -->|rejeita| Pack
+  Publish --> Docs[Handoff documentadores]
+  HF[label hotfix] --> HFDev[Developer merge em dev]
+  HFDev --> HFStg[task-id em staging]
+  HFStg --> HFReview[In Review]
+  HFReview --> Human
