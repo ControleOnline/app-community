@@ -1,5 +1,6 @@
 name: Manager Subworker
 description: Resolve/cria issue, aplica labels e decide quais workers invocar (padrão de branch = master)
+
 inputs:
   gh_token:
     description: PAT (GH_TOKEN)
@@ -7,6 +8,7 @@ inputs:
   branch:
     description: Branch do push (master|dev|staging)
     required: true
+
 outputs:
   issue_number:
     description: Número da issue fonte
@@ -32,6 +34,7 @@ outputs:
   base_branch:
     description: Branch canônico (sempre master se veio main)
     value: ${{ steps.resolve.outputs.base_branch }}
+
 runs:
   using: composite
   steps:
@@ -50,10 +53,12 @@ runs:
 
         # Padrão da org: master (nunca main como branch de trabalho)
         BRANCH="$BRANCH_IN"
+
         if [ "$BRANCH" = "main" ]; then
           echo "AVISO: branch main detectada — tratando como master (padrão org)"
           BRANCH="master"
         fi
+
         echo "base_branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
         MESSAGES=$(git log --pretty=format:"%s %b" "${BEFORE}..${SHA}" 2>/dev/null || git log -1 --pretty=format:"%s %b")
@@ -61,28 +66,31 @@ runs:
 
         if [ -n "$ISSUE_REF" ]; then
           NUM=$(echo "$ISSUE_REF" | grep -oE '[0-9]+$')
+
           echo "found=true" >> "$GITHUB_OUTPUT"
           echo "created=false" >> "$GITHUB_OUTPUT"
           echo "issue_number=$NUM" >> "$GITHUB_OUTPUT"
           echo "Issue fonte: #$NUM"
         else
           echo "Push sem issue → Manager cria issue"
+
           TITLE="ops: orquestração automática (push ${BRANCH} ${SHA:0:7})"
-          BODY=$(cat <<EOF
-        ## Manager Worker — issue automática
 
-        Push em \`${BRANCH}\` sem referência de issue no commit.
-
-        - **Commit**: ${SHA}
-        - **Mensagem**: ${MSG}
-
-        O Manager aplica labels e **invoca** os workers necessários (QA / Security / Technical Documenter) conforme o branch.
-
-        Fonte: https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/manager/agent.md
-        EOF
-        )
+          BODY=$(printf '%s\n' \
+            '## Manager Worker — issue automática' \
+            '' \
+            "Push em \`${BRANCH}\` sem referência de issue no commit." \
+            '' \
+            "- **Commit**: ${SHA}" \
+            "- **Mensagem**: ${MSG}" \
+            '' \
+            'O Manager aplica labels e **invoca** os workers necessários (QA / Security / Technical Documenter) conforme o branch.' \
+            '' \
+            'Fonte: https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/manager/agent.md'
+          )
 
           LABELS='["agent:manager"]'
+
           case "$BRANCH" in
             master)
               LABELS='["agent:manager","agent:technical-documenter"]'
@@ -95,19 +103,23 @@ runs:
               ;;
           esac
 
-          RESPONSE=$(gh api --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "/repos/${REPO}/issues" \
-            --input - <<EOF
-          {
-            "title": $(echo "$TITLE" | jq -Rs .),
-            "body": $(echo "$BODY" | jq -Rs .),
-            "labels": $LABELS
-          }
-          EOF
+          RESPONSE=$(jq -n \
+            --arg title "$TITLE" \
+            --arg body "$BODY" \
+            --argjson labels "$LABELS" \
+            '{
+              title: $title,
+              body: $body,
+              labels: $labels
+            }' | gh api --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "/repos/${REPO}/issues" \
+              --input -
           )
+
           NUM=$(echo "$RESPONSE" | jq -r .number)
+
           echo "found=false" >> "$GITHUB_OUTPUT"
           echo "created=true" >> "$GITHUB_OUTPUT"
           echo "issue_number=$NUM" >> "$GITHUB_OUTPUT"
