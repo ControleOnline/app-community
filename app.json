@@ -9,11 +9,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.7.3",
+    "version": "1.5.1",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
-      "versionCode": 10703,
+      "versionCode": 15001,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#ffffff"
@@ -41,15 +41,14 @@
       "bundleIdentifier": "com.controleonline.app",
       "deploymentTarget": "15.1",
       "infoPlist": {
-        "NSCameraUsageDescription": "Necess\u00e1rio para ler c\u00f3digos de barras e QR Codes no PDV.",
-        "NFCReaderUsageDescription": "Necess\u00e1rio para ler tags NFC e RFID no PDV.",
-        "NSMicrophoneUsageDescription": "Necess\u00e1rio para processamento de \u00e1udio.",
-        "NSAppleMusicUsageDescription": "Necess\u00e1rio para emitir alertas sonoros.",
+        "NSCameraUsageDescription": "Necessário para ler códigos de barras e QR Codes no PDV.",
+        "NFCReaderUsageDescription": "Necessário para ler tags NFC e RFID no PDV.",
+        "NSMicrophoneUsageDescription": "Necessário para processamento de áudio.",
+        "NSAppleMusicUsageDescription": "Necessário para emitir alertas sonoros.",
         "UIBackgroundModes": [
           "audio"
         ]
-      },
-      "buildNumber": "1.7.3"
+      }
     },
     "web": {
       "favicon": "./src/assets/logo.png"
@@ -74,8 +73,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Necess\u00e1rio para ler c\u00f3digos de barras e QR Codes no PDV.",
-          "microphonePermission": "Necess\u00e1rio para processamento de \u00e1udio.",
+          "cameraPermission": "Necessário para ler códigos de barras e QR Codes no PDV.",
+          "microphonePermission": "Necessário para processamento de áudio.",
           "recordAudioAndroid": false
         }
       ],
@@ -83,7 +82,7 @@
       [
         "react-native-nfc-manager",
         {
-          "nfcPermission": "Necess\u00e1rio para ler tags NFC e RFID no PDV."
+          "nfcPermission": "Necessário para ler tags NFC e RFID no PDV."
         }
       ],
       "expo-asset",
@@ -105,6 +104,6 @@
       ]
     ]
   },
-  "version": "1.7.2",
-  "versionCode": 10702
+  "version": "1.5.1",
+  "versionCode": 10501
 }

@@ -28,7 +28,7 @@ jobs:
       - id: set
         run: |
             echo "api=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
-            echo "domain=https://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
+            echo "domain=https://app.lave-go.com" >> "$GITHUB_OUTPUT"
             echo "socket=wss://apinew.lave-go.com" >> "$GITHUB_OUTPUT"
 
   android:

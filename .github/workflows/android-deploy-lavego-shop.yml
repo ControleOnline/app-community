@@ -1,11 +1,11 @@
-# esse é o aplicativo para lave-go, de localização de franquias, 
+# esse é o aplicativo para lave-go, de localização de franquias,
 # é publicado na loja google -> lave-go
 
 name: Deploy Android Lave-Go Shop
 
 on:
   push:
-    branches: [master]
+    branches: [xxx]
   workflow_dispatch:
 
 permissions:
