@@ -7,7 +7,7 @@
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY`, `SERVICE` e `MKT`.
 - `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
 - `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional com gate de onboarding do motoboy. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis, a listagem de empresas homologadas e as tabelas de entrega imutaveis.
@@ -55,6 +55,17 @@
 - Missao: app operacional separado com foco em etiquetas, insumos e apoio ao atendimento.
 - Regras: nao assumir comportamento do `MANAGER` e nao incluir checklist no escopo atual.
 - Implementacao React: `ui-support`.
+
+### MKT
+- Publico: time de marketing digital e growth.
+- Missao: espaco centralizado de marketing (dashboard de KPIs, canais e campanhas).
+- Package: `com.controleonline.mkt`; display name `Marketing`.
+- Home atual: placeholder estruturado em `src/pages/mkt/MarketingDashboard.js` (KPIs, canais e campanhas mock; sem integracao real com Meta/Google Ads).
+- Deploy: incluido na matrix web (master, `ftp_product=mkt` → secrets `MKT_HOST` / `MKT_USER` / `MKT_PASS`) e Android (track internal, release draft).
+- Limites:
+- Nao integra APIs de anuncio nesta entrega.
+- Dados reais de conversao dependem de `wp-mkt-community` e entregas posteriores.
+- Nao substitui `CRM` nem fluxos de venda do `SHOP`/`POS`.
 
 ### CRM
 - Publico: vendedor, consultor comercial, pre-venda e pos-venda comercial.

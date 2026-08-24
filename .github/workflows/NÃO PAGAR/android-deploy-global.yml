@@ -8,7 +8,7 @@ on:
     branches: [production]
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
@@ -130,7 +130,7 @@ jobs:
           sed -i "s/On Gestor/On ${APP_DISPLAY_NAME}/g" app.json
           sed -i "s/controleonline\.manager/controleonline.${APP_LOWER}/g" app.json
           sed -i "s/manager-controle-online/${APP_LOWER}-controle-online/g" app.json
-      
+
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets.js
         env:
@@ -169,7 +169,7 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> ./config/android/env.properties
 
-      - name: Build Android Bundle and APK
+      - name: Build Android Release
         run: |
           cd android
           ./gradlew bundleRelease assembleRelease --init-script ../signing.gradle \
@@ -187,7 +187,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.AAB_ARTIFACT_NAME }}
-          path: ./android/app/build/outputs/bundle/release
+          path: ./android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
 
@@ -195,9 +195,30 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APK_ARTIFACT_NAME }}
-          path: ./android/app/build/outputs/apk/release
+          path: ./android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          APP_LOWER=$(echo "${APP_TYPE}" | tr '[:upper:]' '[:lower:]')
+          RELEASE_TAG="android-${APP_LOWER}-v${VERSION}"
+          RELEASE_TITLE="Android ${APP_DISPLAY_NAME} v${VERSION}"
+
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --clobber
+          else
+            gh release create "${RELEASE_TAG}" \
+              ./android/app/build/outputs/bundle/release/app-release.aab \
+              ./android/app/build/outputs/apk/release/app-release.apk \
+              --title "${RELEASE_TITLE}" \
+              --notes "Android release for ${APP_DISPLAY_NAME} v${VERSION}."
+          fi
 
       - name: Decode Service Account
         run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}" | base64 -d > /tmp/service_account.json
