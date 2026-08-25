@@ -177,6 +177,7 @@ runs:
           app.versionCode=versionCode;
           fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
           console.log('Android versionCode:', versionCode);
+          fs.appendFileSync(process.env.GITHUB_ENV, 'ANDROID_VERSION_CODE=' + versionCode + '\n');
         "
 
     - name: Prebuild
