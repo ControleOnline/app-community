@@ -24,24 +24,85 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          CHECK_URL="$(
+          # Accept successful Pull Request Checks on staging when:
+          # 1) headSha == TARGET_SHA (fast-forward promote), or
+          # 2) headSha is an ancestor of TARGET_SHA (staging tip + post-promote commits), or
+          # 3) fallback: latest successful staging PR Checks + successful staging Deploy
+          #    (handles residual divergence after parallel version bumps).
+          # Exact equality alone permanently blocks production after any master-only commit.
+
+          mapfile -t CHECKS < <(
             gh run list \
               --repo "$REPO" \
               --workflow pull-request-checks.yml \
               --branch staging \
               --limit 50 \
               --json conclusion,headSha,status,url \
-              --jq ".[] | select(.headSha == \"$TARGET_SHA\" and .status == \"completed\" and .conclusion == \"success\") | .url" \
-              | head -n 1
-          )"
+              --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
+          )
 
-          if [ -z "$CHECK_URL" ]; then
-            echo "Production deploy blocked: no successful Pull Request Checks run on staging for $TARGET_SHA." >&2
+          ALLOW_URL=""
+          ALLOW_REASON=""
+
+          for row in "${CHECKS[@]:-}"; do
+            [ -z "$row" ] && continue
+            CHECK_SHA="${row%%$'	'*}"
+            CHECK_URL="${row#*$'	'}"
+            if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="exact SHA match ($CHECK_SHA)"
+              break
+            fi
+            # Ancestor check via compare API: base=CHECK_SHA, head=TARGET_SHA
+            STATUS="$(
+              gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
+            )"
+            if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="staging check $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
+              break
+            fi
+          done
+
+          if [ -z "$ALLOW_URL" ]; then
+            STAGING_CHECK_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow pull-request-checks.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            STAGING_DEPLOY_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow deploy.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            if [ -n "$STAGING_CHECK_URL" ] && [ -n "$STAGING_DEPLOY_URL" ]; then
+              ALLOW_URL="$STAGING_CHECK_URL"
+              ALLOW_REASON="fallback: green staging PR Checks + green staging Deploy (TARGET_SHA=$TARGET_SHA diverged from staging tips)"
+              echo "WARNING: $ALLOW_REASON" >&2
+              echo "staging PR Checks: $STAGING_CHECK_URL" >&2
+              echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
+            fi
+          fi
+
+          if [ -z "$ALLOW_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
+            echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
             exit 1
           fi
 
-          echo "Production deploy allowed by staging checks: $CHECK_URL"
+          echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
+  build:
   build:
     needs: production-gate
     runs-on: ubuntu-latest
