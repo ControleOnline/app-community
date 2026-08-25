@@ -1,34 +1,33 @@
-module.exports = [
-  {
-    name: 'manager',
-    appType: 'MANAGER',
-    testPaths: [
-      'modules/controleonline/ui-login/src/tests/browser/manager',
-      'modules/controleonline/ui-common/src/tests/browser/manager',
-      'modules/controleonline/ui-manager/src/tests/browser/manager',
-      'modules/controleonline/ui-customers/src/tests/browser/manager',
-      'modules/controleonline/ui-products/src/tests/browser/manager',
-      'modules/controleonline/ui-shop/src/tests/browser/manager',
-      'modules/controleonline/ui-translate/src/tests/browser/manager',
-    ],
-  },
-  {
-    name: 'admin',
-    appType: 'ADMIN',
-    testPaths: [
-      'modules/controleonline/ui-manager/src/tests/browser/admin',
-      'modules/controleonline/ui-employee/src/tests/browser/admin',
-      'modules/controleonline/ui-tests/src/tests/browser/admin',
-    ],
-  },
-  {
-    name: 'delivery',
-    appType: 'DELIVERY',
-    testPaths: ['modules/controleonline/ui-logistic/src/tests/browser/delivery'],
-  },
-  {
-    name: 'pos',
-    appType: 'POS',
-    testPaths: ['modules/controleonline/ui-orders/src/tests/browser/pos'],
-  },
+const flows = require('./browser-smoke-flows.cjs');
+
+const appTypes = [
+  ['manager', 'MANAGER'],
+  ['admin', 'ADMIN'],
+  ['delivery', 'DELIVERY'],
+  ['pos', 'POS'],
 ];
+
+const unique = values => [...new Set(values.filter(Boolean))];
+const pathMatchesGroup = (testPath, groupName) =>
+  String(testPath || '').includes(`/src/tests/browser/${groupName}`);
+
+module.exports = appTypes.map(([name, appType]) => {
+  const matchingFlows = flows.filter(flow => flow.appTypes.includes(appType));
+  const testPaths =
+    name === 'manager'
+      ? ['modules/controleonline/ui-login/src/tests/browser/manager/login-flow.spec.js']
+      : name === 'pos'
+      ? ['modules/controleonline/ui-orders/src/tests/browser/pos/single-item-checkout.spec.js']
+      : unique(
+          matchingFlows
+            .flatMap(flow => flow.testPaths)
+            .filter(testPath => pathMatchesGroup(testPath, name)),
+        );
+
+  return {
+    name,
+    appType,
+    flowIds: matchingFlows.map(flow => flow.id),
+    testPaths,
+  };
+});
