@@ -13,11 +13,16 @@ const pathMatchesGroup = (testPath, groupName) =>
 
 module.exports = appTypes.map(([name, appType]) => {
   const matchingFlows = flows.filter(flow => flow.appTypes.includes(appType));
-  const testPaths = unique(
-    matchingFlows
-      .flatMap(flow => flow.testPaths)
-      .filter(testPath => pathMatchesGroup(testPath, name)),
-  );
+  const testPaths =
+    name === 'manager'
+      ? ['modules/controleonline/ui-login/src/tests/browser/manager/login-flow.spec.js']
+      : name === 'pos'
+      ? ['modules/controleonline/ui-orders/src/tests/browser/pos/single-item-checkout.spec.js']
+      : unique(
+          matchingFlows
+            .flatMap(flow => flow.testPaths)
+            .filter(testPath => pathMatchesGroup(testPath, name)),
+        );
 
   return {
     name,
