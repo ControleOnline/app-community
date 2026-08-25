@@ -9,11 +9,12 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.5.2",
+    "version": "1.7.2",
+    "versionCode": 10702,
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
-      "versionCode": 15002,
+      "versionCode": 10702,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#ffffff"
@@ -103,7 +104,5 @@
         }
       ]
     ]
-  },
-  "version": "1.5.2",
-  "versionCode": 10502
+  }
 }
