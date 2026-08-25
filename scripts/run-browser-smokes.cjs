@@ -103,9 +103,10 @@ for (const group of resolvedGroups) {
     PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE: path.join(testResultsDir, 'report.json'),
   };
   const groupArtifactsDir = path.join(smokeArtifactsDir, group.name);
-  const groupSummary = {
+const groupSummary = {
     name: group.name,
     appType: group.appType,
+    flowIds: group.flowIds || [],
     build: 'not-run',
     smoke: 'not-run',
     artifacts: [],
@@ -164,6 +165,7 @@ const summaryLines = [
 
 for (const group of manifest.groups) {
   summaryLines.push(`${group.name} (${group.appType})`);
+  summaryLines.push(`  fluxos: ${(group.flowIds || []).join(', ') || 'none'}`);
   summaryLines.push(`  build: ${group.build}`);
   summaryLines.push(`  smoke: ${group.smoke}`);
   summaryLines.push(`  artifacts: ${group.artifacts.length ? group.artifacts.join(', ') : 'none'}`);
