@@ -103,7 +103,6 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   build:
-  build:
     needs: production-gate
     runs-on: ubuntu-latest
 
