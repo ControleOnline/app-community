@@ -221,6 +221,7 @@ jobs:
           build_apk: "true"
           publish_play: "true"
           publish_github: "true"
+          bump_version_code_from_package: "true"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
         env:
