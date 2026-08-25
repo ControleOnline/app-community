@@ -234,6 +234,7 @@ jobs:
             app_domain: https://menu.controleonline.com
             track: internal
             release_status: completed
+            changes_not_sent_for_review: "true"
           - app_type: POS
             display_name: PDV
             app_domain: https://pos.controleonline.com
@@ -251,8 +252,10 @@ jobs:
             release_status: completed
           - app_type: MKT
             display_name: Marketing
+            app_domain: https://mkt.controleonline.com
             track: internal
             release_status: draft
+            publish_play: "false"
     steps:
       - uses: actions/checkout@v5
 
@@ -266,11 +269,12 @@ jobs:
           socket: ${{ needs.configure.outputs.socket }}
           build_aab: "true"
           build_apk: "true"
-          publish_play: "true"
+          publish_play: ${{ matrix.publish_play || 'true' }}
           publish_github: "true"
           bump_version_code_from_package: "true"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
+          play_changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review || 'false' }}
         env:
           CERT: ${{ secrets.CERT }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
