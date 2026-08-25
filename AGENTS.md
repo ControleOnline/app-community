@@ -18,11 +18,21 @@
 | Wiki do app | https://github.com/ControleOnline/app-community/wiki |
 | PushTrigger (deploys) | `docs/pushtrigger.md` |
 
+### Ambiente de desenvolvimento e CI
+
+| Página | O que documenta |
+| --- | --- |
+| [CI e runtime Node](https://github.com/ControleOnline/app-community/wiki/ci-node-runtime) | Node 20; Scrutinizer e workflows |
+| [Production deploy gate](https://github.com/ControleOnline/app-community/wiki/production-deploy-gate) | Job 1.5 · Require staging checks (exact / ancestor / fallback) |
+
 ### Automações de documentação
 
 | Página | O que documenta |
 | --- | --- |
 | [Technical Documenter workflow](docs/technical/github-actions/technical-documenter-workflow.md) | Abertura/preparo automático da trilha documental após push em `master`/`staging` |
 
-Cópia versionada no Git: `docs/technical/github-actions/technical-documenter-workflow.md`
+Cópia versionada no Git:
+- `docs/technical/github-actions/technical-documenter-workflow.md`
+- `docs/technical/github-actions/production-deploy-gate.md`
+
 Fonte canônica do papel: `https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/technical-documenter/agent.md`

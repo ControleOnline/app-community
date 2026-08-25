@@ -18,7 +18,6 @@ const DEFAULT_DISPLAY_NAMES = {
   PPC: 'PCP',
   SERVICE: 'Service',
   SHOP: 'Shop',
-  MKT: 'Marketing',
 };
 
 const clone = value => JSON.parse(JSON.stringify(value));

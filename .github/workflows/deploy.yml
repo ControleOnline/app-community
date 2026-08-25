@@ -91,10 +91,108 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "env=$ENV native=$NATIVE api=$API"
 
+  production-gate:
+    name: "1.5 · Require staging checks"
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful staging checks before production
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_ENV: ${{ needs.configure.outputs.env }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENV" != "master" ]; then
+            echo "Production gate skipped for $TARGET_ENV."
+            exit 0
+          fi
+
+          # Accept successful Pull Request Checks on staging when:
+          # 1) headSha == TARGET_SHA (fast-forward promote), or
+          # 2) headSha is an ancestor of TARGET_SHA (staging tip + post-promote commits), or
+          # 3) fallback: latest successful staging PR Checks + successful staging Deploy
+          #    (handles residual divergence after parallel version bumps).
+          # Exact equality alone permanently blocks production after any master-only commit.
+
+          mapfile -t CHECKS < <(
+            gh run list \
+              --repo "$REPO" \
+              --workflow pull-request-checks.yml \
+              --branch staging \
+              --limit 50 \
+              --json conclusion,headSha,status,url \
+              --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
+          )
+
+          ALLOW_URL=""
+          ALLOW_REASON=""
+
+          for row in "${CHECKS[@]:-}"; do
+            [ -z "$row" ] && continue
+            CHECK_SHA="${row%%$'	'*}"
+            CHECK_URL="${row#*$'	'}"
+            if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="exact SHA match ($CHECK_SHA)"
+              break
+            fi
+            # Ancestor check via compare API: base=CHECK_SHA, head=TARGET_SHA
+            STATUS="$(
+              gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
+            )"
+            if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="staging check $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
+              break
+            fi
+          done
+
+          if [ -z "$ALLOW_URL" ]; then
+            STAGING_CHECK_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow pull-request-checks.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            STAGING_DEPLOY_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow deploy.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            if [ -n "$STAGING_CHECK_URL" ] && [ -n "$STAGING_DEPLOY_URL" ]; then
+              ALLOW_URL="$STAGING_CHECK_URL"
+              ALLOW_REASON="fallback: green staging PR Checks + green staging Deploy (TARGET_SHA=$TARGET_SHA diverged from staging tips)"
+              echo "WARNING: $ALLOW_REASON" >&2
+              echo "staging PR Checks: $STAGING_CHECK_URL" >&2
+              echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
+            fi
+          fi
+
+          if [ -z "$ALLOW_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
+            echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
+            exit 1
+          fi
+
+          echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
+
+  # ─── 2. Web
   # ─── 2. Web: pre-production publica só MANAGER; master publica todos ──────
   web:
     name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
-    needs: configure
+    needs: [configure, production-gate]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -165,7 +263,7 @@ jobs:
   # ─── 3. Android AAB+APK (somente master) ───────────────────────────────────
   android:
     name: "3 · Android ${{ matrix.app_type }}"
-    needs: configure
+    needs: [configure, production-gate]
     if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     strategy:
@@ -197,6 +295,8 @@ jobs:
             app_domain: https://menu.controleonline.com
             track: internal
             release_status: completed
+            changes_not_sent_for_review: "true"
+            publish_play: "false"
           - app_type: POS
             display_name: PDV
             app_domain: https://pos.controleonline.com
@@ -214,8 +314,10 @@ jobs:
             release_status: completed
           - app_type: MKT
             display_name: Marketing
+            app_domain: https://mkt.controleonline.com
             track: internal
             release_status: draft
+            publish_play: "false"
     steps:
       - uses: actions/checkout@v5
 
@@ -229,11 +331,12 @@ jobs:
           socket: ${{ needs.configure.outputs.socket }}
           build_aab: "true"
           build_apk: "true"
-          publish_play: "true"
+          publish_play: ${{ matrix.publish_play || 'true' }}
           publish_github: "true"
           bump_version_code_from_package: "true"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
+          play_changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review || 'false' }}
         env:
           CERT: ${{ secrets.CERT }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -249,7 +352,7 @@ jobs:
   # ─── 4. LG webOS (somente master) ──────────────────────────────────────────
   lg-webos:
     name: "4 · LG webOS"
-    needs: configure
+    needs: [configure, production-gate]
     if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     steps:
