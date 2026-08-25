@@ -8,6 +8,7 @@ module.exports = {
         alias: {
           '@assets': './src/assets',
           '@appType': './src/appType.js',
+          '@controleonline/react-native-getnet-payment': './node_modules/@controleonline/react-native-getnet-payment',
           '@controleonline': './modules/controleonline',
           '@controleonline-rn': './node_modules/@controleonline',
           '@env': './config/env.local.js',
