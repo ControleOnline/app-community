@@ -1,0 +1,128 @@
+const flow = ({ id, name, owner, steps, appTypes, testPaths }) => ({
+  id,
+  name,
+  owner,
+  evidence: {
+    screenshots: 'required-per-step',
+    qaGate: 'QA só aprova com prints/screenshot cobrindo todo o fluxo.',
+  },
+  steps,
+  appTypes,
+  testPaths,
+});
+
+module.exports = [
+  flow({
+    id: 'produto-cadastro',
+    name: 'Cadastro de produtos',
+    owner: 'ui-products',
+    appTypes: ['MANAGER'],
+    steps: ['abrir produtos', 'iniciar cadastro', 'preencher dados obrigatórios', 'salvar', 'validar produto na listagem'],
+    testPaths: ['modules/controleonline/ui-products/src/tests/browser/manager'],
+  }),
+  flow({
+    id: 'compra-fluxo',
+    name: 'Compra',
+    owner: 'ui-shop/ui-orders',
+    appTypes: ['MANAGER', 'POS'],
+    steps: ['abrir catálogo/POS', 'selecionar produto', 'montar carrinho', 'informar pagamento', 'validar confirmação'],
+    testPaths: [
+      'modules/controleonline/ui-shop/src/tests/browser/manager',
+      'modules/controleonline/ui-orders/src/tests/browser/pos',
+    ],
+  }),
+  flow({
+    id: 'device-configuracao',
+    name: 'Configuração de devices',
+    owner: 'ui-config/ui-manager',
+    appTypes: ['ADMIN', 'MANAGER'],
+    steps: ['abrir configurações', 'selecionar device', 'alterar configuração', 'salvar', 'validar estado configurado'],
+    testPaths: [
+      'modules/controleonline/ui-manager/src/tests/browser/admin',
+      'modules/controleonline/ui-tests/src/tests/browser/admin',
+    ],
+  }),
+  flow({
+    id: 'pedido-criacao',
+    name: 'Criação de pedido',
+    owner: 'ui-orders',
+    appTypes: ['MANAGER', 'POS'],
+    steps: ['abrir pedidos', 'iniciar pedido', 'selecionar cliente/produtos', 'confirmar pedido', 'validar número/status'],
+    testPaths: [
+      'modules/controleonline/ui-orders/src/tests/browser/pos',
+      'modules/controleonline/ui-shop/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'producao-fluxo',
+    name: 'Produção',
+    owner: 'ui-pcp/ui-products',
+    appTypes: ['MANAGER'],
+    steps: ['abrir produção', 'selecionar ordem/item', 'apontar etapa', 'finalizar produção', 'validar baixa/estado final'],
+    testPaths: [
+      'modules/controleonline/ui-products/src/tests/browser/manager',
+      'modules/controleonline/ui-manager/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'cliente-cadastro',
+    name: 'Cadastro de cliente',
+    owner: 'ui-crm/ui-customers',
+    appTypes: ['MANAGER'],
+    steps: ['abrir CRM/clientes', 'iniciar cadastro', 'preencher identificação/contato', 'salvar', 'validar cliente criado'],
+    testPaths: [
+      'modules/controleonline/ui-customers/src/tests/browser/manager',
+      'modules/controleonline/ui-manager/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'usuario-permissao',
+    name: 'Usuários, permissões e autenticação',
+    owner: 'ui-login/ui-users',
+    appTypes: ['MANAGER', 'ADMIN'],
+    steps: ['abrir autenticação/admin', 'criar ou selecionar usuário', 'alterar permissão', 'salvar', 'validar acesso esperado'],
+    testPaths: [
+      'modules/controleonline/ui-login/src/tests/browser/manager',
+      'modules/controleonline/ui-common/src/tests/browser/manager',
+      'modules/controleonline/ui-employee/src/tests/browser/admin',
+    ],
+  }),
+  flow({
+    id: 'financeiro-cobranca',
+    name: 'Cobrança, pagamento e conciliação',
+    owner: 'ui-financial/ui-orders',
+    appTypes: ['MANAGER', 'POS'],
+    steps: ['abrir financeiro/pagamento', 'gerar cobrança', 'registrar pagamento', 'validar confirmação', 'validar conciliação/listagem'],
+    testPaths: [
+      'modules/controleonline/ui-orders/src/tests/browser/pos',
+      'modules/controleonline/ui-shop/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'logistica-entrega',
+    name: 'Entrega e logística',
+    owner: 'ui-logistic',
+    appTypes: ['DELIVERY'],
+    steps: ['abrir entregas', 'selecionar entrega', 'executar ação logística', 'confirmar status', 'validar conclusão'],
+    testPaths: ['modules/controleonline/ui-logistic/src/tests/browser/delivery'],
+  }),
+  flow({
+    id: 'relatorio-consulta',
+    name: 'Relatórios e consultas gerenciais',
+    owner: 'ui-report/ui-manager',
+    appTypes: ['MANAGER'],
+    steps: ['abrir relatório', 'aplicar filtros', 'executar consulta', 'validar dados exibidos', 'registrar evidência final'],
+    testPaths: [
+      'modules/controleonline/ui-manager/src/tests/browser/manager',
+      'modules/controleonline/ui-translate/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'outros',
+    name: 'Outros',
+    owner: 'app-community',
+    appTypes: ['MANAGER', 'ADMIN', 'DELIVERY', 'POS'],
+    steps: ['declarar justificativa', 'executar smoke técnico', 'capturar estado inicial', 'capturar resultado final'],
+    testPaths: [],
+  }),
+];

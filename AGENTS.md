@@ -24,5 +24,5 @@
 | --- | --- |
 | [Technical Documenter workflow](docs/technical/github-actions/technical-documenter-workflow.md) | Abertura/preparo automático da trilha documental após push em `master`/`staging` |
 
-Cópia versionada no Git: `docs/technical/github-actions/technical-documenter-workflow.md`  
+Cópia versionada no Git: `docs/technical/github-actions/technical-documenter-workflow.md`
 Fonte canônica do papel: `https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/technical-documenter/agent.md`
