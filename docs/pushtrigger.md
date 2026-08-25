@@ -70,3 +70,21 @@ Observacoes:
 - No `master`, os workflows web de `manager` e `shop` continuam dependendo de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
 - Os workflows Android de `master` podem acionar os workflows da Cielo via `workflow_run`.
 - `technical-documenter.yml` roda em `push` para `master` e `staging`: detecta issue fonte nas mensagens de commit (ou cria issue documental), atribui o Copilot como `technical-documenter` e aplica labels de conclusão. Contrato versionado: `docs/technical/github-actions/technical-documenter-workflow.md`. Fonte do papel: `agents-mcp` (`agents/roles/technical-documenter/agent.md`).
+
+---
+
+## Pipeline unificado atual (`deploy.yml`)
+
+O pipeline canônico de deploy (web + android + lg-webOS) é **`.github/workflows/deploy.yml`**.
+
+Em `master` (produção), o job **1.5 · Require staging checks** (`production-gate`) bloqueia a publicação até haver evidência de checks verdes em staging:
+
+1. SHA idêntico (promote FF), ou
+2. SHA de staging ancestral do SHA de master (Compare API), ou
+3. Fallback: PR Checks verde + Deploy verde no tip de staging (com WARNING).
+
+Documentação completa: [`docs/technical/github-actions/production-deploy-gate.md`](technical/github-actions/production-deploy-gate.md) e [wiki Production-Deploy-Gate](https://github.com/ControleOnline/app-community/wiki/Production-Deploy-Gate).
+
+Mesma lógica em `.github/workflows/android-deploy-lavego-shop-v2.yml`.
+
+Issue de referência: [#566](https://github.com/ControleOnline/app-community/issues/566).

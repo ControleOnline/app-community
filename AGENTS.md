@@ -17,12 +17,14 @@
 | --- | --- |
 | Wiki do app | https://github.com/ControleOnline/app-community/wiki |
 | PushTrigger (deploys) | `docs/pushtrigger.md` |
+| Production Deploy Gate | `docs/technical/github-actions/production-deploy-gate.md` · [wiki](https://github.com/ControleOnline/app-community/wiki/Production-Deploy-Gate) |
 
 ### Automações de documentação
 
 | Página | O que documenta |
 | --- | --- |
 | [Technical Documenter workflow](docs/technical/github-actions/technical-documenter-workflow.md) | Abertura/preparo automático da trilha documental após push em `master`/`staging` |
+| [Production Deploy Gate](docs/technical/github-actions/production-deploy-gate.md) | Gate 1.5 · Require staging checks (ancestral + fallback) em `deploy.yml` e Android Lave-Go |
 
-Cópia versionada no Git: `docs/technical/github-actions/technical-documenter-workflow.md`
+Cópia versionada no Git: `docs/technical/github-actions/`
 Fonte canônica do papel: `https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/technical-documenter/agent.md`
