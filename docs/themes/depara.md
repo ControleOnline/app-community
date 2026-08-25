@@ -540,3 +540,19 @@ Formato:
 - `ui-config / src/react/pages/MenuAccessConfigPage.styles.js / 285-310`
 - `antigo: primaryButton/primaryButtonText/secondaryButton/secondaryButtonText fixavam cores locais`
 - `novo: primaryButton/primaryButtonText/categoryButton/categoryButtonText preservam apenas layout e tipografia; cores entram por themeStore.getters.colors no JSX`
+
+- `ui-common / src/react/components/ConfirmModal.js / full`
+- `antigo: componente usava StyleSheet estatico com cores hardcoded no styles`
+- `novo: useStore('theme') + palette canônica (modalOverlay, modalBackground, modalBorder, modalHeaderText, modalText, buttonBackground, buttonBorder, buttonText, buttonTextSecondary) e createStyles(palette)`
+
+- `ui-common / src/react/components/ConfirmModal.styles.js / full`
+- `antigo: StyleSheet estatico com backgroundColor 'rgba(0,0,0,0.5)', '#fff', '#007AFF', color '#fff'`
+- `novo: createStyles(palette) usando somente tokens canônicos modal* e button*`
+
+- `ui-common / src/react/components/SystemErrorToast.js / full`
+- `antigo: Icon color="#DC2626" hardcoded; estilos com cores literais`
+- `novo: useStore('theme') + palette toastDanger* e Icon color={palette.toastDangerIcon}`
+
+- `ui-common / src/react/components/SystemErrorToast.styles.js / full`
+- `antigo: StyleSheet estatico com backgroundColor '#FEE2E2', borderColor '#FCA5A5', color '#111827'`
+- `novo: createStyles(palette) usando toastDangerBackground, toastDangerBorder, toastDangerText`

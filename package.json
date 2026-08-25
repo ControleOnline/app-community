@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.7.1",
+  "version": "1.5.2",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -17,6 +17,7 @@
     "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
     "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
     "test:browser:install": "playwright install chromium",
+    "test:browser:flows": "node scripts/validate-smoke-flow-catalog.cjs",
     "tests:index": "node scripts/build-tests-index.cjs",
     "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=src/tests/browser/|modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
   },
@@ -75,7 +76,8 @@
     "react-native-web": "^0.21.0",
     "react-native-webview": "13.15.0",
     "react-native-worklets": "0.5.1",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.10",
+    "@controleonline/react-native-getnet-payment": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

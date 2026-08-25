@@ -48,11 +48,11 @@ jobs:
             dev)
               API=https://d.controleonline.com
               SOCK=wss://d.controleonline.com
-              DOMAIN=https://d.controleonline.com
-              MANAGER_DOMAIN=https://d.controleonline.com
+              DOMAIN=https://dev.controleonline.com
+              MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://d.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://dev.controleonline.com"}]}'
               ;;
             staging)
               API=https://s.controleonline.com
@@ -70,7 +70,8 @@ jobs:
               MANAGER_DOMAIN=https://manager.controleonline.com
               FTP=production
               NATIVE=true
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
+
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -163,6 +164,11 @@ jobs:
                 echo "FTP_USER=${{ secrets.ADMIN_USER }}" >> "$GITHUB_ENV"
                 echo "FTP_PASS=${{ secrets.ADMIN_PASS }}" >> "$GITHUB_ENV"
                 ;;
+              mkt)
+                echo "FTP_HOST=${{ secrets.MKT_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.MKT_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.MKT_PASS }}" >> "$GITHUB_ENV"
+                ;;
             esac
           elif [ "$ENV_PROFILE" = "staging" ]; then
             echo "FTP_HOST=${{ secrets.STAGING_HOST }}" >> "$GITHUB_ENV"
@@ -183,7 +189,7 @@ jobs:
           app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ needs.configure.outputs.domain }}
+          domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
           remote_dir: "public_html/"  # canonical vhost docroot (relative to FTP home; NEVER ~/public_html/)
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
@@ -243,6 +249,10 @@ jobs:
             app_domain: https://service.controleonline.com
             track: internal
             release_status: completed
+          - app_type: MKT
+            display_name: Marketing
+            track: internal
+            release_status: draft
     steps:
       - uses: actions/checkout@v5
 

@@ -36,13 +36,25 @@ jobs:
       - name: Check JavaScript syntax
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
+      - name: Validate browser smoke flow catalog
+        run: npm run test:browser:flows
+
       - name: Check diff hygiene
         run: git diff --check
 
   browser-smoke:
+    name: browser-smoke (${{ matrix.group }})
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     needs: baseline-checks
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - manager
+          - admin
+          - delivery
+          - pos
 
     steps:
       - uses: actions/checkout@v5
@@ -68,4 +80,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
-        run: npm run test:browser
+        run: npm run test:browser -- ${{ matrix.group }}

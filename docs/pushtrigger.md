@@ -12,6 +12,7 @@ flowchart TD
   %% STAGING
   S --> S2[web-deploy-staging-manager-ctrl.yml]
   S --> S3[web-deploy-staging-shop-ctrl.yml]
+  S --> S4[technical-documenter.yml]
 
   S2 --> S2a[Cria env.local.js]
   S2a --> S2b[Atualiza submodules]
@@ -37,6 +38,7 @@ flowchart TD
   M --> M3[web-deploy-production-shop-ctrl.yml]
   M --> M4[android-deploy-global.yml]
   M --> M5[cielo-deploy-pdv-ctrl.yml]
+  M --> M6[technical-documenter.yml]
 
   M1 --> M1a[Cria env.local.js]
   M1a --> M1b[Atualiza submodules]
@@ -67,3 +69,4 @@ Observacoes:
 
 - No `master`, os workflows web de `manager` e `shop` continuam dependendo de uma execucao anterior bem-sucedida em `staging` para o mesmo commit ou um de seus parents.
 - Os workflows Android de `master` podem acionar os workflows da Cielo via `workflow_run`.
+- `technical-documenter.yml` roda em `push` para `master` e `staging`: detecta issue fonte nas mensagens de commit (ou cria issue documental), atribui o Copilot como `technical-documenter` e aplica labels de conclusão. Contrato versionado: `docs/technical/github-actions/technical-documenter-workflow.md`. Fonte do papel: `agents-mcp` (`agents/roles/technical-documenter/agent.md`).
