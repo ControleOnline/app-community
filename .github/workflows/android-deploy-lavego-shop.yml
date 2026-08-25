@@ -67,9 +67,16 @@ jobs:
 
       - name: Update app.json dynamically
         run: |
-          sed -i "s/On Manager/Lave-Go/g" app.json
-          sed -i "s/manager-controle-online/shop-lavego/g" app.json
-          sed -i "s/com\.controleonline\.manager/com.lavego.shop/g" app.json
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.name='Lave-Go';
+            app.expo.slug='shop-lavego';
+            app.expo.android=app.expo.android||{};
+            app.expo.android.package=process.env.PACKAGE_NAME;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+          "
 
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets-lavego2.js
@@ -183,4 +190,3 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
-          changesNotSentForReview: true
