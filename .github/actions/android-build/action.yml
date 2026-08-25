@@ -159,6 +159,26 @@ runs:
           cp "config/firebase/${APP_LOWER}/google-services.json" android/app/google-services.json || true
         fi
 
+    - name: Bump versionCode
+      if: inputs.publish_play == 'true' || inputs.bump_version_code_from_package == 'true'
+      shell: bash
+      run: |
+        node -e "
+          const fs=require('fs');
+          const app=require('./app.json');
+          app.expo.android=app.expo.android||{};
+          const current=Number(app.expo.android.versionCode || app.versionCode || 0);
+          const day=Math.floor((Date.now()-Date.UTC(2020,0,1))/86400000);
+          const run=Number(process.env.GITHUB_RUN_NUMBER || 0) % 10000;
+          const attempt=Number(process.env.GITHUB_RUN_ATTEMPT || 1) % 10;
+          const generated=(day*100000)+(run*10)+attempt;
+          const versionCode=Math.max(current+1, generated);
+          app.expo.android.versionCode=versionCode;
+          app.versionCode=versionCode;
+          fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+          console.log('Android versionCode:', versionCode);
+        "
+
     - name: Prebuild
       shell: bash
       run: npx expo prebuild --clean
@@ -173,20 +193,6 @@ runs:
         echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online" >> ./config/android/env.properties
         echo "MYAPP_UPLOAD_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> ./config/android/env.properties
         echo "MYAPP_UPLOAD_KEY_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> ./config/android/env.properties
-
-    - name: Bump versionCode
-      if: inputs.bump_version_code_from_package == 'true'
-      shell: bash
-      run: |
-        VERSION=$(node -p "require('./package.json').version")
-        VERSION_CODE=$(echo "$VERSION" | tr -d '.')
-        node -e "
-          const fs=require('fs');
-          const app=require('./app.json');
-          app.expo.android=app.expo.android||{};
-          app.expo.android.versionCode=parseInt('$VERSION_CODE',10);
-          fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
-        "
 
     - name: Gradle build
       shell: bash

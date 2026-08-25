@@ -91,10 +91,47 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "env=$ENV native=$NATIVE api=$API"
 
+  production-gate:
+    name: "1.5 · Require staging checks"
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful staging checks before production
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_ENV: ${{ needs.configure.outputs.env }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENV" != "master" ]; then
+            echo "Production gate skipped for $TARGET_ENV."
+            exit 0
+          fi
+
+          CHECK_URL="$(
+            gh run list \
+              --repo "$REPO" \
+              --workflow pull-request-checks.yml \
+              --branch staging \
+              --limit 50 \
+              --json conclusion,headSha,status,url \
+              --jq ".[] | select(.headSha == \"$TARGET_SHA\" and .status == \"completed\" and .conclusion == \"success\") | .url" \
+              | head -n 1
+          )"
+
+          if [ -z "$CHECK_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks run on staging for $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          echo "Production deploy allowed by staging checks: $CHECK_URL"
+
   # ─── 2. Web: pre-production publica só MANAGER; master publica todos ──────
   web:
     name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
-    needs: configure
+    needs: [configure, production-gate]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -165,7 +202,7 @@ jobs:
   # ─── 3. Android AAB+APK (somente master) ───────────────────────────────────
   android:
     name: "3 · Android ${{ matrix.app_type }}"
-    needs: configure
+    needs: [configure, production-gate]
     if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     strategy:
@@ -231,6 +268,7 @@ jobs:
           build_apk: "true"
           publish_play: "true"
           publish_github: "true"
+          bump_version_code_from_package: "true"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
         env:
@@ -248,7 +286,7 @@ jobs:
   # ─── 4. LG webOS (somente master) ──────────────────────────────────────────
   lg-webos:
     name: "4 · LG webOS"
-    needs: configure
+    needs: [configure, production-gate]
     if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     steps:

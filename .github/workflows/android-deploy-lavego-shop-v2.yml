@@ -13,7 +13,37 @@ permissions:
   actions: write
 
 jobs:
+  production-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful staging checks before production
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          CHECK_URL="$(
+            gh run list \
+              --repo "$REPO" \
+              --workflow pull-request-checks.yml \
+              --branch staging \
+              --limit 50 \
+              --json conclusion,headSha,status,url \
+              --jq ".[] | select(.headSha == \"$TARGET_SHA\" and .status == \"completed\" and .conclusion == \"success\") | .url" \
+              | head -n 1
+          )"
+
+          if [ -z "$CHECK_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks run on staging for $TARGET_SHA." >&2
+            exit 1
+          fi
+
+          echo "Production deploy allowed by staging checks: $CHECK_URL"
+
   build:
+    needs: production-gate
     runs-on: ubuntu-latest
 
     env:
@@ -70,6 +100,25 @@ jobs:
 
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets-lavego2.js
+
+      - name: Bump Android versionCode
+        run: |
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.android=app.expo.android||{};
+            const current=Number(app.expo.android.versionCode || app.versionCode || 0);
+            const day=Math.floor((Date.now()-Date.UTC(2020,0,1))/86400000);
+            const run=Number(process.env.GITHUB_RUN_NUMBER || 0) % 10000;
+            const attempt=Number(process.env.GITHUB_RUN_ATTEMPT || 1) % 10;
+            const generated=(day*100000)+(run*10)+attempt;
+            const versionCode=Math.max(current+1, generated);
+            app.expo.android.versionCode=versionCode;
+            app.versionCode=versionCode;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+            console.log('Android versionCode:', versionCode);
+          "
 
       - name: Install Dependencies
         run: npm install
