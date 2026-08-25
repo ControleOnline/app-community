@@ -11,6 +11,8 @@ const smokeArtifactsDir = path.resolve(
   process.env.PLAYWRIGHT_SMOKE_RESULTS_DIR || '.playwright-smoke-results',
 );
 const testResultsDir = path.join(projectRoot, 'test-results');
+const buildTimeoutMs = Number(process.env.BROWSER_SMOKE_BUILD_TIMEOUT_MS || 8 * 60 * 1000);
+const testTimeoutMs = Number(process.env.BROWSER_SMOKE_TEST_TIMEOUT_MS || 5 * 60 * 1000);
 
 const groupByName = new Map(
   groups.flatMap(group => [
@@ -75,13 +77,22 @@ const copyDir = (sourceDir, targetDir) => {
   return true;
 };
 
-const runCommand = (command, commandArgs, env) =>
+const runCommand = (command, commandArgs, env, timeout) =>
   spawnSync(command, commandArgs, {
     cwd: projectRoot,
     env,
     stdio: 'inherit',
     shell: process.platform === 'win32',
+    timeout,
   });
+
+const getExitCode = result => {
+  if (result.error?.code === 'ETIMEDOUT') {
+    return 'timeout';
+  }
+
+  return result.status ?? result.signal ?? 1;
+};
 
 cleanDir(smokeArtifactsDir);
 ensureDir(smokeArtifactsDir);
@@ -103,7 +114,7 @@ for (const group of resolvedGroups) {
     PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE: path.join(testResultsDir, 'report.json'),
   };
   const groupArtifactsDir = path.join(smokeArtifactsDir, group.name);
-const groupSummary = {
+  const groupSummary = {
     name: group.name,
     appType: group.appType,
     flowIds: group.flowIds || [],
@@ -115,8 +126,8 @@ const groupSummary = {
   ensureDir(groupArtifactsDir);
 
   console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
-  const buildResult = runCommand(process.execPath, [buildScript], env);
-  const buildExitCode = buildResult.status ?? buildResult.signal ?? 1;
+  const buildResult = runCommand(process.execPath, [buildScript], env, buildTimeoutMs);
+  const buildExitCode = getExitCode(buildResult);
 
   if (buildResult.status === 0) {
     groupSummary.build = 'passed';
@@ -130,8 +141,8 @@ const groupSummary = {
       playwrightConfig,
       ...testPaths,
       ...forwardedArgs,
-    ], env);
-    const testExitCode = testResult.status ?? testResult.signal ?? 1;
+    ], env, testTimeoutMs);
+    const testExitCode = getExitCode(testResult);
 
     if (testResult.status === 0) {
       groupSummary.smoke = 'passed';
