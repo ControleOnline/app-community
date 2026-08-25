@@ -20,6 +20,7 @@ module.exports = defineConfig({
   workers: 1,
   use: {
     baseURL,
+    locale: 'pt-BR',
     screenshot: 'on',
     trace: 'on-first-retry',
     video: 'retain-on-failure',
