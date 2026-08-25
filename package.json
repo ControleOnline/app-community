@@ -17,6 +17,7 @@
     "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
     "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
     "test:browser:install": "playwright install chromium",
+    "test:browser:flows": "node scripts/validate-smoke-flow-catalog.cjs",
     "tests:index": "node scripts/build-tests-index.cjs",
     "test:coverage": "jest --coverage --coverageReporters=clover --runInBand --testPathIgnorePatterns=src/tests/browser/|modules/controleonline/ui-common/src/tests/react/utils/|modules/controleonline/ui-manager/src/tests/react/pages/TranslationsReviewPage.data.test.js"
   },
