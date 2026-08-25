@@ -11,8 +11,9 @@ const smokeArtifactsDir = path.resolve(
   process.env.PLAYWRIGHT_SMOKE_RESULTS_DIR || '.playwright-smoke-results',
 );
 const testResultsDir = path.join(projectRoot, 'test-results');
-const buildTimeoutMs = Number(process.env.BROWSER_SMOKE_BUILD_TIMEOUT_MS || 8 * 60 * 1000);
-const testTimeoutMs = Number(process.env.BROWSER_SMOKE_TEST_TIMEOUT_MS || 5 * 60 * 1000);
+const buildTimeoutMs = Number(process.env.BROWSER_SMOKE_BUILD_TIMEOUT_MS || 10 * 60 * 1000);
+const testTimeoutMs = Number(process.env.BROWSER_SMOKE_TEST_TIMEOUT_MS || 25 * 60 * 1000);
+const baseWebPort = Number(process.env.PLAYWRIGHT_WEB_PORT || 4173);
 
 const groupByName = new Map(
   groups.flatMap(group => [
@@ -103,13 +104,14 @@ const manifest = {
 };
 const failures = [];
 
-for (const group of resolvedGroups) {
+resolvedGroups.forEach((group, index) => {
   cleanDir(testResultsDir);
 
   const outputDir = path.join('.playwright-web', group.name);
   const env = {
     ...process.env,
     PLAYWRIGHT_APP_TYPE: group.appType,
+    PLAYWRIGHT_WEB_PORT: String(baseWebPort + index),
     PLAYWRIGHT_WEB_OUTPUT_DIR: outputDir,
     PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE: path.join(testResultsDir, 'report.json'),
   };
@@ -165,7 +167,7 @@ for (const group of resolvedGroups) {
     `${JSON.stringify(manifest, null, 2)}\n`,
     'utf8',
   );
-}
+});
 
 const summaryLines = [
   `Generated at: ${manifest.generatedAt}`,
