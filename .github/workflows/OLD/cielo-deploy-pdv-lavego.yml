@@ -1,15 +1,14 @@
 # aplicativo PDV para loja da Cielo
-# usando APINEW
+# usando API
 
-name: DEPLOY CIELO PDV LAVEGO MASTER
+name: DEPLOY CIELO PDV LAVEGO PRODUCTION
 
 on:
- workflow_run:
-   workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
-   types: [completed]
-   branches: [master]
-
- workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Android Apps"] # NÃO MUDAR ESSE NOME
+    types: [completed]
+    branches: [xxx]
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -20,7 +19,7 @@ jobs:
       APP_TYPE: POS
       APP_DISPLAY_NAME: PDV
       APP_SLUG: pos
-      PACKAGE_NAME: com.lavego.staging
+      PACKAGE_NAME: com.lavego.app
       ASSETS_VARIANT: pos_lavego
       GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
       EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
@@ -47,12 +46,14 @@ jobs:
 
       - name: Generate Dynamic Configs
         run: |
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
           echo "const env = {\
-          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          API_ENTRYPOINT: 'https://api.lave-go.com',\
           DOMAIN: 'https://app.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
-          SOCKET: 'wss://apinew.lave-go.com',\
+          SOCKET: 'wss://api.lave-go.com',\
           APP_TYPE: '${APP_TYPE}',\
+          ZOOM: ${ZOOM},\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
@@ -72,8 +73,8 @@ jobs:
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.name                = 'Lave-Go Staging';
-            app.expo.android.package     = 'com.lavego.staging';
+            app.expo.name                = 'Lave-Go';
+            app.expo.android.package     = 'com.lavego.app';
             app.expo.slug                = 'pos-controle-online';
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "           
