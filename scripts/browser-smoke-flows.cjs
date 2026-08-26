@@ -95,6 +95,7 @@ module.exports = [
     steps: ['abrir financeiro/pagamento', 'gerar cobrança', 'registrar pagamento', 'validar confirmação', 'validar conciliação/listagem'],
     testPaths: [
       'modules/controleonline/ui-orders/src/tests/browser/pos',
+      'modules/controleonline/ui-orders/src/tests/browser/manager',
       'modules/controleonline/ui-shop/src/tests/browser/manager',
     ],
   }),
