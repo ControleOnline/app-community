@@ -125,6 +125,8 @@ module.exports = [
     owner: 'app-community',
     appTypes: ['MANAGER', 'ADMIN', 'DELIVERY', 'POS'],
     steps: ['declarar justificativa', 'executar smoke técnico', 'capturar estado inicial', 'capturar resultado final'],
-    testPaths: [],
+    testPaths: [
+      'modules/controleonline/ui-common/src/tests/browser/manager',
+    ],
   }),
 ];
