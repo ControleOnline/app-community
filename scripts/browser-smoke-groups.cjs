@@ -17,7 +17,10 @@ module.exports = appTypes.map(([name, appType]) => {
     name === 'manager'
       ? ['modules/controleonline/ui-login/src/tests/browser/manager/login-flow.spec.js']
       : name === 'pos'
-      ? ['modules/controleonline/ui-orders/src/tests/browser/pos/single-item-checkout.spec.js']
+      ? [
+          'modules/controleonline/ui-orders/src/tests/browser/pos/single-item-checkout.spec.js',
+          'modules/controleonline/ui-orders/src/tests/browser/pos/flowchart-1-single-product-prepaid.spec.js',
+        ]
       : unique(
           matchingFlows
             .flatMap(flow => flow.testPaths)
