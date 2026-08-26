@@ -1,7 +1,7 @@
 name: TESTE RAPIDO FTP SEM COMPILACAO
 
 on:
-  workflow_dispatch: # Permite ativar clicando no botão no GitHub Actions
+  workflow_dispatch:
 
 jobs:
   teste_envio:
@@ -10,13 +10,9 @@ jobs:
     steps:
       - name: Criar APK falso e Pasta Temporaria
         run: |
-          # 1. Cria a pasta simulando a rota de saída do Gradle
           mkdir -p ./android/app/build/outputs/apk
-          
-          # 2. Cria um arquivo de texto com extensão .apk dentro dela
           echo "Este e um arquivo APK falso para teste de conexao FTP" > ./android/app/build/outputs/apk/app-release-fake.apk
           
-          # 3. Salva os caminhos nas variaveis de ambiente ficticias para a Action ler
           echo "APK_DIR=./android/app/build/outputs/apk" >> "$GITHUB_ENV"
           echo "APK_FILENAME=app-release-fake.apk" >> "$GITHUB_ENV"
           echo "APP_VERSION=1.7.4_teste" >> "$GITHUB_ENV"
@@ -33,40 +29,23 @@ jobs:
           local-dir: ${{ env.APK_DIR }}/
           server-dir: /${{ env.APP_VERSION }}/
 
-      - name: Validar se o arquivo realmente subiu para o FTP
+      - name: Validar se o arquivo realmente subiu para o FTP (Via curl)
         run: |
-          # Instala o lftp no servidor do GitHub
-          sudo apt-get update && sudo apt-get install -y lftp
-
-          REMOTE_DIR="/${{ env.APP_VERSION }}/"
-          LOG_FILE="$(mktemp)"
-
-          echo "Buscando pelo arquivo ${{ env.APK_FILENAME }} no diretorio remoto: ${REMOTE_DIR}..."
-
-          set +e
-          # Conecta usando a mesma regra explicita FTPS que funcionou no seu Mac
-          lftp -d -u "${{ secrets.FTPUSER_EXTRASLAVEGO }},${{ secrets.FTPPASS_EXTRASLAVEGO }}" "ftps://${{ secrets.FTPHOST_EXTRASLAVEGO }}:21" -e "
-            set cmd:fail-exit yes
-            set net:timeout 20
-            set net:max-retries 1
-            set ftp:ssl-allow yes
-            set ftp:ssl-force yes
-            set ssl:verify-certificate no
-            cls -la ${REMOTE_DIR}
-            bye
-          " 2>&1 | tee "$LOG_FILE"
-          LFTP_STATUS=${PIPESTATUS}
-          set -e
-
-          if [ "$LFTP_STATUS" -ne 0 ]; then
-            echo "Erro critico: Nao foi possivel conectar ou listar o diretorio no FTP." >&2
-            exit "$LFTP_STATUS"
-          fi
-
-          # Procura o nome do arquivo fake dentro do retorno gerado pelo servidor
-          if grep -Fq "${{ env.APK_FILENAME }}" "$LOG_FILE"; then
-            echo "SUCESSO: O arquivo foi localizado com sucesso em: ${REMOTE_DIR}${{ env.APK_FILENAME }}"
+          # Monta a URL exata do arquivo usando as variáveis do GitHub
+          REMOTE_FILE_URL="ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}/${{ env.APP_VERSION }}/${{ env.APK_FILENAME }}"
+          
+          echo "Verificando a existência do arquivo em: $REMOTE_FILE_URL"
+          
+          # Executa o curl com o --ftp-ssl-reqd que você testou no seu Mac.
+          # O parâmetro --head (-I) serve apenas para checar se o arquivo existe sem baixar o conteúdo inteiro.
+          curl --ftp-ssl-reqd -k -s -I \
+            -u "${{ secrets.FTPUSER_EXTRASLAVEGO }}:${{ secrets.FTPPASS_EXTRASLAVEGO }}" \
+            "$REMOTE_FILE_URL"
+          
+          # Se o curl retornar um código diferente de 0, significa que o arquivo não existe ou a conexão falhou
+          if [ $? -eq 0 ]; then
+            echo "SUCESSO: O arquivo ${{ env.APK_FILENAME }} foi encontrado no FTP!"
           else
-            echo "ERRO CRITICO: O upload terminou, mas o arquivo ${{ env.APK_FILENAME }} nao foi encontrado em ${REMOTE_DIR}." >&2
+            echo "ERRO CRITICO: O arquivo ${{ env.APK_FILENAME }} NÃO foi localizado na pasta remoto." >&2
             exit 1
           fi
