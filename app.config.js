@@ -1,4 +1,5 @@
 const appJson = require('./app.json');
+const {resolveAssetsFolder, updateAssetPath} = require('./scripts/app-assets.cjs');
 
 const APP_NAME_PREFIX = 'On';
 const DEFAULT_APP_TYPE = 'MANAGER';
@@ -38,17 +39,6 @@ const normalizeIdentitySource = value =>
 const resolveDefaultDisplayName = appType =>
   DEFAULT_DISPLAY_NAMES[appType] || DEFAULT_DISPLAY_NAME;
 
-const updateAssetPath = (currentPath, assetsFolder) => {
-  if (typeof currentPath === 'string' && currentPath.startsWith('./src/assets/')) {
-    return currentPath.replace(
-      /^\.\/src\/assets\/([^/]+)\//,
-      `./src/assets/${assetsFolder}/`,
-    );
-  }
-
-  return currentPath;
-};
-
 module.exports = () => {
   const expo = clone(appJson.expo || {});
   const localEnv = resolveLocalEnv();
@@ -63,8 +53,7 @@ module.exports = () => {
   ).toUpperCase();
   const appLower = appType.toLowerCase();
   const assetsFolder = String(
-    process.env.ASSETS_VARIANT ||
-      (appType === 'ADMIN' ? 'manager' : appType),
+    resolveAssetsFolder(appType, process.env.ASSETS_VARIANT),
   ).toLowerCase();
   const displayName =
     localEnv.APP_DISPLAY_NAME ||
