@@ -1,7 +1,7 @@
 name: TESTE RAPIDO FTP SEM COMPILACAO
 
 on:
-  workflow_dispatch: # Permite que você ative o teste clicando em um botão no GitHub Actions
+  workflow_dispatch: # Permite ativar clicando no botão no GitHub Actions
 
 jobs:
   teste_envio:
@@ -18,6 +18,7 @@ jobs:
           
           # 3. Salva os caminhos nas variaveis de ambiente ficticias para a Action ler
           echo "APK_DIR=./android/app/build/outputs/apk" >> "$GITHUB_ENV"
+          echo "APK_FILENAME=app-release-fake.apk" >> "$GITHUB_ENV"
           echo "APP_VERSION=1.7.4_teste" >> "$GITHUB_ENV"
 
       - name: Deploy APK Falso para Extra FTP
@@ -31,3 +32,41 @@ jobs:
           security: loose
           local-dir: ${{ env.APK_DIR }}/
           server-dir: /${{ env.APP_VERSION }}/
+
+      - name: Validar se o arquivo realmente subiu para o FTP
+        run: |
+          # Instala o lftp no servidor do GitHub
+          sudo apt-get update && sudo apt-get install -y lftp
+
+          REMOTE_DIR="/${{ env.APP_VERSION }}/"
+          LOG_FILE="$(mktemp)"
+
+          echo "Buscando pelo arquivo ${{ env.APK_FILENAME }} no diretorio remoto: ${REMOTE_DIR}..."
+
+          set +e
+          # Conecta usando a mesma regra explicita FTPS que funcionou no seu Mac
+          lftp -d -u "${{ secrets.FTPUSER_EXTRASLAVEGO }},${{ secrets.FTPPASS_EXTRASLAVEGO }}" "ftps://${{ secrets.FTPHOST_EXTRASLAVEGO }}:21" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:ssl-allow yes
+            set ftp:ssl-force yes
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          " 2>&1 | tee "$LOG_FILE"
+          LFTP_STATUS=${PIPESTATUS}
+          set -e
+
+          if [ "$LFTP_STATUS" -ne 0 ]; then
+            echo "Erro critico: Nao foi possivel conectar ou listar o diretorio no FTP." >&2
+            exit "$LFTP_STATUS"
+          fi
+
+          # Procura o nome do arquivo fake dentro do retorno gerado pelo servidor
+          if grep -Fq "${{ env.APK_FILENAME }}" "$LOG_FILE"; then
+            echo "SUCESSO: O arquivo foi localizado com sucesso em: ${REMOTE_DIR}${{ env.APK_FILENAME }}"
+          else
+            echo "ERRO CRITICO: O upload terminou, mas o arquivo ${{ env.APK_FILENAME }} nao foi encontrado em ${REMOTE_DIR}." >&2
+            exit 1
+          fi
