@@ -48,14 +48,13 @@ for (const group of groups) {
   }
 }
 
-const wikiPointer = fs.readFileSync(path.join(projectRoot, 'docs/wiki.md'), 'utf8');
-if (wikiPointer !== 'https://github.com/ControleOnline/app-community/wiki\n') {
-  throw new Error('docs/wiki.md must contain only the full app-community wiki URL');
+const gitmodules = fs.readFileSync(path.join(projectRoot, '.gitmodules'), 'utf8');
+if (!/path\s*=\s*docs\/wiki/.test(gitmodules)) {
+  throw new Error('docs/wiki must be configured as the app-community wiki submodule');
 }
 
-const gitmodules = fs.readFileSync(path.join(projectRoot, '.gitmodules'), 'utf8');
-if (/path\s*=\s*docs\/wiki/.test(gitmodules)) {
-  throw new Error('docs/wiki must not be configured as a submodule');
+if (!/url\s*=\s*https:\/\/github\.com\/ControleOnline\/app-community\.wiki\.git/.test(gitmodules)) {
+  throw new Error('docs/wiki must point to https://github.com/ControleOnline/app-community.wiki.git');
 }
 
 console.log(`Validated ${flows.length} browser smoke flows.`);
