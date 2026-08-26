@@ -62,6 +62,7 @@ module.exports = [
     testPaths: [
       'modules/controleonline/ui-products/src/tests/browser/manager',
       'modules/controleonline/ui-manager/src/tests/browser/manager',
+      'modules/controleonline/ui-ppc/src/tests/browser/manager',
     ],
   }),
   flow({
