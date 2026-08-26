@@ -1,0 +1,33 @@
+name: TESTE RAPIDO FTP SEM COMPILACAO
+
+on:
+  workflow_dispatch: # Permite que você ative o teste clicando em um botão no GitHub Actions
+
+jobs:
+  teste_envio:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Criar APK falso e Pasta Temporaria
+        run: |
+          # 1. Cria a pasta simulando a rota de saída do Gradle
+          mkdir -p ./android/app/build/outputs/apk
+          
+          # 2. Cria um arquivo de texto com extensão .apk dentro dela
+          echo "Este e um arquivo APK falso para teste de conexao FTP" > ./android/app/build/outputs/apk/app-release-fake.apk
+          
+          # 3. Salva os caminhos nas variaveis de ambiente ficticias para a Action ler
+          echo "APK_DIR=./android/app/build/outputs/apk" >> "$GITHUB_ENV"
+          echo "APP_VERSION=1.7.4_teste" >> "$GITHUB_ENV"
+
+      - name: Deploy APK Falso para Extra FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_EXTRASLAVEGO }}
+          username: ${{ secrets.FTPUSER_EXTRASLAVEGO }}
+          password: ${{ secrets.FTPPASS_EXTRASLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ${{ env.APK_DIR }}/
+          server-dir: /${{ env.APP_VERSION }}/
