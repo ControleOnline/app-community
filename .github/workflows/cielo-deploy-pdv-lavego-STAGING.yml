@@ -95,15 +95,23 @@ jobs:
             echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
           } > ./config/android/env.properties
 
-      - name: Update versionCode in app.json
+      - name: Update version and versionCode in app.json (Positional)
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
+            
+            // Separa a versão '1.7.4' em [1, 7, 4]
+            const [major, minor, patch] = '$VERSION'.split('.').map(Number);
+            
+            // Calcula o código posicional
+            const calculatedVersionCode = (major * 10000) + (minor * 100) + patch;
+            
+            // 🌟 ATUALIZA OS DOIS CAMPOS AGORA:
+            app.expo.version = '$VERSION'; // Injeta '1.7.4' para visualização do lojista
+            app.expo.android.versionCode = calculatedVersionCode; // Injeta 10704 para validação da Cielo
+            
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "
 
@@ -142,11 +150,17 @@ jobs:
           echo "APK localizado: $APK_FILENAME"
 
           
-      - name: Extract App Version
+      - name: Extract App Version and VersionCode
         run: |
-          VERSION=$(node -p "require('./app.json').expo.version")
-          echo "App version: $VERSION"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # 1. Extrai a versão de exibição do app.json
+          APP_VERSION=$(node -p "require('./app.json').expo.version")
+          echo "versão visível (Cielo Store): $APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+
+          # 2. Extrai o versionCode numérico do app.json
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          echo "versionCode interno (Controle Android): $VERSION_CODE"
+          echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
 
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
