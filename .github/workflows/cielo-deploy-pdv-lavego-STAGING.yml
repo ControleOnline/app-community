@@ -78,23 +78,6 @@ jobs:
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "           
 
-      - name: Prebuild
-        run: npx expo prebuild --clean
-
-      - name: Validate vector icon fonts hook
-        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
-
-      - name: Create Android Signing Files
-        run: |
-          mkdir -p ./config/android
-          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
-          {
-            echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore"
-            echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online"
-            echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-            echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          } > ./config/android/env.properties
-
       - name: Update version and versionCode in app.json (Positional)
         run: |
           VERSION=$(node -p "require('./package.json').version")
@@ -114,6 +97,35 @@ jobs:
             
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "
+
+      - name: Extract App Version and VersionCode
+        run: |
+          # 1. Extrai a versão de exibição do app.json
+          APP_VERSION=$(node -p "require('./app.json').expo.version")
+          echo "versão visível (Cielo Store): $APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+
+          # 2. Extrai o versionCode numérico do app.json
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          echo "versionCode interno (Controle Android): $VERSION_CODE"
+          echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          } > ./config/android/env.properties
 
       - name: Build Android APK
         run: |
@@ -149,19 +161,6 @@ jobs:
           ls -lah "$APK_DIR"
           echo "APK localizado: $APK_FILENAME"
 
-          
-      - name: Extract App Version and VersionCode
-        run: |
-          # 1. Extrai a versão de exibição do app.json
-          APP_VERSION=$(node -p "require('./app.json').expo.version")
-          echo "versão visível (Cielo Store): $APP_VERSION"
-          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
-
-          # 2. Extrai o versionCode numérico do app.json
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          echo "versionCode interno (Controle Android): $VERSION_CODE"
-          echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
-
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
         with:
@@ -169,7 +168,7 @@ jobs:
           user: ${{ secrets.ADMIN_USER }}
           password: ${{ secrets.ADMIN_PASS }}
           localDir: ${{ env.APK_DIR }}
-          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          remoteDir: "public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
       - name: Verify uploaded APK on FTP
@@ -177,7 +176,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-          REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
+          # 🌟 CORRIGIDO: Agora usando o mapeamento de variáveis correto do GitHub
+          REMOTE_DIR="public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           LOG_FILE="$(mktemp)"
 
           set +e
@@ -192,7 +192,7 @@ jobs:
             cls -la ${REMOTE_DIR}
             bye
           " 2>&1 | tee "$LOG_FILE"
-          LFTP_STATUS=${PIPESTATUS[0]}
+          LFTP_STATUS=${PIPESTATUS}
           set -e
 
           if [ "$LFTP_STATUS" -ne 0 ]; then
@@ -200,9 +200,21 @@ jobs:
             exit "$LFTP_STATUS"
           fi
 
-          if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
-            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${APK_FILENAME}"
+          if grep -Fq "${{ env.APK_FILENAME }}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${{ env.APK_FILENAME }}"
           else
-            echo "O upload terminou sem erro, mas o arquivo ${APK_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
+            echo "O upload terminou sem erro, mas o arquivo ${{ env.APK_FILENAME }} não apareceu na listagem de ${REMOTE_DIR}." >&2
             exit 1
           fi
+
+      - name: Deploy APK to Extra FTP (Explicit FTPS)
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_EXTRASLAVEGO }}
+          username: ${{ secrets.FTPUSER_EXTRASLAVEGO }}
+          password: ${{ secrets.FTPPASS_EXTRASLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ${{ env.APK_DIR }}/
+          server-dir: /${{ env.APP_VERSION }}/
