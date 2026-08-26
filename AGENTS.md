@@ -18,6 +18,14 @@
 | Wiki do app | https://github.com/ControleOnline/app-community/wiki |
 | PushTrigger (deploys) | `docs/pushtrigger.md` |
 
+### Qualidade e smoke tests
+
+| Página | O que documenta |
+| --- | --- |
+| [Smoke Test Flows](https://github.com/ControleOnline/app-community/wiki/Smoke-Test-Flows) | Catálogo canônico de fluxos de negócio (`fluxo: <id>`), gate de evidência visual completa (prints por etapa) e regras de uso para QA/Developer |
+
+Espelho da skill: [agents-mcp smoke-test-flows.md](https://github.com/ControleOnline/agents-mcp/blob/master/agents/skills/shared/quality/smoke-test-flows.md).
+
 ### Ambiente de desenvolvimento e CI
 
 | Página | O que documenta |
