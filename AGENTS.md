@@ -25,6 +25,12 @@
 | [CI e runtime Node](https://github.com/ControleOnline/app-community/wiki/ci-node-runtime) | Node 20; Scrutinizer e workflows |
 | [Production deploy gate](https://github.com/ControleOnline/app-community/wiki/production-deploy-gate) | Job 1.5 · Require staging checks (exact / ancestor / fallback) |
 
+### Qualidade e smoke tests
+
+| Página | O que documenta |
+| --- | --- |
+| [Smoke Test Flows](https://github.com/ControleOnline/app-community/wiki/Smoke-Test-Flows) | Catálogo canônico `fluxo: <id>`, gate de evidência visual completa (prints por etapa) |
+
 ### Automações de documentação
 
 | Página | O que documenta |
