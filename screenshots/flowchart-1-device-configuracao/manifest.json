@@ -1,6 +1,9 @@
 {
-  "flowchartIds": [1],
   "fluxo": "device-configuracao",
+  "flowchartIds": [
+    1
+  ],
+  "missingPrints": [],
   "steps": [
     "login",
     "lista-devices",
@@ -17,9 +20,7 @@
     "print-salvo",
     "app-pos-aberto"
   ],
-  "missingPrints": [],
-  "generatedAt": "2026-08-27T08:40:00.000Z",
-  "evidenceDir": "screenshots/flowchart-1-device-configuracao",
-  "issue": "ControleOnline/app-community#602",
-  "notes": "Harness isolado: helpers com installAdminRuntimeMock + prints persistidos. Login real conferido em admin.controleonline.com (APP_TYPE=ADMIN, v1.8.1). 2o teste anota fluxo/flowchartIds (PPC/CHECKOUT)."
+  "generatedAt": "2026-08-27T13:50:53.773Z",
+  "origin": "https://admin.controleonline.com",
+  "notes": "Live UI admin.controleonline.com. Session via Drive api-token (id/people/api_key/active). Sem harness."
 }
