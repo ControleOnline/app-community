@@ -23,3 +23,320 @@ on:
 concurrency:
   group: deploy-${{ github.event.inputs.environment || github.ref_name }}
   cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  configure:
+    name: "1 · Configure"
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.set.outputs.env }}
+      api: ${{ steps.set.outputs.api }}
+      socket: ${{ steps.set.outputs.socket }}
+      domain: ${{ steps.set.outputs.domain }}
+      manager_domain: ${{ steps.set.outputs.manager_domain }}
+      ftp_profile: ${{ steps.set.outputs.ftp_profile }}
+      publish_native: ${{ steps.set.outputs.publish_native }}
+      web_app_type: ${{ steps.set.outputs.web_app_type }}
+      web_matrix: ${{ steps.set.outputs.web_matrix }}
+    steps:
+      - id: set
+        run: |
+          set -e
+          ENV="${{ github.event.inputs.environment || github.ref_name }}"
+          case "$ENV" in
+            dev)
+              API=https://d.controleonline.com
+              SOCK=wss://d.controleonline.com
+              DOMAIN=https://dev.controleonline.com
+              MANAGER_DOMAIN=https://dev.controleonline.com
+              FTP=dev
+              NATIVE=false
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://dev.controleonline.com"}]}'
+              ;;
+            staging)
+              API=https://s.controleonline.com
+              SOCK=wss://s.controleonline.com
+              DOMAIN=https://staging.controleonline.com
+              MANAGER_DOMAIN=https://staging.controleonline.com
+              FTP=staging
+              NATIVE=false
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://staging.controleonline.com"}]}'
+              ;;
+            master)
+              API=https://api.controleonline.com
+              SOCK=wss://api.controleonline.com
+              DOMAIN=https://manager.controleonline.com
+              MANAGER_DOMAIN=https://manager.controleonline.com
+              FTP=production
+              NATIVE=true
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
+              ;;
+            *)
+              echo "Ambiente inválido: $ENV (use dev|staging|master)"
+              exit 1
+              ;;
+          esac
+          {
+            echo "env=$ENV"
+            echo "api=$API"
+            echo "socket=$SOCK"
+            echo "domain=$DOMAIN"
+            echo "manager_domain=$MANAGER_DOMAIN"
+            echo "ftp_profile=$FTP"
+            echo "publish_native=$NATIVE"
+            echo "web_app_type=MANAGER"
+            echo "web_matrix=$WEB_MATRIX"
+          } >> "$GITHUB_OUTPUT"
+          echo "env=$ENV native=$NATIVE api=$API"
+
+  production-gate:
+    name: "1.5 · Require staging checks"
+    needs: configure
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful staging checks before production
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_ENV: ${{ needs.configure.outputs.env }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENV" != "master" ]; then
+            echo "Production gate skipped for $TARGET_ENV."
+            exit 0
+          fi
+          mapfile -t CHECKS < <(
+            gh run list \
+              --repo "$REPO" \
+              --workflow pull-request-checks.yml \
+              --branch staging \
+              --limit 50 \
+              --json conclusion,headSha,status,url \
+              --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
+          )
+          ALLOW_URL=""
+          ALLOW_REASON=""
+          for row in "${CHECKS[@]:-}"; do
+            [ -z "$row" ] && continue
+            CHECK_SHA="${row%%$'\t'*}"
+            CHECK_URL="${row#*$'\t'}"
+            if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="exact SHA match ($CHECK_SHA)"
+              break
+            fi
+            STATUS="$(
+              gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
+            )"
+            if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="staging check $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
+              break
+            fi
+          done
+          if [ -z "$ALLOW_URL" ]; then
+            STAGING_CHECK_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow pull-request-checks.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            STAGING_DEPLOY_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow deploy.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            if [ -n "$STAGING_CHECK_URL" ] && [ -n "$STAGING_DEPLOY_URL" ]; then
+              ALLOW_URL="$STAGING_CHECK_URL"
+              ALLOW_REASON="fallback: green staging PR Checks + green staging Deploy (TARGET_SHA=$TARGET_SHA diverged from staging tips)"
+              echo "WARNING: $ALLOW_REASON" >&2
+              echo "staging PR Checks: $STAGING_CHECK_URL" >&2
+              echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
+            fi
+          fi
+          if [ -z "$ALLOW_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
+            echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
+            exit 1
+          fi
+          echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
+
+  web:
+    name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
+    needs: [configure, production-gate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.configure.outputs.web_matrix) }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: FTP credentials (env × product)
+        run: |
+          set -e
+          ENV_PROFILE="${{ needs.configure.outputs.ftp_profile }}"
+          PRODUCT="${{ matrix.ftp_product }}"
+          if [ "$ENV_PROFILE" = "production" ]; then
+            case "$PRODUCT" in
+              manager)
+                echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
+                ;;
+              shop)
+                echo "FTP_HOST=${{ secrets.SHOP_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.SHOP_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.SHOP_PASS }}" >> "$GITHUB_ENV"
+                ;;
+              admin)
+                echo "FTP_HOST=${{ secrets.ADMIN_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.ADMIN_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.ADMIN_PASS }}" >> "$GITHUB_ENV"
+                ;;
+              mkt)
+                echo "FTP_HOST=${{ secrets.MKT_HOST }}" >> "$GITHUB_ENV"
+                echo "FTP_USER=${{ secrets.MKT_USER }}" >> "$GITHUB_ENV"
+                echo "FTP_PASS=${{ secrets.MKT_PASS }}" >> "$GITHUB_ENV"
+                ;;
+            esac
+          elif [ "$ENV_PROFILE" = "staging" ]; then
+            echo "FTP_HOST=${{ secrets.STAGING_HOST }}" >> "$GITHUB_ENV"
+            echo "FTP_USER=${{ secrets.STAGING_USER }}" >> "$GITHUB_ENV"
+            echo "FTP_PASS=${{ secrets.STAGING_PASS }}" >> "$GITHUB_ENV"
+          else
+            echo "FTP_HOST=${{ secrets.DEV_HOST }}" >> "$GITHUB_ENV"
+            echo "FTP_USER=${{ secrets.DEV_USER }}" >> "$GITHUB_ENV"
+            echo "FTP_PASS=${{ secrets.DEV_PASS }}" >> "$GITHUB_ENV"
+          fi
+      - uses: ./.github/actions/web-export-deploy
+        with:
+          app_type: ${{ matrix.app_type }}
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          socket: ${{ needs.configure.outputs.socket }}
+          domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
+          remote_dir: "public_html/"
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+  android:
+    name: "3 · Android ${{ matrix.app_type }}"
+    needs: [configure, production-gate]
+    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_type: CHECKOUT
+            display_name: Checkout
+            app_domain: https://checkout.controleonline.com
+            track: internal
+            release_status: draft
+          - app_type: CRM
+            display_name: CRM
+            app_domain: https://crm.controleonline.com
+            track: internal
+            release_status: completed
+          - app_type: DELIVERY
+            display_name: Delivery
+            app_domain: https://delivery.controleonline.com
+            track: internal
+            release_status: draft
+          - app_type: MANAGER
+            display_name: Gestor
+            app_domain: https://manager.controleonline.com
+            track: internal
+            release_status: completed
+          - app_type: MENU
+            display_name: Menu
+            app_domain: https://menu.controleonline.com
+            track: internal
+            release_status: completed
+            changes_not_sent_for_review: "true"
+            publish_play: "false"
+          - app_type: POS
+            display_name: PDV
+            app_domain: https://pos.controleonline.com
+            track: internal
+            release_status: completed
+          - app_type: PPC
+            display_name: PCP
+            app_domain: https://ppc.controleonline.com
+            track: internal
+            release_status: completed
+          - app_type: SERVICE
+            display_name: Service
+            app_domain: https://service.controleonline.com
+            track: internal
+            release_status: completed
+          - app_type: MKT
+            display_name: Marketing
+            app_domain: https://mkt.controleonline.com
+            track: internal
+            release_status: draft
+            publish_play: "false"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/android-build
+        with:
+          app_type: ${{ matrix.app_type }}
+          display_name: ${{ matrix.display_name }}
+          api_entrypoint: ${{ needs.configure.outputs.api }}
+          domain: ${{ matrix.app_domain }}
+          manager_app: ${{ needs.configure.outputs.manager_domain }}
+          socket: ${{ needs.configure.outputs.socket }}
+          build_aab: "true"
+          build_apk: "true"
+          publish_play: ${{ matrix.publish_play || 'true' }}
+          publish_github: "true"
+          bump_version_code_from_package: "true"
+          play_track: ${{ matrix.track }}
+          play_status: ${{ matrix.release_status }}
+          play_changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review || 'false' }}
+        env:
+          CERT: ${{ secrets.CERT }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_SERVICE_ACCOUNT_JSON: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+          GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+  lg-webos:
+    name: "4 · LG webOS"
+    needs: [configure, production-gate]
+    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/lg-webos-build
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
