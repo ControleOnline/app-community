@@ -1,0 +1,28 @@
+# Dispara o pipeline Deploy (deploy.yml) na segunda 08:00 America/Sao_Paulo.
+# Push em master NAO deve publicar producao — ver on.push de deploy.yml (dev/staging only).
+name: Deploy Controle Online (schedule)
+
+on:
+  schedule:
+    # Segunda 08:00 America/Sao_Paulo (UTC-3, sem DST) = 11:00 UTC
+    - cron: '0 11 * * 1'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch-production:
+    name: Dispatch deploy.yml environment=master
+    runs-on: ubuntu-latest
+    steps:
+      - name: workflow_dispatch deploy.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml \
+            --repo "${{ github.repository }}" \
+            --ref master \
+            -f environment=master
