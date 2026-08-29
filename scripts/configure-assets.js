@@ -6,7 +6,6 @@ const appJsonPath = path.join(__dirname, '../app.json');
 const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
 
 const appType = (process.argv[2] || process.env.APP_TYPE || 'MANAGER').toUpperCase();
-const appLower = appType.toLowerCase();
 const assetsFolder = resolveAssetsFolder(appType, process.env.ASSETS_VARIANT);
 
 const assetsBasePath = `./src/assets/${assetsFolder}/`;
