@@ -3,11 +3,15 @@
 # 1) configure → ambiente
 # 2) web (dev / staging / master)
 # 3) android AAB+APK + lg-webOS (somente master — sem staging)
+# Produção NÃO dispara no push de master — só cron segunda 08:00 America/Sao_Paulo + dispatch.
 name: Deploy
 
 on:
   push:
-    branches: [dev, staging, master]
+    branches: [dev, staging]
+  schedule:
+    # Segunda 08:00 America/Sao_Paulo (UTC-3, sem DST) = 11:00 UTC
+    - cron: '0 11 * * 1'
   workflow_dispatch:
     inputs:
       environment:
@@ -25,7 +29,6 @@ permissions:
   actions: write
 
 jobs:
-  # ─── 1. Ambiente ───────────────────────────────────────────────────────────
   configure:
     name: "1 · Configure"
     runs-on: ubuntu-latest
@@ -71,7 +74,6 @@ jobs:
               FTP=production
               NATIVE=true
               WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
-
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -109,14 +111,6 @@ jobs:
             echo "Production gate skipped for $TARGET_ENV."
             exit 0
           fi
-
-          # Accept successful Pull Request Checks on staging when:
-          # 1) headSha == TARGET_SHA (fast-forward promote), or
-          # 2) headSha is an ancestor of TARGET_SHA (staging tip + post-promote commits), or
-          # 3) fallback: latest successful staging PR Checks + successful staging Deploy
-          #    (handles residual divergence after parallel version bumps).
-          # Exact equality alone permanently blocks production after any master-only commit.
-
           mapfile -t CHECKS < <(
             gh run list \
               --repo "$REPO" \
@@ -126,20 +120,17 @@ jobs:
               --json conclusion,headSha,status,url \
               --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
           )
-
           ALLOW_URL=""
           ALLOW_REASON=""
-
           for row in "${CHECKS[@]:-}"; do
             [ -z "$row" ] && continue
-            CHECK_SHA="${row%%$'	'*}"
-            CHECK_URL="${row#*$'	'}"
+            CHECK_SHA="${row%%$'\t'*}"
+            CHECK_URL="${row#*$'\t'}"
             if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
               ALLOW_URL="$CHECK_URL"
               ALLOW_REASON="exact SHA match ($CHECK_SHA)"
               break
             fi
-            # Ancestor check via compare API: base=CHECK_SHA, head=TARGET_SHA
             STATUS="$(
               gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
             )"
@@ -149,7 +140,6 @@ jobs:
               break
             fi
           done
-
           if [ -z "$ALLOW_URL" ]; then
             STAGING_CHECK_URL="$(
               gh run list \
@@ -179,17 +169,13 @@ jobs:
               echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
             fi
           fi
-
           if [ -z "$ALLOW_URL" ]; then
             echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
             echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
             exit 1
           fi
-
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
-  # ─── 2. Web
-  # ─── 2. Web: pre-production publica só MANAGER; master publica todos ──────
   web:
     name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
     needs: [configure, production-gate]
@@ -200,14 +186,11 @@ jobs:
       matrix: ${{ fromJSON(needs.configure.outputs.web_matrix) }}
     steps:
       - uses: actions/checkout@v5
-
       - name: FTP credentials (env × product)
         run: |
           set -e
           ENV_PROFILE="${{ needs.configure.outputs.ftp_profile }}"
           PRODUCT="${{ matrix.ftp_product }}"
-          # Production: cada app_type tem host próprio.
-          # Dev/staging: cada ambiente usa seus próprios secrets.
           if [ "$ENV_PROFILE" = "production" ]; then
             case "$PRODUCT" in
               manager)
@@ -236,22 +219,17 @@ jobs:
             echo "FTP_USER=${{ secrets.STAGING_USER }}" >> "$GITHUB_ENV"
             echo "FTP_PASS=${{ secrets.STAGING_PASS }}" >> "$GITHUB_ENV"
           else
-            # dev
             echo "FTP_HOST=${{ secrets.DEV_HOST }}" >> "$GITHUB_ENV"
             echo "FTP_USER=${{ secrets.DEV_USER }}" >> "$GITHUB_ENV"
             echo "FTP_PASS=${{ secrets.DEV_PASS }}" >> "$GITHUB_ENV"
           fi
-          if [ -z "${FTP_HOST:-}" ] && [ -z "$(grep FTP_HOST "$GITHUB_ENV" | cut -d= -f2-)" ]; then
-            echo "Missing FTP secrets for product=$PRODUCT env=$ENV_PROFILE"
-          fi
-
       - uses: ./.github/actions/web-export-deploy
         with:
           app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
-          remote_dir: "public_html/"  # canonical vhost docroot (relative to FTP home; NEVER ~/public_html/)
+          remote_dir: "public_html/"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
@@ -260,7 +238,6 @@ jobs:
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
 
-  # ─── 3. Android AAB+APK (somente master) ───────────────────────────────────
   android:
     name: "3 · Android ${{ matrix.app_type }}"
     needs: [configure, production-gate]
@@ -320,7 +297,6 @@ jobs:
             publish_play: "false"
     steps:
       - uses: actions/checkout@v5
-
       - uses: ./.github/actions/android-build
         with:
           app_type: ${{ matrix.app_type }}
@@ -349,7 +325,6 @@ jobs:
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
 
-  # ─── 4. LG webOS (somente master) ──────────────────────────────────────────
   lg-webos:
     name: "4 · LG webOS"
     needs: [configure, production-gate]
