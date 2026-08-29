@@ -37,6 +37,7 @@ import delivery_courier_schedules from '@controleonline/ui-logistic/src/store/de
 import delivery_courier_company_presences from '@controleonline/ui-logistic/src/store/delivery_courier_company_presences';
 import delivery_tax_groups from '@controleonline/ui-logistic/src/store/delivery_tax_groups';
 import invoice_taxes from '@controleonline/ui-logistic/src/store/invoice_taxes';
+import invoice_taxes_emit from '@controleonline/ui-logistic/src/store/invoice_taxes_emit';
 import invoice_tasks_processing from '@controleonline/ui-logistic/src/store/invoice_tasks_processing';
 import invoice_tasks_emitted from '@controleonline/ui-logistic/src/store/invoice_tasks_emitted';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
@@ -120,6 +121,7 @@ export default {
   inventories,
   invoice,
   invoice_taxes,
+  invoice_taxes_emit,
   invoice_tasks_processing,
   invoice_tasks_emitted,
   imports,
