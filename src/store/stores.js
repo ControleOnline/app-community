@@ -40,7 +40,7 @@ import invoice_taxes from '@controleonline/ui-logistic/src/store/invoice_taxes';
 import invoice_taxes_emit from '@controleonline/ui-logistic/src/store/invoice_taxes_emit';
 import invoice_tasks_processing from '@controleonline/ui-logistic/src/store/invoice_tasks_processing';
 import invoice_tasks_emitted from '@controleonline/ui-logistic/src/store/invoice_tasks_emitted';
-import integration_cte from '@controleonline/ui-logistic/src/store/integration_cte';
+import integration from '@controleonline/ui-common/src/store/integration';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import employee_profiles from '@controleonline/ui-employee/src/store/employee_profiles';
 import attendance_reports from '@controleonline/ui-employee/src/store/attendance_reports';
@@ -125,7 +125,7 @@ export default {
   invoice_taxes_emit,
   invoice_tasks_processing,
   invoice_tasks_emitted,
-  integration_cte,
+  integration,
   imports,
   models,
   order_invoices,
