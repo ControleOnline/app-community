@@ -23,6 +23,7 @@
 | Página | O que documenta |
 | --- | --- |
 | [Smoke Test Flows](https://github.com/ControleOnline/app-community/wiki/Smoke-Test-Flows) | Catálogo canônico de fluxos de negócio (`fluxo: <id>`), gate de evidência visual completa (prints por etapa) e regras de uso para QA/Developer |
+| [Smoke helpers — device-configuracao](https://github.com/ControleOnline/app-community/wiki/Smoke-Helpers-Device-Configuracao) | Login ADMIN + DeviceConfig PDV/DISPLAY/PRINT + switchApp; `fluxo: device-configuracao`, flowchartIds [1] |
 
 Espelho da skill: [agents-mcp smoke-test-flows.md](https://github.com/ControleOnline/agents-mcp/blob/master/agents/skills/shared/quality/smoke-test-flows.md).
 
