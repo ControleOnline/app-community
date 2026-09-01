@@ -64,7 +64,7 @@ jobs:
               MANAGER_DOMAIN=https://staging.controleonline.com
               FTP=staging
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://staging.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://staging.controleonline.com"}]}'
               ;;
             master)
               API=https://api.controleonline.com
