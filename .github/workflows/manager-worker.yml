@@ -142,3 +142,16 @@ jobs:
           gh_token: ${{ secrets.GH_TOKEN }}
           issue_number: ${{ needs.manager.outputs.issue_number }}
           base_branch: master
+
+  master-technical-documenter:
+    name: Technical Documenter (master gap via Manager)
+    needs: [manager, master-gates]
+    if: needs.master-gates.outputs.need_docs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/workers/technical-documenter
+        with:
+          gh_token: ${{ secrets.GH_TOKEN }}
+          issue_number: ${{ needs.manager.outputs.issue_number }}
+          base_branch: master
