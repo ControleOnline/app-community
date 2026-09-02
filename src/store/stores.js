@@ -18,6 +18,7 @@ import display_queues from '@controleonline/ui-ppc/src/store/modules/display_que
 import displays from '@controleonline/ui-ppc/src/store/modules/displays';
 import documents from '@controleonline/ui-people/src/store/documents';
 import documentsTypes from '@controleonline/ui-people/src/store/documents/documentsTypes';
+import document_file from '@controleonline/ui-people/src/store/documents/document_file';
 import emails from '@controleonline/ui-people/src/store/emails';
 import expanded_order_products from '@controleonline/ui-orders/src/store/expanded_order_products';
 import file from '@controleonline/ui-common/src/store/file';
@@ -49,7 +50,6 @@ import people_export_jobs from '@controleonline/ui-employee/src/store/people_exp
 import people_absences from '@controleonline/ui-employee/src/store/people_absences';
 import people_schedules from '@controleonline/ui-employee/src/store/people_schedules';
 import people from '@controleonline/ui-people/src/store/people';
-import people_category from '@controleonline/ui-people/src/store/people_category';
 import people_link from '@controleonline/ui-people/src/store/people_link';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
@@ -113,6 +113,7 @@ export default {
   entity_log,
   display_queues,
   displays,
+  document_file,
   documents,
   documentsTypes,
   emails,
@@ -143,7 +144,6 @@ export default {
   attendance_reports,
   paymentType,
   people,
-  people_category,
   people_access_events,
   people_absences,
   people_export_jobs,
