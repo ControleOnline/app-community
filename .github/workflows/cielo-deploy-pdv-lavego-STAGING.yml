@@ -89,7 +89,7 @@ jobs:
             const [major, minor, patch] = '$VERSION'.split('.').map(Number);
             
             // Calcula o código posicional
-            const calculatedVersionCode = (major * 10000) + (minor * 100) + patch;
+            const calculatedVersionCode = (major * 100000) + (minor * 1000) + patch;
             
             // 🌟 ATUALIZA OS DOIS CAMPOS AGORA:
             app.expo.version = '$VERSION'; // Injeta '1.7.4' para visualização do lojista
