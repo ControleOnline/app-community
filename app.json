@@ -51,7 +51,7 @@
       }
     },
     "web": {
-      "favicon": "./src/assets/logo.png"
+      "favicon": "./src/assets/favicon.png"
     },
     "_androidAppOptimizationNote": "R8/minify e shrinkResources foram ativados no bloco do plugin expo-build-properties abaixo.",
     "plugins": [

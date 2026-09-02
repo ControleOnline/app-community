@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPO_IDENTITY_SOURCE: app-json
+      ASSETS_VARIANT: manager_lavego   # ← pasta do favicon/logo Lave-Go Manager
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -42,6 +43,10 @@ jobs:
         run: npm install --legacy-peer-deps
       - name: Fix Expo Dependencies
         run: npx expo install --fix
+      - name: Configure assets (manager_lavego)
+        run: node scripts/configure-assets.js MANAGER
+        # usa ASSETS_VARIANT → reescreve expo.web.favicon (e icon/splash) para
+        # ./src/assets/manager_lavego/favicon.png se o arquivo existir
       - name: Build
         run: npx expo export --platform web
       - name: Deploy via FTP
