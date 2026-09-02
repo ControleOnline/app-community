@@ -121,6 +121,16 @@ module.exports = [
     ],
   }),
   flow({
+    id: 'manager-general-settings-maps',
+    name: 'General Settings / Mapas',
+    owner: 'ui-crm',
+    appTypes: ['MANAGER'],
+    steps: ['abrir configurador geral', 'aba Mapas', 'tela principal mapa vs vitrine', 'localizador de franquias', 'validar ausência aba Shop'],
+    testPaths: [
+      'modules/controleonline/ui-crm/src/tests/browser/manager',
+    ],
+  }),
+  flow({
     id: 'outros',
     name: 'Outros',
     owner: 'app-community',
