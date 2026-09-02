@@ -110,6 +110,11 @@ jobs:
           echo "versionCode interno (Controle Android): $VERSION_CODE"
           echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
 
+      - name: Copy pos_lavego assets to default assets folder
+        run: |
+          cp -r src/assets/pos_lavego/* src/assets/ 2>/dev/null || true
+          echo "Assets pos_lavego copiados para src/assets/"
+
       - name: Prebuild
         run: npx expo prebuild --clean
 
