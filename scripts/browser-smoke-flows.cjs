@@ -131,6 +131,22 @@ module.exports = [
     ],
   }),
   flow({
+    id: 'manager-my-companies-create',
+    name: 'Minhas empresas — criar PJ vinculada à pessoa autenticada',
+    owner: 'ui-people',
+    appTypes: ['MANAGER'],
+    steps: [
+      'abrir /my-companies-page',
+      'acionar +',
+      'modal PJ sem contato PF',
+      'preencher empresa',
+      'validar listagem',
+    ],
+    testPaths: [
+      'modules/controleonline/ui-people/src/tests/browser/manager',
+    ],
+  }),
+  flow({
     id: 'outros',
     name: 'Outros',
     owner: 'app-community',
