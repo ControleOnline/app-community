@@ -9,6 +9,7 @@ import category_file from '@controleonline/ui-common/src/store/categories/catego
 import city from '@controleonline/ui-common/src/store/address/city';
 import configs from '@controleonline/ui-common/src/store/configs';
 import imports from '@controleonline/ui-common/src/store/imports';
+import integration from '@controleonline/ui-common/src/store/integration';
 import contract from '@controleonline/ui-contracts/src/store/contract';
 import contract_peoples from '@controleonline/ui-contracts/src/store/contract/contract_people';
 import device from '@controleonline/ui-common/src/store/device';
@@ -130,6 +131,7 @@ export default {
   fiscal_orders_pending,
   fiscal_auxiliary,
   imports,
+  integration,
   models,
   order_invoices,
   order_cancellation_reasons,
