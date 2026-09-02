@@ -41,6 +41,7 @@ import invoice_taxes_emit from '@controleonline/ui-logistic/src/store/invoice_ta
 import invoice_tasks_processing from '@controleonline/ui-logistic/src/store/invoice_tasks_processing';
 import invoice_tasks_emitted from '@controleonline/ui-logistic/src/store/invoice_tasks_emitted';
 import fiscal_orders_pending from '@controleonline/ui-logistic/src/store/fiscal_orders_pending';
+import fiscal_auxiliary from '@controleonline/ui-logistic/src/store/fiscal_auxiliary';
 import integration from '@controleonline/ui-common/src/store/integration';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import employee_profiles from '@controleonline/ui-employee/src/store/employee_profiles';
@@ -127,6 +128,7 @@ export default {
   invoice_tasks_processing,
   invoice_tasks_emitted,
   fiscal_orders_pending,
+  fiscal_auxiliary,
   integration,
   imports,
   models,
