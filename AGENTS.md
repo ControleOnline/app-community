@@ -34,6 +34,7 @@ Espelho da skill: [agents-mcp smoke-test-flows.md](https://github.com/ControleOn
 | --- | --- |
 | [CI e runtime Node](https://github.com/ControleOnline/app-community/wiki/ci-node-runtime) | Node 20; Scrutinizer e workflows |
 | [Production deploy gate](https://github.com/ControleOnline/app-community/wiki/production-deploy-gate) | Job 1.5 · Require staging checks (exact / ancestor / fallback) |
+| [Staging web — APP_TYPE ADMIN](https://github.com/ControleOnline/app-community/wiki/staging-web-app-type-admin) | Homologação `staging.controleonline.com` publica ADMIN; contrato deploy.yml + teste (#717) |
 
 ### Automações de documentação
 
