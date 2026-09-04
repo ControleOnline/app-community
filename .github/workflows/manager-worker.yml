@@ -1,8 +1,15 @@
 name: Manager Worker
 
 on:
+<<<<<<< HEAD
   push:
     branches: [master, dev, staging]
+=======
+  workflow_dispatch:
+
+# PAUSA: orquestracao automatica (ops) e dispatch automatico do Copilot.
+# O workflow permanece disponivel somente para execucao manual.
+>>>>>>> 4027041 (chore(task-201): pause root manager worker and UI modules)
 
 permissions:
   contents: read
