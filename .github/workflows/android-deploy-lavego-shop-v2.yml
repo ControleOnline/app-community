@@ -193,6 +193,11 @@ jobs:
       - name: Fix Expo Dependencies
         run: npx expo install --fix
 
+      - name: Copy shop_lavego assets to default assets folder
+        run: |
+          cp -r src/assets/shop_lavego/* src/assets/ 2>/dev/null || true
+          echo "Assets shop_lavego copiados para src/assets/"
+
       - name: Prebuild
         run: npx expo prebuild --clean
 

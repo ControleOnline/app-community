@@ -89,7 +89,7 @@ jobs:
             const [major, minor, patch] = '$VERSION'.split('.').map(Number);
             
             // Calcula o código posicional
-            const calculatedVersionCode = (major * 10000) + (minor * 100) + patch;
+            const calculatedVersionCode = (major * 100000) + (minor * 1000) + patch;
             
             // 🌟 ATUALIZA OS DOIS CAMPOS AGORA:
             app.expo.version = '$VERSION'; // Injeta '1.7.4' para visualização do lojista
@@ -109,6 +109,11 @@ jobs:
           VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
           echo "versionCode interno (Controle Android): $VERSION_CODE"
           echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+
+      - name: Copy pos_lavego assets to default assets folder
+        run: |
+          cp -r src/assets/pos_lavego/* src/assets/ 2>/dev/null || true
+          echo "Assets pos_lavego copiados para src/assets/"
 
       - name: Prebuild
         run: npx expo prebuild --clean

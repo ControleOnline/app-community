@@ -23,6 +23,8 @@
 | Página | O que documenta |
 | --- | --- |
 | [Smoke Test Flows](https://github.com/ControleOnline/app-community/wiki/Smoke-Test-Flows) | Catálogo canônico de fluxos de negócio (`fluxo: <id>`), gate de evidência visual completa (prints por etapa) e regras de uso para QA/Developer |
+| [Smoke helpers — device-configuracao](https://github.com/ControleOnline/app-community/wiki/Smoke-Helpers-Device-Configuracao) | Login ADMIN + DeviceConfig PDV/DISPLAY/PRINT + switchApp; `fluxo: device-configuracao`, flowchartIds [1] |
+| [Flowchart 1 — Venda / produção E2E](https://github.com/ControleOnline/app-community/wiki/Flowchart-1-Venda-Producao-E2E-Smokes) | Programa de smokes E2E do flowchart admin id=1 (Venda/produção): jornadas, APP_TYPE, manifesto e filhas (#601) |
 
 Espelho da skill: [agents-mcp smoke-test-flows.md](https://github.com/ControleOnline/agents-mcp/blob/master/agents/skills/shared/quality/smoke-test-flows.md).
 
@@ -32,6 +34,7 @@ Espelho da skill: [agents-mcp smoke-test-flows.md](https://github.com/ControleOn
 | --- | --- |
 | [CI e runtime Node](https://github.com/ControleOnline/app-community/wiki/ci-node-runtime) | Node 20; Scrutinizer e workflows |
 | [Production deploy gate](https://github.com/ControleOnline/app-community/wiki/production-deploy-gate) | Job 1.5 · Require staging checks (exact / ancestor / fallback) |
+| [Staging web — APP_TYPE ADMIN](https://github.com/ControleOnline/app-community/wiki/staging-web-app-type-admin) | Homologação `staging.controleonline.com` publica ADMIN; contrato deploy.yml + teste (#717) |
 
 ### Automações de documentação
 
