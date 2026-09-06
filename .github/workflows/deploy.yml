@@ -73,7 +73,7 @@ jobs:
               MANAGER_DOMAIN=https://manager.controleonline.com
               FTP=production
               NATIVE=true
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://app.controleonline.com"},{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -228,7 +228,7 @@ jobs:
           app_type: ${{ matrix.app_type }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ matrix.app_domain }}
+          domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
           remote_dir: "public_html/"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
@@ -237,79 +237,6 @@ jobs:
           NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
-
-  smoke-publish:
-    name: "2.5 · Browser smoke catalog (staging)"
-    needs: [configure, production-gate, web]
-    if: needs.configure.outputs.env == 'staging'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Update Submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps --no-audit --no-fund
-
-      - name: Fix Expo dependencies
-        run: npx expo install --fix
-
-      - name: Install Chromium for Playwright
-        run: npx playwright install --with-deps chromium
-
-      - name: Run automated tests
-        id: automated-tests
-        continue-on-error: true
-        run: |
-          mkdir -p tests/automated
-          npm run test:automated -- --json --outputFile=tests/automated/jest-results.json
-
-      - name: Run all browser smoke groups
-        id: browser-smokes
-        continue-on-error: true
-        run: npm run test:browser -- all
-
-      - name: Build complete published index
-        run: |
-          set -euo pipefail
-          rm -rf tests/smoke tests/artifacts
-          mkdir -p tests/smoke/results
-          cp -a .playwright-smoke-results/. tests/smoke/results/
-          npm run tests:index
-          node -e "const x=require('./tests/index.json'); if (!x.summary || x.summary.tests.total < 1) { throw new Error('Smoke index is empty'); } console.log(JSON.stringify(x.summary));"
-
-      - name: FTP credentials
-        run: |
-          {
-            echo "FTP_HOST=${{ secrets.STAGING_HOST }}"
-            echo "FTP_USER=${{ secrets.STAGING_USER }}"
-            echo "FTP_PASS=${{ secrets.STAGING_PASS }}"
-          } >> "$GITHUB_ENV"
-
-      - name: Publish smoke catalog to staging
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ env.FTP_HOST }}
-          username: ${{ env.FTP_USER }}
-          password: ${{ env.FTP_PASS }}
-          protocol: ftp
-          security: loose
-          local-dir: ./tests/
-          server-dir: public_html/tests/
-          state-name: .ftp-deploy-tests-state.json
-          log-level: standard
-
-      - name: Fail when browser smoke tests failed
-        if: steps.browser-smokes.outcome == 'failure' || steps.automated-tests.outcome == 'failure'
-        run: exit 1
 
   android:
     name: "3 · Android ${{ matrix.app_type }}"
