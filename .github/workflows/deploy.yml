@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require successful staging checks before production
+      - name: Require successful staging deployment and tests before production
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET_ENV: ${{ needs.configure.outputs.env }}
@@ -111,10 +111,10 @@ jobs:
             echo "Production gate skipped for $TARGET_ENV."
             exit 0
           fi
-          mapfile -t CHECKS < <(
+          mapfile -t DEPLOYS < <(
             gh run list \
               --repo "$REPO" \
-              --workflow pull-request-checks.yml \
+              --workflow deploy.yml \
               --branch staging \
               --limit 50 \
               --json conclusion,headSha,status,url \
@@ -122,13 +122,13 @@ jobs:
           )
           ALLOW_URL=""
           ALLOW_REASON=""
-          for row in "${CHECKS[@]:-}"; do
+          for row in "${DEPLOYS[@]:-}"; do
             [ -z "$row" ] && continue
             CHECK_SHA="${row%%$'\t'*}"
             CHECK_URL="${row#*$'\t'}"
             if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
               ALLOW_URL="$CHECK_URL"
-              ALLOW_REASON="exact SHA match ($CHECK_SHA)"
+              ALLOW_REASON="staging deploy and tests exact SHA match ($CHECK_SHA)"
               break
             fi
             STATUS="$(
@@ -136,42 +136,15 @@ jobs:
             )"
             if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
               ALLOW_URL="$CHECK_URL"
-              ALLOW_REASON="staging check $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
+              ALLOW_REASON="staging deploy and tests $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
               break
             fi
           done
           if [ -z "$ALLOW_URL" ]; then
-            STAGING_CHECK_URL="$(
-              gh run list \
-                --repo "$REPO" \
-                --workflow pull-request-checks.yml \
-                --branch staging \
-                --limit 10 \
-                --json conclusion,status,url,headSha \
-                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
-                | head -n 1
-            )"
-            STAGING_DEPLOY_URL="$(
-              gh run list \
-                --repo "$REPO" \
-                --workflow deploy.yml \
-                --branch staging \
-                --limit 10 \
-                --json conclusion,status,url,headSha \
-                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
-                | head -n 1
-            )"
-            if [ -n "$STAGING_CHECK_URL" ] && [ -n "$STAGING_DEPLOY_URL" ]; then
-              ALLOW_URL="$STAGING_CHECK_URL"
-              ALLOW_REASON="fallback: green staging PR Checks + green staging Deploy (TARGET_SHA=$TARGET_SHA diverged from staging tips)"
-              echo "WARNING: $ALLOW_REASON" >&2
-              echo "staging PR Checks: $STAGING_CHECK_URL" >&2
-              echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
-            fi
+            echo "No successful staging Deploy (including its tests) is related to $TARGET_SHA." >&2
           fi
           if [ -z "$ALLOW_URL" ]; then
-            echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
-            echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
+            echo "Production deploy blocked: staging Deploy must pass its test job first." >&2
             exit 1
           fi
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
@@ -237,6 +210,38 @@ jobs:
           NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
+
+  tests:
+    name: "3 · Staging browser tests"
+    needs: [configure, web]
+    if: needs.configure.outputs.env == 'staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Init recursive submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout --force
+          test -f modules/controleonline/ui-common/src/react/localStorage.js
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build four app types and run staging browser smokes
+        env:
+          API_ENTRYPOINT: ${{ needs.configure.outputs.api }}
+          API_PLAYWRIGHT: ${{ needs.configure.outputs.api }}
+        run: npm run test:browser -- all
 
   android:
     name: "3 · Android ${{ matrix.app_type }}"
