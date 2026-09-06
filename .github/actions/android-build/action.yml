@@ -47,7 +47,7 @@ inputs:
     default: "completed"
   play_changes_not_sent_for_review:
     required: false
-    default: "false"
+    default: "true"
   bump_version_code_from_package:
     required: false
     default: "false"
@@ -177,7 +177,6 @@ runs:
           app.versionCode=versionCode;
           fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
           console.log('Android versionCode:', versionCode);
-          fs.appendFileSync(process.env.GITHUB_ENV, 'ANDROID_VERSION_CODE=' + versionCode + '\n');
         "
 
     - name: Prebuild
@@ -255,7 +254,7 @@ runs:
         echo "$ANDROID_SERVICE_ACCOUNT_JSON" | base64 -d > /tmp/service_account.json
 
     - name: Upload to Play
-      if: inputs.publish_play == 'true' && inputs.play_changes_not_sent_for_review != 'true'
+      if: inputs.publish_play == 'true'
       uses: r0adkll/upload-google-play@v1
       with:
         serviceAccountJson: /tmp/service_account.json
@@ -263,17 +262,7 @@ runs:
         releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
         track: ${{ inputs.play_track }}
         status: ${{ inputs.play_status }}
-
-    - name: Upload to Play without auto review
-      if: inputs.publish_play == 'true' && inputs.play_changes_not_sent_for_review == 'true'
-      uses: r0adkll/upload-google-play@v1
-      with:
-        serviceAccountJson: /tmp/service_account.json
-        packageName: ${{ env.PACKAGE_NAME }}
-        releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-        track: ${{ inputs.play_track }}
-        status: ${{ inputs.play_status }}
-        changesNotSentForReview: true
+        changesNotSentForReview: ${{ inputs.play_changes_not_sent_for_review }}
 
 
     - name: Restore app.json

@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev
-      - staging
+      - master
   pull_request:
 
 permissions:
@@ -22,9 +21,26 @@ jobs:
   baseline-checks:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      product_changed: ${{ steps.changes.outputs.product_changed }}
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect product changes
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -z "$BASE_SHA" ]; then
+            echo "product_changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$BASE_SHA" "$GITHUB_SHA" | grep -Ev '^(\.github/|\.scrutinizer\.yml$)' | grep -q .; then
+            echo "product_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "product_changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v5
         with:
@@ -36,25 +52,32 @@ jobs:
       - name: Check JavaScript syntax
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
-      - name: Validate browser smoke flow catalog
-        run: npm run test:browser:flows
-
       - name: Check diff hygiene
         run: git diff --check
 
-  browser-smoke:
-    name: browser-smoke (${{ matrix.group }})
+  lint-checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     needs: baseline-checks
-    strategy:
-      fail-fast: false
-      matrix:
-        group:
-          - manager
-          - admin
-          - delivery
-          - pos
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
+
+      - name: Run aggregator lint
+        run: npx eslint src scripts --ignore-pattern 'src/tests/**'
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: [baseline-checks, lint-checks]
+    if: needs.baseline-checks.outputs.product_changed == 'true'
 
     steps:
       - uses: actions/checkout@v5
@@ -80,4 +103,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
-        run: npm run test:browser -- ${{ matrix.group }}
+        run: npm run test:browser

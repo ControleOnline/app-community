@@ -1,8 +1,7 @@
 const path = require('path');
 const { defineConfig } = require('playwright/test');
 
-const webPort = Number(process.env.PLAYWRIGHT_WEB_PORT || 4173);
-const baseURL = `http://127.0.0.1:${webPort}`;
+const baseURL = 'http://127.0.0.1:4173';
 const smokeJsonOutputFile = String(process.env.PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE || '').trim();
 const baseReporter = process.env.CI ? 'line' : 'list';
 const reporter = smokeJsonOutputFile
@@ -20,7 +19,6 @@ module.exports = defineConfig({
   workers: 1,
   use: {
     baseURL,
-    locale: 'pt-BR',
     screenshot: 'on',
     trace: 'on-first-retry',
     video: 'retain-on-failure',

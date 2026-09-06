@@ -11,9 +11,6 @@ const smokeArtifactsDir = path.resolve(
   process.env.PLAYWRIGHT_SMOKE_RESULTS_DIR || '.playwright-smoke-results',
 );
 const testResultsDir = path.join(projectRoot, 'test-results');
-const buildTimeoutMs = Number(process.env.BROWSER_SMOKE_BUILD_TIMEOUT_MS || 10 * 60 * 1000);
-const testTimeoutMs = Number(process.env.BROWSER_SMOKE_TEST_TIMEOUT_MS || 25 * 60 * 1000);
-const baseWebPort = Number(process.env.PLAYWRIGHT_WEB_PORT || 4173);
 
 const groupByName = new Map(
   groups.flatMap(group => [
@@ -78,22 +75,13 @@ const copyDir = (sourceDir, targetDir) => {
   return true;
 };
 
-const runCommand = (command, commandArgs, env, timeout) =>
+const runCommand = (command, commandArgs, env) =>
   spawnSync(command, commandArgs, {
     cwd: projectRoot,
     env,
     stdio: 'inherit',
     shell: process.platform === 'win32',
-    timeout,
   });
-
-const getExitCode = result => {
-  if (result.error?.code === 'ETIMEDOUT') {
-    return 'timeout';
-  }
-
-  return result.status ?? result.signal ?? 1;
-};
 
 cleanDir(smokeArtifactsDir);
 ensureDir(smokeArtifactsDir);
@@ -104,19 +92,18 @@ const manifest = {
 };
 const failures = [];
 
-resolvedGroups.forEach((group, index) => {
+for (const group of resolvedGroups) {
   cleanDir(testResultsDir);
 
   const outputDir = path.join('.playwright-web', group.name);
   const env = {
     ...process.env,
     PLAYWRIGHT_APP_TYPE: group.appType,
-    PLAYWRIGHT_WEB_PORT: String(baseWebPort + index),
     PLAYWRIGHT_WEB_OUTPUT_DIR: outputDir,
     PLAYWRIGHT_SMOKE_JSON_OUTPUT_FILE: path.join(testResultsDir, 'report.json'),
   };
   const groupArtifactsDir = path.join(smokeArtifactsDir, group.name);
-  const groupSummary = {
+const groupSummary = {
     name: group.name,
     appType: group.appType,
     flowIds: group.flowIds || [],
@@ -128,8 +115,8 @@ resolvedGroups.forEach((group, index) => {
   ensureDir(groupArtifactsDir);
 
   console.log(`\n=== Building ${group.name} browser export (${group.appType}) ===`);
-  const buildResult = runCommand(process.execPath, [buildScript], env, buildTimeoutMs);
-  const buildExitCode = getExitCode(buildResult);
+  const buildResult = runCommand(process.execPath, [buildScript], env);
+  const buildExitCode = buildResult.status ?? buildResult.signal ?? 1;
 
   if (buildResult.status === 0) {
     groupSummary.build = 'passed';
@@ -143,8 +130,8 @@ resolvedGroups.forEach((group, index) => {
       playwrightConfig,
       ...testPaths,
       ...forwardedArgs,
-    ], env, testTimeoutMs);
-    const testExitCode = getExitCode(testResult);
+    ], env);
+    const testExitCode = testResult.status ?? testResult.signal ?? 1;
 
     if (testResult.status === 0) {
       groupSummary.smoke = 'passed';
@@ -167,7 +154,7 @@ resolvedGroups.forEach((group, index) => {
     `${JSON.stringify(manifest, null, 2)}\n`,
     'utf8',
   );
-});
+}
 
 const summaryLines = [
   `Generated at: ${manifest.generatedAt}`,

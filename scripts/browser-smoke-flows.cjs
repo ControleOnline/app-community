@@ -40,6 +40,7 @@ module.exports = [
     testPaths: [
       'modules/controleonline/ui-manager/src/tests/browser/admin',
       'modules/controleonline/ui-tests/src/tests/browser/admin',
+      'modules/controleonline/ui-common/src/tests/browser/manager',
     ],
   }),
   flow({
@@ -62,6 +63,7 @@ module.exports = [
     testPaths: [
       'modules/controleonline/ui-products/src/tests/browser/manager',
       'modules/controleonline/ui-manager/src/tests/browser/manager',
+      'modules/controleonline/ui-ppc/src/tests/browser/manager',
     ],
   }),
   flow({
@@ -95,6 +97,7 @@ module.exports = [
     steps: ['abrir financeiro/pagamento', 'gerar cobrança', 'registrar pagamento', 'validar confirmação', 'validar conciliação/listagem'],
     testPaths: [
       'modules/controleonline/ui-orders/src/tests/browser/pos',
+      'modules/controleonline/ui-orders/src/tests/browser/manager',
       'modules/controleonline/ui-shop/src/tests/browser/manager',
     ],
   }),
@@ -118,11 +121,39 @@ module.exports = [
     ],
   }),
   flow({
+    id: 'manager-general-settings-maps',
+    name: 'General Settings / Mapas',
+    owner: 'ui-crm',
+    appTypes: ['MANAGER'],
+    steps: ['abrir configurador geral', 'aba Mapas', 'tela principal mapa vs vitrine', 'localizador de franquias', 'validar ausência aba Shop'],
+    testPaths: [
+      'modules/controleonline/ui-crm/src/tests/browser/manager',
+    ],
+  }),
+  flow({
+    id: 'manager-my-companies-create',
+    name: 'Minhas empresas — criar PJ vinculada à pessoa autenticada',
+    owner: 'ui-people',
+    appTypes: ['MANAGER'],
+    steps: [
+      'abrir /my-companies-page',
+      'acionar +',
+      'modal PJ sem contato PF',
+      'preencher empresa',
+      'validar listagem',
+    ],
+    testPaths: [
+      'modules/controleonline/ui-people/src/tests/browser/manager',
+    ],
+  }),
+  flow({
     id: 'outros',
     name: 'Outros',
     owner: 'app-community',
     appTypes: ['MANAGER', 'ADMIN', 'DELIVERY', 'POS'],
     steps: ['declarar justificativa', 'executar smoke técnico', 'capturar estado inicial', 'capturar resultado final'],
-    testPaths: [],
+    testPaths: [
+      'modules/controleonline/ui-common/src/tests/browser/manager',
+    ],
   }),
 ];

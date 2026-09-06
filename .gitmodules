@@ -1,127 +1,127 @@
 [submodule "modules/controleonline/ui-orders"]
 	path = modules/controleonline/ui-orders
 	url = https://github.com/ControleOnline/ui-orders.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-shop"]
 	path = modules/controleonline/ui-shop
 	url = https://github.com/ControleOnline/ui-shop.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-default"]
 	path = modules/controleonline/ui-default
 	url = https://github.com/ControleOnline/ui-default.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-products"]
 	path = modules/controleonline/ui-products
 	url = https://github.com/ControleOnline/ui-products.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-login"]
 	path = modules/controleonline/ui-login
 	url = https://github.com/ControleOnline/ui-login.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-common"]
 	path = modules/controleonline/ui-common
 	url = https://github.com/ControleOnline/ui-common.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-layout"]
 	path = modules/controleonline/ui-layout
 	url = https://github.com/ControleOnline/ui-layout.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-people"]
 	path = modules/controleonline/ui-people
 	url = https://github.com/ControleOnline/ui-people.git
-	branch = master
+	branch = dev
 [submodule "modules/controleonline/ui-financial"]
 	path = modules/controleonline/ui-financial
 	url = https://github.com/ControleOnline/ui-financial.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-translate"]
 	path = modules/controleonline/ui-translate
 	url = https://github.com/ControleOnline/ui-translate.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-crm"]
 	path = modules/controleonline/ui-crm
 	url = https://github.com/ControleOnline/ui-crm.git
-	branch = master
+	branch = dev
 [submodule "modules/controleonline/ui-manager"]
 	path = modules/controleonline/ui-manager
 	url = https://github.com/ControleOnline/ui-manager.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-customers"]
 	path = modules/controleonline/ui-customers
 	url = https://github.com/ControleOnline/ui-customers.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-ppc"]
 	path = modules/controleonline/ui-ppc
 	url = https://github.com/ControleOnline/ui-ppc.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-contracts"]
 	path = modules/controleonline/ui-contracts
 	url = https://github.com/ControleOnline/ui-contracts.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-users"]
 	path = modules/controleonline/ui-users
 	url = https://github.com/ControleOnline/ui-users.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-tasks"]
 	path = modules/controleonline/ui-tasks
 	url = https://github.com/ControleOnline/ui-tasks.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-providers"]
 	path = modules/controleonline/ui-providers
 	url = https://github.com/ControleOnline/ui-providers.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-professionals"]
 	path = modules/controleonline/ui-professionals
 	url = https://github.com/ControleOnline/ui-professionals.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-report"]
 	path = modules/controleonline/ui-report
 	url = https://github.com/ControleOnline/ui-report.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-logistic"]
 	path = modules/controleonline/ui-logistic
 	url = https://github.com/ControleOnline/ui-logistic.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-carrier"]
 	path = modules/controleonline/ui-carrier
 	url = https://github.com/ControleOnline/ui-carrier.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-employee"]
 	path = modules/controleonline/ui-employee
 	url = https://github.com/ControleOnline/ui-employee.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-legacy"]
 	path = modules/controleonline/ui-legacy
 	url = https://github.com/ControleOnline/ui-legacy.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-accounting"]
 	path = modules/controleonline/ui-accounting
 	url = https://github.com/ControleOnline/ui-accounting.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-config"]
 	path = modules/controleonline/ui-config
 	url = https://github.com/ControleOnline/ui-config.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-ead"]
 	path = modules/controleonline/ui-ead
 	url = https://github.com/ControleOnline/ui-ead.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-pcp"]
 	path = modules/controleonline/ui-pcp
 	url = https://github.com/ControleOnline/ui-pcp.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-support"]
 	path = modules/controleonline/ui-support
 	url = https://github.com/ControleOnline/ui-support.git
-	branch = master
+	branch = staging
 [submodule "modules/modules/controleonline/ui-login"]
 	path = modules/modules/controleonline/ui-login
 	url = https://github.com/ControleOnline/ui-login.git
-	branch = master
+	branch = staging
 [submodule "modules/controleonline/ui-tests"]
 	path = modules/controleonline/ui-tests
 	url = https://github.com/ControleOnline/ui-tests.git
-	branch = master
+	branch = staging
 [submodule "docs/wiki"]
 	path = docs/wiki
 	url = https://github.com/ControleOnline/app-community.wiki.git
