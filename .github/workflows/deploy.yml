@@ -265,6 +265,13 @@ jobs:
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
 
+      - name: Run automated tests
+        id: automated-tests
+        continue-on-error: true
+        run: |
+          mkdir -p tests/automated
+          npm run test:automated -- --json --outputFile=tests/automated/jest-results.json
+
       - name: Run all browser smoke groups
         id: browser-smokes
         continue-on-error: true
@@ -301,7 +308,7 @@ jobs:
           log-level: standard
 
       - name: Fail when browser smoke tests failed
-        if: steps.browser-smokes.outcome == 'failure'
+        if: steps.browser-smokes.outcome == 'failure' || steps.automated-tests.outcome == 'failure'
         run: exit 1
 
   android:
