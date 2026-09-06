@@ -221,6 +221,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           submodules: recursive
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Init recursive submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout --force
+          test -f modules/controleonline/ui-common/src/react/localStorage.js
       - uses: actions/setup-node@v5
         with:
           node-version: 20
@@ -230,7 +237,10 @@ jobs:
         run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run staging browser tests
+      - name: Build four app types and run staging browser smokes
+        env:
+          API_ENTRYPOINT: ${{ needs.configure.outputs.api }}
+          API_PLAYWRIGHT: ${{ needs.configure.outputs.api }}
         run: npm run test:browser -- all
 
   android:
