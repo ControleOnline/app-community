@@ -256,6 +256,49 @@ jobs:
             exit "$SMOKE_EXIT"
           fi
 
+      - name: Prepare tests directory on s.controleonline.com
+        if: always()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            # The API account exposes public_html as its writable deployment
+            # root; keep the executed suite reports available there too.
+            TARGET=public_html/var/tests
+            mkdir -p "$TARGET"
+            find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+
+      - name: Publish executed smoke reports to s.controleonline.com
+        if: always()
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          source: "tests/browser-smoke/*"
+          target: "public_html/var/tests/"
+          strip_components: 1
+
+      - name: Verify smoke report paths on API account
+        if: always()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            echo "api_cwd=$(pwd)"
+            echo "api_public_html_var_tests_reports=$(find public_html/var/tests -type f -name report.json | wc -l)"
+
       - name: Validate published smoke index in Chromium
         if: success()
         env:
