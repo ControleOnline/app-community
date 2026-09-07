@@ -256,6 +256,18 @@ jobs:
             exit "$SMOKE_EXIT"
           fi
 
+      - name: Publish executed smoke catalog to staging web via FTP
+        if: always() && hashFiles('tests/index.json') != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          password: ${{ secrets.STAGING_PASS }}
+          protocol: ftp
+          local-dir: tests/
+          server-dir: public_html/tests/
+          state-name: .ftp-deploy-tests-state.json
+
       - name: Prepare tests directory on s.controleonline.com
         if: always()
         uses: appleboy/ssh-action@v1.2.0
