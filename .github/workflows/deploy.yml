@@ -203,6 +203,7 @@ jobs:
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
           remote_dir: "public_html/"
+          publish_tests: ${{ needs.configure.outputs.env == 'staging' }}
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
@@ -221,13 +222,6 @@ jobs:
       - uses: actions/checkout@v5
         with:
           submodules: recursive
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-      - name: Init recursive submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout --force
-          test -f modules/controleonline/ui-common/src/react/localStorage.js
       - uses: actions/setup-node@v5
         with:
           node-version: 20
@@ -238,6 +232,12 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run staging browser tests and build index
+        env:
+          PLAYWRIGHT_API_ENTRYPOINT: https://s.controleonline.com
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+          SMOKE_LIVE: ${{ secrets.SMOKE_LIVE }}
         run: |
           set +e
           npm run test:browser -- all
@@ -267,11 +267,14 @@ jobs:
           script_stop: true
           script: |
             set -e
-            TARGET=/var/www/api-community/public/tests
+            # The API account exposes public_html as its writable deployment
+            # root; keep the executed suite reports available there too.
+            TARGET=public_html/var/tests
             mkdir -p "$TARGET"
+            chmod -R u+rwX "$TARGET"
             find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
-      - name: Publish complete smoke tests to s.controleonline.com
+      - name: Publish executed smoke reports to s.controleonline.com
         if: always()
         uses: appleboy/scp-action@v1.0.0
         with:
@@ -279,8 +282,33 @@ jobs:
           username: ${{ secrets.API_USER }}
           password: ${{ secrets.API_PASS }}
           port: ${{ secrets.API_PORT }}
-          source: "tests/*"
-          target: "/var/www/api-community/public/tests/"
+          source: "tests/browser-smoke/*"
+          target: "public_html/var/tests/"
+          strip_components: 1
+
+      - name: Verify smoke report paths on API account
+        if: always()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            echo "api_cwd=$(pwd)"
+            echo "api_public_html_var_tests_reports=$(find public_html/var/tests -type f -name report.json | wc -l)"
+
+      - name: Validate published smoke index in Chromium
+        if: success()
+        env:
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
+          STAGING_APP_URL: https://staging.controleonline.com
+          STAGING_API_ENTRYPOINT: https://s.controleonline.com
+          STAGING_EXPECTED_TESTS_MIN: '100'
+          STAGING_EXPECTED_FLOWCHARTS_MIN: '1'
+        run: node scripts/validate-staging-smoke-index.cjs
 
   android:
     name: "3 · Android ${{ matrix.app_type }}"
