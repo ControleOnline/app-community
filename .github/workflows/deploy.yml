@@ -231,6 +231,12 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run staging browser tests and build index
+        env:
+          PLAYWRIGHT_API_ENTRYPOINT: https://s.controleonline.com
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+          SMOKE_LIVE: ${{ secrets.SMOKE_LIVE }}
         run: |
           set +e
           npm run test:browser -- all

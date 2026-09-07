@@ -71,11 +71,36 @@ const overrideEnvLocalAppType = appType => {
   };
 };
 
+const overrideEnvLocalApiEntrypoint = apiEntrypoint => {
+  const normalizedApiEntrypoint = String(apiEntrypoint || '').trim().replace(/\/$/, '');
+
+  if (!normalizedApiEntrypoint) return null;
+
+  const originalEnvLocal = fs.readFileSync(envLocalFile, 'utf8');
+  const apiEntrypointPattern = /API_ENTRYPOINT:\s*(['"])[^'\"]+\1/;
+
+  if (!apiEntrypointPattern.test(originalEnvLocal)) {
+    throw new Error(`Unable to override API_ENTRYPOINT in ${envLocalFile}.`);
+  }
+
+  const nextEnvLocal = originalEnvLocal.replace(
+    apiEntrypointPattern,
+    `API_ENTRYPOINT: '${normalizedApiEntrypoint}'`,
+  );
+
+  if (nextEnvLocal === originalEnvLocal) return null;
+  fs.writeFileSync(envLocalFile, nextEnvLocal);
+  return () => fs.writeFileSync(envLocalFile, originalEnvLocal);
+};
+
 const buildWebExport = () => {
   fs.rmSync(outputDir, { recursive: true, force: true });
   ensureEnvLocalFile();
 
   const restoreEnvLocal = overrideEnvLocalAppType(process.env.PLAYWRIGHT_APP_TYPE);
+  const restoreEnvLocalApiEntrypoint = overrideEnvLocalApiEntrypoint(
+    process.env.PLAYWRIGHT_API_ENTRYPOINT,
+  );
 
   try {
     const command = 'npx';
@@ -100,6 +125,7 @@ const buildWebExport = () => {
       );
     }
   } finally {
+    if (restoreEnvLocalApiEntrypoint) restoreEnvLocalApiEntrypoint();
     if (restoreEnvLocal) {
       restoreEnvLocal();
     }
