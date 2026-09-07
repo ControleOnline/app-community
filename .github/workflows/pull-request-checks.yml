@@ -80,4 +80,10 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
+        env:
+          PLAYWRIGHT_API_ENTRYPOINT: https://s.controleonline.com
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
+          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
+          SMOKE_LIVE: ${{ secrets.SMOKE_LIVE }}
         run: npm run test:browser -- ${{ matrix.group }}
