@@ -283,6 +283,14 @@ jobs:
           source: "tests/*"
           target: "public/tests/"
 
+      - name: Validate published smoke index in Chromium
+        if: success()
+        env:
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
+          STAGING_APP_URL: https://staging.controleonline.com
+          STAGING_API_ENTRYPOINT: https://s.controleonline.com
+        run: node scripts/validate-staging-smoke-index.cjs
+
   android:
     name: "3 · Android ${{ matrix.app_type }}"
     needs: [configure, production-gate]
