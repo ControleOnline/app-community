@@ -271,9 +271,10 @@ jobs:
             # The /tests controller reads report.json files from var/tests;
             # public/tests is only a web document root and is not the backend
             # smoke-tests-playground storage path.
-            TARGET=var/tests
-            mkdir -p "$TARGET"
-            find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+            for TARGET in var/tests public/tests; do
+              mkdir -p "$TARGET"
+              find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+            done
 
       - name: Publish complete smoke tests to s.controleonline.com
         if: always()
@@ -286,6 +287,27 @@ jobs:
           source: "tests/browser-smoke/*"
           target: "var/tests/"
           strip_components: 1
+
+      - name: Verify smoke report paths on API account
+        if: always()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            # Keep both supported layouts synchronized while the backend
+            # setting is deployed per environment; the API reader accepts
+            # report.json files below either project-relative root.
+            rm -rf public/tests
+            mkdir -p public/tests
+            cp -R var/tests/. public/tests/
+            echo "api_cwd=$(pwd)"
+            echo "var_tests_reports=$(find var/tests -type f -name report.json | wc -l)"
+            echo "public_tests_reports=$(find public/tests -type f -name report.json | wc -l)"
 
       - name: Validate published smoke index in Chromium
         if: success()
