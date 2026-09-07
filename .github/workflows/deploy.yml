@@ -238,6 +238,70 @@ jobs:
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
 
+  tests:
+    name: "3 · Staging browser tests"
+    needs: [configure, web]
+    if: needs.configure.outputs.env == 'staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run staging browser tests and build index
+        run: |
+          set +e
+          npm run test:browser -- all
+          SMOKE_EXIT=$?
+          set -e
+
+          # The index builder consumes this canonical results directory, while
+          # the runner keeps its raw output isolated under .playwright-smoke-results.
+          rm -rf tests/smoke/results
+          mkdir -p tests/smoke/results
+          cp -R .playwright-smoke-results/. tests/smoke/results/
+          npm run tests:index
+
+          if [ "$SMOKE_EXIT" -ne 0 ]; then
+            echo "Browser smoke tests failed with exit $SMOKE_EXIT; publishing their reports before failing the job."
+            exit "$SMOKE_EXIT"
+          fi
+
+      - name: Prepare tests directory on s.controleonline.com
+        if: always()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          script_stop: true
+          script: |
+            set -e
+            TARGET=/var/www/api-community/public/tests
+            mkdir -p "$TARGET"
+            find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+
+      - name: Publish complete smoke tests to s.controleonline.com
+        if: always()
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.API_HOST }}
+          username: ${{ secrets.API_USER }}
+          password: ${{ secrets.API_PASS }}
+          port: ${{ secrets.API_PORT }}
+          source: "tests/*"
+          target: "/var/www/api-community/public/tests/"
+
   android:
     name: "3 · Android ${{ matrix.app_type }}"
     needs: [configure, production-gate]
