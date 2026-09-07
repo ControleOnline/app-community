@@ -266,10 +266,9 @@ jobs:
           script_stop: true
           script: |
             set -e
-            # The API application is deployed below public_html/ on the API
-            # account. The /tests controller reads report.json files from the
-            # application's var/tests directory.
-            for TARGET in public_html/var/tests public_html/public/tests; do
+            # Staging API deploys the application at this fixed path. The
+            # /tests controller reads report.json files from its var/tests.
+            for TARGET in /var/www/api-community/var/tests /var/www/api-community/public/tests; do
               mkdir -p "$TARGET"
               find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
             done
@@ -283,7 +282,7 @@ jobs:
           password: ${{ secrets.API_PASS }}
           port: ${{ secrets.API_PORT }}
           source: "tests/browser-smoke/*"
-          target: "public_html/var/tests/"
+          target: "/var/www/api-community/var/tests/"
           strip_components: 1
 
       - name: Verify smoke report paths on API account
@@ -298,12 +297,12 @@ jobs:
           script: |
             set -e
             # Keep the application storage and its public mirror synchronized.
-            rm -rf public_html/public/tests
-            mkdir -p public_html/public/tests
-            cp -R public_html/var/tests/. public_html/public/tests/
+            rm -rf /var/www/api-community/public/tests
+            mkdir -p /var/www/api-community/public/tests
+            cp -R /var/www/api-community/var/tests/. /var/www/api-community/public/tests/
             echo "api_cwd=$(pwd)"
-            echo "api_var_tests_reports=$(find public_html/var/tests -type f -name report.json | wc -l)"
-            echo "api_public_tests_reports=$(find public_html/public/tests -type f -name report.json | wc -l)"
+            echo "api_var_tests_reports=$(find /var/www/api-community/var/tests -type f -name report.json | wc -l)"
+            echo "api_public_tests_reports=$(find /var/www/api-community/public/tests -type f -name report.json | wc -l)"
 
       - name: Validate published smoke index in Chromium
         if: success()
