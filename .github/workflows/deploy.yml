@@ -270,6 +270,7 @@ jobs:
           exclude: |
             **/smoke/**
             **/browser-smoke/**
+            **/artifacts/**
 
       - name: Prepare tests directory on s.controleonline.com
         if: always()
