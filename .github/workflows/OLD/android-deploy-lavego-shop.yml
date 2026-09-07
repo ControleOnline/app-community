@@ -5,7 +5,7 @@ name: Deploy Android Lave-Go Shop
 
 on:
   push:
-    branches: [master]
+    branches: [xxx]
   workflow_dispatch:
 
 permissions:
@@ -67,12 +67,38 @@ jobs:
 
       - name: Update app.json dynamically
         run: |
-          sed -i "s/On Manager/Lave-Go/g" app.json
-          sed -i "s/manager-controle-online/shop-lavego/g" app.json
-          sed -i "s/com\.controleonline\.manager/com.lavego.shop/g" app.json
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.name='Lave-Go';
+            app.expo.slug='shop-lavego';
+            app.expo.android=app.expo.android||{};
+            app.expo.android.package=process.env.PACKAGE_NAME;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+          "
 
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets-lavego2.js
+
+      - name: Bump Android versionCode
+        run: |
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.android=app.expo.android||{};
+            const current=Number(app.expo.android.versionCode || app.versionCode || 0);
+            const day=Math.floor((Date.now()-Date.UTC(2020,0,1))/86400000);
+            const run=Number(process.env.GITHUB_RUN_NUMBER || 0) % 10000;
+            const attempt=Number(process.env.GITHUB_RUN_ATTEMPT || 1) % 10;
+            const generated=(day*100000)+(run*10)+attempt;
+            const versionCode=Math.max(current+1, generated);
+            app.expo.android.versionCode=versionCode;
+            app.versionCode=versionCode;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+            console.log('Android versionCode:', versionCode);
+          "
 
       - name: Install Dependencies
         run: npm install
@@ -164,4 +190,3 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
-          changesNotSentForReview: true

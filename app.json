@@ -9,11 +9,11 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.6.9",
+    "version": "1.10.5",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
-      "versionCode": 10609,
+      "versionCode": 11005,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/logo.png",
         "backgroundColor": "#ffffff"
@@ -48,11 +48,10 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      },
-      "buildNumber": "1.6.3"
+      }
     },
     "web": {
-      "favicon": "./src/assets/logo.png"
+      "favicon": "./src/assets/favicon.png"
     },
     "_androidAppOptimizationNote": "R8/minify e shrinkResources foram ativados no bloco do plugin expo-build-properties abaixo.",
     "plugins": [
@@ -104,7 +103,5 @@
         }
       ]
     ]
-  },
-  "version": "1.6.9",
-  "versionCode": 10609
+  }
 }

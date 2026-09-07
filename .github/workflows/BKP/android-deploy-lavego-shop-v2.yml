@@ -1,0 +1,299 @@
+# esse é o aplicativo para lave-go, de localização de franquias, 
+# é publicado na loja google -> lave-go
+
+name: Deploy Android Lave-Go Shop
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  production-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful staging checks before production
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Accept successful Pull Request Checks on staging when:
+          # 1) headSha == TARGET_SHA (fast-forward promote), or
+          # 2) headSha is an ancestor of TARGET_SHA (staging tip + post-promote commits), or
+          # 3) fallback: latest successful staging PR Checks + successful staging Deploy
+          #    (handles residual divergence after parallel version bumps).
+          # Exact equality alone permanently blocks production after any master-only commit.
+
+          mapfile -t CHECKS < <(
+            gh run list \
+              --repo "$REPO" \
+              --workflow pull-request-checks.yml \
+              --branch staging \
+              --limit 50 \
+              --json conclusion,headSha,status,url \
+              --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
+          )
+
+          ALLOW_URL=""
+          ALLOW_REASON=""
+
+          for row in "${CHECKS[@]:-}"; do
+            [ -z "$row" ] && continue
+            CHECK_SHA="${row%%$'	'*}"
+            CHECK_URL="${row#*$'	'}"
+            if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="exact SHA match ($CHECK_SHA)"
+              break
+            fi
+            # Ancestor check via compare API: base=CHECK_SHA, head=TARGET_SHA
+            STATUS="$(
+              gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
+            )"
+            if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
+              ALLOW_URL="$CHECK_URL"
+              ALLOW_REASON="staging check $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
+              break
+            fi
+          done
+
+          if [ -z "$ALLOW_URL" ]; then
+            STAGING_CHECK_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow pull-request-checks.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            STAGING_DEPLOY_URL="$(
+              gh run list \
+                --repo "$REPO" \
+                --workflow deploy.yml \
+                --branch staging \
+                --limit 10 \
+                --json conclusion,status,url,headSha \
+                --jq '.[] | select(.status == "completed" and .conclusion == "success") | .url' \
+                | head -n 1
+            )"
+            if [ -n "$STAGING_CHECK_URL" ] && [ -n "$STAGING_DEPLOY_URL" ]; then
+              ALLOW_URL="$STAGING_CHECK_URL"
+              ALLOW_REASON="fallback: green staging PR Checks + green staging Deploy (TARGET_SHA=$TARGET_SHA diverged from staging tips)"
+              echo "WARNING: $ALLOW_REASON" >&2
+              echo "staging PR Checks: $STAGING_CHECK_URL" >&2
+              echo "staging Deploy: $STAGING_DEPLOY_URL" >&2
+            fi
+          fi
+
+          if [ -z "$ALLOW_URL" ]; then
+            echo "Production deploy blocked: no successful Pull Request Checks on staging related to $TARGET_SHA." >&2
+            echo "Need exact match, ancestor staging check, or green staging PR Checks + Deploy." >&2
+            exit 1
+          fi
+
+          echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
+
+  build:
+  build:
+    needs: production-gate
+    runs-on: ubuntu-latest
+
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
+      APP_DISPLAY_NAME: "Shop"
+      PACKAGE_NAME: com.lavego.shop
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          DOMAIN: 'https://shop.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          APP_TYPE: 'shop',\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Update app.json dynamically
+        run: |
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.name='Lave-Go';
+            app.expo.slug='shop-lavego';
+            app.expo.android=app.expo.android||{};
+            app.expo.android.package=process.env.PACKAGE_NAME;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+          "
+
+      - name: Configure Assets by APP_TYPE
+        run: node scripts/configure-assets-lavego2.js
+
+      - name: Bump Android versionCode
+        run: |
+          node -e "
+            const fs=require('fs');
+            const app=require('./app.json');
+            app.expo=app.expo||{};
+            app.expo.android=app.expo.android||{};
+            const current=Number(app.expo.android.versionCode || app.versionCode || 0);
+            const day=Math.floor((Date.now()-Date.UTC(2020,0,1))/86400000);
+            const run=Number(process.env.GITHUB_RUN_NUMBER || 0) % 10000;
+            const attempt=Number(process.env.GITHUB_RUN_ATTEMPT || 1) % 10;
+            const generated=(day*100000)+(run*10)+attempt;
+            const versionCode=Math.max(current+1, generated);
+            app.expo.android.versionCode=versionCode;
+            app.versionCode=versionCode;
+            fs.writeFileSync('./app.json', JSON.stringify(app,null,2));
+            console.log('Android versionCode:', versionCode);
+          "
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Fix Expo Dependencies
+        run: npx expo install --fix
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.LAVEGO_SHOP_KEYSTORE_CERT }}" | base64 -d > ./config/android/lave-go.keystore
+          echo "MYAPP_UPLOAD_STORE_FILE=./config/android/lave-go.keystore" > ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=lave-go" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.LAVEGO_SHOP_KEYSTORE_PASS }}" >> ./config/android/env.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.LAVEGO_SHOP_KEYSTORE_PASS }}" >> ./config/android/env.properties
+
+      - name: Build Android Bundle
+        run: |
+          cd android
+          ./gradlew bundleRelease --init-script ../signing.gradle \
+            -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
+
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Show Version (v.${{ env.VERSION }})
+        run: echo "Compilando versão ${{ env.VERSION }}"
+
+      - name: Validate generated AAB
+        run: |
+          AAB_PATH=$(find ./android/app/build/outputs/bundle -type f -name '*.aab' | sort | head -n 1)
+          if [ -z "$AAB_PATH" ]; then
+            echo "Nenhum AAB foi gerado dentro de ./android/app/build/outputs/bundle" >&2
+            echo
+            echo "Conteudo disponivel em ./android/app/build/outputs:"
+            find ./android/app/build/outputs -maxdepth 4 -type f | sort || true
+            exit 1
+          fi
+
+          AAB_DIR=$(dirname "$AAB_PATH")
+          AAB_FILENAME=$(basename "$AAB_PATH")
+
+          echo "AAB_PATH=$AAB_PATH" >> "$GITHUB_ENV"
+          echo "AAB_DIR=$AAB_DIR" >> "$GITHUB_ENV"
+          echo "AAB_FILENAME=$AAB_FILENAME" >> "$GITHUB_ENV"
+
+          ls -lah "$AAB_DIR"
+          echo "AAB localizado: $AAB_FILENAME"
+
+      - name: Upload AAB to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: ${{ env.AAB_DIR }}
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/aab"
+          forceSsl: false
+
+      - name: Verify uploaded AAB on FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/aab"
+          LOG_FILE="$(mktemp)"
+
+          set +e
+          lftp -d -u "${{ secrets.ADMIN_USER }},${{ secrets.ADMIN_PASS }}" "ftp://${{ secrets.ADMIN_HOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ftp:ssl-allow no
+            set ftp:ssl-force no
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          " 2>&1 | tee "$LOG_FILE"
+          LFTP_STATUS=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$LFTP_STATUS" -ne 0 ]; then
+            echo "Falha ao listar o diretório remoto após o upload." >&2
+            exit "$LFTP_STATUS"
+          fi
+
+          if grep -Fq "${AAB_FILENAME}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${AAB_FILENAME}"
+          else
+            echo "O upload terminou sem erro, mas o arquivo ${AAB_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
+            exit 1
+          fi
+
+      - name: Decode Service Account
+        run: echo "${{ secrets.LAVEGO_SHOP_SERVICE_ACCOUNT }}" | base64 -d > /tmp/service_account.json
+
+      - name: Upload .aab to Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJson: /tmp/service_account.json
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed

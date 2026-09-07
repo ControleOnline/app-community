@@ -9,6 +9,7 @@ import category_file from '@controleonline/ui-common/src/store/categories/catego
 import city from '@controleonline/ui-common/src/store/address/city';
 import configs from '@controleonline/ui-common/src/store/configs';
 import imports from '@controleonline/ui-common/src/store/imports';
+import integration from '@controleonline/ui-common/src/store/integration';
 import contract from '@controleonline/ui-contracts/src/store/contract';
 import contract_peoples from '@controleonline/ui-contracts/src/store/contract/contract_people';
 import device from '@controleonline/ui-common/src/store/device';
@@ -18,6 +19,7 @@ import display_queues from '@controleonline/ui-ppc/src/store/modules/display_que
 import displays from '@controleonline/ui-ppc/src/store/modules/displays';
 import documents from '@controleonline/ui-people/src/store/documents';
 import documentsTypes from '@controleonline/ui-people/src/store/documents/documentsTypes';
+import document_file from '@controleonline/ui-people/src/store/documents/document_file';
 import emails from '@controleonline/ui-people/src/store/emails';
 import expanded_order_products from '@controleonline/ui-orders/src/store/expanded_order_products';
 import file from '@controleonline/ui-common/src/store/file';
@@ -36,6 +38,12 @@ import order_logistics from '@controleonline/ui-logistic/src/store/order_logisti
 import delivery_courier_schedules from '@controleonline/ui-logistic/src/store/delivery_courier_schedules';
 import delivery_courier_company_presences from '@controleonline/ui-logistic/src/store/delivery_courier_company_presences';
 import delivery_tax_groups from '@controleonline/ui-logistic/src/store/delivery_tax_groups';
+import invoice_taxes from '@controleonline/ui-logistic/src/store/invoice_taxes';
+import invoice_taxes_emit from '@controleonline/ui-logistic/src/store/invoice_taxes_emit';
+import invoice_tasks_processing from '@controleonline/ui-logistic/src/store/invoice_tasks_processing';
+import invoice_tasks_emitted from '@controleonline/ui-logistic/src/store/invoice_tasks_emitted';
+import fiscal_orders_pending from '@controleonline/ui-logistic/src/store/fiscal_orders_pending';
+import fiscal_auxiliary from '@controleonline/ui-logistic/src/store/fiscal_auxiliary';
 import paymentType from '@controleonline/ui-financial/src/store/paymentType';
 import employee_profiles from '@controleonline/ui-employee/src/store/employee_profiles';
 import attendance_reports from '@controleonline/ui-employee/src/store/attendance_reports';
@@ -44,7 +52,6 @@ import people_export_jobs from '@controleonline/ui-employee/src/store/people_exp
 import people_absences from '@controleonline/ui-employee/src/store/people_absences';
 import people_schedules from '@controleonline/ui-employee/src/store/people_schedules';
 import people from '@controleonline/ui-people/src/store/people';
-import people_category from '@controleonline/ui-people/src/store/people_category';
 import people_link from '@controleonline/ui-people/src/store/people_link';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
@@ -108,6 +115,7 @@ export default {
   entity_log,
   display_queues,
   displays,
+  document_file,
   documents,
   documentsTypes,
   emails,
@@ -116,7 +124,14 @@ export default {
   flowcharts,
   inventories,
   invoice,
+  invoice_taxes,
+  invoice_taxes_emit,
+  invoice_tasks_processing,
+  invoice_tasks_emitted,
+  fiscal_orders_pending,
+  fiscal_auxiliary,
   imports,
+  integration,
   models,
   order_invoices,
   order_cancellation_reasons,
@@ -133,7 +148,6 @@ export default {
   attendance_reports,
   paymentType,
   people,
-  people_category,
   people_access_events,
   people_absences,
   people_export_jobs,

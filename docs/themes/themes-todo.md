@@ -7,7 +7,6 @@
 - `src/react/components/BottomNavigationBar.styles.js`
 - `src/react/components/CategoryForm.js`
 - `src/react/components/CategoryForm.styles.js`
-- `src/react/components/ConfirmModal.styles.js`
 - `src/react/components/ContextHelpButton.js`
 - `src/react/components/ContextHelpButton.styles.js`
 - `src/react/components/DefaultProvider.native.js`
@@ -16,8 +15,6 @@
 - `src/react/components/EntityLogContent.styles.js`
 - `src/react/components/LinkedOrderProductsTab.js`
 - `src/react/components/LinkedOrderProductsTab.styles.js`
-- `src/react/components/SystemErrorToast.js`
-- `src/react/components/SystemErrorToast.styles.js`
 - `src/react/components/UnifiedPaymentBar.js`
 - `src/react/components/UnifiedPaymentBar.styles.js`
 - `src/react/components/WebsocketListener.native.js`
@@ -754,6 +751,26 @@
 - `depois: defaults locais passam a expor iconBackground e cardIconBackground usando o mesmo nome de variavel CSS aplicado pelo runtime`
 
 ### ui-common
+
+- `src/react/components/ConfirmModal.js`
+- `full`
+- `antes: StyleSheet estatico com cores hardcoded no styles; sem themeStore`
+- `depois: useStore('theme') + palette canônica modal* e button* via createStyles(palette)`
+
+- `src/react/components/ConfirmModal.styles.js`
+- `full`
+- `antes: overlay rgba(0,0,0,0.5), card #fff, confirm #007AFF, text #fff`
+- `depois: createStyles(palette) com modalOverlay/modalBackground/modalBorder/modalHeaderText/modalText e button*`
+
+- `src/react/components/SystemErrorToast.js`
+- `full`
+- `antes: Icon color="#DC2626" e estilos literais`
+- `depois: useStore('theme') + toastDanger* tokens; Icon color={palette.toastDangerIcon}`
+
+- `src/react/components/SystemErrorToast.styles.js`
+- `full`
+- `antes: backgroundColor '#FEE2E2', borderColor '#FCA5A5', color '#111827'`
+- `depois: createStyles(palette) com toastDangerBackground/toastDangerBorder/toastDangerText`
 - `src/react/components/BottomNavigationBar.js`
 - `linha 21-29, 49-85, 117-156`
 - `antes: navegacao inferior usando footer* e herdando estado ativo por footerLink com fallback vindo da palette`

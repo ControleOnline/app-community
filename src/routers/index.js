@@ -161,9 +161,15 @@ if (homeByType[normalizedAppType]) {
   })
 }
 
-const routeDefinitions = allRoutes.filter(
-  route => route?.name && route?.component,
-)
+const routeDefinitions = (() => {
+  const seen = new Set()
+  return allRoutes.filter(route => {
+    if (!route?.name || !route?.component) return false
+    if (seen.has(route.name)) return false
+    seen.add(route.name)
+    return true
+  })
+})()
 
 normalizeInitialBrowserPath(globalThis?.window)
 

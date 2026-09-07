@@ -20,15 +20,16 @@ runs:
       run: |
         set -euo pipefail
         # Regras 100% no agents-mcp — não copiar checklist/labels aqui
-        CUSTOM_INSTRUCTIONS='Atue 100% como technical-documenter do ControleOnline.
-Leia e siga OBRIGATORIAMENTE (fonte canônica única):
-https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/technical-documenter/agent.md
-
-Também leia:
-https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/skills/shared/operations/copilot-cooperation.md
-https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/skills/by-role/technical-documenter/README.md
-
-Não use regras embutidas neste assignment; a fonte acima prevalece.'
+        CUSTOM_INSTRUCTIONS="$(printf '%s\n' \
+          'Atue 100% como technical-documenter do ControleOnline.' \
+          'Leia e siga OBRIGATORIAMENTE (fonte canônica única):' \
+          'https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/roles/technical-documenter/agent.md' \
+          '' \
+          'Também leia:' \
+          'https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/skills/shared/operations/copilot-cooperation.md' \
+          'https://raw.githubusercontent.com/ControleOnline/agents-mcp/master/agents/skills/by-role/technical-documenter/README.md' \
+          '' \
+          'Não use regras embutidas neste assignment; a fonte acima prevalece.')"
 
         gh issue edit "$ISSUE" --repo "$REPO" --add-label "agent:technical-documenter" || true
 

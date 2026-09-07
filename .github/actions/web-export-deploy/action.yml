@@ -12,6 +12,7 @@ inputs:
     required: false
     default: ""
   remote_dir:
+    description: "FTP server-dir relative to login home. Canonical document root is public_html/ (no tilde). Tilde paths (~/public_html/) land outside the vhost and must not be used."
     required: false
     default: "public_html/"
   skip_ftp:
@@ -71,7 +72,28 @@ runs:
         npx expo install --fix
         npx expo export --platform web
 
+    - name: Guard remote_dir (no tilde)
+      if: ${{ inputs.skip_ftp != 'true' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        RD="${{ inputs.remote_dir }}"
+        case "$RD" in
+          "~"*|"~/"*)
+            echo "::error::remote_dir must not use tilde (~). Use path relative to FTP login home, e.g. public_html/. Got: ${RD}"
+            exit 1
+            ;;
+        esac
+        if [[ "$RD" != */ ]]; then
+          echo "::warning::remote_dir should end with /. SamKirkland expects trailing slash. Got: ${RD}"
+        fi
+        echo "remote_dir OK (relative, no tilde): ${RD}"
+
     # Sem locaweb/ftp-deploy. SamKirkland (basic-ftp).
+    # Canonical document root for staging/dev/prod manager vhosts: public_html/
+    # (relative to FTP account home). Do NOT use ~/public_html/ — tilde is
+    # treated literally or resolves outside the vhost document root, so the
+    # job can succeed while staging.controleonline.com keeps serving the old bundle.
     - name: Deploy FTP (SamKirkland)
       if: ${{ inputs.skip_ftp != 'true' }}
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6

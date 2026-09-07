@@ -1,0 +1,29 @@
+flowchart TD
+  Start([Entrada: prompt ou captura autonoma]) --> Discover[issue-queue-discovery]
+  Discover --> Type{Tipo prioritario?}
+  Type -->|hotfix| P1[P1 hotfix]
+  Type -->|qa ou security rejected| P2[P2 retomada]
+  Type -->|bug| P3[P3 bug]
+  Type -->|feature enhancement| P4[P4 demais]
+  P1 --> Branch
+  P2 --> Branch
+  P3 --> Branch
+  P4 --> Branch
+  Branch[Branch task-id a partir de master] --> Impl[Implementar e testar]
+  Impl --> Sync[Sincronizar origin/master]
+  Sync --> MergeDev[Merge task-id em dev sem PR]
+  MergeDev --> Handoff[Labels agent:qa e agent:security]
+  Handoff --> Review{QA e Security}
+  Review -->|rejected| Fix[Corrigir na mesma task-id]
+  Fix --> Impl
+  Review -->|dual accepted| Dual[agent:qa:accepted + agent:security:accepted]
+  Dual --> Pack[DevOps empacota RC em staging]
+  Pack --> InReview[Coluna In Review]
+  InReview --> Human{Humano aprova?}
+  Human -->|Deploy| Publish[staging para master e Done]
+  Human -->|rejeita| Pack
+  Publish --> Docs[Handoff documentadores]
+  HF[label hotfix] --> HFDev[Developer merge em dev]
+  HFDev --> HFStg[task-id em staging]
+  HFStg --> HFReview[In Review]
+  HFReview --> Human
