@@ -268,7 +268,10 @@ jobs:
             set -e
             # API_USER is scoped to the API deployment root; use its relative
             # public path instead of assuming a host-level /var/www layout.
-            TARGET=public/tests
+            # The /tests controller reads report.json files from var/tests;
+            # public/tests is only a web document root and is not the backend
+            # smoke-tests-playground storage path.
+            TARGET=var/tests
             mkdir -p "$TARGET"
             find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
@@ -280,8 +283,9 @@ jobs:
           username: ${{ secrets.API_USER }}
           password: ${{ secrets.API_PASS }}
           port: ${{ secrets.API_PORT }}
-          source: "tests/*"
-          target: "public/tests/"
+          source: "tests/browser-smoke/*"
+          target: "var/tests/"
+          strip_components: 1
 
       - name: Validate published smoke index in Chromium
         if: success()

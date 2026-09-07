@@ -10,6 +10,7 @@ const testsRoot = path.join(projectRoot, 'tests');
 const automatedReportPath = path.join(testsRoot, 'automated', 'jest-results.json');
 const smokeResultsRoot = path.join(testsRoot, 'smoke', 'results');
 const artifactsRoot = path.join(testsRoot, 'artifacts');
+const publishedSuitesRoot = path.join(testsRoot, 'browser-smoke');
 const indexPath = path.join(testsRoot, 'index.json');
 
 const typeLabels = new Map([
@@ -327,6 +328,7 @@ function buildStep(step, outputDir, reportDir, suiteId, copiedArtifacts) {
     screenshots.push({
       label: String(attachment.name || path.basename(relativePath)).trim() || path.basename(relativePath),
       name: path.basename(relativePath),
+      path: relativePath,
       url: artifactUrlForSuite(suiteId, relativePath),
       mimeType: guessMimeType(relativePath, attachment.contentType),
       kind: 'image',
@@ -382,6 +384,7 @@ function buildPlaywrightTest(spec, outputDir, reportDir, suiteId, copiedArtifact
     screenshots.push({
       label: String(attachment.name || path.basename(relativePath)).trim() || path.basename(relativePath),
       name: path.basename(relativePath),
+      path: relativePath,
       url: artifactUrlForSuite(suiteId, relativePath),
       mimeType: guessMimeType(relativePath, attachment.contentType),
       kind: 'image',
@@ -832,6 +835,24 @@ function mergeCatalogWithReports(catalogSuites, reportSuites) {
   return merged;
 }
 
+function publishSuitesForApi(suites) {
+  cleanDir(publishedSuitesRoot);
+
+  for (const suite of suites) {
+    const suitePath = normalizeRelativePath(suite?.suitePath);
+    if (!suitePath) continue;
+
+    const targetDir = path.join(testsRoot, ...suitePath.split('/'));
+    const sourceArtifactDir = path.join(artifactsRoot, String(suite.suiteId || ''));
+
+    if (fs.existsSync(sourceArtifactDir)) {
+      fs.cpSync(sourceArtifactDir, targetDir, {recursive: true, force: true});
+    }
+
+    writeJson(path.join(targetDir, 'report.json'), suite);
+  }
+}
+
 function main() {
   cleanDir(artifactsRoot);
   ensureDir(artifactsRoot);
@@ -842,6 +863,7 @@ function main() {
   const flowcharts = buildFlowchartCatalog(catalogSuites);
   const index = buildCanonicalIndex(suites, flowcharts);
 
+  publishSuitesForApi(suites);
   writeJson(indexPath, index);
   console.log(`Published ${index.summary.tests.total} tests in ${index.suites.length} suites to ${path.relative(projectRoot, indexPath)}`);
 }
