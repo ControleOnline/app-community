@@ -114,6 +114,7 @@ function buildBrowserCatalog() {
     const tests = extractTestTitles(source).map(title => buildCatalogTest(title, flowchartIds));
     const suiteName = path.basename(suitePath);
     const suiteId = encodeSuiteId(suitePath);
+    const reportArtifactUrl = `/tests/artifacts/${suiteId}/report.json`;
 
     suites.push({
       type: 'browser-smoke',
@@ -136,8 +137,13 @@ function buildBrowserCatalog() {
       cataloged: true,
       links: {
         source: `/${normalizePathValue(path.relative(projectRoot, filePath))}`,
-        report: null,
+        report: reportArtifactUrl,
       },
+      artifacts: [{
+        name: 'report.json',
+        path: 'report.json',
+        url: reportArtifactUrl,
+      }],
     });
   }
 
