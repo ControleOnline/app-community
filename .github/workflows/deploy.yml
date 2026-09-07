@@ -266,7 +266,9 @@ jobs:
           script_stop: true
           script: |
             set -e
-            TARGET=/var/www/api-community/public/tests
+            # API_USER is scoped to the API deployment root; use its relative
+            # public path instead of assuming a host-level /var/www layout.
+            TARGET=public/tests
             mkdir -p "$TARGET"
             find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
@@ -279,7 +281,7 @@ jobs:
           password: ${{ secrets.API_PASS }}
           port: ${{ secrets.API_PORT }}
           source: "tests/*"
-          target: "/var/www/api-community/public/tests/"
+          target: "public/tests/"
 
   android:
     name: "3 · Android ${{ matrix.app_type }}"
