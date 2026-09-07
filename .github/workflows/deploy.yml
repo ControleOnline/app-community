@@ -267,6 +267,9 @@ jobs:
           local-dir: tests/
           server-dir: public_html/tests/
           state-name: .ftp-deploy-tests-state.json
+          exclude: |
+            **/smoke/**
+            **/browser-smoke/**
 
       - name: Prepare tests directory on s.controleonline.com
         if: always()
