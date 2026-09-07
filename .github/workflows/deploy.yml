@@ -203,6 +203,7 @@ jobs:
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
           remote_dir: "public_html/"
+          publish_tests: ${{ needs.configure.outputs.env == 'staging' }}
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
           NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
@@ -254,54 +255,6 @@ jobs:
             echo "Browser smoke tests failed with exit $SMOKE_EXIT; publishing their reports before failing the job."
             exit "$SMOKE_EXIT"
           fi
-
-      - name: Prepare tests directory on s.controleonline.com
-        if: always()
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.API_HOST }}
-          username: ${{ secrets.API_USER }}
-          password: ${{ secrets.API_PASS }}
-          port: ${{ secrets.API_PORT }}
-          script_stop: true
-          script: |
-            set -e
-            # Staging API deploys the application at this fixed path. The
-            # /tests controller reads report.json files from its var/tests.
-            TARGET=/var/www/api-community/var/tests
-            mkdir -p "$TARGET"
-            find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
-
-      - name: Publish complete smoke tests to s.controleonline.com
-        if: always()
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.API_HOST }}
-          username: ${{ secrets.API_USER }}
-          password: ${{ secrets.API_PASS }}
-          port: ${{ secrets.API_PORT }}
-          source: "tests/browser-smoke/*"
-          target: "/var/www/api-community/var/tests/"
-          strip_components: 1
-
-      - name: Verify smoke report paths on API account
-        if: always()
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.API_HOST }}
-          username: ${{ secrets.API_USER }}
-          password: ${{ secrets.API_PASS }}
-          port: ${{ secrets.API_PORT }}
-          script_stop: true
-          script: |
-            set -e
-            # Keep the application storage and its public mirror synchronized.
-            rm -rf /var/www/api-community/public/tests
-            mkdir -p /var/www/api-community/public/tests
-            cp -R /var/www/api-community/var/tests/. /var/www/api-community/public/tests/
-            echo "api_cwd=$(pwd)"
-            echo "api_var_tests_reports=$(find /var/www/api-community/var/tests -type f -name report.json | wc -l)"
-            echo "api_public_tests_reports=$(find /var/www/api-community/public/tests -type f -name report.json | wc -l)"
 
       - name: Validate published smoke index in Chromium
         if: success()
