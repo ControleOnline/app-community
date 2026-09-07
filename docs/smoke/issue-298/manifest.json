@@ -1,25 +1,30 @@
 {
   "fluxo": "compra-fluxo",
-  "flowchartIds": [1],
-  "result": "passed",
+  "wikiPage": "https://github.com/ControleOnline/app-community/wiki/Smoke-Test-Flows",
+  "wikiFlow": "compra-fluxo",
+  "result": "pending-runtime",
   "steps": [
     {
       "id": "checkout-desktop",
+      "wikiStep": "checkout-home-header",
       "description": "Open Shop checkout on desktop and verify the internal Home action.",
       "screenshot": "checkout-desktop.png"
     },
     {
       "id": "shop-home-desktop",
+      "wikiStep": "checkout-home-header",
       "description": "Use the header Home action and verify the Shop Home on desktop.",
       "screenshot": "shop-home-desktop.png"
     },
     {
       "id": "checkout-compact",
+      "wikiStep": "checkout-home-header",
       "description": "Open Shop checkout on a compact viewport and verify the internal Home action.",
       "screenshot": "checkout-compact.png"
     },
     {
       "id": "shop-home-compact",
+      "wikiStep": "checkout-home-header",
       "description": "Use the header Home action and verify the Shop Home on a compact viewport.",
       "screenshot": "shop-home-compact.png"
     }
@@ -30,5 +35,6 @@
     "checkout-compact.png",
     "shop-home-compact.png"
   ],
-  "source": "ui-shop/src/tests/browser/manager/checkout-page.spec.js"
+  "source": "ui-shop/src/tests/browser/manager/checkout-page.spec.js",
+  "evidenceContract": "published-wiki-flow-with-step-prints"
 }
