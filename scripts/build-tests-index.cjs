@@ -1,5 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const {
+  buildBrowserCatalog,
+  buildFlowchartCatalog,
+} = require('./build-tests-catalog.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const testsRoot = path.join(projectRoot, 'tests');
@@ -144,18 +148,21 @@ function countSummary(tests) {
   let total = 0;
   let passed = 0;
   let failed = 0;
+  let pending = 0;
 
   for (const test of tests) {
     total += 1;
 
     if (test.status === 'passed') {
       passed += 1;
-    } else {
+    } else if (test.status === 'failed') {
       failed += 1;
+    } else {
+      pending += 1;
     }
   }
 
-  return {total, passed, failed};
+  return {total, passed, failed, pending};
 }
 
 function statusFromSummary(summary) {
@@ -163,7 +170,11 @@ function statusFromSummary(summary) {
     return 'idle';
   }
 
-  return summary.failed === 0 ? 'passed' : 'failed';
+  if (summary.failed > 0) {
+    return 'failed';
+  }
+
+  return summary.pending > 0 ? 'pending' : 'passed';
 }
 
 function reportTimestamp(report, fallbackPath) {
@@ -560,6 +571,7 @@ function buildInvalidSuite(reportPath, type, message) {
       total: 0,
       passed: 0,
       failed: 0,
+      pending: 0,
     },
     tests: [],
     error: message,
@@ -605,7 +617,7 @@ function collectReportFiles(rootDir) {
   return files.sort((left, right) => left.localeCompare(right));
 }
 
-function buildCanonicalIndex(suites) {
+function buildCanonicalIndex(suites, flowcharts = []) {
   const sortedSuites = [...suites].sort((left, right) => {
     const rightTime = Number(right?.updatedAt ? Date.parse(right.updatedAt) : 0) || Number(right?.generatedAt ? Date.parse(right.generatedAt) : 0) || 0;
     const leftTime = Number(left?.updatedAt ? Date.parse(left.updatedAt) : 0) || Number(left?.generatedAt ? Date.parse(left.generatedAt) : 0) || 0;
@@ -621,12 +633,14 @@ function buildCanonicalIndex(suites) {
       message: 'Nenhum relatório publicado ainda.',
       lastRunAt: null,
       summary: {
-        types: {total: 0, passed: 0, failed: 0},
-        suites: {total: 0, passed: 0, failed: 0},
-        tests: {total: 0, passed: 0, failed: 0},
+        types: {total: 0, passed: 0, failed: 0, pending: 0},
+        suites: {total: 0, passed: 0, failed: 0, pending: 0},
+        tests: {total: 0, passed: 0, failed: 0, pending: 0},
+        flowcharts: {total: flowcharts.length, passed: 0, failed: 0, pending: flowcharts.length},
       },
       types: [],
       suites: [],
+      flowcharts,
       links: {
         self: '/tests',
         artifacts: '/tests/artifacts',
@@ -675,6 +689,7 @@ function buildCanonicalIndex(suites) {
   const suiteSummary = countSummary(sortedSuites.map((suite) => ({status: suite.status})));
   const testSummary = countSummary(sortedSuites.flatMap((suite) => Array.isArray(suite.tests) ? suite.tests : []));
   const typeSummary = countSummary(types.map((type) => ({status: type.status})));
+  const flowchartSummary = countSummary(flowcharts.map((flowchart) => ({status: flowchart.status})));
   const lastRunAtTimestamp = Math.max(
     ...sortedSuites.map((suite) => Date.parse(suite.generatedAt || suite.updatedAt || 0) || 0),
     0,
@@ -690,9 +705,11 @@ function buildCanonicalIndex(suites) {
       types: typeSummary,
       suites: suiteSummary,
       tests: testSummary,
+      flowcharts: flowchartSummary,
     },
     types,
     suites: sortedSuites,
+    flowcharts,
     links: {
       self: '/tests',
       artifacts: '/tests/artifacts',
@@ -706,7 +723,10 @@ function buildMessage(suiteSummary, testSummary) {
   }
 
   if (suiteSummary.failed === 0) {
-    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} com sucesso e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.`;
+    const pendingMessage = testSummary.pending > 0
+      ? ` ${testSummary.pending} ainda não executado${testSummary.pending === 1 ? '' : 's'}.`
+      : '';
+    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.${pendingMessage}`;
   }
 
   return `${suiteSummary.failed} suite${suiteSummary.failed === 1 ? '' : 's'} com falha em ${suiteSummary.total} publicad${suiteSummary.total === 1 ? 'a' : 'as'}.`;
@@ -718,7 +738,10 @@ function buildTypeMessage(suiteSummary, testSummary) {
   }
 
   if (suiteSummary.failed === 0) {
-    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.`;
+    const pendingMessage = testSummary.pending > 0
+      ? ` ${testSummary.pending} ainda não executado${testSummary.pending === 1 ? '' : 's'}.`
+      : '';
+    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.${pendingMessage}`;
   }
 
   return `${suiteSummary.failed} suite${suiteSummary.failed === 1 ? '' : 's'} com falha em ${suiteSummary.total} publicad${suiteSummary.total === 1 ? 'a' : 'as'}.`;
@@ -751,15 +774,76 @@ function collectSuitesFromReports() {
   return suites;
 }
 
+function mergeCatalogSuite(catalogSuite, reportSuite) {
+  const reportTestsByTitle = new Map();
+
+  for (const test of Array.isArray(reportSuite.tests) ? reportSuite.tests : []) {
+    const title = String(test?.title || '').trim();
+    if (!reportTestsByTitle.has(title)) reportTestsByTitle.set(title, []);
+    reportTestsByTitle.get(title).push(test);
+  }
+
+  const tests = [];
+  for (const catalogTest of Array.isArray(catalogSuite.tests) ? catalogSuite.tests : []) {
+    const candidates = reportTestsByTitle.get(String(catalogTest.title || '').trim()) || [];
+    tests.push(candidates.shift() || catalogTest);
+  }
+
+  for (const candidates of reportTestsByTitle.values()) {
+    tests.push(...candidates);
+  }
+
+  const summary = countSummary(tests);
+  return {
+    ...catalogSuite,
+    ...reportSuite,
+    generatedAt: reportSuite.generatedAt,
+    updatedAt: reportSuite.updatedAt,
+    status: statusFromSummary(summary),
+    summary,
+    tests,
+    flowchartIds: catalogSuite.flowchartIds || reportSuite.flowchartIds || [],
+    cataloged: true,
+  };
+}
+
+function mergeCatalogWithReports(catalogSuites, reportSuites) {
+  const reportsBySuiteId = new Map(
+    reportSuites.map(suite => [String(suite?.suiteId || ''), suite]),
+  );
+  const merged = [];
+
+  for (const catalogSuite of catalogSuites) {
+    const reportSuite = reportsBySuiteId.get(String(catalogSuite.suiteId || ''));
+    const suite = reportSuite ? mergeCatalogSuite(catalogSuite, reportSuite) : catalogSuite;
+
+    if (reportSuite) reportsBySuiteId.delete(String(catalogSuite.suiteId || ''));
+    merged.push(suite);
+
+    if (suite.links?.report) {
+      writeJson(path.join(artifactsRoot, suite.suiteId, 'report.json'), suite);
+    }
+  }
+
+  for (const suite of reportsBySuiteId.values()) {
+    merged.push(suite);
+  }
+
+  return merged;
+}
+
 function main() {
   cleanDir(artifactsRoot);
   ensureDir(artifactsRoot);
 
-  const suites = collectSuitesFromReports();
-  const index = buildCanonicalIndex(suites);
+  const catalogSuites = buildBrowserCatalog();
+  const reportSuites = collectSuitesFromReports();
+  const suites = mergeCatalogWithReports(catalogSuites, reportSuites);
+  const flowcharts = buildFlowchartCatalog(catalogSuites);
+  const index = buildCanonicalIndex(suites, flowcharts);
 
   writeJson(indexPath, index);
-  console.log(`Published ${index.suites.length} suites to ${path.relative(projectRoot, indexPath)}`);
+  console.log(`Published ${index.summary.tests.total} tests in ${index.suites.length} suites to ${path.relative(projectRoot, indexPath)}`);
 }
 
 main();

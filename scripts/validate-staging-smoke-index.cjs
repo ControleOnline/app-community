@@ -5,6 +5,8 @@ const {chromium} = require('playwright');
 const APP_URL = String(process.env.STAGING_APP_URL || 'https://staging.controleonline.com').replace(/\/$/, '');
 const API_URL = String(process.env.STAGING_API_ENTRYPOINT || 'https://s.controleonline.com').replace(/\/$/, '');
 const sessionJson = String(process.env.PLAYWRIGHT_SESSION_JSON || '').trim();
+const minimumCatalogTests = Number(process.env.STAGING_EXPECTED_TESTS_MIN || 100);
+const minimumFlowcharts = Number(process.env.STAGING_EXPECTED_FLOWCHARTS_MIN || 1);
 
 if (!sessionJson) {
   throw new Error('PLAYWRIGHT_SESSION_JSON deve conter uma sessao real do staging.');
@@ -75,13 +77,19 @@ const main = async () => {
         indexType: response.type,
         summary: body?.summary || {},
         suiteCount: Array.isArray(body?.suites) ? body.suites.length : 0,
+        flowchartCount: Number(body?.summary?.flowcharts?.total || (Array.isArray(body?.flowcharts) ? body.flowcharts.length : 0)),
         artifactResult,
       };
     }, {apiUrl: API_URL, appUrl: APP_URL});
 
     if (result.indexStatus !== 200) throw new Error(`Indice /tests retornou HTTP ${result.indexStatus}.`);
-    if (Number(result.summary?.tests?.total || 0) <= 0 || result.suiteCount <= 0) {
-      throw new Error('Indice /tests publicado esta vazio.');
+    const testCount = Number(result.summary?.tests?.total || 0);
+    const flowchartCount = Number(result.flowchartCount || result.summary?.flowcharts?.total || 0);
+    if (testCount < minimumCatalogTests || result.suiteCount <= 0) {
+      throw new Error(`Indice /tests incompleto: ${testCount} testes publicados; esperado >= ${minimumCatalogTests}.`);
+    }
+    if (flowchartCount < minimumFlowcharts) {
+      throw new Error(`Indice /tests sem flowcharts publicados: ${flowchartCount}; esperado >= ${minimumFlowcharts}.`);
     }
     if (!result.artifactResult || result.artifactResult.status !== 200 || result.artifactResult.bytes <= 0) {
       throw new Error('Nenhum artefato publicado foi baixado com sucesso.');
@@ -93,7 +101,8 @@ const main = async () => {
       indexStatus: result.indexStatus,
       corsType: result.indexType,
       suites: result.suiteCount,
-      tests: result.summary.tests.total,
+      tests: testCount,
+      flowcharts: flowchartCount,
       artifactStatus: result.artifactResult.status,
       artifactBytes: result.artifactResult.bytes,
     }));
