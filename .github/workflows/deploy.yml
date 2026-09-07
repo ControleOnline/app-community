@@ -266,12 +266,10 @@ jobs:
           script_stop: true
           script: |
             set -e
-            # API_USER is scoped to the API deployment root; use its relative
-            # public path instead of assuming a host-level /var/www layout.
-            # The /tests controller reads report.json files from var/tests;
-            # public/tests is only a web document root and is not the backend
-            # smoke-tests-playground storage path.
-            for TARGET in var/tests public/tests; do
+            # The API application is deployed below public_html/ on the API
+            # account. The /tests controller reads report.json files from the
+            # application's var/tests directory.
+            for TARGET in public_html/var/tests public_html/public/tests; do
               mkdir -p "$TARGET"
               find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
             done
@@ -285,7 +283,7 @@ jobs:
           password: ${{ secrets.API_PASS }}
           port: ${{ secrets.API_PORT }}
           source: "tests/browser-smoke/*"
-          target: "var/tests/"
+          target: "public_html/var/tests/"
           strip_components: 1
 
       - name: Verify smoke report paths on API account
@@ -299,15 +297,13 @@ jobs:
           script_stop: true
           script: |
             set -e
-            # Keep both supported layouts synchronized while the backend
-            # setting is deployed per environment; the API reader accepts
-            # report.json files below either project-relative root.
-            rm -rf public/tests
-            mkdir -p public/tests
-            cp -R var/tests/. public/tests/
+            # Keep the application storage and its public mirror synchronized.
+            rm -rf public_html/public/tests
+            mkdir -p public_html/public/tests
+            cp -R public_html/var/tests/. public_html/public/tests/
             echo "api_cwd=$(pwd)"
-            echo "var_tests_reports=$(find var/tests -type f -name report.json | wc -l)"
-            echo "public_tests_reports=$(find public/tests -type f -name report.json | wc -l)"
+            echo "api_var_tests_reports=$(find public_html/var/tests -type f -name report.json | wc -l)"
+            echo "api_public_tests_reports=$(find public_html/public/tests -type f -name report.json | wc -l)"
 
       - name: Validate published smoke index in Chromium
         if: success()
