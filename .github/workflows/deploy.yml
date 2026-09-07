@@ -268,10 +268,9 @@ jobs:
             set -e
             # Staging API deploys the application at this fixed path. The
             # /tests controller reads report.json files from its var/tests.
-            for TARGET in /var/www/api-community/var/tests /var/www/api-community/public/tests; do
-              mkdir -p "$TARGET"
-              find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
-            done
+            TARGET=/var/www/api-community/var/tests
+            mkdir -p "$TARGET"
+            find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
       - name: Publish complete smoke tests to s.controleonline.com
         if: always()
