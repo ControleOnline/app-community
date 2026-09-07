@@ -222,6 +222,14 @@ jobs:
       - uses: actions/checkout@v5
         with:
           submodules: recursive
+          fetch-depth: 0
+      - name: Init recursive submodules
+        run: |
+          set -euo pipefail
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout --force
+          test -f modules/controleonline/ui-common/src/react/localStorage.js
+          echo "submodule ui-common localStorage.js OK"
       - uses: actions/setup-node@v5
         with:
           node-version: 20
@@ -231,9 +239,11 @@ jobs:
         run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run staging browser tests and build index
+      - name: Run staging browser tests (MANAGER/ADMIN/DELIVERY/POS) and build index
         env:
-          PLAYWRIGHT_API_ENTRYPOINT: https://s.controleonline.com
+          API_ENTRYPOINT: ${{ needs.configure.outputs.api }}
+          API_PLAYWRIGHT: ${{ needs.configure.outputs.api }}
+          PLAYWRIGHT_API_ENTRYPOINT: ${{ needs.configure.outputs.api }}
           PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
           SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
           SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
@@ -325,6 +335,7 @@ jobs:
           STAGING_EXPECTED_TESTS_MIN: '100'
           STAGING_EXPECTED_FLOWCHARTS_MIN: '1'
         run: node scripts/validate-staging-smoke-index.cjs
+
 
   android:
     name: "3 · Android ${{ matrix.app_type }}"
