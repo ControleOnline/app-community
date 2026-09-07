@@ -271,6 +271,7 @@ jobs:
             # root; keep the executed suite reports available there too.
             TARGET=public_html/var/tests
             mkdir -p "$TARGET"
+            chmod -R u+rwX "$TARGET"
             find "$TARGET" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
       - name: Publish executed smoke reports to s.controleonline.com
