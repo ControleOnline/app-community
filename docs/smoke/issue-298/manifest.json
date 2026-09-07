@@ -1,0 +1,34 @@
+{
+  "fluxo": "compra-fluxo",
+  "flowchartIds": [1],
+  "result": "passed",
+  "steps": [
+    {
+      "id": "checkout-desktop",
+      "description": "Open Shop checkout on desktop and verify the internal Home action.",
+      "screenshot": "checkout-desktop.png"
+    },
+    {
+      "id": "shop-home-desktop",
+      "description": "Use the header Home action and verify the Shop Home on desktop.",
+      "screenshot": "shop-home-desktop.png"
+    },
+    {
+      "id": "checkout-compact",
+      "description": "Open Shop checkout on a compact viewport and verify the internal Home action.",
+      "screenshot": "checkout-compact.png"
+    },
+    {
+      "id": "shop-home-compact",
+      "description": "Use the header Home action and verify the Shop Home on a compact viewport.",
+      "screenshot": "shop-home-compact.png"
+    }
+  ],
+  "artifacts": [
+    "checkout-desktop.png",
+    "shop-home-desktop.png",
+    "checkout-compact.png",
+    "shop-home-compact.png"
+  ],
+  "source": "ui-shop/src/tests/browser/manager/checkout-page.spec.js"
+}
