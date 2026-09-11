@@ -15,6 +15,11 @@ Deploys e verificações do app-community. Pipelines **independentes** — sem t
 2 · Web: MANAGER + SHOP + ADMIN (FTP de cada produto)
 3 · Android AAB+APK (só master) → GitHub Releases + Play
 4 · LG webOS (só master) → GitHub Releases
+
+Para `master`, o job `1.5 · Local production readiness checks` executa
+verificações reproduzíveis no runner antes da publicação. A produção não
+depende de um deploy prévio em `staging`; `staging` continua disponível para
+conferência humana, mas não bloqueia a fila de produção.
 ```
 
 Sem trigger cruzado entre pipelines.

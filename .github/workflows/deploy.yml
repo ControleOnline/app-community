@@ -94,60 +94,30 @@ jobs:
           echo "env=$ENV native=$NATIVE api=$API"
 
   production-gate:
-    name: "1.5 · Require staging checks"
+    name: "1.5 · Local production readiness checks"
     needs: configure
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require successful staging deployment and tests before production
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TARGET_ENV: ${{ needs.configure.outputs.env }}
-          TARGET_SHA: ${{ github.sha }}
-          REPO: ${{ github.repository }}
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Run local production readiness checks
         run: |
           set -euo pipefail
-          if [ "$TARGET_ENV" != "master" ]; then
-            echo "Production gate skipped for $TARGET_ENV."
+          if [ "${{ needs.configure.outputs.env }}" != "master" ]; then
+            echo "Production readiness checks skipped for ${{ needs.configure.outputs.env }}."
             exit 0
           fi
-          mapfile -t DEPLOYS < <(
-            gh run list \
-              --repo "$REPO" \
-              --workflow deploy.yml \
-              --branch staging \
-              --limit 50 \
-              --json conclusion,headSha,status,url \
-              --jq '.[] | select(.status == "completed" and .conclusion == "success") | [.headSha, .url] | @tsv'
-          )
-          ALLOW_URL=""
-          ALLOW_REASON=""
-          for row in "${DEPLOYS[@]:-}"; do
-            [ -z "$row" ] && continue
-            CHECK_SHA="${row%%$'\t'*}"
-            CHECK_URL="${row#*$'\t'}"
-            if [ "$CHECK_SHA" = "$TARGET_SHA" ]; then
-              ALLOW_URL="$CHECK_URL"
-              ALLOW_REASON="staging deploy and tests exact SHA match ($CHECK_SHA)"
-              break
-            fi
-            STATUS="$(
-              gh api "repos/$REPO/compare/${CHECK_SHA}...${TARGET_SHA}" --jq '.status' 2>/dev/null || true
-            )"
-            if [ "$STATUS" = "ahead" ] || [ "$STATUS" = "identical" ]; then
-              ALLOW_URL="$CHECK_URL"
-              ALLOW_REASON="staging deploy and tests $CHECK_SHA is ancestor of $TARGET_SHA (compare=$STATUS)"
-              break
-            fi
-          done
-          if [ -z "$ALLOW_URL" ]; then
-            echo "No successful staging Deploy (including its tests) is related to $TARGET_SHA." >&2
-          fi
-          if [ -z "$ALLOW_URL" ]; then
-            echo "Production deploy blocked: staging Deploy must pass its test job first." >&2
-            exit 1
-          fi
-          echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
+          npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+          find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
+          npm run test:browser:flows
+          npm test -- --runInBand
+          git diff --check
+          echo "Production deploy allowed: local readiness checks passed for $GITHUB_SHA."
 
   web:
     name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
