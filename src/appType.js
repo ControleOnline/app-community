@@ -11,6 +11,7 @@ export const app_type_options = Object.freeze([
   'PPC',
   'SHOP',
   'SERVICE',
+  'MKT',
 ]);
 
 const normalizeAppType = value =>
