@@ -91,6 +91,20 @@ runs:
           cp -R tests/browser-smoke dist/tests/
         fi
 
+    # SamKirkland skips upload when .ftp-deploy-state.json says the hash is
+    # unchanged. If the remote file was deleted (or never landed) but state
+    # remains, nginx serves index.html for the .js URL → SyntaxError
+    # Unexpected token '<'. Bust core chunk bytes so they always re-upload.
+    - name: Force re-upload of core web chunks
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        for f in dist/_expo/static/js/web/__common-*.js dist/_expo/static/js/web/__expo-metro-runtime-*.js; do
+          printf '\n;/* ftp-bust:%s */\n' "$(date -u +%Y%m%d%H%M%S)" >> "$f"
+          echo "busted $f"
+        done
+
     - name: Guard remote_dir (no tilde)
       if: ${{ inputs.skip_ftp != 'true' }}
       shell: bash
