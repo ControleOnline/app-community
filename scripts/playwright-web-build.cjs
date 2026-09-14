@@ -80,9 +80,12 @@ const buildWebExport = () => {
   try {
     const command = 'npx';
 
+    const exportArgs = ["expo", "export", "--platform", "web", "--output-dir", outputDir];
+    if (process.env.EXPO_EXPORT_MAX_WORKERS) exportArgs.push("--max-workers", String(process.env.EXPO_EXPORT_MAX_WORKERS));
+    if (process.env.EXPO_EXPORT_NO_MINIFY === "1") exportArgs.push("--no-minify");
     const result = spawnSync(
       command,
-      ['expo', 'export', '--platform', 'web', '--output-dir', outputDir],
+      exportArgs,
       {
         cwd: projectRoot,
         env: {
