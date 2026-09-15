@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-14T05:50:01.394Z",
+  "generatedAt": "2026-09-15T13:02:03.685Z",
   "groups": [
     {
       "name": "manager",
@@ -16,12 +16,13 @@
         "relatorio-consulta",
         "outros"
       ],
-      "build": "failed (exit 1)",
+      "build": "failed (exit timeout)",
       "smoke": "not-run",
       "testPaths": [
         "modules/controleonline/ui-login/src/tests/browser/manager/login-flow.spec.js",
         "modules/controleonline/ui-crm/src/tests/browser/manager/general-settings-maps-complete.spec.js",
-        "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js"
+        "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js",
+        "modules/controleonline/ui-common/src/tests/browser/manager"
       ],
       "evidence": "required-per-step",
       "artifacts": []
