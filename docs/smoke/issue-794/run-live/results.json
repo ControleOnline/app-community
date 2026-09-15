@@ -1,0 +1,154 @@
+{
+  "config": {
+    "configFile": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/playwright.config.cjs",
+    "rootDir": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/docs/smoke/issue-794/run-live/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794",
+        "testIgnore": [],
+        "testMatch": [
+          "**/src/tests/browser/**/*.spec.js"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/smoke/issue-794/run-live/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "\"/usr/bin/node\" \"/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/scripts/playwright-web-server.cjs\"",
+      "reuseExistingServer": true,
+      "timeout": 600000,
+      "url": "http://127.0.0.1:4173"
+    }
+  },
+  "suites": [
+    {
+      "title": "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js",
+      "file": "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "financial hub authenticated browser smoke",
+          "file": "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js",
+          "line": 91,
+          "column": 6,
+          "specs": [
+            {
+              "title": "fluxo: financeiro-cobranca renders rows, status chips and striped backgrounds",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 53167,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/modules/controleonline/ui-tests/src/tests/helpers/adminLogin.js",
+                            "column": 48,
+                            "line": 30
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByPlaceholder('Email')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByPlaceholder('Email')\u001b[22m\n\u001b[2m    8 × locator resolved to 1 element\u001b[22m\n\u001b[2m      - unexpected value \"1\"\u001b[22m\n\n\n   at modules/controleonline/ui-tests/src/tests/helpers/adminLogin.js:30\n\n  28 |   await page.getByText('Entrar', {exact: true}).click();\n  29 |\n> 30 |   await expect(page.getByPlaceholder('Email')).toHaveCount(0, {timeout: 15000});\n     |                                                ^\n  31 |\n  32 |   return {\n  33 |     source: fields.source,\n    at loginAsAdmin (/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/modules/controleonline/ui-tests/src/tests/helpers/adminLogin.js:30:48)\n    at /home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js:99:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-15T14:02:16.520Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/docs/smoke/issue-794/run-live/test-results/modules-controleonline-ui--a5683-ips-and-striped-backgrounds-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/paperclip/.paperclip/instances/default/projects/3fed493c-bd7b-487c-99f8-0bd5e2908faf/167b56c8-f080-4487-a0f9-c4ba3e288758/_default/app-community-task-794/docs/smoke/issue-794/run-live/test-results/modules-controleonline-ui--a5683-ips-and-striped-backgrounds-chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "569726ddf2c9971079a6-d76b801a281a85f2663c",
+              "file": "modules/controleonline/ui-financial/src/tests/browser/manager/financial-hub-page.spec.js",
+              "line": 92,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-15T14:01:52.475Z",
+    "duration": 90987.878,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

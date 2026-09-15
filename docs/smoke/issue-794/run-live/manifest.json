@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-15T13:02:03.685Z",
+  "generatedAt": "2026-09-15T14:25:00.000Z",
   "groups": [
     {
       "name": "manager",
@@ -16,8 +16,8 @@
         "relatorio-consulta",
         "outros"
       ],
-      "build": "failed (exit timeout)",
-      "smoke": "not-run",
+      "build": "passed (Expo web export, 5514 modules, 840770ms; warning: missing android Firebase file)",
+      "smoke": "failed (exit 1: live authentication could not leave login screen)",
       "testPaths": [
         "modules/controleonline/ui-login/src/tests/browser/manager/login-flow.spec.js",
         "modules/controleonline/ui-crm/src/tests/browser/manager/general-settings-maps-complete.spec.js",
@@ -25,7 +25,23 @@
         "modules/controleonline/ui-common/src/tests/browser/manager"
       ],
       "evidence": "required-per-step",
-      "artifacts": []
+      "artifacts": [
+        "results.json",
+        "test-results/*/login.png",
+        "test-results/*/video.webm",
+        "test-results/*/console.log",
+        "test-results/*/network.log",
+        "test-results/*/error-context.md"
+      ],
+      "runtime": {
+        "route": "/financial-hub-page",
+        "authenticated": true,
+        "stageReached": "login",
+        "network": "GET /people/company/default and POST /token failed with net::ERR_FAILED; no 401 response received",
+        "consoleErrors": 0,
+        "duplicateRequestCheck": "not reached",
+        "nextAction": "restore API connectivity/CORS for the live smoke account, then rerun this spec"
+      }
     }
   ]
 }

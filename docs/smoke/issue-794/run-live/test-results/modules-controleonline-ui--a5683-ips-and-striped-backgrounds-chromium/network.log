@@ -1,0 +1,43 @@
+{
+  "requests": [
+    {
+      "method": "GET",
+      "pathname": "/themes-colors.css"
+    },
+    {
+      "method": "GET",
+      "pathname": "/people/company/default"
+    },
+    {
+      "method": "GET",
+      "pathname": "/people/company/default"
+    },
+    {
+      "method": "POST",
+      "pathname": "/token"
+    }
+  ],
+  "responses": [],
+  "failedRequests": [
+    {
+      "method": "GET",
+      "pathname": "/people/company/default",
+      "failure": "net::ERR_FAILED"
+    },
+    {
+      "method": "POST",
+      "pathname": "/token",
+      "failure": "net::ERR_FAILED"
+    },
+    {
+      "method": "GET",
+      "pathname": "/people/company/default",
+      "failure": "net::ERR_FAILED"
+    },
+    {
+      "method": "GET",
+      "pathname": "/themes-colors.css",
+      "failure": "net::ERR_FAILED"
+    }
+  ]
+}
