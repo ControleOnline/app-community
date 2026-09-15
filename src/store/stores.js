@@ -53,6 +53,7 @@ import people_absences from '@controleonline/ui-employee/src/store/people_absenc
 import people_schedules from '@controleonline/ui-employee/src/store/people_schedules';
 import people from '@controleonline/ui-people/src/store/people';
 import people_link from '@controleonline/ui-people/src/store/people_link';
+import people_categories from '@controleonline/ui-customers/src/store/people_categories';
 import phones from '@controleonline/ui-people/src/store/phones';
 import print from '@controleonline/ui-common/src/store/print';
 import printer from '@controleonline/ui-common/src/store/printer';
@@ -109,6 +110,9 @@ export default {
   configs,
   contract,
   people_link,
+  people_categories,
+  // alias used by ClassificationChips / CategoriesTab
+  people_category: people_categories,
   contract_peoples,
   device,
   device_config,
