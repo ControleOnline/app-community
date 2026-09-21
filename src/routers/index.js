@@ -34,6 +34,7 @@ import {
   normalizeInitialBrowserPath,
   normalizeProductDetailsTabPath,
 } from './browserPath'
+import {createStableRouteComponents} from './stableRouteComponents'
 
 const Stack = createNativeStackNavigator()
 
@@ -183,6 +184,11 @@ const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) =
   )
 }
 
+const stableRouteComponents = createStableRouteComponents(
+  routeDefinitions,
+  WrappedComponent,
+)
+
 export const linking = (() => {
   const screens = {}
   const seen = new Set()
@@ -251,7 +257,7 @@ export default function Routes() {
     },
     routeDefinitions.map((route, index) =>
       React.createElement(Stack.Screen, {
-        component: WrappedComponent(route.options, route.component),
+        component: stableRouteComponents.get(route),
         initialParams: route.initialParams,
         key: index,
         name: route.name,
