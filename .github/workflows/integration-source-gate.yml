@@ -13,7 +13,7 @@ jobs:
   source-policy:
     runs-on: ubuntu-latest
     steps:
-      - name: Enforce task or frozen RC source
+      - name: Enforce task, staging hotfix or frozen RC source
         env:
           HEAD_REF: ${{ github.head_ref }}
           BASE_REF: ${{ github.base_ref }}
@@ -26,18 +26,22 @@ jobs:
             }
             exit 0
           fi
+          if [ "$BASE_REF" = "staging" ] &&
+             echo "$HEAD_REF" | grep -Eq '^hotfix-[1-9][0-9]*-staging$'; then
+            exit 0
+          fi
           echo "$HEAD_REF" | grep -Eq '^rc/[0-9]+\.[0-9]+\.[0-9]+-rc\.[1-9][0-9]*$' || {
             echo "::error::$BASE_REF only accepts a frozen rc/X.Y.Z-rc.N source."
             exit 1
           }
 
       - uses: actions/checkout@v4
-        if: github.base_ref != 'dev'
+        if: github.base_ref != 'dev' && !(github.base_ref == 'staging' && startsWith(github.head_ref, 'hotfix-'))
         with:
           ref: ${{ github.head_ref }}
 
       - name: Validate frozen RC manifest
-        if: github.base_ref != 'dev'
+        if: github.base_ref != 'dev' && !(github.base_ref == 'staging' && startsWith(github.head_ref, 'hotfix-'))
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
