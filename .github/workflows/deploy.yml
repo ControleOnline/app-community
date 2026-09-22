@@ -241,6 +241,11 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run staging browser tests
+        env:
+          SMOKE_ADMIN_EMAIL: ${{ secrets.ADMIN_USER }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.ADMIN_PASS }}
+          SMOKE_LIVE: ${{ secrets.SMOKE_LIVE }}
+          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
         run: npm run test:browser -- all
 
   android:
