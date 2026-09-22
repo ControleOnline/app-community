@@ -78,43 +78,6 @@ jobs:
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
           "           
 
-      - name: Update version and versionCode in app.json (Positional)
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          node -e "
-            const fs = require('fs');
-            const app = require('./app.json');
-            
-            // Separa a versão '1.7.4' em [1, 7, 4]
-            const [major, minor, patch] = '$VERSION'.split('.').map(Number);
-            
-            // Calcula o código posicional
-            const calculatedVersionCode = (major * 100000) + (minor * 1000) + patch;
-            
-            // 🌟 ATUALIZA OS DOIS CAMPOS AGORA:
-            app.expo.version = '$VERSION'; // Injeta '1.7.4' para visualização do lojista
-            app.expo.android.versionCode = calculatedVersionCode; // Injeta 10704 para validação da Cielo
-            
-            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
-          "
-
-      - name: Extract App Version and VersionCode
-        run: |
-          # 1. Extrai a versão de exibição do app.json
-          APP_VERSION=$(node -p "require('./app.json').expo.version")
-          echo "versão visível (Cielo Store): $APP_VERSION"
-          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
-
-          # 2. Extrai o versionCode numérico do app.json
-          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          echo "versionCode interno (Controle Android): $VERSION_CODE"
-          echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
-
-      - name: Copy pos_lavego assets to default assets folder
-        run: |
-          cp -r src/assets/pos_lavego/* src/assets/ 2>/dev/null || true
-          echo "Assets pos_lavego copiados para src/assets/"
-
       - name: Prebuild
         run: npx expo prebuild --clean
 
@@ -131,6 +94,17 @@ jobs:
             echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
             echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
           } > ./config/android/env.properties
+
+      - name: Update versionCode in app.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          VERSION_CODE=$(echo "$VERSION" | tr -d '.')
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.android.versionCode = parseInt('$VERSION_CODE', 10);
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
 
       - name: Build Android APK
         run: |
@@ -166,6 +140,13 @@ jobs:
           ls -lah "$APK_DIR"
           echo "APK localizado: $APK_FILENAME"
 
+          
+      - name: Extract App Version
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          echo "App version: $VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - name: Upload APK to Website (FTP)
         uses: locaweb/ftp-deploy@1.0.0
         with:
@@ -173,7 +154,7 @@ jobs:
           user: ${{ secrets.ADMIN_USER }}
           password: ${{ secrets.ADMIN_PASS }}
           localDir: ${{ env.APK_DIR }}
-          remoteDir: "public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          remoteDir: "public_html/${{ env.VERSION }}/${{ env.PACKAGE_NAME }}/apk"
           forceSsl: false
 
       - name: Verify uploaded APK on FTP
@@ -181,8 +162,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y lftp
 
-          # 🌟 CORRIGIDO: Agora usando o mapeamento de variáveis correto do GitHub
-          REMOTE_DIR="public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          REMOTE_DIR="public_html/${VERSION}/${PACKAGE_NAME}/apk"
           LOG_FILE="$(mktemp)"
 
           set +e
@@ -197,7 +177,7 @@ jobs:
             cls -la ${REMOTE_DIR}
             bye
           " 2>&1 | tee "$LOG_FILE"
-          LFTP_STATUS=${PIPESTATUS}
+          LFTP_STATUS=${PIPESTATUS[0]}
           set -e
 
           if [ "$LFTP_STATUS" -ne 0 ]; then
@@ -205,42 +185,9 @@ jobs:
             exit "$LFTP_STATUS"
           fi
 
-          if grep -Fq "${{ env.APK_FILENAME }}" "$LOG_FILE"; then
-            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${{ env.APK_FILENAME }}"
+          if grep -Fq "${APK_FILENAME}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${APK_FILENAME}"
           else
-            echo "O upload terminou sem erro, mas o arquivo ${{ env.APK_FILENAME }} não apareceu na listagem de ${REMOTE_DIR}." >&2
-            exit 1
-          fi
-
-      - name: Deploy APK to Extra FTP (Explicit FTPS)
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTPHOST_EXTRASLAVEGO }}
-          username: ${{ secrets.FTPUSER_EXTRASLAVEGO }}
-          password: ${{ secrets.FTPPASS_EXTRASLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ${{ env.APK_DIR }}/
-          server-dir: /${{ env.APP_VERSION }}/
-          
-      - name: Validar se o arquivo realmente subiu para o FTP (Via curl)
-        run: |
-          # Monta a URL exata do arquivo usando as variáveis do GitHub
-          REMOTE_FILE_URL="ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}/${{ env.APP_VERSION }}/${{ env.APK_FILENAME }}"
-          
-          echo "Verificando a existência do arquivo em: $REMOTE_FILE_URL"
-          
-          # Executa o curl com o --ftp-ssl-reqd que você testou no seu Mac.
-          # O parâmetro --head (-I) serve apenas para checar se o arquivo existe sem baixar o conteúdo inteiro.
-          curl --ftp-ssl-reqd -k -s -I \
-            -u "${{ secrets.FTPUSER_EXTRASLAVEGO }}:${{ secrets.FTPPASS_EXTRASLAVEGO }}" \
-            "$REMOTE_FILE_URL"
-          
-          # Se o curl retornar um código diferente de 0, significa que o arquivo não existe ou a conexão falhou
-          if [ $? -eq 0 ]; then
-            echo "SUCESSO: O arquivo ${{ env.APK_FILENAME }} foi encontrado no FTP!"
-          else
-            echo "ERRO CRITICO: O arquivo ${{ env.APK_FILENAME }} NÃO foi localizado no diretório remoto." >&2
+            echo "O upload terminou sem erro, mas o arquivo ${APK_FILENAME} não apareceu na listagem de ${REMOTE_DIR}." >&2
             exit 1
           fi

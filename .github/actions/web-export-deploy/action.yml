@@ -19,6 +19,10 @@ inputs:
     description: "If true, only export web (caller runs deploy)"
     required: false
     default: "false"
+  publish_tests:
+    description: "If true, include the complete smoke catalog and artifacts in the web export"
+    required: false
+    default: "false"
   ftp_protocol:
     description: "ftp | ftps | ftps-legacy (SamKirkland)"
     required: false
@@ -71,6 +75,21 @@ runs:
         npm install --legacy-peer-deps
         npx expo install --fix
         npx expo export --platform web
+
+    - name: Include smoke catalog in web export
+      if: ${{ inputs.publish_tests == 'true' }}
+      shell: bash
+      run: |
+        set -e
+        npm run tests:index
+        mkdir -p dist/tests
+        cp tests/index.json dist/tests/index.json
+        if [ -d tests/artifacts ]; then
+          cp -R tests/artifacts dist/tests/
+        fi
+        if [ -d tests/browser-smoke ]; then
+          cp -R tests/browser-smoke dist/tests/
+        fi
 
     - name: Guard remote_dir (no tilde)
       if: ${{ inputs.skip_ftp != 'true' }}

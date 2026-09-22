@@ -1,13 +1,9 @@
 # Whitelabel Lave-Go ONLY. Does not run as part of Controle Online deploy.yml.
 # Espelha a estrutura do deploy principal, sem compartilhar jobs/matriz/secrets de produto.
 # Ordem: 1) web  2) Android AAB+APK via SFTP  3) Google Play
-# Producao NAO dispara no push de master — so cron + dispatch.
 name: Deploy Lave-Go
 
 on:
-  schedule:
-    # Domingo 06:00 America/Sao_Paulo (UTC-3, sem DST) = 09:00 UTC
-    - cron: '0 9 * * 0'
   workflow_dispatch:
     inputs:
       target:
@@ -30,6 +26,7 @@ permissions:
   actions: write
 
 jobs:
+  # ─── 1. Ambiente (endpoints Lave-Go) ───────────────────────────────────────
   configure:
     name: "1 · Configure"
     runs-on: ubuntu-latest
@@ -54,6 +51,7 @@ jobs:
             echo "publish_native=$NATIVE"
           } >> "$GITHUB_OUTPUT"
 
+  # ─── 2. Web (MANAGER) → SFTP public_html ───────────────────────────────────
   web:
     name: "2 · Web"
     needs: configure
@@ -61,8 +59,6 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: master
       - uses: ./.github/actions/web-export-deploy
         with:
           app_type: MANAGER
@@ -78,6 +74,7 @@ jobs:
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
 
+      # Host Lave-Go: FTP/FTPS → 521 PROT; plain FTP → connect fail. Use SFTP (lftp).
       - name: Deploy web via SFTP
         env:
           FTP_HOST: ${{ secrets.FTPHOST_APPLAVEGO }}
@@ -98,6 +95,7 @@ jobs:
             quit
           "
 
+  # ─── 3. Android AAB+APK → SFTP + Google Play ───────────────────────────────
   android:
     name: "3 · Android AAB+APK + Play"
     needs: [configure, web]
@@ -105,8 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: master
+
       - uses: ./.github/actions/android-build
         with:
           app_type: POS

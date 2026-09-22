@@ -1,0 +1,28 @@
+{
+  "issue": "ControleOnline/app-community#723",
+  "fluxo": "fiscal-documents",
+  "wikiPage": "https://github.com/ControleOnline/app-community/wiki/Fiscal-documents",
+  "result": "pending-runtime",
+  "stages": [
+    "current-company-filter",
+    "nfe-selection-and-emission",
+    "nfse-selection-and-emission",
+    "fiscal-detail",
+    "pdf-download"
+  ],
+  "implementation": {
+    "repository": "ControleOnline/ui-logistic",
+    "ref": "master",
+    "paths": [
+      "src/react/pages/fiscal/FiscalDocumentsPage.js",
+      "src/react/pages/fiscal/NfeDetailPage.js",
+      "src/react/pages/fiscal/NfseDetailPage.js",
+      "src/react/pages/fiscal/FiscalEmittedActions.js",
+      "src/shared/fiscalDocuments.js"
+    ]
+  },
+  "tests": [
+    "src/tests/react/utils/fiscalDocuments.test.js",
+    "src/tests/react/utils/fiscalEmitOrders.test.js"
+  ]
+}

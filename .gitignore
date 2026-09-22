@@ -81,3 +81,4 @@ config/env.local.js
 playwright-report/
 test-results/
 .playwright-*
+/tests/browser-smoke/

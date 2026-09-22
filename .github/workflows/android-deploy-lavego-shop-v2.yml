@@ -103,6 +103,7 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   build:
+  build:
     needs: production-gate
     runs-on: ubuntu-latest
 
@@ -192,11 +193,6 @@ jobs:
 
       - name: Fix Expo Dependencies
         run: npx expo install --fix
-
-      - name: Copy shop_lavego assets to default assets folder
-        run: |
-          cp -r src/assets/shop_lavego/* src/assets/ 2>/dev/null || true
-          echo "Assets shop_lavego copiados para src/assets/"
 
       - name: Prebuild
         run: npx expo prebuild --clean
@@ -301,36 +297,3 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
-
-
-      - name: Deploy AAB to Extra FTP (Explicit FTPS)
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTPHOST_EXTRASLAVEGO }}
-          username: ${{ secrets.FTPUSER_EXTRASLAVEGO }}
-          password: ${{ secrets.FTPPASS_EXTRASLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ${{ env.AAB_DIR }}/
-          server-dir: /${{ env.VERSION }}/
-          
-      - name: Validar se o arquivo realmente subiu para o FTP (Via curl)
-        run: |
-          # Monta a URL exata do arquivo usando as variáveis corretas do GitHub (VERSION)
-          REMOTE_FILE_URL="ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}/${{ env.VERSION }}/${{ env.AAB_FILENAME }}"
-          
-          echo "Verificando a existência do arquivo em: $REMOTE_FILE_URL"
-          
-          # Executa o curl com o --ftp-ssl-reqd validado no terminal do Mac
-          curl --ftp-ssl-reqd -k -s -I \
-            -u "${{ secrets.FTPUSER_EXTRASLAVEGO }}:${{ secrets.FTPPASS_EXTRASLAVEGO }}" \
-            "$REMOTE_FILE_URL"
-          
-          # Se o curl retornar um código diferente de 0, significa que o arquivo não existe ou a conexão falhou
-          if [ $? -eq 0 ]; then
-            echo "SUCESSO: O arquivo ${{ env.AAB_FILENAME }} foi encontrado no FTP!"
-          else
-            echo "ERRO CRITICO: O arquivo ${{ env.AAB_FILENAME }} NÃO foi localizado no diretório remoto." >&2
-            exit 1
-          fi
