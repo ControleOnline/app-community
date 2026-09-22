@@ -1,0 +1,14 @@
+{
+  "branch": "rc/1.10.29-rc.1",
+  "version": "1.10.29",
+  "rc": 1,
+  "frozen": true,
+  "tasks": [
+    805
+  ],
+  "baseMaster": "663d13e0a54bf4ab3398475b0ee6daba78f8a184",
+  "repositories": {
+    "ControleOnline/app-community": "8e7080119401e9469d8a2f1e7d9bd4c0e48c1830",
+    "ControleOnline/ui-people": "22f0a64d73daa99385946d7a35e9a4c0b162630f"
+  }
+}
