@@ -44,6 +44,9 @@ jobs:
 
   browser-smoke:
     name: browser-smoke (${{ matrix.group }})
+    # Smoke is available for manual/staging runs. It is not a pull-request
+    # gate: unrelated journeys and live credentials must not block delivery.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     # Browser smoke remains visible on PRs, but it is informational. It must
