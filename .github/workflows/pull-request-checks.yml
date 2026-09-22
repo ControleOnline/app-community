@@ -46,6 +46,11 @@ jobs:
     name: browser-smoke (${{ matrix.group }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Browser smoke remains visible on PRs, but it is informational. It must
+    # not block an unrelated task or deployment when credentials or another
+    # module's scenario is unavailable. Baseline and task-specific checks are
+    # the release gates.
+    continue-on-error: true
     needs: baseline-checks
     strategy:
       fail-fast: false
