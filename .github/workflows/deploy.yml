@@ -224,7 +224,10 @@ jobs:
   tests:
     name: "3 · Staging browser tests"
     needs: [configure, web]
-    if: needs.configure.outputs.env == 'staging'
+    # Staging publication must not depend on the broad browser suite. Run it
+    # only when explicitly dispatched; the deployed task is validated by its
+    # targeted checks and human staging review.
+    if: needs.configure.outputs.env == 'staging' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
