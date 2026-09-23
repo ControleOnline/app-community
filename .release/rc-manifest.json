@@ -1,7 +1,7 @@
 {
-  "branch": "rc/1.10.31-rc.4",
+  "branch": "rc/1.10.31-rc.5",
   "version": "1.10.31",
-  "rc": 4,
+  "rc": 5,
   "frozen": true,
   "tasks": [805, 832, 837],
   "baseMaster": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
