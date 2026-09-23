@@ -69,6 +69,10 @@ runs:
         git submodule sync --recursive
         git submodule update --recursive --init --checkout
 
+    - name: Validate company contract in checked-out modules
+      shell: bash
+      run: node scripts/validate-company-contract.cjs
+
     - name: Install & build
       shell: bash
       run: |
