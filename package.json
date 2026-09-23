@@ -16,6 +16,7 @@
     "test:browser:manager": "node scripts/run-browser-smokes.cjs manager",
     "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
     "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
+    "test:smoke:mark-as-paid:live": "node scripts/smoke-mark-as-paid-live.cjs",
     "test:browser:install": "playwright install chromium",
     "test:browser:flows": "node scripts/validate-smoke-flow-catalog.cjs",
     "tests:index": "node scripts/build-tests-index.cjs",
