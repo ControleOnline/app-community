@@ -4,9 +4,12 @@ const assert = require("node:assert/strict");
 const apiOrigin = String(process.env.SMOKE_API_ENTRYPOINT || "").replace(/\/$/, "");
 const token = String(process.env.SMOKE_API_TOKEN || "");
 const orderId = String(process.env.SMOKE_ORDER_ID || "");
+const paymentType = String(process.env.SMOKE_AUTH_PAYMENT_TYPE || "");
+const destinationWallet = String(process.env.SMOKE_AUTH_DESTINATION_WALLET || "");
+const product = String(process.env.SMOKE_AUTH_PRODUCT || "");
 
-if (!apiOrigin || !token || !orderId) {
-  throw new Error("Configure SMOKE_API_ENTRYPOINT, SMOKE_API_TOKEN e SMOKE_ORDER_ID antes de executar o smoke live.");
+if (!apiOrigin || !token || !orderId || !paymentType) {
+  throw new Error("Configure SMOKE_API_ENTRYPOINT, SMOKE_API_TOKEN, SMOKE_ORDER_ID e SMOKE_AUTH_PAYMENT_TYPE antes de executar o smoke live.");
 }
 
 const headers = {Accept: "application/ld+json", "API-TOKEN": token, "Content-Type": "application/json"};
@@ -42,4 +45,20 @@ assert.deepEqual({
 }, "A tentativa rejeitada alterou o pedido.");
 
 console.log(JSON.stringify({flow: "financeiro-cobranca", endpoint: `orders/${orderId}/mark-as-paid`, backend: apiOrigin, result: "rejected-without-mutation", httpStatus: attempted.response.status, orderUnchanged: true}));
+const authorizedPayload = {paymentType};
+if (destinationWallet) authorizedPayload.destinationWallet = destinationWallet;
+if (product) authorizedPayload.product = product;
+const authorized = await requestJson("orders/" + orderId + "/mark-as-paid", {
+  method: "POST",
+  body: JSON.stringify(authorizedPayload),
+});
+assert.equal(authorized.response.status, 200, "A referência autorizada não liquidou o pedido: HTTP " + authorized.response.status);
+assert.equal(authorized.body?.outcome, "success", "A resposta autorizada não confirmou sucesso.");
+assert.ok(["closed", "paid"].includes(String(authorized.body?.order?.realStatus || "").toLowerCase()), "A liquidação autorizada não terminou em PAGO/closed.");
+assert.ok(["closed", "paid"].includes(String(authorized.body?.invoice?.realStatus || "").toLowerCase()), "A invoice autorizada não terminou em PAGO/closed.");
+const settled = await requestJson("orders/" + orderId);
+assert.equal(settled.response.ok, true, "Não foi possível reler o pedido liquidado " + orderId + ".");
+assert.ok(["closed", "paid"].includes(String(settled.body?.status?.realStatus || settled.body?.status?.status || "").toLowerCase()), "O pedido relido não está PAGO/closed.");
+console.log(JSON.stringify({flow: "financeiro-cobranca", endpoint: "orders/" + orderId + "/mark-as-paid", backend: apiOrigin, result: "authorized-settlement", httpStatus: authorized.response.status, orderStatus: authorized.body?.order?.realStatus, invoiceStatus: authorized.body?.invoice?.realStatus}));
+
 })();
