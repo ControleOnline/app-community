@@ -53,6 +53,11 @@ jobs:
           const match = /^rc\/(\d+\.\d+\.\d+)-rc\.([1-9][0-9]*)$/.exec(branch);
           if (!match) throw new Error('invalid RC branch');
           if (m.branch !== branch || m.version !== match[1] || Number(m.rc) !== Number(match[2])) throw new Error('manifest identity mismatch');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+          if (pkg.version !== m.version || app.expo?.version !== m.version) {
+            throw new Error(`product version mismatch: manifest=${m.version}, package.json=${pkg.version}, app.json expo.version=${app.expo?.version}`);
+          }
           if (m.frozen !== true) throw new Error('manifest is not frozen');
           if (!Array.isArray(m.tasks) || m.tasks.length < 1 || m.tasks.length > 5) throw new Error('RC must contain 1..5 tasks');
           const tasks = m.tasks.map(Number);
