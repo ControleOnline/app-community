@@ -17,6 +17,7 @@ config.resolver.nodeModulesPaths = [
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
   '@appType': path.resolve(projectRoot, 'src', 'appType.js'),
+  '@controleonline/ui-accounting': path.resolve(projectRoot, 'modules', 'controleonline', 'ui-accounting'),
   react: path.resolve(appNodeModules, 'react'),
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };

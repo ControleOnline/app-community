@@ -1,13 +1,16 @@
 {
-  "branch": "rc/1.10.30-rc.1",
-  "version": "1.10.30",
-  "rc": 1,
+  "branch": "rc/1.10.31-rc.7",
+  "version": "1.10.31",
+  "rc": 7,
   "frozen": true,
-  "tasks": [835, 809],
-  "baseMaster": "bab3905ed5de2af8d969078d88c7bc3969e656e3",
+  "tasks": [805, 832, 837],
+  "baseMaster": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
   "repositories": {
-    "ControleOnline/app-community": "08520891485e5f2a6cf8cc0b83ec7d6283ecddca",
-    "ControleOnline/ui-orders": "bb577ac62ad5436fa8f519999ee298a09e223a4c",
-    "ControleOnline/ui-default": "b8489dfa367d1a18625e2f8783c6d4c7f72c1738"
+    "ControleOnline/app-community": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
+    "ControleOnline/ui-manager": "f08b84ec0711f979717fbd3037fc2a7420a59bb3",
+    "ControleOnline/ui-people": "1375f85ad8db738f1e191508f56ac5483092833e",
+    "ControleOnline/api-community": "41348e9f224d12d378aa4d8d14adeb7d3ed1af79",
+    "ControleOnline/api-platform-financial": "ee494c35cf2623fcf86b19d9347250fc3ef4e9ed",
+    "ControleOnline/api-platform-orders": "0ce3f06537439d85c7602ca19710b6c8ac5230f3"
   }
 }

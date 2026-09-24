@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.29",
+  "version": "1.10.31",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -11,14 +11,11 @@
     "lint": "eslint .",
     "test": "jest",
     "test:automated": "jest --runInBand",
-    "test:company-contract": "node scripts/validate-company-contract.cjs",
-    "test:company-bootstrap": "node scripts/tests/company-bootstrap-smoke.cjs",
     "test:browser": "node scripts/run-browser-smokes.cjs",
     "test:browser:headed": "node scripts/run-browser-smokes.cjs --headed",
     "test:browser:manager": "node scripts/run-browser-smokes.cjs manager",
     "test:browser:delivery": "node scripts/run-browser-smokes.cjs delivery",
     "test:browser:pos": "node scripts/run-browser-smokes.cjs pos",
-    "test:smoke:mark-as-paid:live": "node scripts/smoke-mark-as-paid-live.cjs",
     "test:browser:install": "playwright install chromium",
     "test:browser:flows": "node scripts/validate-smoke-flow-catalog.cjs",
     "tests:index": "node scripts/build-tests-index.cjs",
