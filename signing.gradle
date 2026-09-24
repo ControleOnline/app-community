@@ -19,6 +19,8 @@ gradle.afterProject { project ->
     if (!packageFile.exists()) return
 
     def pkg = new JsonSlurper().parse(packageFile)
+    def appFile = new File(rootDir, "../app.json")
+    def app = appFile.exists() ? new JsonSlurper().parse(appFile) : [:]
 
     android.signingConfigs.maybeCreate("release").with {
         storeFile file(env["MYAPP_UPLOAD_STORE_FILE"])
@@ -29,13 +31,17 @@ gradle.afterProject { project ->
 
     android.buildTypes.release.signingConfig = android.signingConfigs.release
 
-    android.defaultConfig.versionName = pkg.version
+    android.defaultConfig.versionName = app?.expo?.version ?: pkg.version
 
     def parts = pkg.version.tokenize('.').collect { it.toInteger() }
     while (parts.size() < 3) parts << 0
 
-    android.defaultConfig.versionCode =
-        (parts[0] * 100000) +
-        (parts[1] * 1000) +
-        parts[2]
+    def configuredVersionCode =
+        System.getenv("ANDROID_VERSION_CODE") ?:
+        app?.expo?.android?.versionCode ?:
+        app?.versionCode
+
+    android.defaultConfig.versionCode = configuredVersionCode ?
+        configuredVersionCode.toString().toInteger() :
+        ((parts[0] * 100000) + (parts[1] * 1000) + parts[2])
 }
