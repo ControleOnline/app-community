@@ -65,12 +65,17 @@ runs:
         git submodule sync --recursive
         git submodule update --recursive --init --checkout
 
+    - name: Validate company contract in checked-out modules
+      shell: bash
+      run: node scripts/validate-company-contract.cjs
+
     - name: Install & build
       shell: bash
       run: |
         npm install --legacy-peer-deps
         npx expo install --fix
         npx expo export --platform web
+        test -s ./dist/index.html
 
     - name: Guard remote_dir (no tilde)
       if: ${{ inputs.skip_ftp != 'true' }}
