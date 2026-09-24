@@ -97,6 +97,13 @@ const buildWebExport = () => {
         'Expo web export failed with exit code ' + (result.status || 1) + '.',
       );
     }
+
+    const indexFile = path.join(outputDir, 'index.html');
+    if (!fs.existsSync(indexFile) || fs.statSync(indexFile).size === 0) {
+      throw new Error(
+        'Expo web export completed without a non-empty index.html at ' + indexFile + '.',
+      );
+    }
   } finally {
     if (restoreEnvLocal) {
       restoreEnvLocal();

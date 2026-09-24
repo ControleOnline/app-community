@@ -12,7 +12,7 @@ function fixture() {
   const files = {
     'customActions.js': "export const mainCompany = () => fetch('/people/company/default');",
     'getters.js': 'export const mainCompany = state => state.mainCompany;',
-    'index.js': 'export default {state: {mainCompany: {}, currentCompany: {}}};',
+    'index.js': 'export default {state: {mainCompany: {}, currentCompany: {}}, actions: {...actions, ...customActions}};',
     'mutation_types.js': "export const SET_MAIN_COMPANY = 'SET_MAIN_COMPANY';",
   };
   for (const [name, text] of Object.entries(files)) fs.writeFileSync(path.join(dir, name), text);

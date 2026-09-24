@@ -25,6 +25,12 @@ function validateCompanyContract(root) {
   for (const [file, pattern] of Object.entries(required)) {
     if (!pattern.test(read(file))) errors.push(`Missing mainCompany contract in ${file}`);
   }
+  const peopleStore = read('ui-people/src/store/people/index.js');
+  const genericActionsIndex = peopleStore.indexOf('...actions');
+  const customActionsIndex = peopleStore.indexOf('...customActions');
+  if (genericActionsIndex < 0 || customActionsIndex <= genericActionsIndex) {
+    errors.push('ui-people store must apply customActions after generic actions');
+  }
   function scan(dir) {
     for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
       const file = path.join(dir, entry.name);
