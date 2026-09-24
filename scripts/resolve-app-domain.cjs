@@ -12,7 +12,7 @@ const APP_DOMAIN_NAMESPACES = Object.freeze({
 });
 
 const ENVIRONMENT_DOMAINS = Object.freeze({
-  dev: 'https://d.controleonline.com',
+  dev: 'https://dd.controleonline.com',
   staging: 'https://staging.controleonline.com',
 });
 
