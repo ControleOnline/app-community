@@ -8,7 +8,7 @@ Refs completas: `.release/task-857-composition.json`.
 
 ## O que entra
 
-Somente o delta original da #857, reconciliado com a base atual: mainCompany representa a empresa do domínio; currentCompany representa a seleção. Preserva rota HTTP, políticas de fallback e mudanças posteriores da base. Commits originais preservados na ancestralidade dos merges. Módulos: ui-people 4cec40b, ui-default 9f8846a, ui-customers ca17f6f (PR #36 da correção visual).
+Somente o delta original da #857, reconciliado com a base atual: mainCompany representa a empresa do domínio; currentCompany representa a seleção. Preserva rota HTTP, políticas de fallback e mudanças posteriores da base. Commits originais preservados na ancestralidade dos merges. Módulos: ui-people 4cec40b, ui-default 9f8846a, ui-customers ba206a3 (PR #36 correção visual, PR #37 testes focados).
 
 #809 e #835 já foram integradas pela PR #846 (784869fd), ancestral da base atual. O gitlink ui-orders permanece bb577ac6; a implementação operacional/tooltip e estabilidade das rotas foram preservadas. Não reintegrar essas tasks nem reutilizar a RC 1.10.30.
 
@@ -24,6 +24,6 @@ Não incorporar a PR #874 inteira à RC: ela usa módulos agregados de dev e con
 
 Esta branch é um artefato de composição para revisão. O manifesto de RC herdado da base não autoriza esta entrega: `.release/task-857-composition.json` é a referência de preparação e declara explicitamente não congelada.
 
-Faltam integrar/revisar esta composição exata na nova RC, registrar quatro decisões formais sobre seus SHAs, congelar manifesto do pai, promover e homologar staging. Não emitir In Review antecipadamente. Falhas gerais de CI devem ser classificadas com evidência do baseline pelo fluxo canônico; não corrigir indiscriminadamente outras tasks nem ignorar os gates.
+Faltam integrar ui-people/ui-default na branch da RC, revisar e registrar quatro decisões formais sobre os SHAs exatos, congelar manifesto do pai, promover e homologar staging. O workflow Actions 36027223608 passou em baseline-checks, mas os quatro browser-smokes falharam por pré-condições de CI (sessão de staging/credenciais ausentes, CORS de tema e timeouts de API); isso está registrado como suplementar e não foi mascarado como aceite. O smoke local autenticado das duas jornadas #857 passou; ainda falta a homologação DevOps após deploy em staging. Não emitir In Review antecipadamente. Falhas gerais de CI devem ser classificadas com evidência do baseline pelo fluxo canônico; não corrigir indiscriminadamente outras tasks nem ignorar os gates.
 
 A entrega original está preservada. Próxima execução deve partir deste pacote, e não reiniciar a investigação de dev.
