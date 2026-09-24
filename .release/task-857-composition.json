@@ -1,0 +1,67 @@
+{
+  "status": "prepared-updated-not-frozen-not-staged",
+  "baseMaster": "d84cfa176d5d24c5b9830c720e6b0f518f53e58c",
+  "newTasks": [
+    857
+  ],
+  "preservedTasks": [
+    809,
+    835
+  ],
+  "preservedReleaseMerge": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
+  "repositories": {
+    "ControleOnline/app-community": "f4a64a8dbee32fe3e4cb9d1410f8774def22db93",
+    "ControleOnline/ui-people": "4cec40bad47498aafe9af1cc83edf0473760025a",
+    "ControleOnline/ui-default": "9f8846a53114e9ecb0c211008458f1054471cef4",
+    "ControleOnline/ui-customers": "ba206a30cb971e39d3c5eb5933fc9720131097c1"
+  },
+  "branch": "delivery/task-857-d84cfa17-tests",
+  "validation": {
+    "contract": "passed on original prepared composition; unchanged by this UI-only patch",
+    "salesmanTabTests": {
+      "passed": 14,
+      "failed": 0,
+      "command": "npm run test:salesman-tab"
+    },
+    "expoWeb": "passed on exact ui-customers commit e1130fdf37a0b054794136540ec487c18ba3eeb5",
+    "liveReview": {
+      "browser": "Playwright 1.60.0, authenticated with real dev API",
+      "mobile": "390x844; no tab overlap; tab strip scroll width 568px within 390px viewport; Contracts tab opened",
+      "desktop": "1440x1000; tabs fit with no horizontal overflow",
+      "sellers": "empty state guided non-manager to ask an administrator; existing manager permission gates the visible Vincular vendedor action",
+      "pageErrors": 0,
+      "relatedHttpErrors": 0,
+      "unrelated": "one Gravatar 404",
+      "exactModuleSource": "e1130fdf37a0b054794136540ec487c18ba3eeb5 (later integrated as ba206a30cb971e39d3c5eb5933fc9720131097c1)"
+    }
+  },
+  "pending": [
+    "Integrate ui-people and ui-default task commits into RC-specific module branches without widening scope",
+    "Create RC 1.10.31-rc.9 from current master and integrate the exact #857 module changes",
+    "Record QA, Security, Design, and UX decisions against exact RC SHAs",
+    "Freeze the RC manifest only after all four accepts",
+    "Deploy and validate the exact frozen snapshot in staging; then move #857 to In Review"
+  ],
+  "excluded": [
+    "Aggregated dev module revisions",
+    "Additional list-layout fix",
+    "Browser runner and fixture investigation"
+  ],
+  "baselineComparison": {
+    "baseMaster": "d84cfa176d5d24c5b9830c720e6b0f518f53e58c",
+    "compositionBefore": "4c02072a1291e9f0fe8b70d23a13a163c6a6c08d",
+    "findings": "Both findings also reproduce on d84cfa17 under the same authenticated company route and 390x844 viewport: labels overlap/extend beyond viewport; Sellers empty state only states that none are linked. Canonical Design/UX checklist rejects any screen/journey fail and has no pre-existing-defect exemption; the user authorized these two minimal fixes.",
+    "protocol": "Design and UX remain rejected until formal re-review of the updated exact composition SHA."
+  },
+  "supplementalCI": {
+    "runId": 36027223608,
+    "baselineChecks": "passed",
+    "browserSmoke": {
+      "delivery": "failed: PLAYWRIGHT_SESSION_JSON must contain a real staging session",
+      "admin": "failed: SMOKE_ADMIN_EMAIL/SMOKE_ADMIN_PASSWORD absent; separate PPC/report expectations failed",
+      "manager": "failed: themes-colors.css CORS plus missing selectors",
+      "pos": "failed: API waitForResponse timed out at 30s"
+    },
+    "qaProtocol": "GitHub Actions are supplemental to QA; failures are recorded and not represented as passing. DevOps staging smoke remains a separate mandatory release step."
+  }
+}
