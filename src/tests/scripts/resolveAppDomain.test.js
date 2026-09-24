@@ -14,7 +14,7 @@ describe('resolveAppDomain', () => {
   });
 
   it('keeps non-production domains tied to the selected environment', () => {
-    expect(resolveAppDomain('CRM', 'dev')).toBe('https://dd.controleonline.com');
+    expect(resolveAppDomain('CRM', 'dev')).toBe('https://d.controleonline.com');
     expect(resolveAppDomain('POS', 'staging')).toBe('https://staging.controleonline.com');
   });
 
