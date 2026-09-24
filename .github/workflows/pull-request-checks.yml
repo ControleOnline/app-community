@@ -44,16 +44,8 @@ jobs:
 
   browser-smoke:
     name: browser-smoke (${{ matrix.group }})
-    # Smoke is available for manual/staging runs. It is not a pull-request
-    # gate: unrelated journeys and live credentials must not block delivery.
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # Browser smoke remains visible on PRs, but it is informational. It must
-    # not block an unrelated task or deployment when credentials or another
-    # module's scenario is unavailable. Baseline and task-specific checks are
-    # the release gates.
-    continue-on-error: true
     needs: baseline-checks
     strategy:
       fail-fast: false
@@ -66,16 +58,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
       - name: Update Submodules
         run: |
-          set -euo pipefail
           git submodule sync --recursive
-          git submodule update --recursive --init --checkout --force
-          test -f modules/controleonline/ui-common/src/react/localStorage.js
+          git submodule update --recursive --init --checkout
 
       - uses: actions/setup-node@v5
         with:
@@ -93,10 +80,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
-        env:
-          PLAYWRIGHT_API_ENTRYPOINT: https://s.controleonline.com
-          PLAYWRIGHT_SESSION_JSON: ${{ secrets.PLAYWRIGHT_SESSION_JSON }}
-          SMOKE_ADMIN_EMAIL: ${{ secrets.SMOKE_ADMIN_EMAIL }}
-          SMOKE_ADMIN_PASSWORD: ${{ secrets.SMOKE_ADMIN_PASSWORD }}
-          SMOKE_LIVE: ${{ secrets.SMOKE_LIVE }}
         run: npm run test:browser -- ${{ matrix.group }}
