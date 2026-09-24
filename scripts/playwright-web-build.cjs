@@ -48,21 +48,19 @@ const overrideEnvLocalAppType = appType => {
     );
   }
 
-  const currentAppType = String(appTypeMatch[0] || '')
-    .replace(/^APP_TYPE:\s*/, '')
-    .replace(/^resolveAppType\(\)$/, 'MANAGER')
-    .replace(/^['"]|['"]$/g, '')
-    .trim()
-    .toUpperCase();
-
-  if (currentAppType === normalizedAppType) {
-    return null;
+  const configuredEnv = require(envLocalFile).env;
+  const apiOrigin = String(configuredEnv.API_PLAYWRIGHT || '').trim();
+  if (!apiOrigin || !/^https?:\/\//.test(apiOrigin)) {
+    throw new Error('API_PLAYWRIGHT must be an HTTP(S) origin for browser smoke builds.');
   }
-
-  const nextEnvLocal = originalEnvLocal.replace(
-    appTypePattern,
-    `APP_TYPE: '${normalizedAppType}'`,
-  );
+  const apiPattern = /API_ENTRYPOINT:\s*['"][^'"]+['"]/;
+  if (!apiPattern.test(originalEnvLocal)) {
+    throw new Error('Unable to override API_ENTRYPOINT in ' + envLocalFile);
+  }
+  // Fixtures intercept API_PLAYWRIGHT: the exported app must use the same API.
+  const nextEnvLocal = originalEnvLocal
+    .replace(appTypePattern, `APP_TYPE: '${normalizedAppType}'`)
+    .replace(apiPattern, () => `API_ENTRYPOINT: ${JSON.stringify(apiOrigin)}`);
 
   fs.writeFileSync(envLocalFile, nextEnvLocal);
 
