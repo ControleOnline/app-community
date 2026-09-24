@@ -1,0 +1,36 @@
+{
+  "status": "prepared-not-frozen-not-staged",
+  "baseMaster": "d84cfa176d5d24c5b9830c720e6b0f518f53e58c",
+  "newTasks": [
+    857
+  ],
+  "preservedTasks": [
+    809,
+    835
+  ],
+  "preservedReleaseMerge": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
+  "repositories": {
+    "ControleOnline/app-community": "f4a64a8dbee32fe3e4cb9d1410f8774def22db93",
+    "ControleOnline/ui-people": "4cec40bad47498aafe9af1cc83edf0473760025a",
+    "ControleOnline/ui-default": "9f8846a53114e9ecb0c211008458f1054471cef4",
+    "ControleOnline/ui-customers": "235226dca89e6879d0c730cbef4cf0c10c6c34ba"
+  },
+  "branch": "delivery/task-857-d84cfa17",
+  "validation": {
+    "contract": "passed",
+    "jestSuites": 11,
+    "jestTests": 33,
+    "expoWeb": "passed",
+    "liveReview": "Local compiled frontend with real dev API; authenticated bootstrap, selected-company switch and reload persistence; no pageerror or API HTTP error observed; mobile has no horizontal overflow. Not public deploy evidence."
+  },
+  "pending": [
+    "Exact composition integration and four formal decisions",
+    "RC freeze after accepts",
+    "Staging deploy and exact snapshot validation"
+  ],
+  "excluded": [
+    "Aggregated dev module revisions",
+    "Additional list-layout fix",
+    "Browser runner and fixture investigation"
+  ]
+}
