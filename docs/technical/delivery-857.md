@@ -1,6 +1,6 @@
 # Composição delimitada — #857, preservando #809 e #835
 
-Estado: composição atualizada e validada; **não é RC congelada nem entrega em staging**.
+Estado: candidata à RC `1.10.31-rc.9`, ainda **não congelada nem em staging**.
 
 Base master: `d84cfa176d5d24c5b9830c720e6b0f518f53e58c`.
 Código de produto preparado: `f4a64a8dbee32fe3e4cb9d1410f8774def22db93`.
@@ -8,7 +8,7 @@ Refs completas: `.release/task-857-composition.json`.
 
 ## O que entra
 
-Somente o delta original da #857, reconciliado com a base atual: mainCompany representa a empresa do domínio; currentCompany representa a seleção. Preserva rota HTTP, políticas de fallback e mudanças posteriores da base. Commits originais preservados na ancestralidade dos merges. Módulos: ui-people 4cec40b, ui-default 9f8846a, ui-customers ba206a3 (PR #36 correção visual, PR #37 testes focados).
+Somente o delta original da #857, reconciliado com a base atual: mainCompany representa a empresa do domínio; currentCompany representa a seleção. Preserva rota HTTP, políticas de fallback e mudanças posteriores da base. Commits originais preservados na ancestralidade dos merges. Módulos: ui-people `fb105d4` (PR #27), ui-default `db2790e` (PR #37), ui-customers `1b2c45c` (PR #38), todos integrados nas branches `rc/1.10.31-rc.9`. Os trees de produto correspondem aos SHAs revistos da composição.
 
 #809 e #835 já foram integradas pela PR #846 (784869fd), ancestral da base atual. O gitlink ui-orders permanece bb577ac6; a implementação operacional/tooltip e estabilidade das rotas foram preservadas. Não reintegrar essas tasks nem reutilizar a RC 1.10.30.
 
@@ -24,6 +24,6 @@ Não incorporar a PR #874 inteira à RC: ela usa módulos agregados de dev e con
 
 Esta branch é um artefato de composição para revisão. O manifesto de RC herdado da base não autoriza esta entrega: `.release/task-857-composition.json` é a referência de preparação e declara explicitamente não congelada.
 
-Faltam integrar ui-people/ui-default na branch da RC, revisar e registrar quatro decisões formais sobre os SHAs exatos, congelar manifesto do pai, promover e homologar staging. O workflow Actions 36027223608 passou em baseline-checks, mas os quatro browser-smokes falharam por pré-condições de CI (sessão de staging/credenciais ausentes, CORS de tema e timeouts de API); isso está registrado como suplementar e não foi mascarado como aceite. O smoke local autenticado das duas jornadas #857 passou; ainda falta a homologação DevOps após deploy em staging. Não emitir In Review antecipadamente. Falhas gerais de CI devem ser classificadas com evidência do baseline pelo fluxo canônico; não corrigir indiscriminadamente outras tasks nem ignorar os gates.
+A nova RC parte de `d84cfa1`; os três PRs de módulos foram integrados em `rc/1.10.31-rc.9`. Falta formalizar novamente os quatro pareceres sobre o candidate root SHA, congelar manifesto, promover e homologar staging. O workflow Actions 36027223608 passou em baseline-checks, mas os quatro browser-smokes falharam por pré-condições de CI (sessão de staging/credenciais ausentes, CORS de tema e timeouts de API); isso está registrado como suplementar e não foi mascarado como aceite. O smoke local autenticado das duas jornadas #857 passou; ainda falta a homologação DevOps após deploy em staging. Não emitir In Review antecipadamente. Falhas gerais de CI devem ser classificadas com evidência do baseline pelo fluxo canônico; não corrigir indiscriminadamente outras tasks nem ignorar os gates.
 
 A entrega original está preservada. Próxima execução deve partir deste pacote, e não reiniciar a investigação de dev.

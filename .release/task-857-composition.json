@@ -1,5 +1,5 @@
 {
-  "status": "prepared-updated-not-frozen-not-staged",
+  "status": "rc-candidate-not-frozen-not-staged",
   "baseMaster": "d84cfa176d5d24c5b9830c720e6b0f518f53e58c",
   "newTasks": [
     857
@@ -11,11 +11,11 @@
   "preservedReleaseMerge": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb",
   "repositories": {
     "ControleOnline/app-community": "f4a64a8dbee32fe3e4cb9d1410f8774def22db93",
-    "ControleOnline/ui-people": "4cec40bad47498aafe9af1cc83edf0473760025a",
-    "ControleOnline/ui-default": "9f8846a53114e9ecb0c211008458f1054471cef4",
-    "ControleOnline/ui-customers": "ba206a30cb971e39d3c5eb5933fc9720131097c1"
+    "ControleOnline/ui-people": "fb105d4577e8a8f560e720b56720a602519ef7db",
+    "ControleOnline/ui-default": "db2790e195642742f77255cee53c1e0053771310",
+    "ControleOnline/ui-customers": "1b2c45c7790c932613156fd0616d8075ac363b85"
   },
-  "branch": "delivery/task-857-d84cfa17-tests",
+  "branch": "rc/1.10.31-rc.9",
   "validation": {
     "contract": "passed on original prepared composition; unchanged by this UI-only patch",
     "salesmanTabTests": {
@@ -36,11 +36,9 @@
     }
   },
   "pending": [
-    "Integrate ui-people and ui-default task commits into RC-specific module branches without widening scope",
-    "Create RC 1.10.31-rc.9 from current master and integrate the exact #857 module changes",
-    "Record QA, Security, Design, and UX decisions against exact RC SHAs",
-    "Freeze the RC manifest only after all four accepts",
-    "Deploy and validate the exact frozen snapshot in staging; then move #857 to In Review"
+    "Formal re-review on the integrated RC candidate SHA, then freeze the manifest",
+    "Promote exactly this RC to staging and run deploy, browser, API/Postman and regression gates",
+    "After successful staging validation, move #857 to In Review"
   ],
   "excluded": [
     "Aggregated dev module revisions",
@@ -63,5 +61,26 @@
       "pos": "failed: API waitForResponse timed out at 30s"
     },
     "qaProtocol": "GitHub Actions are supplemental to QA; failures are recorded and not represented as passing. DevOps staging smoke remains a separate mandatory release step."
+  },
+  "rcIntegration": {
+    "version": "1.10.31-rc.9",
+    "modulePullRequests": {
+      "ui-people": {
+        "pr": 27,
+        "sha": "fb105d4577e8a8f560e720b56720a602519ef7db"
+      },
+      "ui-default": {
+        "pr": 37,
+        "sha": "db2790e195642742f77255cee53c1e0053771310"
+      },
+      "ui-customers": {
+        "pr": 38,
+        "sha": "1b2c45c7790c932613156fd0616d8075ac363b85"
+      }
+    },
+    "preserved": {
+      "ui-orders": "bb577ac62ad5436fa8f519999ee298a09e223a4c",
+      "releaseMerge": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb"
+    }
   }
 }
