@@ -54,13 +54,13 @@ jobs:
           ENV="${{ github.event.inputs.environment || github.ref_name }}"
           case "$ENV" in
             dev)
-              API=https://dd.controleonline.com
-              SOCK=wss://dd.controleonline.com
+              API=https://d.controleonline.com
+              SOCK=wss://d.controleonline.com
               DOMAIN=https://dev.controleonline.com
               MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://dev.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://dev.controleonline.com"}]}'
               ;;
             staging)
               API=https://s.controleonline.com
