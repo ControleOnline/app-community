@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "sourceRoot": "modules/controleonline",
+  "modes": {
+    "development": "source",
+    "production": "published"
+  },
+  "publishedPackages": {
+    "@controleonline/ui-common": "1.2.87",
+    "@controleonline/ui-default": "1.0.270",
+    "@controleonline/ui-layout": "1.0.13",
+    "@controleonline/ui-login": "1.0.97"
+  },
+  "requiredPackages": [
+    "@controleonline/ui-accounting",
+    "@controleonline/ui-carrier",
+    "@controleonline/ui-common",
+    "@controleonline/ui-config",
+    "@controleonline/ui-contracts",
+    "@controleonline/ui-crm",
+    "@controleonline/ui-customers",
+    "@controleonline/ui-default",
+    "@controleonline/ui-employee",
+    "@controleonline/ui-financial",
+    "@controleonline/ui-layout",
+    "@controleonline/ui-login",
+    "@controleonline/ui-logistic",
+    "@controleonline/ui-manager",
+    "@controleonline/ui-orders",
+    "@controleonline/ui-people",
+    "@controleonline/ui-ppc",
+    "@controleonline/ui-products",
+    "@controleonline/ui-professionals",
+    "@controleonline/ui-providers",
+    "@controleonline/ui-report",
+    "@controleonline/ui-shop",
+    "@controleonline/ui-tasks",
+    "@controleonline/ui-translate",
+    "@controleonline/ui-users"
+  ]
+}
