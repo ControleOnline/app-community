@@ -7,7 +7,7 @@ test('package.json is the single source of exact UI module versions', () => {
   const packageManifest = readPackageManifest();
   const packages = requiredPackages(packageManifest);
   assert.deepEqual(validatePackageManifest(packageManifest), []);
-  assert.equal(packages.length, 25);
+  assert.equal(packages.length, 27);
   for (const packageName of packages) assert.match(packageManifest.dependencies[packageName], /^\d+\.\d+\.\d+$/);
 });
 
