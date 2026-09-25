@@ -1,15 +1,19 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { readManifest, validateManifest } = require('./validate-module-contract.cjs');
+const path = require('node:path');
+const { modulePath, readPackageManifest, requiredPackages, validatePackageManifest } = require('./validate-module-contract.cjs');
 
-test('module manifest uses exact versions and contains only required packages', () => {
-  const manifest = readManifest();
-  assert.deepEqual(validateManifest(manifest), []);
-  for (const version of Object.values(manifest.publishedPackages)) assert.match(version, /^\d+\.\d+\.\d+$/);
+test('package.json is the single source of exact UI module versions', () => {
+  const packageManifest = readPackageManifest();
+  const packages = requiredPackages(packageManifest);
+  assert.deepEqual(validatePackageManifest(packageManifest), []);
+  assert.equal(packages.length, 25);
+  for (const packageName of packages) assert.match(packageManifest.dependencies[packageName], /^\d+\.\d+\.\d+$/);
 });
 
 test('production cannot silently fall back to source modules', () => {
-  const manifest = readManifest();
-  assert.equal(manifest.modes.production, 'published');
-  assert.equal(manifest.modes.development, 'source');
+  const root = path.resolve(__dirname, '..');
+  const name = '@controleonline/ui-common';
+  assert.equal(modulePath(name, 'development'), path.join(root, 'modules', 'controleonline', 'ui-common'));
+  assert.equal(modulePath(name, 'production'), path.join(root, 'node_modules', '@controleonline', 'ui-common'));
 });

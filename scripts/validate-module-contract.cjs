@@ -2,39 +2,42 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const manifestPath = path.join(root, 'config', 'module-resolution.json');
+const packagePathname = path.join(root, 'package.json');
 
-function readManifest() {
-  return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+function readPackageManifest() {
+  return JSON.parse(fs.readFileSync(packagePathname, 'utf8'));
 }
 
-function packagePath(packageName, mode) {
-  const manifest = readManifest();
-  if (mode === 'development') return path.join(root, manifest.sourceRoot, packageName.replace('@controleonline/', ''));
+function requiredPackages(packageManifest = readPackageManifest()) {
+  return Object.keys(packageManifest.dependencies || {}).filter((name) => /^@controleonline\/ui-[a-z0-9-]+$/.test(name));
+}
+
+function modulePath(packageName, mode) {
+  if (mode === 'development') return path.join(root, 'modules', 'controleonline', packageName.replace('@controleonline/', ''));
   return path.join(root, 'node_modules', ...packageName.split('/'));
 }
 
-function validateManifest(manifest) {
+function validatePackageManifest(packageManifest) {
   const errors = [];
-  if (manifest.modes?.development !== 'source' || manifest.modes?.production !== 'published') errors.push('modes must map development to source and production to published');
-  if (!manifest.requiredPackages?.length) errors.push('requiredPackages must not be empty');
-  for (const packageName of manifest.requiredPackages || []) if (!/^@controleonline\/[a-z0-9-]+$/.test(packageName)) errors.push(`invalid package name: ${packageName}`);
-  for (const [packageName, version] of Object.entries(manifest.publishedPackages || {})) {
-    if (!manifest.requiredPackages.includes(packageName)) errors.push(`${packageName} is published but not required`);
-    if (!/^\d+\.\d+\.\d+$/.test(version)) errors.push(`${packageName} must use an exact semver version, got ${version}`);
+  const packages = requiredPackages(packageManifest);
+  if (!packages.length) errors.push('package.json dependencies must include at least one @controleonline/ui-* package');
+  for (const packageName of packages) {
+    const version = packageManifest.dependencies[packageName];
+    if (!/^\d+\.\d+\.\d+$/.test(version)) errors.push(`${packageName} must use an exact semver version in dependencies, got ${version}`);
   }
   return errors;
 }
 
 function validateMode(mode) {
-  const manifest = readManifest();
-  const errors = validateManifest(manifest);
+  const packageManifest = readPackageManifest();
+  const packages = requiredPackages(packageManifest);
+  const errors = validatePackageManifest(packageManifest);
   if (!['development', 'production'].includes(mode)) {
     errors.push(`unsupported module resolution mode: ${mode}`);
     return errors;
   }
-  for (const packageName of manifest.requiredPackages) {
-    const resolvedPath = packagePath(packageName, mode);
+  for (const packageName of packages) {
+    const resolvedPath = modulePath(packageName, mode);
     if (!fs.existsSync(resolvedPath)) {
       errors.push(`${mode}: missing ${packageName} at ${path.relative(root, resolvedPath)}`);
       continue;
@@ -43,9 +46,8 @@ function validateMode(mode) {
       const packageJsonPath = path.join(resolvedPath, 'package.json');
       if (!fs.existsSync(packageJsonPath)) { errors.push(`production: ${packageName} has no package.json`); continue; }
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-      const expected = manifest.publishedPackages[packageName];
-      if (!expected) errors.push(`production: ${packageName} is not pinned in publishedPackages`);
-      else if (packageJson.version !== expected) errors.push(`production: ${packageName} expected ${expected}, found ${packageJson.version}`);
+      const expected = packageManifest.dependencies[packageName];
+      if (packageJson.version !== expected) errors.push(`production: ${packageName} expected ${expected} from package.json, found ${packageJson.version}`);
     }
   }
   return errors;
@@ -62,4 +64,4 @@ if (require.main === module) {
   } else console.log(`Module contract passed for ${mode}`);
 }
 
-module.exports = { packagePath, readManifest, validateManifest, validateMode };
+module.exports = { modulePath, readPackageManifest, requiredPackages, validatePackageManifest, validateMode };
