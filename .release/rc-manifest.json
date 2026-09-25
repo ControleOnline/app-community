@@ -7,8 +7,8 @@
   "baseMaster": "724f06443f37e4cccac1b8eb47367d4fe940ccc3",
   "repositories": {
     "ControleOnline/app-community": "a2e581fa7b6dce9193c822412c9296daddc9adf5",
-    "ControleOnline/ui-orders": "b75514126561c3598fb4b975492a13c418a5ca4e",
-    "ControleOnline/api-platform-financial": "ee260c003226ae4962d36197876d63bd668444a5"
+    "ControleOnline/ui-orders": "157c2cef31f170980fb38c01b74e91e91f8c5933",
+    "ControleOnline/api-platform-financial": "8f5347acb76ce9d60023e53a1e2a851fd6645b46"
   },
   "sourceRefs": {
     "ControleOnline/app-community": "dcc2baf55bbc7acfd375968c35029bfdcd9eca9e",
