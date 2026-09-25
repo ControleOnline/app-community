@@ -80,3 +80,5 @@ config/env.local.js
 playwright-report/
 test-results/
 .playwright-*
+
+/modules/controleonline/*

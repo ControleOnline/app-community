@@ -83,10 +83,6 @@ jobs:
           echo "AAB_ARTIFACT_NAME=android-aab-${APP_LOWER}" >> $GITHUB_ENV
           echo "APK_ARTIFACT_NAME=android-apk-${APP_LOWER}" >> $GITHUB_ENV
 
-      - name: Update Submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout
 
       - uses: gradle/actions/setup-gradle@v3
 
@@ -137,7 +133,7 @@ jobs:
           APP_TYPE: ${{ env.APP_TYPE }}
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci --legacy-peer-deps
 
       - name: Fix Expo Dependencies
         run: npx expo install --fix
