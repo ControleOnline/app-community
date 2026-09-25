@@ -54,8 +54,8 @@ jobs:
           ENV="${{ github.event.inputs.environment || github.ref_name }}"
           case "$ENV" in
             dev)
-              API=https://d.controleonline.com
-              SOCK=wss://d.controleonline.com
+              API=https://dd.controleonline.com
+              SOCK=wss://dd.controleonline.com
               DOMAIN=https://dev.controleonline.com
               MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
