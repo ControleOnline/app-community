@@ -126,8 +126,6 @@ resolvedGroups.forEach((group, index) => {
     flowIds: group.flowIds || [],
     build: 'not-run',
     smoke: 'not-run',
-    testPaths: Array.isArray(group.testPaths) ? group.testPaths : [],
-    evidence: 'required-per-step',
     artifacts: [],
   };
 

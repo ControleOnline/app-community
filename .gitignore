@@ -70,7 +70,6 @@ yarn-error.log
 /coverage
 
 .env*.local
-package-lock.json
 .expo
 .expo/*
 *.lock
@@ -81,4 +80,3 @@ config/env.local.js
 playwright-report/
 test-results/
 .playwright-*
-/tests/browser-smoke/

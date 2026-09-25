@@ -6,6 +6,7 @@ const config = getDefaultConfig(projectRoot);
 
 const appNodeModules = path.resolve(projectRoot, 'node_modules');
 const workspaceNodeModules = path.resolve(projectRoot, '..', 'node_modules');
+const productionModules = process.env.MODULE_RESOLUTION_MODE === 'production';
 
 config.useWatchman = false;
 
@@ -14,9 +15,12 @@ config.resolver.nodeModulesPaths = [
   workspaceNodeModules,
 ];
 
+config.resolver.disableHierarchicalLookup = productionModules;
+
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
   '@appType': path.resolve(projectRoot, 'src', 'appType.js'),
+  '@controleonline/ui-accounting': path.resolve(projectRoot, 'modules', 'controleonline', 'ui-accounting'),
   react: path.resolve(appNodeModules, 'react'),
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };

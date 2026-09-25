@@ -1,16 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const {
-  buildBrowserCatalog,
-  buildFlowchartCatalog,
-} = require('./build-tests-catalog.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const testsRoot = path.join(projectRoot, 'tests');
 const automatedReportPath = path.join(testsRoot, 'automated', 'jest-results.json');
 const smokeResultsRoot = path.join(testsRoot, 'smoke', 'results');
 const artifactsRoot = path.join(testsRoot, 'artifacts');
-const publishedSuitesRoot = path.join(testsRoot, 'browser-smoke');
 const indexPath = path.join(testsRoot, 'index.json');
 
 const typeLabels = new Map([
@@ -149,21 +144,18 @@ function countSummary(tests) {
   let total = 0;
   let passed = 0;
   let failed = 0;
-  let pending = 0;
 
   for (const test of tests) {
     total += 1;
 
     if (test.status === 'passed') {
       passed += 1;
-    } else if (test.status === 'failed') {
-      failed += 1;
     } else {
-      pending += 1;
+      failed += 1;
     }
   }
 
-  return {total, passed, failed, pending};
+  return {total, passed, failed};
 }
 
 function statusFromSummary(summary) {
@@ -171,11 +163,7 @@ function statusFromSummary(summary) {
     return 'idle';
   }
 
-  if (summary.failed > 0) {
-    return 'failed';
-  }
-
-  return summary.pending > 0 ? 'pending' : 'passed';
+  return summary.failed === 0 ? 'passed' : 'failed';
 }
 
 function reportTimestamp(report, fallbackPath) {
@@ -361,7 +349,6 @@ function buildStep(step, outputDir, reportDir, suiteId, copiedArtifacts) {
     screenshots.push({
       label: String(attachment.name || path.basename(relativePath)).trim() || path.basename(relativePath),
       name: path.basename(relativePath),
-      path: relativePath,
       url: artifactUrlForSuite(suiteId, relativePath),
       mimeType: guessMimeType(relativePath, attachment.contentType),
       kind: 'image',
@@ -417,7 +404,6 @@ function buildPlaywrightTest(spec, outputDir, reportDir, suiteId, copiedArtifact
     screenshots.push({
       label: String(attachment.name || path.basename(relativePath)).trim() || path.basename(relativePath),
       name: path.basename(relativePath),
-      path: relativePath,
       url: artifactUrlForSuite(suiteId, relativePath),
       mimeType: guessMimeType(relativePath, attachment.contentType),
       kind: 'image',
@@ -613,7 +599,6 @@ function buildInvalidSuite(reportPath, type, message) {
       total: 0,
       passed: 0,
       failed: 0,
-      pending: 0,
     },
     tests: [],
     error: message,
@@ -659,7 +644,7 @@ function collectReportFiles(rootDir) {
   return files.sort((left, right) => left.localeCompare(right));
 }
 
-function buildCanonicalIndex(suites, flowcharts = []) {
+function buildCanonicalIndex(suites) {
   const sortedSuites = [...suites].sort((left, right) => {
     const rightTime = Number(right?.updatedAt ? Date.parse(right.updatedAt) : 0) || Number(right?.generatedAt ? Date.parse(right.generatedAt) : 0) || 0;
     const leftTime = Number(left?.updatedAt ? Date.parse(left.updatedAt) : 0) || Number(left?.generatedAt ? Date.parse(left.generatedAt) : 0) || 0;
@@ -675,14 +660,12 @@ function buildCanonicalIndex(suites, flowcharts = []) {
       message: 'Nenhum relatório publicado ainda.',
       lastRunAt: null,
       summary: {
-        types: {total: 0, passed: 0, failed: 0, pending: 0},
-        suites: {total: 0, passed: 0, failed: 0, pending: 0},
-        tests: {total: 0, passed: 0, failed: 0, pending: 0},
-        flowcharts: {total: flowcharts.length, passed: 0, failed: 0, pending: flowcharts.length},
+        types: {total: 0, passed: 0, failed: 0},
+        suites: {total: 0, passed: 0, failed: 0},
+        tests: {total: 0, passed: 0, failed: 0},
       },
       types: [],
       suites: [],
-      flowcharts,
       links: {
         self: '/tests',
         artifacts: '/tests/artifacts',
@@ -731,7 +714,6 @@ function buildCanonicalIndex(suites, flowcharts = []) {
   const suiteSummary = countSummary(sortedSuites.map((suite) => ({status: suite.status})));
   const testSummary = countSummary(sortedSuites.flatMap((suite) => Array.isArray(suite.tests) ? suite.tests : []));
   const typeSummary = countSummary(types.map((type) => ({status: type.status})));
-  const flowchartSummary = countSummary(flowcharts.map((flowchart) => ({status: flowchart.status})));
   const lastRunAtTimestamp = Math.max(
     ...sortedSuites.map((suite) => Date.parse(suite.generatedAt || suite.updatedAt || 0) || 0),
     0,
@@ -747,11 +729,9 @@ function buildCanonicalIndex(suites, flowcharts = []) {
       types: typeSummary,
       suites: suiteSummary,
       tests: testSummary,
-      flowcharts: flowchartSummary,
     },
     types,
     suites: sortedSuites,
-    flowcharts,
     links: {
       self: '/tests',
       artifacts: '/tests/artifacts',
@@ -765,10 +745,7 @@ function buildMessage(suiteSummary, testSummary) {
   }
 
   if (suiteSummary.failed === 0) {
-    const pendingMessage = testSummary.pending > 0
-      ? ` ${testSummary.pending} ainda não executado${testSummary.pending === 1 ? '' : 's'}.`
-      : '';
-    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.${pendingMessage}`;
+    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} com sucesso e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.`;
   }
 
   return `${suiteSummary.failed} suite${suiteSummary.failed === 1 ? '' : 's'} com falha em ${suiteSummary.total} publicad${suiteSummary.total === 1 ? 'a' : 'as'}.`;
@@ -780,10 +757,7 @@ function buildTypeMessage(suiteSummary, testSummary) {
   }
 
   if (suiteSummary.failed === 0) {
-    const pendingMessage = testSummary.pending > 0
-      ? ` ${testSummary.pending} ainda não executado${testSummary.pending === 1 ? '' : 's'}.`
-      : '';
-    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.${pendingMessage}`;
+    return `${suiteSummary.total} suite${suiteSummary.total === 1 ? '' : 's'} publicada${suiteSummary.total === 1 ? '' : 's'} e ${testSummary.passed} teste${testSummary.passed === 1 ? '' : 's'} passaram.`;
   }
 
   return `${suiteSummary.failed} suite${suiteSummary.failed === 1 ? '' : 's'} com falha em ${suiteSummary.total} publicad${suiteSummary.total === 1 ? 'a' : 'as'}.`;
@@ -816,95 +790,15 @@ function collectSuitesFromReports() {
   return suites;
 }
 
-function mergeCatalogSuite(catalogSuite, reportSuite) {
-  const reportTestsByTitle = new Map();
-
-  for (const test of Array.isArray(reportSuite.tests) ? reportSuite.tests : []) {
-    const title = String(test?.title || '').trim();
-    if (!reportTestsByTitle.has(title)) reportTestsByTitle.set(title, []);
-    reportTestsByTitle.get(title).push(test);
-  }
-
-  const tests = [];
-  for (const catalogTest of Array.isArray(catalogSuite.tests) ? catalogSuite.tests : []) {
-    const candidates = reportTestsByTitle.get(String(catalogTest.title || '').trim()) || [];
-    tests.push(candidates.shift() || catalogTest);
-  }
-
-  for (const candidates of reportTestsByTitle.values()) {
-    tests.push(...candidates);
-  }
-
-  const summary = countSummary(tests);
-  return {
-    ...catalogSuite,
-    ...reportSuite,
-    generatedAt: reportSuite.generatedAt,
-    updatedAt: reportSuite.updatedAt,
-    status: statusFromSummary(summary),
-    summary,
-    tests,
-    flowchartIds: catalogSuite.flowchartIds || reportSuite.flowchartIds || [],
-    cataloged: true,
-  };
-}
-
-function mergeCatalogWithReports(catalogSuites, reportSuites) {
-  const reportsBySuiteId = new Map(
-    reportSuites.map(suite => [String(suite?.suiteId || ''), suite]),
-  );
-  const merged = [];
-
-  for (const catalogSuite of catalogSuites) {
-    const reportSuite = reportsBySuiteId.get(String(catalogSuite.suiteId || ''));
-    const suite = reportSuite ? mergeCatalogSuite(catalogSuite, reportSuite) : catalogSuite;
-
-    if (reportSuite) reportsBySuiteId.delete(String(catalogSuite.suiteId || ''));
-    merged.push(suite);
-
-    if (suite.links?.report) {
-      writeJson(path.join(artifactsRoot, suite.suiteId, 'report.json'), suite);
-    }
-  }
-
-  for (const suite of reportsBySuiteId.values()) {
-    merged.push(suite);
-  }
-
-  return merged;
-}
-
-function publishSuitesForApi(suites) {
-  cleanDir(publishedSuitesRoot);
-
-  for (const suite of suites) {
-    const suitePath = normalizeRelativePath(suite?.suitePath);
-    if (!suitePath) continue;
-
-    const targetDir = path.join(testsRoot, ...suitePath.split('/'));
-    const sourceArtifactDir = path.join(artifactsRoot, String(suite.suiteId || ''));
-
-    if (fs.existsSync(sourceArtifactDir)) {
-      fs.cpSync(sourceArtifactDir, targetDir, {recursive: true, force: true});
-    }
-
-    writeJson(path.join(targetDir, 'report.json'), suite);
-  }
-}
-
 function main() {
   cleanDir(artifactsRoot);
   ensureDir(artifactsRoot);
 
-  const catalogSuites = buildBrowserCatalog();
-  const reportSuites = collectSuitesFromReports();
-  const suites = mergeCatalogWithReports(catalogSuites, reportSuites);
-  const flowcharts = buildFlowchartCatalog(catalogSuites);
-  const index = buildCanonicalIndex(suites, flowcharts);
+  const suites = collectSuitesFromReports();
+  const index = buildCanonicalIndex(suites);
 
-  publishSuitesForApi(suites);
   writeJson(indexPath, index);
-  console.log(`Published ${index.summary.tests.total} tests in ${index.suites.length} suites to ${path.relative(projectRoot, indexPath)}`);
+  console.log(`Published ${index.suites.length} suites to ${path.relative(projectRoot, indexPath)}`);
 }
 
 main();

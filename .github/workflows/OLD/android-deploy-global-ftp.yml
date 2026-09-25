@@ -1,0 +1,65 @@
+name: Upload Android AAB FTP
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Run de origem com o artifact do bundle Android"
+        required: true
+        type: string
+      artifact_name:
+        description: "Nome do artifact enviado pelo workflow principal"
+        required: true
+        type: string
+      version:
+        description: "Versao usada no diretorio remoto"
+        required: true
+        type: string
+      package_name:
+        description: "Package name usado no diretorio remoto"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  ftp-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download AAB Artifact from Source Run
+        run: |
+          DOWNLOAD_ROOT="ftp-artifact"
+          mkdir -p "${DOWNLOAD_ROOT}"
+
+          gh run download "${{ inputs.source_run_id }}" \
+            --repo "${GH_REPO}" \
+            --name "${{ inputs.artifact_name }}" \
+            --dir "${DOWNLOAD_ROOT}"
+
+          ARTIFACT_DIR="${DOWNLOAD_ROOT}"
+          if [ -d "${DOWNLOAD_ROOT}/${{ inputs.artifact_name }}" ]; then
+            ARTIFACT_DIR="${DOWNLOAD_ROOT}/${{ inputs.artifact_name }}"
+          fi
+
+          if ! find "${ARTIFACT_DIR}" -type f | grep -q .; then
+            echo "Nenhum arquivo encontrado no artifact ${ARTIFACT_DIR}."
+            exit 1
+          fi
+
+          echo "FTP_LOCAL_DIR=${ARTIFACT_DIR}" >> "${GITHUB_ENV}"
+          find "${ARTIFACT_DIR}" -maxdepth 3 -type f -print
+        env:
+          GH_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload AAB to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: ${{ env.FTP_LOCAL_DIR }}
+          remoteDir: public_html/${{ inputs.version }}/${{ inputs.package_name }}/aab
+          forceSsl: false
