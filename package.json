@@ -11,8 +11,6 @@
     "lint": "eslint .",
     "test": "jest",
     "test:automated": "jest --runInBand",
-    "test:company-contract": "node scripts/validate-company-contract.cjs",
-    "test:company-bootstrap": "node scripts/tests/company-bootstrap-smoke.cjs",
     "test:browser": "node scripts/run-browser-smokes.cjs",
     "test:browser:headed": "node scripts/run-browser-smokes.cjs --headed",
     "test:browser:manager": "node scripts/run-browser-smokes.cjs manager",
