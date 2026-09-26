@@ -1,32 +1,16 @@
 {
-  "version": "1.10.32",
-  "rc": 3,
-  "branch": "rc/1.10.32-rc.3",
-  "baseMaster": "6bfd32b10edc8f346e935ae31a4572935f43bd52",
+  "version": "1.10.33",
+  "rc": 2,
+  "branch": "rc/1.10.33-rc.2",
+  "baseMaster": "74fe6030ee445f0bb1d04311362d4ce0d7a11056",
   "tasks": [
-    809,
-    835
+    909
   ],
   "repositories": {
-    "ControleOnline/app-community": "6bfd32b10edc8f346e935ae31a4572935f43bd52",
-    "ControleOnline/ui-default": "db2790e195642742f77255cee53c1e0053771310",
-    "ControleOnline/ui-orders": "bb577ac62ad5436fa8f519999ee298a09e223a4c"
+    "ControleOnline/app-community": "119d6dd327f453be56420a660b864aa94beb1821",
+    "ControleOnline/api-community": "88fb8a79b1eb12848055669f3080267301898a16",
+    "ControleOnline/api-platform-orders": "68e8693314fddce4888267ea5d1cc21065366e93"
   },
-  "sourceRefs": {
-    "ControleOnline/app-community#809": "43622e94eb6511f67359012adbc2a8227ba58038",
-    "ControleOnline/app-community#835": "08cac4d5cb24b01da7ef3a5e7ca11498fd9b3682"
-  },
-  "integrationEvidence": {
-    "app-community#809": {
-      "integratedInDev": "45f22ba7ffb8158e9a9763db88d1b89118d79b17",
-      "integratedInMaster": "18efce935ceb0206bc5db4959293cacc8aa424e8",
-      "priorJointRelease": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb"
-    },
-    "app-community#835": {
-      "integratedInDev": "08cac4d5cb24b01da7ef3a5e7ca11498fd9b3682",
-      "integratedInMaster": "eef50579580b50909774729b8f5b659ecd220ce7",
-      "priorJointRelease": "784869fdbf96b0cf992fdc1737c423ead7fd0ebb"
-    }
-  },
-  "frozen": true
+  "frozen": true,
+  "notes": "API-only #909 mark-as-paid; runtime on api-community RC staging"
 }
