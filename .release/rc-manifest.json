@@ -1,20 +1,16 @@
 {
-  "version": "1.10.32",
-  "rc": 5,
-  "branch": "rc/1.10.32-rc.5",
-  "baseMaster": "6bfd32b10edc8f346e935ae31a4572935f43bd52",
+  "version": "1.10.33",
+  "rc": 1,
+  "branch": "rc/1.10.33-rc.1",
+  "baseMaster": "74fe6030ee445f0bb1d04311362d4ce0d7a11056",
   "tasks": [
-    826,
-    835,
-    880,
-    887
+    909
   ],
   "repositories": {
-    "ControleOnline/app-community": "557d76acb6116ddddf538e90a74b9072b9a4f281",
-    "ControleOnline/ui-orders": "1720833090fa6333e3081880a4dae76453bdf990",
-    "ControleOnline/api-community": "52c446c7e9b16c0841e741a546da7ee232563dee",
-    "ControleOnline/api-platform-users": "1239185c44553869a45bd60251ae18c3118cb48e"
+    "ControleOnline/app-community": "b55fae8c8e29c94c2157abcd4b19fbe7b5e9ad2c",
+    "ControleOnline/api-community": "c3db14b29cfbcbe61c8590f2f0c5f80d99137ba0",
+    "ControleOnline/api-platform-orders": "68e8693314fddce4888267ea5d1cc21065366e93"
   },
   "frozen": true,
-  "notes": "RC with all 4 Working tasks per human order: #826 #835 #880 #887"
+  "notes": "API-only #909 mark-as-paid; runtime on api-community RC staging"
 }
