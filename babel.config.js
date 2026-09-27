@@ -17,10 +17,6 @@ module.exports = {
         alias: {
           '@assets': './src/assets',
           '@appType': './src/appType.js',
-          '@controleonline/react-native-getnet-payment': './node_modules/@controleonline/react-native-getnet-payment',
-          '@controleonline/ui-accounting': path.join(moduleRoot, 'ui-accounting'),
-          '@controleonline': moduleRoot,
-          '@controleonline-rn': './node_modules/@controleonline',
           '@env': './config/env.local.js',
           '@package': './package.json',
           '@store': './src/store',

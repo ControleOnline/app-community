@@ -24,7 +24,6 @@ config.resolver.disableHierarchicalLookup = productionModules;
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
   '@appType': path.resolve(projectRoot, 'src', 'appType.js'),
-  '@controleonline/ui-accounting': path.resolve(projectRoot, moduleRoot, 'ui-accounting'),
   react: path.resolve(appNodeModules, 'react'),
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };
