@@ -1,16 +1,15 @@
 {
   "version": "1.10.33",
-  "rc": 4,
-  "branch": "rc/1.10.33-rc.4",
-  "baseMaster": "74fe6030ee445f0bb1d04311362d4ce0d7a11056",
+  "rc": 5,
+  "branch": "rc/1.10.33-rc.5",
+  "baseMaster": "c4a183f35cd48468383de1af28f7617983a990a0",
   "tasks": [
     909
   ],
   "repositories": {
-    "ControleOnline/app-community": "2994678962558984af4c5c7cd2cb109749336a8a",
-    "ControleOnline/api-community": "19b0aeb64673f81b14bbce6c6c4cc662b3727a92",
-    "ControleOnline/api-platform-orders": "8c34399768fcd781f55c05ca0c22138c4bc82a78"
+    "ControleOnline/app-community": "1de9afbc583b72c93ef3e6a4ee5f6c8ae114df92",
+    "ControleOnline/ui-orders": "82a2d752e8cac488fc907ffc9c3eaf94f5a728f3"
   },
   "frozen": true,
-  "notes": "#909 open/paid only for order payment"
+  "notes": "#909 front shows mark-as-paid API message"
 }
