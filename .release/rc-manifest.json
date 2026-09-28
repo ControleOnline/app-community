@@ -1,20 +1,14 @@
 {
-  "version": "1.10.32",
-  "rc": 5,
-  "branch": "rc/1.10.32-rc.5",
-  "baseMaster": "6bfd32b10edc8f346e935ae31a4572935f43bd52",
+  "version": "1.10.34",
+  "rc": 1,
+  "branch": "rc/1.10.34-rc.1",
+  "baseMaster": "84b3174863459ee4a44229a141cf87e4b9c5d8d4",
   "tasks": [
-    826,
-    835,
-    880,
-    887
+    918
   ],
   "repositories": {
-    "ControleOnline/app-community": "557d76acb6116ddddf538e90a74b9072b9a4f281",
-    "ControleOnline/ui-orders": "1720833090fa6333e3081880a4dae76453bdf990",
-    "ControleOnline/api-community": "52c446c7e9b16c0841e741a546da7ee232563dee",
-    "ControleOnline/api-platform-users": "1239185c44553869a45bd60251ae18c3118cb48e"
+    "ControleOnline/app-community": "3b43123b534a9525e745f37fd42a668f2b2f8751"
   },
   "frozen": true,
-  "notes": "RC with all 4 Working tasks per human order: #826 #835 #880 #887"
+  "notes": "#918 Android Lave-Go Shop versionCode posicional (v3)"
 }
