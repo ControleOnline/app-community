@@ -1,14 +1,14 @@
 {
-  "version": "1.10.34",
+  "version": "1.10.35",
   "rc": 1,
-  "branch": "rc/1.10.34-rc.1",
-  "baseMaster": "84b3174863459ee4a44229a141cf87e4b9c5d8d4",
+  "branch": "rc/1.10.35-rc.1",
+  "baseMaster": "6cc773af44cf0e2b3c23d7d2e6b435ca78c2488b",
   "tasks": [
     918
   ],
   "repositories": {
-    "ControleOnline/app-community": "3b43123b534a9525e745f37fd42a668f2b2f8751"
+    "ControleOnline/app-community": "ddb2f480157c7851156463a3c90ecb245b13e97c"
   },
   "frozen": true,
-  "notes": "#918 Android Lave-Go Shop versionCode posicional (v3)"
+  "notes": "#918 Android Lave-Go versionCode posicional Play-safe (max positional/dayBased)"
 }
