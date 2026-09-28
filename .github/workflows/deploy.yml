@@ -54,8 +54,8 @@ jobs:
           ENV="${{ github.event.inputs.environment || github.ref_name }}"
           case "$ENV" in
             dev)
-              API=https://d.controleonline.com
-              SOCK=wss://d.controleonline.com
+              API=https://dd.controleonline.com
+              SOCK=wss://dd.controleonline.com
               DOMAIN=https://dev.controleonline.com
               MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
@@ -224,20 +224,20 @@ jobs:
   tests:
     name: "3 · Staging browser tests"
     needs: [configure, web]
-    if: needs.configure.outputs.env == 'staging'
+    # Keep the broad suite available for explicit staging checks, but do not
+    # let external credentials or tenant state block RC publication.
+    if: needs.configure.outputs.env == 'staging' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: recursive
       - uses: actions/setup-node@v5
         with:
           node-version: 20
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-        run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run staging browser tests

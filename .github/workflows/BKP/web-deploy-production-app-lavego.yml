@@ -34,12 +34,8 @@ jobs:
           };
           module.exports = { env };
           ENVEOF
-      - name: Update Submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
       - name: Fix Expo Dependencies
         run: npx expo install --fix
       - name: Build

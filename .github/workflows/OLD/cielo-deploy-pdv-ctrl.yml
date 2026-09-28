@@ -39,10 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Update Submodules
-        run: |
-          git submodule sync --recursive
-          git submodule update --recursive --init --checkout
 
       - uses: gradle/actions/setup-gradle@v3
 
@@ -84,7 +80,7 @@ jobs:
         run: cp app.json app.json.backup
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci --legacy-peer-deps
 #
 #      - name: Fix Expo Dependencies
 #        run: npx expo install --fix
