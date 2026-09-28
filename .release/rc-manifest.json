@@ -1,15 +1,14 @@
 {
-  "version": "1.10.33",
-  "rc": 5,
-  "branch": "rc/1.10.33-rc.5",
-  "baseMaster": "c4a183f35cd48468383de1af28f7617983a990a0",
+  "version": "1.10.34",
+  "rc": 1,
+  "branch": "rc/1.10.34-rc.1",
+  "baseMaster": "84b3174863459ee4a44229a141cf87e4b9c5d8d4",
   "tasks": [
-    909
+    918
   ],
   "repositories": {
-    "ControleOnline/app-community": "1de9afbc583b72c93ef3e6a4ee5f6c8ae114df92",
-    "ControleOnline/ui-orders": "82a2d752e8cac488fc907ffc9c3eaf94f5a728f3"
+    "ControleOnline/app-community": "41480385971b599f33941668e0b08e670b54c8ed"
   },
   "frozen": true,
-  "notes": "#909 front shows mark-as-paid API message"
+  "notes": "#918 Android Lave-Go Shop versionCode posicional (v3)"
 }
