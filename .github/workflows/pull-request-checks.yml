@@ -32,7 +32,25 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install --ignore-scripts --no-package-lock --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
+
+      - name: Test pinned module contract
+        run: npm run test:module-contract
+
+      - name: Validate published module resolution
+        env:
+          APP_ENV: prod
+        run: |
+          npm run validate:module-contract -- --mode=production
+          node scripts/validate-module-resolution.cjs
+
+      - name: Check development source resolution
+        env:
+          APP_ENV: dev
+        run: |
+          npm run modules:sync
+          npm run validate:module-contract -- --mode=development
+          node scripts/validate-module-resolution.cjs
 
       - name: Check JavaScript syntax
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
