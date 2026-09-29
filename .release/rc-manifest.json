@@ -1,14 +1,14 @@
 {
-  "version": "1.10.36",
+  "version": "1.10.35",
   "rc": 1,
-  "branch": "rc/1.10.36-rc.1",
-  "baseMaster": "02727175812adf6cae5a2042df3a0cdaea990dc1",
+  "branch": "rc/1.10.35-rc.1",
+  "baseMaster": "6cc773af44cf0e2b3c23d7d2e6b435ca78c2488b",
   "tasks": [
     918
   ],
   "repositories": {
-    "ControleOnline/app-community": "e61420032a1f7ce4c85d46b4d39fb4f78d48a219"
+    "ControleOnline/app-community": "ddb2f480157c7851156463a3c90ecb245b13e97c"
   },
   "frozen": true,
-  "notes": "#918 remove BKP/OLD and legacy workflows"
+  "notes": "#918 Android Lave-Go versionCode posicional Play-safe (max positional/dayBased)"
 }
