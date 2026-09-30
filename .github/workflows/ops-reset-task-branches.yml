@@ -1,0 +1,33 @@
+name: ops-reset-task-branches
+on:
+  workflow_dispatch:
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Force task-912 and task-384 to master; delete *-reset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          MASTER=38a336469c6db1c9d5e8f0b39fc6d7679d07f934
+          API=https://api.github.com/repos/ControleOnline/app-community
+          HDR=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          echo "Force task-912 -> $MASTER"
+          curl -sS -f -X PATCH "${HDR[@]}" "$API/git/refs/heads/task-912" \
+            -d "{\"sha\":\"$MASTER\",\"force\":true}"
+
+          echo "Force task-384 -> $MASTER"
+          curl -sS -f -X PATCH "${HDR[@]}" "$API/git/refs/heads/task-384" \
+            -d "{\"sha\":\"$MASTER\",\"force\":true}"
+
+          echo "Delete task-912-reset"
+          curl -sS -f -X DELETE "${HDR[@]}" "$API/git/refs/heads/task-912-reset" || true
+
+          echo "Delete task-384-reset"
+          curl -sS -f -X DELETE "${HDR[@]}" "$API/git/refs/heads/task-384-reset" || true
+
+          echo "Done"
