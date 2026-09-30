@@ -1,14 +1,18 @@
 {
-  "version": "1.10.36",
+  "version": "1.10.37",
   "rc": 1,
-  "branch": "rc/1.10.36-rc.1",
-  "baseMaster": "02727175812adf6cae5a2042df3a0cdaea990dc1",
+  "branch": "rc/1.10.37-rc.1",
+  "baseMaster": "226cbc25a50d1b3394b418b8ac5804c69ecf2964",
   "tasks": [
-    918
+    930,
+    931,
+    936,
+    937
   ],
   "repositories": {
-    "ControleOnline/app-community": "e61420032a1f7ce4c85d46b4d39fb4f78d48a219"
+    "ControleOnline/app-community": "876a6025158773321cbd7e955def687fa4b08577",
+    "ControleOnline/ui-common": "cc573f8d5edef24348f1c5b3c590d28fe116825a"
   },
   "frozen": true,
-  "notes": "#918 remove BKP/OLD and legacy workflows"
+  "notes": "Deploy board approved: #930 #931 #936 #937 ui-common pin (pre-npm-migration)"
 }

@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.36",
+  "version": "1.10.37",
   "private": true,
   "scripts": {
     "android": "expo run:android",
