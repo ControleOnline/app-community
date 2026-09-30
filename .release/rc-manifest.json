@@ -10,7 +10,7 @@
     384
   ],
   "repositories": {
-    "ControleOnline/app-community": "PENDING"
+    "ControleOnline/app-community": "f6b9cc1198566a21fa991d74d064a820bd35baeb"
   },
   "packagePins": {
     "@controleonline/ui-accounting": "1.0.19",
