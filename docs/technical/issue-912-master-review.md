@@ -1,3 +1,122 @@
+# #912 — recuperação da entrega npm sobre master (30/09/2026)
+
+Estado atual: os três pacotes estáveis da recuperação foram publicados e seus
+artefatos conferidos. O app mantém base `origin/master`
+`4e10c1fdc758a2e5502ce29b1cc2249a70a47f6c` e pins exatos para a entrega
+revisável em `task-912`. Não houve publicação em Staging, geração de RC ou nova
+issue GitHub. A issue permanece aberta/Working; isto não é aceite de Security
+nem conclusão de publicação do aplicativo em produção.
+
+## Entrega dos módulos
+
+| Pacote | task-912 publicada | Merge atual em dev / gitHead npm | Integração |
+| --- | --- | --- | --- |
+| ui-orders 1.3.38 | `f9d960be523672daabf46922ab1d32002e421813` | `62ced4dc17b23dce587b8dc51ef2511eb2ce63eb` | [PR #40](https://github.com/ControleOnline/ui-orders/pull/40) |
+| ui-products 1.0.34 | `2ef10c3fe9926705954207a8bd6d85368692e6ba` | `e07d361af821cd560a4b3c90a1834867ff60b7f1` | [PR #23](https://github.com/ControleOnline/ui-products/pull/23) |
+| ui-default 1.0.274 | `ea622e7237efdaca1925a84abe3ac737c519b5a3` | `5579256972acb1b37befeb26af6ed41193e2327c` | [PR #41](https://github.com/ControleOnline/ui-default/pull/41) |
+
+Os três masters permanecem os do histórico abaixo. Cada master remoto é
+ancestral da respectiva task; nenhuma branch antiga foi apagada/substituída.
+Na entrada, as árvores de dev e do merge-base da task coincidiam. O merge local
+sem commit não produziu conflitos e sua árvore final coincidiu exatamente com
+a task revisada. O resultado remoto de cada merge também foi comparado a essa
+árvore. Proteções exigiram PR + source-policy: esta foi a exceção canônica ao
+fluxo normal sem PR. Os três checks source-policy e as publicações npm por OIDC
+passaram; nenhuma proteção ou workflow foi alterado.
+
+Prova detalhada com bases, árvores, SHAs, integridade SHA-512, provenance e runs:
+[issue-912-package-proof.json](issue-912-package-proof.json). Todos os arquivos
+baixados do registry coincidem byte a byte com os pacotes locais revisados:
+orders326, products239, default143. Uma leitura inicial em cache retornou404;
+a verificação atual sem cache confirmou versões/gitHeads e integridade.
+
+## Comportamento revisado
+
+- Device em operação Garçom governa os controles simplificados. Na lista de
+  pedidos, ficam a ação de adicionar e os pedidos permitidos pelo escopo
+  existente; toolbar administrativa, motivos de cancelamento e total são
+  ocultados também quando o Device pode consultar pedidos da empresa.
+- Catálogo usa busca compacta do Garçom, preserva company + activeOrderId e
+  limpa busca/categoria após inclusão/retorno. Abas inline mantêm o breakpoint
+  móvel existente; Garçom desktop também oculta controles genéricos.
+- Só resposta de categorias que seja um array vazio válido abre Products.
+  Erro ou coleção malformada permanece visível com retry.
+- ProductItem/customização propagam orderId, singleItemMode, contexto e override
+  de showBottomCart, inclusive edição de customização aninhada. O Garçom retorna
+  ao lançamento depois de salvar; os demais modos mantêm seus destinos anteriores.
+- Enviar para produção aguarda flush dos itens, confirmação explícita errno0
+  do servidor e refresh; só depois retorna para Orders. Respostas nulas/vazias,
+  malformadas ou erro não navegam. Não se força status no cliente.
+- Os gates de pagamento/resumo do pedido e de modificação/pagamento do produto
+  existentes foram preservados. Counter, cashier, totem, single-item e SHOP
+  conservam os comportamentos fora da operação Garçom.
+
+Componentes/fontes tocados foram modularizados até500 linhas. DefaultTable
+mantém defaults genéricos; sua apresentação foi extraída sem mudar a lógica.
+Revisão independente não deixou Critical/Important pendente no código.
+
+## Aplicativo e resolução npm
+
+Pins exatos: ui-orders1.3.38, ui-products1.0.34, ui-default1.0.274. Os demais
+pins de UI do time foram mantidos; não se restauraram submódulos de UI.
+`ui-common1.2.88` ainda importa o escopo antigo de Cielo/Infinitepay. Dois aliases
+Metro direcionam esses nomes aos pacotes atuais já instalados, sem mudar
+código de pagamento. Reanimated exige semver^7.7.2, enquanto a resolução
+produção sem busca hierárquica encontrava semver6: dependência direta exata
+semver7.8.5 corrigiu essa resolução. Os dois erros de build foram observados e
+corrigidos antes de publicar a entrega do app.
+
+O lock local é regenerado, mas permanece ignorado segundo a convenção atual do
+repositório. A prova dos módulos UI é feita pelos pins exatos + artefatos npm
+imutáveis conferidos. A configuração local de build é ignorada e usa APP_TYPE
+POS; não entra na branch.
+
+## Validação e limites
+
+Node20.20.0. `npm run test:waiter -- --silent`:87 testes focados passaram em
+fontes, tarballs instalados e árvore pós-merge. O runner versionado resolve os
+pacotes npm por padrão; CONTROLEONLINE_MODULES_ROOT permite repetir sobre clones
+locais. Inclui testes renderizados de Device/permissões, erro/empty/retry,
+contexto/override, retorno de customização, persistência e confirmação de produção.
+
+- Contrato dos módulos:2 testes passaram; validação --mode=production passou.
+- Lint oficial com reconhecimento JSX local:33 fontes tocadas passaram; parser
+  e limite de linhas passaram. Não se alterou a configuração global de lint.
+- Export web POS e bundle Android POS passaram com resolução npm. O bundle
+  Android não é APK e não comprova funcionamento físico da impressão/pagamento.
+- Smoke local do web export abriu login sem pageerror. Requests de APIs/serviços
+  externos foram interceptados, com apenas o asset estático jsQR permitido.
+  Não representa jornada autenticada POS→PPC ou teste de hardware.
+- Suítes amplas NÃO são integralmente verdes: a revisão independente reproduziu
+  exatamente15 falhas anteriores de fixtures DefaultTable,2 de OrderHistory
+  (ícone legado e período salvo) e2 de menu-costs. A suite MenuCostsPage.viewModel
+  inalterada consumiu CPU e reproduziu timeout15s. Essas fontes de menu-costs
+  não foram alteradas. Suites amplas/falhas não foram declaradas aprovadas.
+
+Comandos reproduzíveis: `npm run test:waiter`,
+`node scripts/validate-module-contract.cjs --mode=production`,
+`npx expo export --platform web --output-dir /tmp/912-web`,
+`npx expo export --platform android --output-dir /tmp/912-android`,
+`npm run test:waiter:bundle -- http://127.0.0.1:4173/` após servir o export local.
+
+## Coordenação e próxima etapa
+
+Task Paperclip existente CON-726 foi reutilizada, sem nova task duplicada.
+A credencial automática exigia contexto heartbeat; a retomada manual do board
+usou a credencial de board existente autorizada pelo usuário. Não se alteraram
+grants, agent/runtime ou secrets. O antigo erro HTTP402/deactivated_workspace
+permanece responsabilidade operacional do Manager/CTO, sem impedir os commits
+publicados nesta rodada.
+
+NEXT_ACTION: Manager deve revisar a integração app task-912→dev com os SHAs
+atuais e preservar os artefatos operacionais do time; Security deve revalidar
+os novos SHAs/pacotes e a jornada autenticada POS→PPC. A issue permanece
+Working. Não criar RC, não promover Staging e não fechar a #912 nesta rodada.
+
+## Histórico da auditoria inicial (antes desta recuperação)
+
+O texto abaixo registra o estado anterior e não descreve os pins atuais.
+
 # #912 — revisão da retomada sobre master (30/09/2026)
 
 Resultado: base sincronizada; entrega funcional incompleta. Não promover esta
