@@ -3,10 +3,10 @@
   "rc": 4,
   "branch": "rc/1.10.38-rc.4",
   "baseMaster": "38a336469c6db1c9d5e8f0b39fc6d7679d07f934",
-  "tasks": [],
+  "tasks": [942],
   "repositories": {
     "ControleOnline/app-community": "38a336469c6db1c9d5e8f0b39fc6d7679d07f934"
   },
   "frozen": true,
-  "notes": "Force-align staging to master v1.10.38 identical tip (no partial). Tasks recreated from master."
+  "notes": "ops: workflow to force task-912/task-384 = master and delete *-reset duplicates"
 }
