@@ -36,6 +36,9 @@ jobs:
       - name: Check JavaScript syntax
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
+      - name: Test npm module validation and browser fixture resolution
+        run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs
+
       - name: Validate browser smoke flow catalog
         run: npm run test:browser:flows
 
@@ -73,8 +76,8 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
 
-      - name: Fix Expo Dependencies
-        run: npx expo install --fix
+      - name: Validate installed module versions
+        run: node scripts/validate-module-contract.cjs --mode=production
 
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium

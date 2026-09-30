@@ -270,3 +270,25 @@ Fonte: Developer e referências atuais em
 `ControleOnline/agents-mcp/agents/skills/controleonline/*/SKILL.md`; links
 históricos de shared/by-role foram resolvidos no índice atual do repositório.
 QA/Design/UX estão suspensos no fluxo atual; não solicitar aceites desses papéis.
+
+
+## Retomada para RC autorizada em 2026-09-30
+
+O usuário autorizou criar RC após a entrega npm. Antes da integração, a task remove o workflow one-shot `ops-reset-task-branches.yml` herdado de master, já ausente em dev, para preservar as branches e impedir sua reintrodução. O manifesto congelado existente de dev é mantido byte a byte nesta integração; esta recuperação não altera a RC anterior. A nova RC será criada do master remoto atual e receberá exclusivamente a task 912 com seus pins npm exatos, nova identidade/manifesto e nova homologação em staging. Security e revalidação Manager continuam obrigatórios antes do freeze. Produção depende da etapa humana Deploy.
+
+
+### Preflight de RC: pendência confirmada de Security
+
+A auditoria somente leitura no servidor confirmou que nginx serve `s.controleonline.com` por `/home/staging/api-community/public`. O checkout `staging` é `264a2a679b7e5e7f96a7e6df5f059e4e37ba3746`; o lock instalado de products aponta para `521b20e70eb7f79218be91a84f17076ade2182fc`. O filtro equivalente de `ProductService` está vazio/comentado e não foi encontrada proteção equivalente para leitura de Product nos dispatchers examinados. A versão Composer publicada `controleonline/products@1.0.2` também não oferece a comprovação necessária. A mudança existente `46b40f0` não pode ser promovida como correção suficiente: faltam evidência da chamada efetiva nas leituras, testes negativos entre empresas e definição de permissão para manutenção de catálogo.
+
+A correção não pode presumir que qualquer funcionário possa administrar produtos, nem remover o cardápio público do Shop. Foi solicitada ao usuário a definição dos perfis autorizados. Manager/Developer do backend devem implementar e comprovar a proteção das leituras/mutações preservando os contratos públicos; Security deve revalidar os SHAs integrados antes do freeze. Nenhuma alteração no servidor da API foi realizada.
+
+O preflight também encontrou o gitlink documental `docs/wiki` em master, com branches dev/staging distintas e subwikis internas. O alinhamento recursivo exigido pelo fluxo deve ser inspecionado e integrado sem descartar conteúdo documental antes de promover o app. As RC anteriores permanecem imutáveis. A tag estável `v1.10.38` já existe; a nova composição deve usar uma nova versão estável livre (candidata `1.10.39`, branch `rc/1.10.39-rc.1`), não sobrescrever a tag publicada. Sem Security aceito e integração segura em dev, nenhuma nova branch RC congelada, tag RC, promoção de staging ou produção é realizada nesta rodada.
+
+### Preparação de runtime publicada na própria task
+
+`ui-orders@1.3.39` remove apenas o alias interno legado `defaultCompany` em favor de `mainCompany`, mantendo o fallback `currentCompany || mainCompany`. PR ui-orders#41, task `32c1cba89f7849fc480bc2ba093e0b86d150b179`, merge dev/npm gitHead `8e479b21323827963732a89085ffeb70d3a82462`; publicação npm OIDC run `36744943525`. Os 326 arquivos do tarball foram comparados integralmente com a fonte revisada e SHA-512 verificado. A publicação anterior 1.3.38 permanece preservada no registry e na prova histórica.
+
+Os validadores e harness de CI passaram a usar os mesmos módulos npm do aplicativo. A instalação antecede a validação; `expo install --fix` deixa de recalcular a composição durante build. Playwright resolve fixtures dos pacotes instalados, conserva os testes de contrato e exige uma API explícita de homologação, alinhando temporariamente API/socket no export de testes e restaurando a configuração original depois. A proibição de nomes legados continua ativa e os testes de regressão incluem ausência de pacotes e impedem fallback silencioso para fontes.
+
+Validação da preparação (Node 20, pacotes reais npm instalados): 87 testes focados do Garçom passaram; 10 regressões novas de CI/fixtures/ambiente mais 2 testes de contrato de módulos passaram (12/12). Contratos de módulos em produção e mainCompany/currentCompany passaram. Catálogo de 11 fluxos de smoke validado; descoberta oficial encontrou Manager29/Admin17/Delivery25/POS14, e descoberta adicional do Garçom25 (descoberta não equivale a execução). Export web POS usando API explícita de homologação passou; a configuração original foi restaurada após o export. O novo smoke de bootstrap é local, com APIs remotas interceptadas, e não constitui validação autenticada POS→PPC.

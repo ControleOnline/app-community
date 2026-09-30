@@ -43,6 +43,7 @@ runs:
         cat > ./config/env.local.js << ENVEOF
         const env = {
           API_ENTRYPOINT: '${{ inputs.api_entrypoint }}',
+          API_PLAYWRIGHT: '${{ inputs.api_entrypoint }}',
           SOCKET: '${{ inputs.socket }}',
           ${DOMAIN_LINE}
           APP_TYPE: '${{ inputs.app_type }}',
@@ -65,16 +66,23 @@ runs:
         git submodule sync --recursive
         git submodule update --recursive --init --checkout
 
-    - name: Validate company contract in checked-out modules
+    - name: Install frozen package versions
       shell: bash
-      run: node scripts/validate-company-contract.cjs
+      run: npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
 
-    - name: Install & build
+    - name: Validate installed module and company contracts
       shell: bash
+      env:
+        APP_ENV: production
       run: |
-        npm install --legacy-peer-deps
-        npx expo install --fix
-        npx expo export --platform web
+        node scripts/validate-module-contract.cjs --mode=production
+        node scripts/validate-company-contract.cjs
+
+    - name: Build the reviewed package composition
+      shell: bash
+      env:
+        APP_ENV: production
+      run: npx expo export --platform web
 
     - name: Guard remote_dir (no tilde)
       if: ${{ inputs.skip_ftp != 'true' }}

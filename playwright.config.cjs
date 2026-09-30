@@ -1,5 +1,7 @@
 const path = require('path');
 const { defineConfig } = require('playwright/test');
+const {installBrowserModuleResolver} = require('./scripts/browser-module-paths.cjs');
+installBrowserModuleResolver(__dirname);
 
 const webPort = Number(process.env.PLAYWRIGHT_WEB_PORT || 4173);
 const baseURL = `http://127.0.0.1:${webPort}`;
@@ -10,7 +12,8 @@ const reporter = smokeJsonOutputFile
   : baseReporter;
 
 module.exports = defineConfig({
-  testDir: path.join(__dirname),
+  testDir: path.join(__dirname, process.env.APP_ENV === 'dev' ? 'modules/controleonline' : 'node_modules/@controleonline'),
+  respectGitIgnore: false,
   testMatch: ['**/src/tests/browser/**/*.spec.js'],
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
