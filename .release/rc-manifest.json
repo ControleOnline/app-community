@@ -1,14 +1,14 @@
 {
-  "version": "1.10.36",
+  "version": "1.10.37",
   "rc": 1,
-  "branch": "rc/1.10.36-rc.1",
-  "baseMaster": "02727175812adf6cae5a2042df3a0cdaea990dc1",
+  "branch": "rc/1.10.37-rc.1",
+  "baseMaster": "226cbc25a50d1b3394b418b8ac5804c69ecf2964",
   "tasks": [
-    918
+    942
   ],
   "repositories": {
-    "ControleOnline/app-community": "e61420032a1f7ce4c85d46b4d39fb4f78d48a219"
+    "ControleOnline/app-community": "3d30350cafe3b5fed02c094f43495e20bbfb6738"
   },
   "frozen": true,
-  "notes": "#918 remove BKP/OLD and legacy workflows"
+  "notes": "#942 complete #880 UI npm migration \u2014 remove ui submodules"
 }
