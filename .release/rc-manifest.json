@@ -11,7 +11,7 @@
     937
   ],
   "repositories": {
-    "ControleOnline/app-community": "PENDING",
+    "ControleOnline/app-community": "e3fe949b93e0a913158d95c6866a3014adcfdefc",
     "ControleOnline/ui-common": "cc573f8d5edef24348f1c5b3c590d28fe116825a"
   },
   "frozen": true,
