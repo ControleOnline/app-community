@@ -66,8 +66,8 @@ produção sem busca hierárquica encontrava semver6: dependência direta exata
 semver7.8.5 corrigiu essa resolução. Os dois erros de build foram observados e
 corrigidos antes de publicar a entrega do app.
 
-O lock local é regenerado, mas permanece ignorado segundo a convenção atual do
-repositório. A prova dos módulos UI é feita pelos pins exatos + artefatos npm
+O lock local permanece ignorado segundo a convenção atual do repositório e
+não integra esta entrega. A prova dos módulos UI é feita pelos pins exatos + artefatos npm
 imutáveis conferidos. A configuração local de build é ignorada e usa APP_TYPE
 POS; não entra na branch.
 
@@ -99,6 +99,34 @@ Comandos reproduzíveis: `npm run test:waiter`,
 `npx expo export --platform android --output-dir /tmp/912-android`,
 `npm run test:waiter:bundle -- http://127.0.0.1:4173/` após servir o export local.
 
+## Gate semântico da integração do aplicativo em dev
+
+A prévia `git merge-tree` de dev `e0d27d010ca5a7b05c3b22947c7922837562005e`
+com a entrega do app não teve conflitos textuais (árvore inicial
+`e64b4587c1f0ff409d13d64b9dbc7d66d525d838`). O diff completo revelou delta
+operacional fora da recuperação de produto:
+
+- substituiria `.release/rc-manifest.json` existente de dev, RC1 congelada com
+  quatro tasks/pins, pelo manifesto histórico RC4 de master com somente942;
+- reintroduziria o workflow manual `ops-reset-task-branches.yml` vindo de master,
+  cujo conteúdo hardcoded reseta912/384 para38a33646 e apaga branches*-reset.
+
+Nenhum merge/PR do app→dev foi feito, nenhuma RC foi modificada/gerada e nenhum
+workflow de reset/deploy foi executado. A branch task-912 continua derivada do
+master remoto atual, com as mudanças do time preservadas. Dev e todas as
+branches antigas ficam preservadas. A ausência de conflitos não autoriza esse
+merge automaticamente.
+
+Recuperação correta: Manager deve revisar a origem/destino e os dois artefatos
+operacionais com os responsáveis, preparar um resultado de integração que
+preserve os metadados necessários do time e não reative o reset destrutivo,
+revisar novamente o diff inteiro e validar a mesma composição npm. Se precisar
+reconstruir uma origem, preservar primeiro a branch/remotos e demonstrar esse
+resultado antes de substituir qualquer branch. Não escolher ours/theirs
+cegamente, não fazer force/reset e não montar nova RC para contornar a revisão.
+Security revalida os novos SHAs depois da integração segura em dev. Até lá,
+a entrega fica revisável na branch publicada, com pacote/module dev comprovado.
+
 ## Coordenação e próxima etapa
 
 Task Paperclip existente CON-726 foi reutilizada, sem nova task duplicada.
@@ -108,8 +136,8 @@ grants, agent/runtime ou secrets. O antigo erro HTTP402/deactivated_workspace
 permanece responsabilidade operacional do Manager/CTO, sem impedir os commits
 publicados nesta rodada.
 
-NEXT_ACTION: Manager deve revisar a integração app task-912→dev com os SHAs
-atuais e preservar os artefatos operacionais do time; Security deve revalidar
+NEXT_ACTION: Manager deve resolver o gate semântico acima antes da integração
+app task-912→dev, preservando os artefatos operacionais do time; Security deve revalidar
 os novos SHAs/pacotes e a jornada autenticada POS→PPC. A issue permanece
 Working. Não criar RC, não promover Staging e não fechar a #912 nesta rodada.
 
