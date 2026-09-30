@@ -54,8 +54,8 @@ jobs:
           ENV="${{ github.event.inputs.environment || github.ref_name }}"
           case "$ENV" in
             dev)
-              API=https://dd.controleonline.com
-              SOCK=wss://dd.controleonline.com
+              API=https://d.controleonline.com
+              SOCK=wss://d.controleonline.com
               DOMAIN=https://dev.controleonline.com
               MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
@@ -224,9 +224,7 @@ jobs:
   tests:
     name: "3 · Staging browser tests"
     needs: [configure, web]
-    # Keep the broad suite available for explicit staging checks, but do not
-    # let external credentials or tenant state block RC publication.
-    if: needs.configure.outputs.env == 'staging' && github.event_name == 'workflow_dispatch'
+    if: needs.configure.outputs.env == 'staging'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
