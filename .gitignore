@@ -80,4 +80,4 @@ config/env.local.js
 .playwright-smoke-results/
 playwright-report/
 test-results/
-.playwright-*
+.playwright-*composer.lock
