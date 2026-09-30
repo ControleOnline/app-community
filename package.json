@@ -33,7 +33,7 @@
     "@controleonline/react-native-infinitepay-payment": "^1.0.5",
     "@controleonline/ui-accounting": "1.0.19",
     "@controleonline/ui-carrier": "1.0.29",
-    "@controleonline/ui-common": "1.2.88",
+    "@controleonline/ui-common": "github:ControleOnline/ui-common#cc573f8d5edef24348f1c5b3c590d28fe116825a",
     "@controleonline/ui-config": "1.0.24",
     "@controleonline/ui-contracts": "1.6.81",
     "@controleonline/ui-crm": "1.0.44",

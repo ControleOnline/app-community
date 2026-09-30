@@ -1,14 +1,19 @@
 {
   "version": "1.10.37",
-  "rc": 1,
-  "branch": "rc/1.10.37-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.37-rc.2",
   "baseMaster": "226cbc25a50d1b3394b418b8ac5804c69ecf2964",
   "tasks": [
-    942
+    942,
+    930,
+    931,
+    936,
+    937
   ],
   "repositories": {
-    "ControleOnline/app-community": "3d30350cafe3b5fed02c094f43495e20bbfb6738"
+    "ControleOnline/app-community": "PENDING",
+    "ControleOnline/ui-common": "cc573f8d5edef24348f1c5b3c590d28fe116825a"
   },
   "frozen": true,
-  "notes": "#942 complete #880 UI npm migration \u2014 remove ui submodules"
+  "notes": "#942 UI npm migration + board Deploy/InReview #930 #931 #936 #937 (ui-common pin cc573f8). Excluded #912 #384 #935 (RC max 5 / not Deploy-ready)."
 }
