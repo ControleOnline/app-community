@@ -7,7 +7,7 @@
     942
   ],
   "repositories": {
-    "ControleOnline/app-community": "PENDING"
+    "ControleOnline/app-community": "3d30350cafe3b5fed02c094f43495e20bbfb6738"
   },
   "frozen": true,
   "notes": "#942 complete #880 UI npm migration \u2014 remove ui submodules"
