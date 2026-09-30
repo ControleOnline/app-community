@@ -1,14 +1,17 @@
 {
-  "version": "1.10.36",
-  "rc": 1,
-  "branch": "rc/1.10.36-rc.1",
-  "baseMaster": "02727175812adf6cae5a2042df3a0cdaea990dc1",
+  "version": "1.10.38",
+  "rc": 3,
+  "branch": "rc/1.10.38-rc.3",
+  "baseMaster": "38a336469c6db1c9d5e8f0b39fc6d7679d07f934",
   "tasks": [
-    918
+    942,
+    912,
+    935,
+    384
   ],
   "repositories": {
-    "ControleOnline/app-community": "e61420032a1f7ce4c85d46b4d39fb4f78d48a219"
+    "ControleOnline/app-community": "2b40a2a7584adcc86332162c5b8640c6e4eac8a9"
   },
   "frozen": true,
-  "notes": "#918 remove BKP/OLD and legacy workflows"
+  "notes": "Align staging to master v1.10.38 identical product tree"
 }
