@@ -10,7 +10,7 @@
     384
   ],
   "repositories": {
-    "ControleOnline/app-community": "f75b49705132e4e24503330915e8b8d1bd52cad3"
+    "ControleOnline/app-community": "2b40a2a7584adcc86332162c5b8640c6e4eac8a9"
   },
   "frozen": true,
   "notes": "Align staging to master v1.10.38 identical product tree"
