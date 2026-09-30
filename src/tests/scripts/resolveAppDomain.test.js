@@ -14,7 +14,7 @@ describe('resolveAppDomain', () => {
   });
 
   it('keeps non-production domains tied to the selected environment', () => {
-    expect(resolveAppDomain('CRM', 'dev')).toBe('https://d.controleonline.com');
+    expect(resolveAppDomain('CRM', 'dev')).toBe('https://dd.controleonline.com');
     expect(resolveAppDomain('POS', 'staging')).toBe('https://staging.controleonline.com');
   });
 
@@ -51,5 +51,15 @@ describe('resolveAppDomain', () => {
     expect(workflow).toContain('app_domain: https://pos.controleonline.com');
     expect(workflow).toContain('domain: ${{ matrix.app_domain }}');
     expect(workflow).toContain('manager_app: ${{ needs.configure.outputs.manager_domain }}');
+  });
+
+  it('routes the dev frontend to the dd API and WebSocket endpoints', () => {
+    const workflowPath = path.resolve(__dirname, '../../../.github/workflows/deploy.yml');
+    const workflow = fs.readFileSync(workflowPath, 'utf8');
+
+    expect(workflow).toContain('API=https://dd.controleonline.com');
+    expect(workflow).toContain('SOCK=wss://dd.controleonline.com');
+    expect(workflow).not.toContain('API=https://d.controleonline.com');
+    expect(workflow).not.toContain('SOCK=wss://d.controleonline.com');
   });
 });
