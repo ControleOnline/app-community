@@ -37,7 +37,10 @@ jobs:
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
       - name: Test npm module validation and browser fixture resolution
-        run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs scripts/validate-smoke-flow-catalog.test.cjs
+        run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs scripts/validate-smoke-flow-catalog.test.cjs scripts/validate-dev-api-target.test.cjs
+
+      - name: Verify deployment domain and API endpoints
+        run: node node_modules/jest/bin/jest.js --config='{"testEnvironment":"node","transform":{},"testPathIgnorePatterns":["/node_modules/"]}' src/tests/scripts/resolveAppDomain.test.js --runInBand
 
       - name: Validate browser smoke flow catalog
         run: npm run test:browser:flows
