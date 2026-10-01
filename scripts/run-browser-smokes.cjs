@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 const groups = require('./browser-smoke-groups.cjs');
+const {browserModulePath} = require('./browser-module-paths.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const playwrightConfig = path.join(projectRoot, 'playwright.config.cjs');
@@ -145,7 +146,7 @@ resolvedGroups.forEach((group, index) => {
       'test',
       '--config',
       playwrightConfig,
-      ...testPaths,
+      ...testPaths.map(testPath => browserModulePath(projectRoot, path.resolve(projectRoot, testPath))),
       ...forwardedArgs,
     ], env, testTimeoutMs);
     const testExitCode = getExitCode(testResult);
