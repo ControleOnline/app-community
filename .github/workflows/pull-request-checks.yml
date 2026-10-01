@@ -37,7 +37,7 @@ jobs:
         run: find src -name '*.js' -print0 | xargs -0 -r -n1 node --check
 
       - name: Test npm module validation and browser fixture resolution
-        run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs
+        run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs scripts/validate-smoke-flow-catalog.test.cjs
 
       - name: Validate browser smoke flow catalog
         run: npm run test:browser:flows
