@@ -1,13 +1,17 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// This checks the actual submodule checkout used by the build, not branch names.
+// Validate the module source actually used by Metro; never fall back between modes.
 const legacyNames = ['default' + 'Company', 'Default' + 'Company',
   'SET_' + 'DEFAULT_COMPANY', 'mergeCompanyThemeFrom' + 'Default'];
 
-function validateCompanyContract(root) {
+function validateCompanyContract(root, {mode = process.env.APP_ENV === 'dev' ? 'development' : 'production'} = {}) {
   const errors = [];
-  const modules = path.join(root, 'modules/controleonline');
+  if (!['production', 'development'].includes(mode)) return [`Unsupported module resolution mode: ${mode}`];
+  const modules = path.join(root, mode === 'production' ? 'node_modules/@controleonline' : 'modules/controleonline');
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  const packages = Object.keys(manifest.dependencies || {}).filter(name => /^@controleonline\/ui-[a-z0-9-]+$/.test(name));
+  if (!packages.length) errors.push('No UI modules declared in package.json');
   const read = relative => {
     const file = path.join(modules, relative);
     if (!fs.existsSync(file)) {
@@ -39,11 +43,10 @@ function validateCompanyContract(root) {
       }
     }
   }
-  if (!fs.existsSync(modules)) return [...errors, 'Submodules are not initialized'];
-  for (const entry of fs.readdirSync(modules, {withFileTypes: true})) {
-    if (!entry.isDirectory()) continue;
-    const src = path.join(modules, entry.name, 'src');
-    if (fs.existsSync(src)) scan(src);
+  for (const name of packages) {
+    const src = path.join(modules, name.replace('@controleonline/', ''), 'src');
+    if (!fs.existsSync(src)) errors.push(`${mode}: missing UI module source ${name}`);
+    else scan(src);
   }
   return errors;
 }
