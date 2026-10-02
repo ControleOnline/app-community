@@ -24,7 +24,7 @@ Sem trigger cruzado entre pipelines.
 O deploy grava `DOMAIN` no `env.local.js` para que o runtime envie o `App-Domain`
 correto ao carregar `/themes-colors.css`.
 
-- `dev` usa `https://d.controleonline.com`.
+- `dev` usa `https://dd.controleonline.com`.
 - `staging` usa `https://staging.controleonline.com`.
 - `master` usa domínio por app, por exemplo `https://crm.controleonline.com`,
   `https://pos.controleonline.com`, `https://manager.controleonline.com`,
