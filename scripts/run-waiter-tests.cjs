@@ -15,7 +15,7 @@ const tests = {
     'pages/customizationOrderContext', 'pages/customizationNavigation',
     'components/ProductItemCustomizationRoute',
   ],
-  'ui-default': ['components/table/DefaultTableToolbar.waiter'],
+  'ui-default': ['components/table/DefaultTableToolbar.waiter', 'components/table/DefaultTableCards.layout'],
 };
 const files = Object.entries(tests).flatMap(([name, paths]) => paths.map(file => path.join(moduleRoot, name, `src/tests/react/${file}.test.js`)));
 const batches = [

@@ -42,6 +42,9 @@ jobs:
       - name: Verify deployment domain and API endpoints
         run: node node_modules/jest/bin/jest.js --config='{"testEnvironment":"node","transform":{},"testPathIgnorePatterns":["/node_modules/"]}' src/tests/scripts/resolveAppDomain.test.js --runInBand
 
+      - name: Verify published card layout regression coverage
+        run: npm run test:cards-layout
+
       - name: Validate browser smoke flow catalog
         run: npm run test:browser:flows
 
