@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const {browserEnvSource} = require('./browser-env.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
 const outputDir = path.resolve(
@@ -31,51 +32,19 @@ const ensureEnvLocalFile = () => {
   fs.copyFileSync(envLocalSampleFile, envLocalFile);
 };
 
-const overrideEnvLocalAppType = appType => {
-  const normalizedAppType = String(appType || '').trim().toUpperCase();
-
-  if (!normalizedAppType) {
-    return null;
-  }
-
+const overrideBrowserEnvLocal = appType => {
   const originalEnvLocal = fs.readFileSync(envLocalFile, 'utf8');
-  const appTypePattern = /APP_TYPE:\s*(?:resolveAppType\(\)|['"][^'"]+['"])/;
-  const appTypeMatch = originalEnvLocal.match(appTypePattern);
-
-  if (!appTypeMatch) {
-    throw new Error(
-      'Unable to override APP_TYPE in ' + envLocalFile + '. The file format may have changed.',
-    );
-  }
-
-  const currentAppType = String(appTypeMatch[0] || '')
-    .replace(/^APP_TYPE:\s*/, '')
-    .replace(/^resolveAppType\(\)$/, 'MANAGER')
-    .replace(/^['"]|['"]$/g, '')
-    .trim()
-    .toUpperCase();
-
-  if (currentAppType === normalizedAppType) {
-    return null;
-  }
-
-  const nextEnvLocal = originalEnvLocal.replace(
-    appTypePattern,
-    `APP_TYPE: '${normalizedAppType}'`,
-  );
-
+  const browserApi = require(envLocalFile).env.API_PLAYWRIGHT;
+  const nextEnvLocal = browserEnvSource(originalEnvLocal, String(appType || 'MANAGER').trim().toUpperCase(), browserApi);
   fs.writeFileSync(envLocalFile, nextEnvLocal);
-
-  return () => {
-    fs.writeFileSync(envLocalFile, originalEnvLocal);
-  };
+  return () => fs.writeFileSync(envLocalFile, originalEnvLocal);
 };
 
 const buildWebExport = () => {
   fs.rmSync(outputDir, { recursive: true, force: true });
   ensureEnvLocalFile();
 
-  const restoreEnvLocal = overrideEnvLocalAppType(process.env.PLAYWRIGHT_APP_TYPE);
+  const restoreEnvLocal = overrideBrowserEnvLocal(process.env.PLAYWRIGHT_APP_TYPE);
 
   try {
     const command = 'npx';
