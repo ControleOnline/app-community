@@ -27,7 +27,8 @@
     "modules:sync": "node scripts/sync-module-sources.mjs",
     "test:waiter": "node scripts/run-waiter-tests.cjs",
     "test:waiter:bundle": "node scripts/smoke-local-web-bundle.cjs",
-    "test:cards-layout": "node node_modules/jest/bin/jest.js --config jest.waiter.config.cjs --runInBand --runTestsByPath node_modules/@controleonline/ui-default/src/tests/react/components/table/DefaultTableCards.layout.test.js"
+    "test:cards-layout": "node node_modules/jest/bin/jest.js --config jest.waiter.config.cjs --runInBand --runTestsByPath node_modules/@controleonline/ui-default/src/tests/react/components/table/DefaultTableCards.layout.test.js",
+    "test:waiter:local": "node --test tests/*.local.test.cjs"
   },
   "dependencies": {
     "@backpackapp-io/react-native-toast": "^0.15.1",
