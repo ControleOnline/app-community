@@ -1,4 +1,5 @@
 # Validate the reviewed native composition without publishing to stores/releases.
+# Validation artifacts use Expo template debug signing; production keys stay in Deploy.
 name: Native Build Checks
 on:
   push:
@@ -62,10 +63,7 @@ jobs:
           publish_github: "false"
           domain: ${{ matrix.app_domain }}
           manager_app: https://manager.controleonline.com
-        env:
-          CERT: ${{ secrets.CERT }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+          sign_release: "false"
   webos:
     name: LG webOS build
     runs-on: ubuntu-latest

@@ -32,3 +32,24 @@ for (const [action, stepName] of [
     }
   });
 }
+
+for (const signRelease of ['false', 'true']) {
+  test(`Android validation applies production signing only when requested (${signRelease})`, () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'native-signing-'));
+    try {
+      fs.mkdirSync(path.join(root, 'android'));
+      fs.writeFileSync(path.join(root, 'android', 'gradlew'), '#!/bin/sh\nprintf "%s\\n" "$@" > ../gradle-args\n', { mode: 0o755 });
+      const file = path.resolve(__dirname, '..', '.github', 'actions', 'android-build', 'action.yml');
+      let script = YAML.parse(fs.readFileSync(file, 'utf8')).runs.steps.find(s => s.name === 'Gradle build').run;
+      script = script.replace(/\$\{\{ inputs\.build_(?:aab|apk) \}\}/g, 'true')
+        .replace(/\$\{\{ inputs\.sign_release \}\}/g, signRelease);
+      const result = spawnSync('/bin/bash', ['-e', '-o', 'pipefail', '-c', script], { cwd: root, encoding: 'utf8' });
+      assert.equal(result.status, 0, result.stderr);
+      const args = fs.readFileSync(path.join(root, 'gradle-args'), 'utf8').trim().split('\n');
+      assert.ok(args.includes('bundleRelease') && args.includes('assembleRelease'));
+      assert.equal(args.includes('--init-script'), signRelease === 'true');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+}

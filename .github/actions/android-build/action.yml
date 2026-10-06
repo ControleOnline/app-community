@@ -27,6 +27,10 @@ inputs:
   socket:
     required: false
     default: "wss://api.controleonline.com"
+  sign_release:
+    description: Apply production signing (disable only for validation artifacts)
+    required: false
+    default: "true"
   build_aab:
     required: false
     default: "true"
@@ -191,6 +195,7 @@ runs:
       run: node node_modules/expo/bin/cli prebuild --clean --platform android --no-install
 
     - name: Signing files
+      if: inputs.sign_release == 'true'
       shell: bash
       run: |
         set -e
@@ -210,8 +215,12 @@ runs:
         [ "${{ inputs.build_aab }}" = "true" ] && TASKS="$TASKS bundleRelease"
         [ "${{ inputs.build_apk }}" = "true" ] && TASKS="$TASKS assembleRelease"
         [ -z "$TASKS" ] && { echo "No build targets"; exit 1; }
+        SIGNING_ARGS=()
+        if [ "${{ inputs.sign_release }}" = "true" ]; then
+          SIGNING_ARGS=(--init-script ../signing.gradle)
+        fi
         # shellcheck disable=SC2086
-        ./gradlew $TASKS --init-script ../signing.gradle \
+        ./gradlew $TASKS "${SIGNING_ARGS[@]}" \
           -Dorg.gradle.jvmargs="-Xmx6144m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8"
 
     - name: Extract version
