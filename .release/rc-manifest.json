@@ -1,8 +1,8 @@
 {
-  "version": "1.10.40",
+  "version": "1.10.41",
   "rc": 1,
-  "branch": "rc/1.10.40-rc.1",
-  "baseMaster": "6dc48b954397484c684c1a31891a10618e87ad55",
+  "branch": "rc/1.10.41-rc.1",
+  "baseMaster": "1319a3de9fb592c81dc2e32327bc5f777096fec6",
   "tasks": [
     975
   ],
@@ -23,7 +23,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "0c8b67ac001fdabd6da9eca668d5a999ca2e7cd8",
     "ControleOnline/api-platform-users": "453b7eae37d5b147dcbe15bb376ed8a057c4284c",
-    "ControleOnline/app-community": "45a123715f8e9ebb49d2f24dd1c20c982071c855"
+    "ControleOnline/app-community": "e70fdc4e42f31906e95db3804c8f568072065d3b"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -380,11 +380,21 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "e4f5ab093da8a476d25fab045a601c8601f21021",
+    "ControleOnline/app-community": "522185627b551449ebe0e3e4ee1d633e61fa676d",
     "ControleOnline/api-community": "dc02812e52c9d9f667b52982df5a2087e2bcf2ba"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "consumerSnapshot": "45a123715f8e9ebb49d2f24dd1c20c982071c855"
+  "consumerSnapshot": "e70fdc4e42f31906e95db3804c8f568072065d3b",
+  "nativeValidation": {
+    "run": 37495033597,
+    "source": "c5ca1437d09e8d395192b1eeacea43f9fcc1ce60",
+    "androidVariants": 9,
+    "webos": true,
+    "publication": false,
+    "productionSigningSecrets": false
+  },
+  "nativeCorrectionOnly": true,
+  "previousPublishedRC": "rc/1.10.40-rc.1"
 }
