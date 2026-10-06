@@ -210,6 +210,12 @@ runs:
       shell: bash
       run: |
         set -e
+        if [ "${{ inputs.sign_release }}" != "true" ] && {
+          [ "${{ inputs.publish_play }}" = "true" ] || [ "${{ inputs.publish_github }}" = "true" ];
+        }; then
+          echo "::error::Production signing is required for publication."
+          exit 1
+        fi
         cd android
         TASKS=""
         [ "${{ inputs.build_aab }}" = "true" ] && TASKS="$TASKS bundleRelease"

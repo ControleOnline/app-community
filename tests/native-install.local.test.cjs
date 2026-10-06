@@ -42,12 +42,32 @@ for (const signRelease of ['false', 'true']) {
       const file = path.resolve(__dirname, '..', '.github', 'actions', 'android-build', 'action.yml');
       let script = YAML.parse(fs.readFileSync(file, 'utf8')).runs.steps.find(s => s.name === 'Gradle build').run;
       script = script.replace(/\$\{\{ inputs\.build_(?:aab|apk) \}\}/g, 'true')
-        .replace(/\$\{\{ inputs\.sign_release \}\}/g, signRelease);
+        .replace(/\$\{\{ inputs\.sign_release \}\}/g, signRelease)
+        .replace(/\$\{\{ inputs\.publish_(?:play|github) \}\}/g, 'false');
       const result = spawnSync('/bin/bash', ['-e', '-o', 'pipefail', '-c', script], { cwd: root, encoding: 'utf8' });
       assert.equal(result.status, 0, result.stderr);
       const args = fs.readFileSync(path.join(root, 'gradle-args'), 'utf8').trim().split('\n');
       assert.ok(args.includes('bundleRelease') && args.includes('assembleRelease'));
       assert.equal(args.includes('--init-script'), signRelease === 'true');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+}
+
+for (const publisher of ['publish_play', 'publish_github']) {
+  test(`Android rejects debug-signed artifacts requested for ${publisher}`, () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'native-publish-'));
+    try {
+      fs.mkdirSync(path.join(root, 'android'));
+      fs.writeFileSync(path.join(root, 'android', 'gradlew'), '#!/bin/sh\ntouch ../unexpected-build\n', { mode: 0o755 });
+      const file = path.resolve(__dirname, '..', '.github', 'actions', 'android-build', 'action.yml');
+      const values = { build_aab: 'true', build_apk: 'true', sign_release: 'false', publish_play: 'false', publish_github: 'false', [publisher]: 'true' };
+      const script = YAML.parse(fs.readFileSync(file, 'utf8')).runs.steps.find(s => s.name === 'Gradle build').run
+        .replace(/\$\{\{ inputs\.(\w+) \}\}/g, (_, name) => values[name]);
+      const result = spawnSync('/bin/bash', ['-e', '-o', 'pipefail', '-c', script], { cwd: root, encoding: 'utf8' });
+      assert.notEqual(result.status, 0, 'Debug validation artifacts must never reach publication');
+      assert.equal(fs.existsSync(path.join(root, 'unexpected-build')), false);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
