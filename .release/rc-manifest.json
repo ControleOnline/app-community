@@ -1,13 +1,17 @@
 {
-  "version": "1.10.40",
+  "version": "1.10.45",
   "rc": 1,
-  "branch": "rc/1.10.40-rc.1",
-  "baseMaster": "6dc48b954397484c684c1a31891a10618e87ad55",
+  "branch": "rc/1.10.45-rc.1",
+  "baseMaster": "1319a3de9fb592c81dc2e32327bc5f777096fec6",
   "tasks": [
-    975
+    975,
+    981,
+    967
   ],
   "taskRepositories": {
-    "975": "ControleOnline/app-community"
+    "975": "ControleOnline/app-community",
+    "981": "ControleOnline/app-community",
+    "967": "ControleOnline/app-community"
   },
   "repositories": {
     "ControleOnline/ui-common": "4919724c04f3d6e66280db4c9e2a66db65c47cc0",
@@ -23,7 +27,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "0c8b67ac001fdabd6da9eca668d5a999ca2e7cd8",
     "ControleOnline/api-platform-users": "453b7eae37d5b147dcbe15bb376ed8a057c4284c",
-    "ControleOnline/app-community": "45a123715f8e9ebb49d2f24dd1c20c982071c855"
+    "ControleOnline/app-community": "9e0615f72a0f02173588530859ef1c8b7753c337"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -83,10 +87,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-crm/-/ui-crm-1.0.44.tgz"
     },
     "@controleonline/ui-customers": {
-      "version": "1.0.82",
-      "gitHead": "bc75a8f1b3a3ff86692ae1b8b5052325212c732d",
-      "integrity": "sha512-jVeVMCfgde0AnA1nchvnDyev9R8p+4qamZVgSY6lDX0LCL0MoK/SMWmpQOiNoPImm9c2ATrfOFteXDNgOW38ug==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-customers/-/ui-customers-1.0.82.tgz"
+      "version": "1.0.84",
+      "gitHead": "c542c7c18a082749864240c0e2597a323fe859e5",
+      "integrity": "sha512-NvswG95Dr20EemnNK6xrqdF/7THO5Fm+WqJMF7eRud3PhQTTIElHNcGhLkMFBBXez2AYEFQ6ezFkIRNBVzU1ZA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-customers/-/ui-customers-1.0.84.tgz"
     },
     "@controleonline/ui-default": {
       "version": "1.0.276",
@@ -137,10 +141,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.42.tgz"
     },
     "@controleonline/ui-people": {
-      "version": "1.0.94",
-      "gitHead": "034573deb587471f6dde8bbe824e0fe5e1ab1509",
-      "integrity": "sha512-uQP7JXeje0OUABiWpg4bnI8USv8yLLaoscl5A3b+LKrBExMmZRccQpQx7af1jSHTSXtkRXj7HB2HhOlyv3KBwg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.94.tgz"
+      "version": "1.0.97",
+      "gitHead": "99e0ad931039989a8f5ea06a21c7ad871383c1da",
+      "integrity": "sha512-fuIcpuyb07foZebYtleQXGqec5GcHiwVDDUs9faBz3163K9qhJdwEj3eiARAY3Asln6vJPqKU1+6qL0ovmL4AA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.97.tgz"
     },
     "@controleonline/ui-ppc": {
       "version": "1.0.56",
@@ -380,11 +384,28 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "e4f5ab093da8a476d25fab045a601c8601f21021",
+    "ControleOnline/app-community": "c7897b7aea52254a712297ae938c13d60aed0ca2",
     "ControleOnline/api-community": "dc02812e52c9d9f667b52982df5a2087e2bcf2ba"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "consumerSnapshot": "45a123715f8e9ebb49d2f24dd1c20c982071c855"
+  "consumerSnapshot": "9e0615f72a0f02173588530859ef1c8b7753c337",
+  "nativeValidation": {
+    "run": 37495033597,
+    "source": "c5ca1437d09e8d395192b1eeacea43f9fcc1ce60",
+    "androidVariants": 9,
+    "webos": true,
+    "publication": false,
+    "productionSigningSecrets": false,
+    "scope": "Prior native CI actions validation at recorded source; not a native build proof for the newer employee package pins"
+  },
+  "previousPublishedRC": "rc/1.10.44-rc.1",
+  "humanApprovedComposition": {
+    "branch": "rc/1.10.44-rc.1",
+    "tip": "bcb39ee12fc30f6988692eac594e13e69f7082ad",
+    "tree": "2258551f072d96f4b4fca6539a7b8219d1ec1661",
+    "source": "Explicit human request in current chat: composition approved; promote Master",
+    "functionalChanges": false
+  }
 }
