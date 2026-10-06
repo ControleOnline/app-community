@@ -151,8 +151,11 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        npm install
-        npx expo install --fix
+        set -euo pipefail
+        # Preserve the reviewed lock; never repair dependency versions in CI.
+        npm ci --legacy-peer-deps --no-audit --no-fund
+        node -e "require('./node_modules/expo/package.json')"
+        APP_ENV=production node scripts/validate-module-contract.cjs --mode=production
 
     - name: Firebase config
       shell: bash
@@ -185,7 +188,7 @@ runs:
 
     - name: Prebuild
       shell: bash
-      run: npx expo prebuild --clean
+      run: node node_modules/expo/bin/cli prebuild --clean --platform android --no-install
 
     - name: Signing files
       shell: bash

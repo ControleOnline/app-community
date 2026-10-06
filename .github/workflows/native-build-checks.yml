@@ -1,0 +1,77 @@
+# Validate the reviewed native composition without publishing to stores/releases.
+name: Native Build Checks
+on:
+  push:
+    branches:
+      - task-*
+    paths:
+      - .github/actions/android-build/**
+      - .github/actions/lg-webos-build/**
+      - .github/workflows/native-build-checks.yml
+      - package-lock.json
+      - tests/native-install.local.test.cjs
+  workflow_dispatch: null
+permissions:
+  contents: read
+concurrency:
+  group: native-checks-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  android:
+    name: Android ${{ matrix.app_type }} build
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_type: CHECKOUT
+            display_name: Checkout
+            app_domain: https://checkout.controleonline.com
+          - app_type: CRM
+            display_name: CRM
+            app_domain: https://crm.controleonline.com
+          - app_type: DELIVERY
+            display_name: Delivery
+            app_domain: https://delivery.controleonline.com
+          - app_type: MANAGER
+            display_name: Gestor
+            app_domain: https://manager.controleonline.com
+          - app_type: MENU
+            display_name: Menu
+            app_domain: https://menu.controleonline.com
+          - app_type: POS
+            display_name: PDV
+            app_domain: https://pos.controleonline.com
+          - app_type: PPC
+            display_name: PCP
+            app_domain: https://ppc.controleonline.com
+          - app_type: SERVICE
+            display_name: Service
+            app_domain: https://service.controleonline.com
+          - app_type: MKT
+            display_name: Marketing
+            app_domain: https://mkt.controleonline.com
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/android-build
+        with:
+          app_type: ${{ matrix.app_type }}
+          display_name: ${{ matrix.display_name }}
+          publish_play: "false"
+          publish_github: "false"
+          domain: ${{ matrix.app_domain }}
+          manager_app: https://manager.controleonline.com
+        env:
+          CERT: ${{ secrets.CERT }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+  webos:
+    name: LG webOS build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/lg-webos-build
+        with:
+          publish_github: "false"
