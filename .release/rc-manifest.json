@@ -1,7 +1,7 @@
 {
-  "version": "1.10.44",
+  "version": "1.10.45",
   "rc": 1,
-  "branch": "rc/1.10.44-rc.1",
+  "branch": "rc/1.10.45-rc.1",
   "baseMaster": "1319a3de9fb592c81dc2e32327bc5f777096fec6",
   "tasks": [
     975,
@@ -397,7 +397,15 @@
     "androidVariants": 9,
     "webos": true,
     "publication": false,
-    "productionSigningSecrets": false
+    "productionSigningSecrets": false,
+    "scope": "Prior native CI actions validation at recorded source; not a native build proof for the newer employee package pins"
   },
-  "previousPublishedRC": "rc/1.10.43-rc.1"
+  "previousPublishedRC": "rc/1.10.44-rc.1",
+  "humanApprovedComposition": {
+    "branch": "rc/1.10.44-rc.1",
+    "tip": "bcb39ee12fc30f6988692eac594e13e69f7082ad",
+    "tree": "2258551f072d96f4b4fca6539a7b8219d1ec1661",
+    "source": "Explicit human request in current chat: composition approved; promote Master",
+    "functionalChanges": false
+  }
 }
