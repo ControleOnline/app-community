@@ -6,7 +6,7 @@ import {Pressable, StyleSheet} from 'react-native'
 
 //import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
-import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
+import ManagerHomePage from '../onboarding/ManagerHomePage'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
 import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
@@ -35,6 +35,8 @@ import {
   normalizeProductDetailsTabPath,
 } from './browserPath'
 import {createStableRouteComponents} from './stableRouteComponents'
+import OnboardingPage from '../onboarding/OnboardingPage'
+import {applyOnboardingRoute} from '../onboarding/model'
 
 const Stack = createNativeStackNavigator()
 
@@ -122,7 +124,7 @@ export const allRoutes = [
   ...crmRoutes,
   ...customersRoutes,
   ...loginRoutes,
-  ...managerRoutes,
+  ...applyOnboardingRoute(managerRoutes, OnboardingPage),
   ...ordersRoutes,
   ...reportRoutes,
   ...employeeRoutes,
