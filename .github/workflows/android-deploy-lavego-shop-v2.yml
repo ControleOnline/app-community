@@ -190,18 +190,22 @@ jobs:
             console.log('Android versionCode:', calculatedVersionCode);
           "
 
-      - name: Extract App Version and VersionCode
+      - name: Extract and Show App Version and VersionCode
         run: |
           # 1. Extrai a versão de exibição do app.json
           APP_VERSION=$(node -p "require('./app.json').expo.version")
-          echo "versão visível: $APP_VERSION"
           echo "VERSION=$APP_VERSION" >> "$GITHUB_ENV"
 
-          # 2. Extrai o versionCode numérico do app.json
+          # 2. Extrai o versionCode numérico do app.json e expõe para o env do GitHub
           VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          echo "versionCode interno (Controle Android): $VERSION_CODE"
           echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
-          
+
+          echo "=========================================="
+          echo "🚀 Aplicativo: Lave-Go Shop"
+          echo "📦 Versão Visível (version): ${{ env.VERSION }}"
+          echo "🔢 VersionCode Interno (Google Play): ${{ env.APP_VERSION_CODE }}"
+          echo "=========================================="
+                    
       - name: Install Dependencies
         run: npm install
 
