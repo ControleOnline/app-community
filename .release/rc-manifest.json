@@ -4,10 +4,10 @@
   "branch": "rc/1.10.48-rc.1",
   "baseMaster": "b05eeb13888e1ce50b557e76cf6dda460034a9b0",
   "tasks": [
-    1005
+    973
   ],
   "taskRepositories": {
-    "1005": "ControleOnline/app-community"
+    "973": "ControleOnline/app-community"
   },
   "repositories": {
     "ControleOnline/ui-common": "4919724c04f3d6e66280db4c9e2a66db65c47cc0",
@@ -23,7 +23,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "0c8b67ac001fdabd6da9eca668d5a999ca2e7cd8",
     "ControleOnline/api-platform-users": "453b7eae37d5b147dcbe15bb376ed8a057c4284c",
-    "ControleOnline/app-community": "b4ba7ce191590691915c8283f70fd72ef58782b5"
+    "ControleOnline/app-community": "b1aef34b9563f891799a608965a68668af85d598"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -380,11 +380,11 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "b4ba7ce191590691915c8283f70fd72ef58782b5"
+    "ControleOnline/app-community": "b1aef34b9563f891799a608965a68668af85d598"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
   "previousPublishedRC": "rc/1.10.46-rc.1",
-  "consumerSnapshot": "b4ba7ce191590691915c8283f70fd72ef58782b5"
+  "consumerSnapshot": "b1aef34b9563f891799a608965a68668af85d598"
 }
