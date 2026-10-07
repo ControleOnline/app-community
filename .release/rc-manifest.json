@@ -1,13 +1,17 @@
 {
-  "version": "1.10.46",
+  "version": "1.10.47",
   "rc": 1,
-  "branch": "rc/1.10.46-rc.1",
-  "baseMaster": "41099c12315ef4e1b412063bc163f641cb9a3223",
+  "branch": "rc/1.10.47-rc.1",
+  "baseMaster": "c5dcd8f52820f4590d161238217cb8b2b9a2eca7",
   "tasks": [
-    990
+    997,
+    999,
+    1001
   ],
   "taskRepositories": {
-    "990": "ControleOnline/app-community"
+    "997": "ControleOnline/app-community",
+    "999": "ControleOnline/app-community",
+    "1001": "ControleOnline/app-community"
   },
   "repositories": {
     "ControleOnline/ui-common": "4919724c04f3d6e66280db4c9e2a66db65c47cc0",
@@ -380,12 +384,11 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "f994fe50952b3eb0947da724709cb63a3a066fb5"
+    "ControleOnline/app-community": "2e0ff14db6e22ff1f32aafa45a3080d651cb01f8"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "consumerSnapshot": "f994fe50952b3eb0947da724709cb63a3a066fb5",
   "nativeValidation": {
     "run": 37495033597,
     "source": "c5ca1437d09e8d395192b1eeacea43f9fcc1ce60",
@@ -395,5 +398,6 @@
     "productionSigningSecrets": false,
     "scope": "Workflow-only change (android-deploy-lavego-shop-v2.yml); no application code changed"
   },
-  "previousPublishedRC": "rc/1.10.45-rc.1"
+  "previousPublishedRC": "rc/1.10.46-rc.1",
+  "consumerSnapshot": "2e0ff14db6e22ff1f32aafa45a3080d651cb01f8"
 }

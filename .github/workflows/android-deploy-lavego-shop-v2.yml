@@ -168,40 +168,51 @@ jobs:
       - name: Configure Assets by APP_TYPE
         run: node scripts/configure-assets-lavego2.js
 
-      - name: Update version and versionCode in app.json (Positional)
+      - name: Update version and versionCode in app.json (Positional + Play-safe)
         run: |
           VERSION=$(node -p "require('./package.json').version")
           node -e "
             const fs = require('fs');
             const app = require('./app.json');
-            
-            // Separa a versão (ex: '1.10.29') em partes [major, minor, patch]
+            app.expo = app.expo || {};
+            app.expo.android = app.expo.android || {};
+
+            // Semantic parts from package.json (ex: 1.10.34)
             const [major, minor, patch] = '$VERSION'.split('.').map(Number);
-            
-            // Calcula o código posicional (ex: 1 * 100000 + 10 * 1000 + 29 = 110029)
-            const calculatedVersionCode = (major * 100000) + (minor * 1000) + patch;
-            
+            const positional = (major * 100000) + (minor * 1000) + patch;
+
+            // Day-based floor (same magnitude as historical Play uploads ~246M)
+            // so versionCode never goes backwards vs store.
+            const day = Math.floor((Date.now() - Date.UTC(2020, 0, 1)) / 86400000);
+            const dayBased = (day * 100000) + ((minor % 100) * 100) + (patch % 100);
+
+            const calculatedVersionCode = Math.max(positional, dayBased);
+
             app.expo.version = '$VERSION';
             app.expo.android.versionCode = calculatedVersionCode;
             app.versionCode = calculatedVersionCode;
-            
+
             fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
             console.log('Android version:', '$VERSION');
-            console.log('Android versionCode:', calculatedVersionCode);
+            console.log('Android versionCode:', calculatedVersionCode, '(positional=', positional, 'dayBased=', dayBased, ')');
           "
 
-      - name: Extract App Version and VersionCode
+      - name: Extract and Show App Version and VersionCode
         run: |
           # 1. Extrai a versão de exibição do app.json
           APP_VERSION=$(node -p "require('./app.json').expo.version")
-          echo "versão visível: $APP_VERSION"
           echo "VERSION=$APP_VERSION" >> "$GITHUB_ENV"
 
-          # 2. Extrai o versionCode numérico do app.json
+          # 2. Extrai o versionCode numérico do app.json e expõe para o env do GitHub
           VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
-          echo "versionCode interno (Controle Android): $VERSION_CODE"
           echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
-          
+
+          echo "=========================================="
+          echo "🚀 Aplicativo: Lave-Go Shop"
+          echo "📦 Versão Visível (version): ${{ env.VERSION }}"
+          echo "🔢 VersionCode Interno (Google Play): ${{ env.APP_VERSION_CODE }}"
+          echo "=========================================="
+                    
       - name: Install Dependencies
         run: npm install
 
