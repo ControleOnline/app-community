@@ -1,8 +1,8 @@
 {
-  "version": "1.10.49",
-  "rc": 1,
-  "branch": "rc/1.10.49-rc.1",
-  "baseMaster": "2199ca7a869764380042ef616ba6aeab006074a5",
+  "version": "1.10.50",
+  "rc": 2,
+  "branch": "rc/1.10.50-rc.2",
+  "baseMaster": "cda19e51a6c5adc391ad0c6b22bb0ee6a61dfbb8",
   "tasks": [
     973
   ],
@@ -23,7 +23,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "8beedfe08fba16a9568dc708a7ae92d4dc851311",
     "ControleOnline/api-platform-users": "69255e893a94791de8471e46af1fcc58028fc4aa",
-    "ControleOnline/app-community": "e1b3d0f0c97ddc717c91816dd5319fd2fce1bf93"
+    "ControleOnline/app-community": "67c0d3ae1722d391c98042d10b03ced5a56d20a3"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -113,10 +113,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.15.tgz"
     },
     "@controleonline/ui-login": {
-      "version": "1.0.110",
-      "gitHead": "d420bde9192c263a25c3dbf2dafd15b43fca8b6a",
-      "integrity": "sha512-gqFjn7OeUx0I5TK0GCq75b2lno8A1uXLVMPAbwyq3VJwTBDZTyLD9GtWmiQhEBoNkNMdPdp/0z+pxs8Cg7Gaug==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.110.tgz"
+      "version": "1.0.111",
+      "gitHead": "db08162316a3299638da18f9628c6f6df2d58483",
+      "integrity": "sha512-iEZz+y7mMkVOPj+ZxSzacNu62bZLN9qAscqjauzpoUpkuucDyg+B/x3/NBH84yZWJajTS2i/7R8TYY6raY0oYg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.111.tgz"
     },
     "@controleonline/ui-logistic": {
       "version": "1.0.41",
@@ -380,11 +380,11 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "e1b3d0f0c97ddc717c91816dd5319fd2fce1bf93"
+    "ControleOnline/app-community": "064777236124898865d268c49d49d7b195fc11f5"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "previousPublishedRC": "rc/1.10.48-rc.1",
-  "consumerSnapshot": "e1b3d0f0c97ddc717c91816dd5319fd2fce1bf93"
+  "previousPublishedRC": "rc/1.10.49-rc.1",
+  "consumerSnapshot": "67c0d3ae1722d391c98042d10b03ced5a56d20a3"
 }
