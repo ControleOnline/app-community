@@ -17,7 +17,7 @@ if (!fs.existsSync(path.join(directory, 'index.html'))) throw new Error('Pass th
   const server = http.createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const candidate = path.resolve(directory, `.${pathname}`);
-    if (!candidate.startsWith(directory + path.sep)) {res.writeHead(403); res.end(); return;}
+    if (candidate !== directory && !candidate.startsWith(directory + path.sep)) {res.writeHead(403); res.end(); return;}
     const file = fs.existsSync(candidate) && fs.statSync(candidate).isFile() ? candidate : path.join(directory, 'index.html');
     const types = {'.js': 'application/javascript', '.html': 'text/html', '.json': 'application/json', '.css': 'text/css', '.svg': 'image/svg+xml', '.ttf': 'font/ttf'};
     res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
@@ -60,7 +60,15 @@ if (!fs.existsSync(path.join(directory, 'index.html'))) throw new Error('Pass th
     state.mainCompany.permission = ['owner'];
     state.deviceConfig.alias = 'Garçom de teste';
     state.deviceConfig.configs = JSON.stringify({...JSON.parse(state.deviceConfig.configs), 'check-order-type': 'table-tab', 'order-charge-enabled': false});
-    await page.goto(`${origin}/onboarding`);
+    await page.goto(`${origin}/`);
+    try {
+      await expect(page.getByTestId('open-operation-setup')).toBeVisible({timeout: 30000});
+    } catch (error) {
+      await page.screenshot({path: '/tmp/onboarding-1013-home-failure.png', fullPage: true});
+      throw new Error(`${error.message}\nSynthetic page: ${await page.locator('body').innerText()}`);
+    }
+    await page.getByTestId('open-operation-setup').click();
+    await expect(page).toHaveURL(/\/onboarding$/);
     expect(await page.evaluate(() => localStorage.getItem('app-type'))).toBe('MANAGER');
     await expect(page.getByTestId('setup-onboarding')).toBeVisible({timeout: 30000});
     await expect(page.getByRole('button', {name: 'Cadastrar e configurar devices'})).toHaveCount(0);
