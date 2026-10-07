@@ -44,9 +44,14 @@ runs:
       run: |
         set -e
         ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        MANAGER_APP=$(node -p "require('./config/env.local.sample').env.MANAGER_APP ?? ''")
         DOMAIN_LINE=""
+        MANAGER_APP_LINE=""
         if [ -n "${{ inputs.domain }}" ]; then
           DOMAIN_LINE="DOMAIN: '${{ inputs.domain }}',"
+        fi
+        if [ -n "$MANAGER_APP" ]; then
+          MANAGER_APP_LINE="MANAGER_APP: '${MANAGER_APP}',"
         fi
         cat > ./config/env.local.js << ENVEOF
         const env = {
@@ -54,6 +59,7 @@ runs:
           API_PLAYWRIGHT: '${{ inputs.api_entrypoint }}',
           SOCKET: '${{ inputs.socket }}',
           ${DOMAIN_LINE}
+          ${MANAGER_APP_LINE}
           APP_TYPE: '${{ inputs.app_type }}',
           ZOOM: ${ZOOM},
           NEW_RELIC: {
