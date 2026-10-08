@@ -23,7 +23,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "8beedfe08fba16a9568dc708a7ae92d4dc851311",
     "ControleOnline/api-platform-users": "69255e893a94791de8471e46af1fcc58028fc4aa",
-    "ControleOnline/app-community": "73c7fe22"
+    "ControleOnline/app-community": "73c7fe22d590c08ef099a2b7b58258f094c71355"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -386,5 +386,5 @@
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
   "previousPublishedRC": "rc/1.10.51-rc.1",
-  "consumerSnapshot": "73c7fe22"
+  "consumerSnapshot": "73c7fe22d590c08ef099a2b7b58258f094c71355"
 }
