@@ -257,7 +257,6 @@ jobs:
             app_domain: https://checkout.controleonline.com
             track: internal
             release_status: draft
-            changes_not_sent_for_review: "true"
           - app_type: CRM
             display_name: CRM
             app_domain: https://crm.controleonline.com
@@ -278,7 +277,6 @@ jobs:
             app_domain: https://menu.controleonline.com
             track: internal
             release_status: completed
-            changes_not_sent_for_review: "true"
             publish_play: "false"
           - app_type: POS
             display_name: PDV
@@ -318,7 +316,6 @@ jobs:
           bump_version_code_from_package: "true"
           play_track: ${{ matrix.track }}
           play_status: ${{ matrix.release_status }}
-          play_changes_not_sent_for_review: ${{ matrix.changes_not_sent_for_review || 'false' }}
         env:
           CERT: ${{ secrets.CERT }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
