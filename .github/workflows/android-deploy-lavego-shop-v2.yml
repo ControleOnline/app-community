@@ -320,13 +320,46 @@ jobs:
         run: echo "${{ secrets.LAVEGO_SHOP_SERVICE_ACCOUNT }}" | base64 -d > /tmp/service_account.json
 
       - name: Upload .aab to Play Store
-        uses: r0adkll/upload-google-play@v1.1.3
-        with:
-          serviceAccountJson: /tmp/service_account.json
-          packageName: ${{ env.PACKAGE_NAME }}
-          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: internal
-          status: completed
+        env:
+          AAB_FILE: android/app/build/outputs/bundle/release/app-release.aab
+          PLAY_TRACK: internal
+        run: |
+          # Commit sem o parametro changesNotSentForReview (o app envia mudancas para revisao automaticamente
+          # e o Google recusa o parametro, mesmo com valor false, como a action r0adkll@v1.1.3 envia).
+          npm install --no-save --no-audit --no-fund --prefix /tmp/gp googleapis
+          node - <<'JS'
+          const { google } = require('/tmp/gp/node_modules/googleapis');
+          const fs = require('fs');
+          (async () => {
+            const auth = new google.auth.GoogleAuth({
+              keyFile: '/tmp/service_account.json',
+              scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+            });
+            const ap = google.androidpublisher({ version: 'v3', auth });
+            const packageName = process.env.PACKAGE_NAME;
+            const track = process.env.PLAY_TRACK;
+            const { data: edit } = await ap.edits.insert({ packageName });
+            const editId = edit.id;
+            const up = await ap.edits.bundles.upload({
+              packageName,
+              editId,
+              media: { mimeType: 'application/octet-stream', body: fs.createReadStream(process.env.AAB_FILE) },
+            });
+            const versionCode = String(up.data.versionCode);
+            console.log('Bundle enviado. versionCode:', versionCode);
+            await ap.edits.tracks.update({
+              packageName,
+              editId,
+              track,
+              requestBody: { track, releases: [{ versionCodes: [versionCode], status: 'completed' }] },
+            });
+            const res = await ap.edits.commit({ packageName, editId });
+            console.log('Edit confirmado:', res.data.id);
+          })().catch((e) => {
+            console.error('Falha no upload para a Play Store:', e.message);
+            process.exit(1);
+          });
+          JS
 
 
       - name: Deploy AAB to Extra FTP (Explicit FTPS)
