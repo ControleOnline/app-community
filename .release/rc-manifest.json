@@ -1,13 +1,17 @@
 {
-  "version": "1.10.50",
-  "rc": 2,
-  "branch": "rc/1.10.50-rc.2",
-  "baseMaster": "cda19e51a6c5adc391ad0c6b22bb0ee6a61dfbb8",
+  "version": "1.10.47",
+  "rc": 1,
+  "branch": "rc/1.10.47-rc.1",
+  "baseMaster": "c5dcd8f52820f4590d161238217cb8b2b9a2eca7",
   "tasks": [
-    973
+    997,
+    999,
+    1001
   ],
   "taskRepositories": {
-    "973": "ControleOnline/app-community"
+    "997": "ControleOnline/app-community",
+    "999": "ControleOnline/app-community",
+    "1001": "ControleOnline/app-community"
   },
   "repositories": {
     "ControleOnline/ui-common": "4919724c04f3d6e66280db4c9e2a66db65c47cc0",
@@ -21,9 +25,9 @@
     "ControleOnline/api-platform-integration": "055626cbbbcda56306bdd9d83d34b5b5372ac627",
     "ControleOnline/api-platform-queue": "be5467f177c7e65c57845d6afde7b0a53e414283",
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
-    "ControleOnline/api-platform-mcp": "8beedfe08fba16a9568dc708a7ae92d4dc851311",
-    "ControleOnline/api-platform-users": "69255e893a94791de8471e46af1fcc58028fc4aa",
-    "ControleOnline/app-community": "67c0d3ae1722d391c98042d10b03ced5a56d20a3"
+    "ControleOnline/api-platform-mcp": "0c8b67ac001fdabd6da9eca668d5a999ca2e7cd8",
+    "ControleOnline/api-platform-users": "453b7eae37d5b147dcbe15bb376ed8a057c4284c",
+    "ControleOnline/app-community": "9e0615f72a0f02173588530859ef1c8b7753c337"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -113,10 +117,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.15.tgz"
     },
     "@controleonline/ui-login": {
-      "version": "1.0.111",
-      "gitHead": "db08162316a3299638da18f9628c6f6df2d58483",
-      "integrity": "sha512-iEZz+y7mMkVOPj+ZxSzacNu62bZLN9qAscqjauzpoUpkuucDyg+B/x3/NBH84yZWJajTS2i/7R8TYY6raY0oYg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.111.tgz"
+      "version": "1.0.107",
+      "gitHead": "8138e39836756d26c5a23e80cae0af6dcf645feb",
+      "integrity": "sha512-FM95wjIyuDF0l+wWVx8Oo6MU93ePbTXmnzH907/UgifMAFoMvaYEwLCq/+YIbU2UsLwyHO60LLdWkGenoMBWtQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.107.tgz"
     },
     "@controleonline/ui-logistic": {
       "version": "1.0.41",
@@ -347,11 +351,11 @@
       }
     },
     "controleonline/users": {
-      "version": "1.0.5",
+      "version": "1.0.4",
       "source": {
         "url": "https://github.com/ControleOnline/api-platform-users.git",
         "type": "git",
-        "reference": "69255e893a94791de8471e46af1fcc58028fc4aa"
+        "reference": "453b7eae37d5b147dcbe15bb376ed8a057c4284c"
       }
     },
     "controleonline/websocket-server": {
@@ -371,20 +375,29 @@
       }
     },
     "controleonline/mcp": {
-      "version": "1.0.3",
+      "version": "1.0.2",
       "source": {
         "url": "https://github.com/ControleOnline/api-platform-mcp.git",
         "type": "git",
-        "reference": "8beedfe08fba16a9568dc708a7ae92d4dc851311"
+        "reference": "0c8b67ac001fdabd6da9eca668d5a999ca2e7cd8"
       }
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "064777236124898865d268c49d49d7b195fc11f5"
+    "ControleOnline/app-community": "2e0ff14db6e22ff1f32aafa45a3080d651cb01f8"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "previousPublishedRC": "rc/1.10.49-rc.1",
-  "consumerSnapshot": "67c0d3ae1722d391c98042d10b03ced5a56d20a3"
+  "nativeValidation": {
+    "run": 37495033597,
+    "source": "c5ca1437d09e8d395192b1eeacea43f9fcc1ce60",
+    "androidVariants": 9,
+    "webos": true,
+    "publication": false,
+    "productionSigningSecrets": false,
+    "scope": "Workflow-only change (android-deploy-lavego-shop-v2.yml); no application code changed"
+  },
+  "previousPublishedRC": "rc/1.10.46-rc.1",
+  "consumerSnapshot": "2e0ff14db6e22ff1f32aafa45a3080d651cb01f8"
 }
