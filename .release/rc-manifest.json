@@ -1,13 +1,13 @@
 {
-  "version": "1.10.52",
+  "version": "1.10.53",
   "rc": 1,
-  "branch": "rc/1.10.52-rc.1",
-  "baseMaster": "fd640261161059416cfe561ace88b21e5774fd8d",
+  "branch": "rc/1.10.53-rc.1",
+  "baseMaster": "a4f53ffddd11a33d0bf637b5aa5fd0526fcf82fc",
   "tasks": [
-    973
+    1024
   ],
   "taskRepositories": {
-    "973": "ControleOnline/app-community"
+    "1024": "ControleOnline/app-community"
   },
   "repositories": {
     "ControleOnline/ui-common": "4919724c04f3d6e66280db4c9e2a66db65c47cc0",
@@ -380,11 +380,11 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "215a2d66fabe28aff0c44811177e19a5ce02ae36"
+    "ControleOnline/app-community": "b38b5dac4c5e0ffc55e8a50d2573d543d0f88d2a"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "previousPublishedRC": "rc/1.10.51-rc.1",
-  "consumerSnapshot": "73c7fe22d590c08ef099a2b7b58258f094c71355"
+  "previousPublishedRC": "rc/1.10.52-rc.1",
+  "consumerSnapshot": "b38b5dac4c5e0ffc55e8a50d2573d543d0f88d2a"
 }
