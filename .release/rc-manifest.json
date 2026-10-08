@@ -1,7 +1,7 @@
 {
-  "version": "1.10.51",
+  "version": "1.10.52",
   "rc": 1,
-  "branch": "rc/1.10.51-rc.1",
+  "branch": "rc/1.10.52-rc.1",
   "baseMaster": "fd640261161059416cfe561ace88b21e5774fd8d",
   "tasks": [
     973
@@ -23,7 +23,7 @@
     "ControleOnline/api-platform-websocket-server": "8d36d6525019e8eb2a0f4d739f5535a0c5192e4b",
     "ControleOnline/api-platform-mcp": "8beedfe08fba16a9568dc708a7ae92d4dc851311",
     "ControleOnline/api-platform-users": "69255e893a94791de8471e46af1fcc58028fc4aa",
-    "ControleOnline/app-community": "9697505fd3176d6cdc0a15e9ae71d5ae8045307c"
+    "ControleOnline/app-community": "73c7fe22"
   },
   "frozen": true,
   "dependencyMode": "published-packages",
@@ -113,10 +113,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.15.tgz"
     },
     "@controleonline/ui-login": {
-      "version": "1.0.114",
-      "gitHead": "7f04e1744d9964ed9f84e7d5a433f2b2a481b453",
-      "integrity": "sha512-hHw8Tg+xORNVFhFbCInBi1CUKSFa6a10kVEyJzy/UKJft3QR/IpmMZ0ULbxVPyWUz8bsE6KGpjR4mQofO77u8w==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.114.tgz"
+      "version": "1.0.115",
+      "gitHead": "7cd6af6966f02c7334c49dc2d967f694ef622cb3",
+      "integrity": "sha512-rCH0Q5DaecNHF+gxUPFS3g8EoP+7G6DjW7cvnFes1qA16FLEzzBxTRU/3bn03USOZXe+z31j9Ymykq0jr6dHxg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.115.tgz"
     },
     "@controleonline/ui-logistic": {
       "version": "1.0.41",
@@ -380,11 +380,11 @@
     }
   },
   "approvedDev": {
-    "ControleOnline/app-community": "dd4ae52559d2d9e4041b43829e6412585c759686"
+    "ControleOnline/app-community": "215a2d66fabe28aff0c44811177e19a5ce02ae36"
   },
   "force_deploy": true,
   "forcePolicySource": "https://github.com/ControleOnline/agents-mcp/blob/master/agents/roles/devops/agent.md",
   "schemaChanges": false,
-  "previousPublishedRC": "rc/1.10.50-rc.2",
-  "consumerSnapshot": "9697505fd3176d6cdc0a15e9ae71d5ae8045307c"
+  "previousPublishedRC": "rc/1.10.51-rc.1",
+  "consumerSnapshot": "73c7fe22"
 }
