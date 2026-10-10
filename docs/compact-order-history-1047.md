@@ -1,7 +1,7 @@
 # Operação Compacta — #1047
 
 The app consumes published packages ui-default 1.0.278, ui-orders 1.3.43,
-ui-layout 1.0.16 and ui-common 1.2.91. Order History opts into the shared compact
+ui-layout 1.0.17 and ui-common 1.2.91. Order History opts into the shared compact
 table, numbered pagination and API-backed totals. Other consumers retain the
 legacy default. Domain Themes governs the palette independently of franchise
 selection; registered status colors remain the alternative to theme overrides.
@@ -18,3 +18,6 @@ owned by the existing services. Header logo authentication is restricted to the
 exact API origin. A remote release is complete only after its frozen RC is
 promoted and its served bundle is confirmed. Master/production is outside this
 delivery's authorization.
+
+Layout 1.0.17 contains the same compact pilot plus the legacy-to-mainCompany
+contract correction required by the deployment guard in ThemeManagerPage.
