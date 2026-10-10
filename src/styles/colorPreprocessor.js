@@ -123,7 +123,30 @@ if (!global.__coThemeColorPatched) {
       return value.trim().toLowerCase();
     };
 
+    // Themes has already chosen these colors. Do not collapse distinct tokens
+    // (for example input/striped-row backgrounds) into the legacy palette.
+    let themeCssText = null;
+    let configuredThemeColors = new Set();
+    const isConfiguredWebThemeColor = value => {
+      if (Platform.OS !== 'web' || typeof document === 'undefined') return false;
+      const rootStyle = document.documentElement?.style;
+      if (!rootStyle) return false;
+      if (rootStyle.cssText !== themeCssText) {
+        themeCssText = rootStyle.cssText;
+        configuredThemeColors = new Set();
+        for (let index = 0; index < rootStyle.length; index += 1) {
+          const key = rootStyle.item(index);
+          if (key.startsWith('--')) {
+            const color = normalizeColor(rootStyle.getPropertyValue(key));
+            if (color) configuredThemeColors.add(color);
+          }
+        }
+      }
+      return configuredThemeColors.has(normalizeColor(value));
+    };
+
     const resolveMappedColor = value => {
+      if (isConfiguredWebThemeColor(value)) return value;
       let token = null;
 
       if (typeof value === 'number' && Platform.OS !== 'web') {
