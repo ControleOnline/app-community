@@ -1,12 +1,13 @@
 {
-  "version": "1.10.58",
+  "version": "1.10.59",
   "rc": 1,
-  "branch": "rc/1.10.58-rc.1",
+  "branch": "rc/1.10.59-rc.1",
   "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
-  "tasks": [1051],
+  "tasks": [1051, 18, 21],
   "repositories": {
-    "ControleOnline/app-community": "6760305459a0d4a21162e7f2230c0d4f9fd2fed8",
-    "ControleOnline/ui-common": "5754b47897723c0ad663d355a7c16a56d6e5ce62"
+    "ControleOnline/app-community": "6b2e3521babad77ede32f8710b069ad112d49276",
+    "ControleOnline/ui-common": "5754b47897723c0ad663d355a7c16a56d6e5ce62",
+    "ControleOnline/ui-shop": "379189640577e805574789ea7fa56aed12b84a45"
   },
   "packages": {
     "ui-common": {
@@ -14,6 +15,10 @@
       "gitHead": "5754b47897723c0ad663d355a7c16a56d6e5ce62",
       "integrity": "sha512-0YRSd25+oE9Q2UfTP4FIH3WOgc/LNeelebT4ubiNAu7EEqohgRN8OWU0sWyc34FOKImRMruObuZ4bNsZdZftFg==",
       "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.93.tgz"
+    },
+    "ui-shop": {
+      "version": "1.0.18",
+      "note": "pinned before npm publication (publication in progress by the requester); integrity to be recorded after publish"
     }
   },
   "frozen": true
