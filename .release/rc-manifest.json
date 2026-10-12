@@ -1,19 +1,19 @@
 {
-  "version": "1.10.57",
+  "version": "1.10.58",
   "rc": 1,
-  "branch": "rc/1.10.57-rc.1",
+  "branch": "rc/1.10.58-rc.1",
   "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
   "tasks": [1051],
   "repositories": {
-    "ControleOnline/app-community": "d4e2da39fba272f0ad4654a8a7dfc117a02ef0fa",
-    "ControleOnline/ui-common": "b4db94eb1ccd3bf878dc96e3d32c0249aad07402"
+    "ControleOnline/app-community": "6760305459a0d4a21162e7f2230c0d4f9fd2fed8",
+    "ControleOnline/ui-common": "5754b47897723c0ad663d355a7c16a56d6e5ce62"
   },
   "packages": {
     "ui-common": {
-      "version": "1.2.92",
-      "gitHead": "b4db94eb1ccd3bf878dc96e3d32c0249aad07402",
-      "integrity": "sha512-Ilouvr/klmgssZLdoHBLQhTrT9VWVk7AczzI+T3yj9ukOMic1rG/npoh/Fkc3BBlnr1lbzLdj+x1E8aGIVL4MQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.92.tgz"
+      "version": "1.2.93",
+      "gitHead": "5754b47897723c0ad663d355a7c16a56d6e5ce62",
+      "integrity": "sha512-0YRSd25+oE9Q2UfTP4FIH3WOgc/LNeelebT4ubiNAu7EEqohgRN8OWU0sWyc34FOKImRMruObuZ4bNsZdZftFg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.93.tgz"
     }
   },
   "frozen": true
