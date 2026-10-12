@@ -1,53 +1,20 @@
 {
-  "version": "1.10.56",
-  "rc": 2,
-  "branch": "rc/1.10.56-rc.2",
-  "baseMaster": "18e50fd7ac6d543214e98e46582e8a67b761752f",
-  "tasks": [
-    1047
-  ],
+  "version": "1.10.57",
+  "rc": 1,
+  "branch": "rc/1.10.57-rc.1",
+  "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
+  "tasks": [1051],
   "repositories": {
-    "ControleOnline/app-community": "066a4c313f1b23e1fa02c33ae01de1effabd4b87",
-    "ControleOnline/ui-default": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
-    "ControleOnline/ui-orders": "023c0a3cd926edeccca114417dd773c7b7b77029",
-    "ControleOnline/ui-common": "03e8ae44638497cb992d2c6e6d00c898abb24cde",
-    "ControleOnline/ui-layout": "d03f042aca45d4fc3c9f6b663a0beeb400b21914"
+    "ControleOnline/app-community": "a8aaa17de71bf3cc29e99b114dad05758f8c0be4",
+    "ControleOnline/ui-common": "b4db94eb1ccd3bf878dc96e3d32c0249aad07402"
   },
   "packages": {
-    "ui-default": {
-      "version": "1.0.278",
-      "gitHead": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
-      "integrity": "sha512-B70SAQHDDIuISthrsTNuz2t2yTT43lAg5/i0RqNzYlDQ1Jid93bmF9UNNkua7Fmkih+r1dyvGo3o4BxCyHvESw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.278.tgz"
-    },
-    "ui-orders": {
-      "version": "1.3.43",
-      "gitHead": "023c0a3cd926edeccca114417dd773c7b7b77029",
-      "integrity": "sha512-q/fAmmkLOK4YhVK6nfJ7z73rSQGFNhdkw1cpvifuNfojtIFxrESRh6qfpmgx0knRrO40W2dcJ/higCcB7ZGT8w==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.43.tgz"
-    },
-    "ui-layout": {
-      "version": "1.0.17",
-      "gitHead": "d03f042aca45d4fc3c9f6b663a0beeb400b21914",
-      "integrity": "sha512-sfgp2bgEgWPb+q/CGETh5KWQRo+oF698ofzuX5yPKHLBlT24FOI4fY8Ey91sbxjp9mjEt6Yztp7U5Dzxic2NQw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.17.tgz"
-    },
     "ui-common": {
-      "version": "1.2.91",
-      "gitHead": "03e8ae44638497cb992d2c6e6d00c898abb24cde",
-      "integrity": "sha512-rRziERsNgl3eUGRPLh/oUkZLHo7tpeOCOCGg84eEzI/5/ASkEHRPKn8DQSNMyFEZG4uYIQSQAWfTn4+mm2e6Kw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.91.tgz"
+      "version": "1.2.92",
+      "gitHead": "b4db94eb1ccd3bf878dc96e3d32c0249aad07402",
+      "integrity": "sha512-Ilouvr/klmgssZLdoHBLQhTrT9VWVk7AczzI+T3yj9ukOMic1rG/npoh/Fkc3BBlnr1lbzLdj+x1E8aGIVL4MQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.92.tgz"
     }
   },
-  "frozen": true,
-  "compositionNotes": [
-    "Only task1047; master-based app source39ad excludes unrelated dev changes.",
-    "ui-layout1.0.17 preserves compact source plus mainCompany contract correction.",
-    "Four numeric npm package pins; no gitlinks for these packages.",
-    "No shared database, DEFAULT or staging Themes configuration writes. Prior tests reused per human instruction.",
-    "RC2 adds theme color preprocessor guard to preserve domain-configured backgrounds; focused verification passed."
-  ],
-  "approvedDev": {
-    "ControleOnline/app-community": "d08fd8fa95464880ad2423f01c1d89126da7fc0e"
-  }
+  "frozen": true
 }
