@@ -5,7 +5,7 @@
   "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
   "tasks": [1051],
   "repositories": {
-    "ControleOnline/app-community": "a8aaa17de71bf3cc29e99b114dad05758f8c0be4",
+    "ControleOnline/app-community": "d4e2da39fba272f0ad4654a8a7dfc117a02ef0fa",
     "ControleOnline/ui-common": "b4db94eb1ccd3bf878dc96e3d32c0249aad07402"
   },
   "packages": {
