@@ -14,4 +14,3 @@ export function resolveHomeImageUrl(uri, api) {
       || !/\/files\/[^/?#]+\/download(?:[?#]|$)/i.test(image)) return image;
   return apiOrigin[0] + image.slice(imageOrigin[0].length);
 }
-
