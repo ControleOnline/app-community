@@ -3,7 +3,11 @@
   "rc": 1,
   "branch": "rc/1.10.59-rc.1",
   "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
-  "tasks": [1051, 18, 21],
+  "tasks": [
+    1051,
+    18,
+    21
+  ],
   "repositories": {
     "ControleOnline/app-community": "6b2e3521babad77ede32f8710b069ad112d49276",
     "ControleOnline/ui-common": "5754b47897723c0ad663d355a7c16a56d6e5ce62",
@@ -17,8 +21,11 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.93.tgz"
     },
     "ui-shop": {
-      "version": "1.0.18",
-      "note": "pinned before npm publication (publication in progress by the requester); integrity to be recorded after publish"
+      "version": "1.0.19",
+      "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
+      "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz",
+      "note": "1.0.19 = ui-shop master 1.0.18 content (verified identical for the 3 changed files) + package.json repository identity fix (task 1056)"
     }
   },
   "frozen": true
