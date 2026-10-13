@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.56",
+  "version": "1.10.59",
   "private": true,
   "scripts": {
     "android": "expo run:android",
@@ -38,7 +38,7 @@
     "@controleonline/react-native-infinitepay-payment": "1.0.5",
     "@controleonline/ui-accounting": "1.0.19",
     "@controleonline/ui-carrier": "1.0.29",
-    "@controleonline/ui-common": "1.2.91",
+    "@controleonline/ui-common": "1.2.93",
     "@controleonline/ui-config": "1.0.24",
     "@controleonline/ui-contracts": "1.6.81",
     "@controleonline/ui-crm": "1.0.44",
@@ -57,7 +57,7 @@
     "@controleonline/ui-professionals": "1.0.32",
     "@controleonline/ui-providers": "1.0.28",
     "@controleonline/ui-report": "1.2.49",
-    "@controleonline/ui-shop": "1.0.16",
+    "@controleonline/ui-shop": "1.0.19",
     "@controleonline/ui-support": "1.0.20",
     "@controleonline/ui-tasks": "1.1.64",
     "@controleonline/ui-tests": "1.0.24",
