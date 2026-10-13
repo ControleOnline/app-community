@@ -6,7 +6,8 @@ import {Pressable, StyleSheet} from 'react-native'
 
 //import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
-import ManagerHomePage from '@controleonline/ui-manager/src/react/pages/home/index'
+import ManagerHomePage from '../pages/OnGestorHome'
+import {homepageAppearanceForApp} from '../pages/homeAppearance'
 import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
 import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
@@ -158,6 +159,7 @@ if (homeByType[normalizedAppType]) {
       showBottomToolBar: normalizedAppType !== 'PPC',
       showBottomCart: false,
       showCompanyFilter: normalizedAppType !== 'DELIVERY',
+      homepageAppearance: homepageAppearanceForApp(normalizedAppType),
     },
   })
 }
