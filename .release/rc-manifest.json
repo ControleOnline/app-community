@@ -1,19 +1,45 @@
 {
-  "version": "1.10.56",
-  "rc": 2,
-  "branch": "rc/1.10.56-rc.2",
-  "baseMaster": "18e50fd7ac6d543214e98e46582e8a67b761752f",
+  "version": "1.10.60",
+  "rc": 1,
+  "branch": "rc/1.10.60-rc.1",
+  "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
   "tasks": [
-    1047
+    1056
   ],
   "repositories": {
-    "ControleOnline/app-community": "066a4c313f1b23e1fa02c33ae01de1effabd4b87",
+    "ControleOnline/app-community": "c98eb1ea5c3a34dd88586d950f011b343675b38a",
+    "ControleOnline/ui-common": "fcb46f4f0c4a016cbc207eafd110028f4387cac9",
+    "ControleOnline/ui-layout": "c50f190f2bfa66f237b70b0f7f575f9fee657f68",
+    "ControleOnline/ui-manager": "1b09bbe910158681cbf69439c6c9fd8f436afc86",
+    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
     "ControleOnline/ui-default": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
-    "ControleOnline/ui-orders": "023c0a3cd926edeccca114417dd773c7b7b77029",
-    "ControleOnline/ui-common": "03e8ae44638497cb992d2c6e6d00c898abb24cde",
-    "ControleOnline/ui-layout": "d03f042aca45d4fc3c9f6b663a0beeb400b21914"
+    "ControleOnline/ui-orders": "023c0a3cd926edeccca114417dd773c7b7b77029"
   },
   "packages": {
+    "ui-common": {
+      "version": "1.2.94",
+      "gitHead": "fcb46f4f0c4a016cbc207eafd110028f4387cac9",
+      "integrity": "sha512-qxPtcztsvi/fHt+mSE5W9+V3FgWlKIVW44DAiwWXFUveZnE0pjr5LMZCXToAl5W+FW3yDBKlzYqA6g0fwm1qKQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.94.tgz"
+    },
+    "ui-layout": {
+      "version": "1.0.18",
+      "gitHead": "c50f190f2bfa66f237b70b0f7f575f9fee657f68",
+      "integrity": "sha512-9JAQaaJUHyRXgrytMyzNWDmXUf3e84OfzAsU29t4UNHn6PlaTSEeFP8pzAahzOYNgGW6ZO/yRWmRdpACwq1kRA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.18.tgz"
+    },
+    "ui-manager": {
+      "version": "1.0.19",
+      "gitHead": "1b09bbe910158681cbf69439c6c9fd8f436afc86",
+      "integrity": "sha512-Fs/cMICLpOej/mqGz6I5MAsVZtNR6RUzBEHZc+iCC9IJwWXFYRzGlKU2+/hUqg0F6riWQ0B9ASCjoMe2+AoHiw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.19.tgz"
+    },
+    "ui-shop": {
+      "version": "1.0.19",
+      "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
+      "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz"
+    },
     "ui-default": {
       "version": "1.0.278",
       "gitHead": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
@@ -25,29 +51,18 @@
       "gitHead": "023c0a3cd926edeccca114417dd773c7b7b77029",
       "integrity": "sha512-q/fAmmkLOK4YhVK6nfJ7z73rSQGFNhdkw1cpvifuNfojtIFxrESRh6qfpmgx0knRrO40W2dcJ/higCcB7ZGT8w==",
       "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.43.tgz"
-    },
-    "ui-layout": {
-      "version": "1.0.17",
-      "gitHead": "d03f042aca45d4fc3c9f6b663a0beeb400b21914",
-      "integrity": "sha512-sfgp2bgEgWPb+q/CGETh5KWQRo+oF698ofzuX5yPKHLBlT24FOI4fY8Ey91sbxjp9mjEt6Yztp7U5Dzxic2NQw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.17.tgz"
-    },
-    "ui-common": {
-      "version": "1.2.91",
-      "gitHead": "03e8ae44638497cb992d2c6e6d00c898abb24cde",
-      "integrity": "sha512-rRziERsNgl3eUGRPLh/oUkZLHo7tpeOCOCGg84eEzI/5/ASkEHRPKn8DQSNMyFEZG4uYIQSQAWfTn4+mm2e6Kw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.91.tgz"
     }
   },
   "frozen": true,
-  "compositionNotes": [
-    "Only task1047; master-based app source39ad excludes unrelated dev changes.",
-    "ui-layout1.0.17 preserves compact source plus mainCompany contract correction.",
-    "Four numeric npm package pins; no gitlinks for these packages.",
-    "No shared database, DEFAULT or staging Themes configuration writes. Prior tests reused per human instruction.",
-    "RC2 adds theme color preprocessor guard to preserve domain-configured backgrounds; focused verification passed."
-  ],
   "approvedDev": {
-    "ControleOnline/app-community": "d08fd8fa95464880ad2423f01c1d89126da7fc0e"
-  }
+    "ControleOnline/app-community": "8358de65d704f13be2e8d470cc552ca64cb13ebf"
+  },
+  "taskSource": "15c5a5866b206b2e17dafbff0553498a96831e08",
+  "compositionNotes": [
+    "Only homepage task #1056; master-based source excludes unrelated dev Android window/plugin work and QR/checkout changes.",
+    "Published ui-common 1.2.94 retains previously accepted footer fixes; ui-shop 1.0.19 is official master plus release metadata.",
+    "ui-default and ui-orders remain at the existing master pins.",
+    "Previously executed local behavioral tests reused per human instruction; published manager/shop sources verified byte-for-byte.",
+    "No client database/theme configuration changes; production remains unauthorized."
+  ]
 }
