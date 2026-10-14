@@ -1,25 +1,127 @@
-name: Deploy Project app.lave-go.com (LEGACY — deprecated)
-# DEPRECATED: use workflow_dispatch only. Prefer deploy-lave-go.yml for Lave-Go pipeline.
-# Push trigger removed to avoid dual-fire with the new deploy-lave-go.yml after staging→master.
+# =============================================================================
+# Deploy web Lave-Go (APP / POS / SHOP) via FTP
+# -----------------------------------------------------------------------------
+# COMO DISPARA E O QUE PUBLICA
+#   Push no master ............ POS e SHOP   (nunca o APP), SOMENTE se a
+#                               variável do repositório WEB_AUTO_DEPLOY = true
+#   Manual, sem parâmetro ..... POS e SHOP
+#   Manual, target=APP ........ somente APP
+#   Manual, target=ALL ........ APP, POS e SHOP
+#
+# SEGURANÇA DO PUSH
+#   Enquanto a variável WEB_AUTO_DEPLOY não existir (ou for diferente de "true"),
+#   o push no master apenas cria uma execução com o job "skipped": nada de
+#   build, nada de FTP. Para ligar o automático, crie a variável em
+#   Settings > Secrets and variables > Actions > Variables.
+#   Para desligar, apague a variável ou troque o valor.
+#
+# Manual pelo terminal:
+#   gh workflow run web-deploy-production-app-lavego.yml                 # POS+SHOP
+#   gh workflow run web-deploy-production-app-lavego.yml -f target=APP   # só APP
+#   gh workflow run web-deploy-production-app-lavego.yml -f target=ALL   # todos
+# =============================================================================
+name: Deploy Project app.lave-go.com
+
+
 on:
+  # Disparo automático: qualquer push (inclusive merge de PR) no master.
+  # Só publica se a variável WEB_AUTO_DEPLOY estiver ligada (ver "if" do job).
+  push:
+    branches: [master]
+
+
+  # Disparo manual (botão "Run workflow" ou `gh workflow run`).
   workflow_dispatch:
     inputs:
       target:
-        description: "Destino da publicacao (padrao: POS+SHOP; APP so quando indicado)"
+        description: "Destino (padrão: POS+SHOP). APP e ALL só quando indicados."
         type: choice
-        options: [POS+SHOP, APP, POS, SHOP, ALL]
-        default: POS+SHOP
+        options: [POS+SHOP, APP, ALL]
+        default: POS+SHOP     # usado quando você não passa -f
+
+
 jobs:
   build:
+    # GUARDA: em push, o job só executa se WEB_AUTO_DEPLOY for exatamente "true".
+    # Em execução manual (workflow_dispatch) a guarda não se aplica.
+    if: ${{ github.event_name != 'push' || vars.WEB_AUTO_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
     env:
       EXPO_IDENTITY_SOURCE: app-json
-      ASSETS_VARIANT: manager_lavego   # ← pasta do favicon/logo Lave-Go Manager
+      ASSETS_VARIANT: manager_lavego   # pasta de favicon/logo do Lave-Go Manager
     steps:
+
+
+      # -----------------------------------------------------------------------
+      # PASSO 1 - Decide o que vai subir.
+      # Lê o tipo de evento (push ou manual) e o parâmetro `target`, e grava
+      # três flags (deploy_app / deploy_pos / deploy_shop) que os passos de FTP
+      # consultam mais abaixo. Assim a regra fica em um único lugar.
+      # Também escreve a tabela "Plano de publicação" no resumo da execução.
+      # -----------------------------------------------------------------------
+      - name: Resolve targets
+        id: targets                     # o id permite ler as flags em steps.targets.outputs
+        run: |
+          set -e
+          EVENT="${{ github.event_name }}"      # "push" ou "workflow_dispatch"
+          TARGET="${{ inputs.target }}"         # vazio quando o evento é push
+          DEPLOY_APP=false; DEPLOY_POS=false; DEPLOY_SHOP=false
+
+
+          if [ "$EVENT" = "push" ]; then
+            # Push: só POS e SHOP. O APP NUNCA sobe automaticamente,
+            # pois deploy_app só vira true no ramo manual abaixo.
+            DEPLOY_POS=true; DEPLOY_SHOP=true
+          else
+            # Execução manual: depende do parâmetro.
+            case "$TARGET" in
+              APP)  DEPLOY_APP=true ;;                                    # só APP
+              ALL)  DEPLOY_APP=true; DEPLOY_POS=true; DEPLOY_SHOP=true ;; # todos
+              *)    DEPLOY_POS=true; DEPLOY_SHOP=true ;;                  # padrão: POS+SHOP
+            esac
+          fi
+
+
+          # Publica as flags para os próximos passos.
+          echo "deploy_app=$DEPLOY_APP"   >> "$GITHUB_OUTPUT"
+          echo "deploy_pos=$DEPLOY_POS"   >> "$GITHUB_OUTPUT"
+          echo "deploy_shop=$DEPLOY_SHOP" >> "$GITHUB_OUTPUT"
+
+
+          # Resumo visível na página da execução (aba "Summary").
+          {
+            echo "## Plano de publicação"
+            echo ""
+            echo "- Evento: \`$EVENT\`  |  target: \`${TARGET:-n/a}\`"
+            echo ""
+            echo "| Destino | Vai publicar? |"
+            echo "|---|---|"
+            echo "| APP  | $DEPLOY_APP |"
+            echo "| POS  | $DEPLOY_POS |"
+            echo "| SHOP | $DEPLOY_SHOP |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+
+          # Anotação em destaque no topo da execução.
+          echo "::notice title=Plano de publicação::APP=$DEPLOY_APP POS=$DEPLOY_POS SHOP=$DEPLOY_SHOP"
+
+
+      # PASSO 2 - Baixa o código do repositório na máquina do GitHub.
       - uses: actions/checkout@v5
+
+
+      # PASSO 3 - Instala o Node 20 (necessário para o build do Expo).
       - uses: actions/setup-node@v5
         with:
           node-version: "20"
+
+
+      # -----------------------------------------------------------------------
+      # PASSO 4 - Gera o config/env.local.js do build web (API, socket, tipo de
+      # app MANAGER, ZOOM 100 e chaves do New Relic vindas das variáveis de
+      # ambiente). A linha ZOOM=$(...) é herdada do arquivo original e não é
+      # usada depois (o valor real está fixo em ZOOM: 100 abaixo).
+      # -----------------------------------------------------------------------
       - name: Creating Config
         run: |
           set -e
@@ -41,40 +143,75 @@ jobs:
           };
           module.exports = { env };
           ENVEOF
+
+
+      # PASSO 5 - Sincroniza submódulos git, se houver.
       - name: Update Submodules
         run: |
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
+
+
+      # PASSO 6 - Instala as dependências npm (inclui ui-common e ui-shop).
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
+
+
+      # PASSO 7 - Alinha as versões das bibliotecas Expo com a versão do SDK.
       - name: Fix Expo Dependencies
         run: npx expo install --fix
+
+
+      # PASSO 8 - Escolhe favicon/ícone/splash da variante manager_lavego.
       - name: Configure assets (manager_lavego)
         run: node scripts/configure-assets.js MANAGER
-        # usa ASSETS_VARIANT → reescreve expo.web.favicon (e icon/splash) para
-        # ./src/assets/manager_lavego/favicon.png se o arquivo existir
+
+
+      # PASSO 9 - Gera o site estático na pasta ./dist/. O build roda UMA vez
+      # e o mesmo conteúdo é enviado a todos os destinos escolhidos.
       - name: Build
         run: npx expo export --platform web
 
+
+      # =======================================================================
+      # PUBLICAÇÃO. Cada destino tem dois passos:
+      #   (a) "Deploy via FTP"      - envia ./dist/ ao servidor
+      #   (b) "Confirm upload"      - só roda se (a) terminou com sucesso, e
+      #                               escreve a confirmação no log
+      # O `if` usa a flag do PASSO 1; se for false, o passo fica "skipped".
+      # =======================================================================
+
+
+      # ----- APP: só em execução manual com target=APP ou ALL ----------------
       - name: Deploy via FTP -> APP
-        if: ${{ inputs.target == 'APP' || inputs.target == 'ALL' }}
+        if: ${{ steps.targets.outputs.deploy_app == 'true' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          server: ${{ secrets.FTPHOST_APPLAVEGO }}
+          server: ${{ secrets.FTPHOST_APPLAVEGO }}     # segredos do repositório
           username: ${{ secrets.FTPUSER_APPLAVEGO }}
           password: ${{ secrets.FTPPASS_APPLAVEGO }}
           protocol: ftps
           port: 21
           security: loose
-          local-dir: ./dist/
-          server-dir: /
-          exclude: |
+          local-dir: ./dist/        # o que sobe
+          server-dir: /             # destino no servidor FTP
+          log-level: standard       # lista no log os arquivos enviados
+          exclude: |                # nunca envia arquivos de git ou node_modules
             **/.git*
             **/.git*/**
             **/node_modules/**
 
+
+      - name: Confirm upload -> APP
+        if: ${{ steps.targets.outputs.deploy_app == 'true' }}
+        run: |
+          echo "::notice title=FTP APP::UPLOAD CONCLUÍDO para APP (commit ${GITHUB_SHA::7})"
+          echo "- APP: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
+
+
+      # ----- POS: push (com guarda ligada), manual padrão, ou target=ALL -----
       - name: Deploy via FTP -> POS
-        if: ${{ inputs.target == 'POS+SHOP' || inputs.target == 'POS' || inputs.target == 'ALL' }}
+        if: ${{ steps.targets.outputs.deploy_pos == 'true' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_POSLAVEGO }}
@@ -85,13 +222,23 @@ jobs:
           security: loose
           local-dir: ./dist/
           server-dir: /
+          log-level: standard
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
 
+
+      - name: Confirm upload -> POS
+        if: ${{ steps.targets.outputs.deploy_pos == 'true' }}
+        run: |
+          echo "::notice title=FTP POS::UPLOAD CONCLUÍDO para POS (commit ${GITHUB_SHA::7})"
+          echo "- POS: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
+
+
+      # ----- SHOP: push (com guarda ligada), manual padrão, ou target=ALL ----
       - name: Deploy via FTP -> SHOP
-        if: ${{ inputs.target == 'POS+SHOP' || inputs.target == 'SHOP' || inputs.target == 'ALL' }}
+        if: ${{ steps.targets.outputs.deploy_shop == 'true' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_SHOPLAVEGO }}
@@ -102,7 +249,15 @@ jobs:
           security: loose
           local-dir: ./dist/
           server-dir: /
+          log-level: standard
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+
+
+      - name: Confirm upload -> SHOP
+        if: ${{ steps.targets.outputs.deploy_shop == 'true' }}
+        run: |
+          echo "::notice title=FTP SHOP::UPLOAD CONCLUÍDO para SHOP (commit ${GITHUB_SHA::7})"
+          echo "- SHOP: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
