@@ -15,10 +15,10 @@ export default function HomeChrome({navigation, showCompany, showAppType}) {
   const palette = resolveHomepagePalette(colors);
   const mobile = width < 700;
   return (
-    <View style={[styles.header, {backgroundColor: palette.cardBackground,
-      borderBottomColor: palette.cardBorder, marginTop: -insets.top, paddingTop: insets.top, flexDirection: mobile ? 'column' : 'row'}]}>
+    <View style={[styles.header, {backgroundColor: palette.headerBackground,
+      borderBottomColor: palette.headerBorder, marginTop: -insets.top, paddingTop: insets.top, flexDirection: mobile ? 'column' : 'row'}]}>
       {focused && Platform.OS !== 'web' && <StatusBar
-        barStyle="dark-content" backgroundColor={palette.cardBackground} />}
+        barStyle="dark-content" backgroundColor={palette.headerBackground} />}
       {showCompany && <CompanyFilter navigation={navigation} appearance="soft" compact={mobile} />}
       {showAppType && <View style={[styles.tools, mobile && styles.mobileTools]}>
         <AppTypeSwitcher />
