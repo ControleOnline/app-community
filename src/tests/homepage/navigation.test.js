@@ -4,7 +4,8 @@ import Navigation from '@controleonline/ui-common/src/react/components/BottomNav
 import softenStyles from '@controleonline/ui-common/src/react/components/BottomNavigationBar.soft.styles';
 
 const mockColors = {cardBackground: '#ffffff', cardIconBackground: '#7777ff',
-  textPrimary: '#203047', textSecondary: '#637287', navigationText: '#000000'};
+  textPrimary: '#203047', textSecondary: '#637287', navigationText: '#000000', footerText: '#abcdef',
+  navigationActiveBackground: '#fedcba'};
 jest.mock('react-native', () => ({Platform: {OS: 'web'}, StyleSheet: {create: value => value},
   View: 'View', Text: 'Text', Pressable: 'Pressable'}));
 jest.mock('react-native-vector-icons/Feather', () => 'Icon');
@@ -42,14 +43,14 @@ it('uses flat separators and soft selection while preserving navigation and rest
   const dock = tree.root.findByProps({testID: 'bottom-navigation'}).props.style[1];
   expect(dock).toMatchObject({borderTopWidth: 1, borderWidth: 0, borderTopLeftRadius: 0, boxShadow: 'none'});
   const buttons = tree.root.findAllByType('Pressable');
-  expect(buttons[0].props.style({pressed: false})[1].backgroundColor).not.toBe('#ffffff');
+  expect(buttons[0].props.style({pressed: false})[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
   expect(buttons[2].props.disabled).toBe(true);
   act(() => buttons[1].props.onPress());
   expect(navigation.navigate).toHaveBeenCalledWith('OrderHistoryPage', {orderTypeFilter: 'purchase'});
   const footer = tree.root.findByType('Footer').props;
   expect(footer.appearance).toBe('soft');
   expect(footer.colors.statusConnected).toBe('#00ff00');
-  expect(footer.colors.footerText).toBe('#637287');
+  expect(footer.colors.footerText).toBe(mockColors.footerText);
   expect(footer.device.id).toBe(7);
   expect(tree.root.findByProps({testID: 'bottom-navigation-footer-slot'}).props.style[1].borderTopWidth).toBe(1);
   act(() => tree.unmount());

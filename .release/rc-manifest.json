@@ -1,68 +1,46 @@
 {
-  "version": "1.10.60",
+  "version": "1.10.62",
   "rc": 1,
-  "branch": "rc/1.10.60-rc.1",
-  "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
+  "branch": "rc/1.10.62-rc.1",
+  "baseMaster": "bc3089495dbb1b3b06787f834b0cb407ecf24348",
   "tasks": [
     1056
   ],
   "repositories": {
-    "ControleOnline/app-community": "c98eb1ea5c3a34dd88586d950f011b343675b38a",
-    "ControleOnline/ui-common": "fcb46f4f0c4a016cbc207eafd110028f4387cac9",
-    "ControleOnline/ui-layout": "c50f190f2bfa66f237b70b0f7f575f9fee657f68",
-    "ControleOnline/ui-manager": "1b09bbe910158681cbf69439c6c9fd8f436afc86",
-    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
-    "ControleOnline/ui-default": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
-    "ControleOnline/ui-orders": "023c0a3cd926edeccca114417dd773c7b7b77029"
+    "ControleOnline/app-community": "3d95f5ee8157df375a780e2be2ea882846868822",
+    "ControleOnline/ui-common": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
+    "ControleOnline/ui-layout": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
+    "ControleOnline/ui-manager": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
+    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2"
   },
   "packages": {
     "ui-common": {
-      "version": "1.2.94",
-      "gitHead": "fcb46f4f0c4a016cbc207eafd110028f4387cac9",
-      "integrity": "sha512-qxPtcztsvi/fHt+mSE5W9+V3FgWlKIVW44DAiwWXFUveZnE0pjr5LMZCXToAl5W+FW3yDBKlzYqA6g0fwm1qKQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.94.tgz"
+      "version": "1.2.97",
+      "gitHead": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
+      "integrity": "sha512-59sutHSD6sku7Tb2Uno7apSB63mtPt4TRONTcu9HCOvNb2l/VVoHOFccVkmY/LJW/4CqDXLFocCyVQcjbMe4AQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.97.tgz"
     },
     "ui-layout": {
-      "version": "1.0.18",
-      "gitHead": "c50f190f2bfa66f237b70b0f7f575f9fee657f68",
-      "integrity": "sha512-9JAQaaJUHyRXgrytMyzNWDmXUf3e84OfzAsU29t4UNHn6PlaTSEeFP8pzAahzOYNgGW6ZO/yRWmRdpACwq1kRA==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.18.tgz"
+      "version": "1.0.19",
+      "gitHead": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
+      "integrity": "sha512-/Vu3YT/gp/YTVZKdcLCbIJ2KBXOFzLmYsW9kogHdc6aAWcS8CnFvqJT8OqIgFbutzSkZPLrZaSMZwmZ72i2+xQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.19.tgz"
     },
     "ui-manager": {
-      "version": "1.0.19",
-      "gitHead": "1b09bbe910158681cbf69439c6c9fd8f436afc86",
-      "integrity": "sha512-Fs/cMICLpOej/mqGz6I5MAsVZtNR6RUzBEHZc+iCC9IJwWXFYRzGlKU2+/hUqg0F6riWQ0B9ASCjoMe2+AoHiw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.19.tgz"
+      "version": "1.0.20",
+      "gitHead": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
+      "integrity": "sha512-sO6oitBjU4ryaGis6/+GLx2W9DJoo6LQB8q2o9I6rW+uA832T76Oz09npxDKEacAGMnD3VhaAnHBbTO4snQVsA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.20.tgz"
     },
     "ui-shop": {
       "version": "1.0.19",
       "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
       "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==",
       "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz"
-    },
-    "ui-default": {
-      "version": "1.0.278",
-      "gitHead": "526e48ee475113e1bb7fb7fa2fec9d6ccf7c256c",
-      "integrity": "sha512-B70SAQHDDIuISthrsTNuz2t2yTT43lAg5/i0RqNzYlDQ1Jid93bmF9UNNkua7Fmkih+r1dyvGo3o4BxCyHvESw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.278.tgz"
-    },
-    "ui-orders": {
-      "version": "1.3.43",
-      "gitHead": "023c0a3cd926edeccca114417dd773c7b7b77029",
-      "integrity": "sha512-q/fAmmkLOK4YhVK6nfJ7z73rSQGFNhdkw1cpvifuNfojtIFxrESRh6qfpmgx0knRrO40W2dcJ/higCcB7ZGT8w==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.43.tgz"
     }
   },
-  "frozen": true,
-  "approvedDev": {
-    "ControleOnline/app-community": "8358de65d704f13be2e8d470cc552ca64cb13ebf"
-  },
-  "taskSource": "15c5a5866b206b2e17dafbff0553498a96831e08",
   "compositionNotes": [
-    "Only homepage task #1056; master-based source excludes unrelated dev Android window/plugin work and QR/checkout changes.",
-    "Published ui-common 1.2.94 retains previously accepted footer fixes; ui-shop 1.0.19 is official master plus release metadata.",
-    "ui-default and ui-orders remain at the existing master pins.",
-    "Previously executed local behavioral tests reused per human instruction; published manager/shop sources verified byte-for-byte.",
-    "No client database/theme configuration changes; production remains unauthorized."
-  ]
+    "Current master plus isolated task1056 homepage/official theme contract/web login bootstrap. Independent dev native plugin and Sem Parar excluded. Scale70 preserved. Dedicated staging theme appearance values promoted separately via official themes API."
+  ],
+  "frozen": true
 }
