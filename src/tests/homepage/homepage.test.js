@@ -10,6 +10,8 @@ let mockWidth = 393;
 let mockInteraction = {hovered: false, focused: false, pressed: false};
 const mockColors = {primary: '#7777ff', cardIconBackground: '#7777ff',
   cardBackground: '#ffffff', textPrimary: '#203047', textSecondary: '#637287',
+  cardText: '#203047', cardShadow: '#203047', iconMuted: '#637287',
+  buttonFocusBorder: '#7777ff', buttonPressedBackground: '#eeeeff', dividerBorder: '#e5e9f2',
   cardBorder: '#e5e9f2', pageBackground: '#f6f7fb', iconBackground: '#000000', iconColor: '#ffffff'};
 const mockMenus = [{id: 1, label: 'Operações', menuType: 'home', menus: [
   {id: 2, label: 'Pedidos', menuKey: 'orders', route: 'OrderHistoryPage',
@@ -58,7 +60,7 @@ describe('home-only appearance', () => {
     expect(gyros.cardIconBackground).not.toBe(lavego.cardIconBackground);
     expect(input.cardIconBackground).toBe('#7777ff');
     expect(gyros.cardBackground).toBe(input.cardBackground);
-    expect(resolveHomepagePalette({...input, homeCardBorder: '#abc123'}).cardBorder).toBe('#abc123');
+    expect(resolveHomepagePalette({...input, cardBorder: '#abc123'}).cardBorder).toBe('#abc123');
   });
   it('preserves destination and parameters in the real grid interaction', () => {
     global.IS_REACT_ACT_ENVIRONMENT = true;
@@ -86,16 +88,16 @@ describe('home-only appearance', () => {
     const render = () => <Grid appearance="soft" colorTokens={palette} menus={mockMenus} />;
     act(() => {tree = renderer.create(render());});
     const arrow = () => tree.root.findAllByType('Icon').find(icon => icon.props.name === 'chevron-right');
-    expect(arrow().props.color).toBe(palette.textMuted);
+    expect(arrow().props.color).toBe(palette.iconMuted);
     mockInteraction = {...mockInteraction, [state]: true};
     act(() => tree.update(render()));
     expect(arrow().props.color).toBe(palette.cardIconColor);
     expect(arrow().props.style[1].opacity).toBe(1);
     expect(tree.root.findAllByType('View').some(view => Array.isArray(view.props.style)
-      && view.props.style.some(style => style?.borderColor === palette.homeHoverBorder))).toBe(true);
+      && view.props.style.some(style => style?.borderColor === palette.buttonFocusBorder))).toBe(true);
     mockInteraction = {...mockInteraction, [state]: false};
     act(() => tree.update(render()));
-    expect(arrow().props.color).toBe(palette.textMuted);
+    expect(arrow().props.color).toBe(palette.iconMuted);
     expect(arrow().props.style[1]).toBe(false);
     act(() => tree.unmount());
   });
