@@ -1,13 +1,46 @@
 {
-  "version": "1.10.61",
+  "version": "1.10.62",
   "rc": 1,
-  "branch": "rc/1.10.61-rc.1",
-  "baseMaster": "8c193279f877f41c752d8c61f1d036a0e83d5333",
-  "tasks": [1063],
-  "repositories": { "ControleOnline/app-community": "3157114de827572efe9eb1888c00fe51804265d0" },
+  "branch": "rc/1.10.62-rc.1",
+  "baseMaster": "bc3089495dbb1b3b06787f834b0cb407ecf24348",
+  "tasks": [
+    1056
+  ],
+  "repositories": {
+    "ControleOnline/app-community": "3d95f5ee8157df375a780e2be2ea882846868822",
+    "ControleOnline/ui-common": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
+    "ControleOnline/ui-layout": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
+    "ControleOnline/ui-manager": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
+    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2"
+  },
+  "packages": {
+    "ui-common": {
+      "version": "1.2.97",
+      "gitHead": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
+      "integrity": "sha512-59sutHSD6sku7Tb2Uno7apSB63mtPt4TRONTcu9HCOvNb2l/VVoHOFccVkmY/LJW/4CqDXLFocCyVQcjbMe4AQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.97.tgz"
+    },
+    "ui-layout": {
+      "version": "1.0.19",
+      "gitHead": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
+      "integrity": "sha512-/Vu3YT/gp/YTVZKdcLCbIJ2KBXOFzLmYsW9kogHdc6aAWcS8CnFvqJT8OqIgFbutzSkZPLrZaSMZwmZ72i2+xQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.19.tgz"
+    },
+    "ui-manager": {
+      "version": "1.0.20",
+      "gitHead": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
+      "integrity": "sha512-sO6oitBjU4ryaGis6/+GLx2W9DJoo6LQB8q2o9I6rW+uA832T76Oz09npxDKEacAGMnD3VhaAnHBbTO4snQVsA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.20.tgz"
+    },
+    "ui-shop": {
+      "version": "1.0.19",
+      "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
+      "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz"
+    }
+  },
   "compositionNotes": [
-    "CI-only change (manual legacy web deploy workflow). No product code.",
-    "Not promoted to staging: staging holds rc/1.10.60-rc.1 (task 1056) under homologation; promoting would replace it. Requester asked to reach master."
+    "Current master plus isolated task1056 homepage/official theme contract/web login bootstrap. Independent dev native plugin and Sem Parar excluded. Scale70 preserved. Dedicated staging theme appearance values promoted separately via official themes API."
   ],
   "frozen": true
 }

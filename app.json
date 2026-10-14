@@ -9,8 +9,7 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "orientation": "default",
-    "version": "1.10.61",
+    "version": "1.10.62",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
@@ -38,7 +37,6 @@
     },
     "ios": {
       "supportsTablet": true,
-      "requireFullScreen": false,
       "jsEngine": "hermes",
       "bundleIdentifier": "com.controleonline.app",
       "deploymentTarget": "15.1",
@@ -58,7 +56,6 @@
     "_androidAppOptimizationNote": "R8/minify e shrinkResources foram ativados no bloco do plugin expo-build-properties abaixo.",
     "plugins": [
       "./withAndroidTV",
-      "./withFullScreenWindow",
       "./withKioskMode",
       "./withLauncherMode",
       "./withBackgroundRuntime",
