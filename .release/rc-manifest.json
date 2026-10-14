@@ -1,13 +1,13 @@
 {
   "version": "1.10.62",
-  "rc": 1,
-  "branch": "rc/1.10.62-rc.1",
-  "baseMaster": "bc3089495dbb1b3b06787f834b0cb407ecf24348",
+  "rc": 2,
+  "branch": "rc/1.10.62-rc.2",
+  "baseMaster": "ab30550f4101090a424acc3c2925bfe55ae3a0de",
   "tasks": [
     1056
   ],
   "repositories": {
-    "ControleOnline/app-community": "3d95f5ee8157df375a780e2be2ea882846868822",
+    "ControleOnline/app-community": "a1e8e5e5a05c3da6b07f2892be17c6df11d2e9dc",
     "ControleOnline/ui-common": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
     "ControleOnline/ui-layout": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
     "ControleOnline/ui-manager": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
@@ -40,7 +40,7 @@
     }
   },
   "compositionNotes": [
-    "Current master plus isolated task1056 homepage/official theme contract/web login bootstrap. Independent dev native plugin and Sem Parar excluded. Scale70 preserved. Dedicated staging theme appearance values promoted separately via official themes API."
+    "Pipeline-only correction: changesNotSentForReview enabled only for SERVICE. Existing version, package pins, signed artifact, track and product layout preserved. Source reviewed by Security; exact failed upload recovered successfully in run 38619947062. No new production build requested."
   ],
   "frozen": true
 }
