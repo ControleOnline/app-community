@@ -25,12 +25,6 @@ on:
         type: boolean
         default: false
 
-      service_upload_only:
-        description: 'Retry only the approved SERVICE AAB upload; skip builds and web deploys'
-        required: false
-        type: boolean
-        default: false
-
 concurrency:
   group: deploy-${{ github.event.inputs.environment || github.ref_name }}
   cancel-in-progress: false
@@ -166,7 +160,6 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   web:
-    if: ${{ !inputs.service_upload_only }}
     name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
     needs: [configure, production-gate]
     runs-on: ubuntu-latest
@@ -253,7 +246,7 @@ jobs:
   android:
     name: "3 · Android ${{ matrix.app_type }}"
     needs: [configure, production-gate]
-    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true' && !inputs.service_upload_only
+    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -338,7 +331,7 @@ jobs:
   lg-webos:
     name: "4 · LG webOS"
     needs: [configure, production-gate]
-    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true' && !inputs.service_upload_only
+    if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -350,47 +343,3 @@ jobs:
           NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
           NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
           NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}
-
-  service-upload-recovery:
-    name: Android SERVICE upload recovery
-    needs: [configure, production-gate]
-    if: github.event_name == 'workflow_dispatch' && inputs.service_upload_only && needs.configure.outputs.env == 'master'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Verify the approved build source
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -eu
-          SHA=$(gh run view 38612101585 --repo "$GITHUB_REPOSITORY" --json headSha --jq .headSha)
-          test "$SHA" = 'ab30550f4101090a424acc3c2925bfe55ae3a0de'
-      - uses: actions/download-artifact@v4
-        with:
-          name: android-SERVICE-1.10.62
-          run-id: 38612101585
-          github-token: ${{ github.token }}
-          path: service-artifact
-      - name: Prepare upload using the existing signed AAB
-        env:
-          ANDROID_SERVICE_ACCOUNT_JSON: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
-        run: |
-          set -eu
-          umask 077
-          printf '%s' "$ANDROID_SERVICE_ACCOUNT_JSON" | base64 -d > "$RUNNER_TEMP/service-account.json"
-          AAB=$(find service-artifact -type f -name '*.aab')
-          test "$(find service-artifact -type f -name '*.aab' | wc -l)" -eq 1
-          test -s "$AAB"
-          echo "SERVICE_AAB=$AAB" >> "$GITHUB_ENV"
-      - name: Retry only SERVICE upload to Play
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: ${{ runner.temp }}/service-account.json
-          packageName: com.controleonline.service
-          releaseFiles: ${{ env.SERVICE_AAB }}
-          track: internal
-          status: completed
-          changesNotSentForReview: true
-      - name: Remove temporary credentials
-        if: always()
-        run: python -c "from pathlib import Path; import os; Path(os.environ['RUNNER_TEMP'], 'service-account.json').unlink(missing_ok=True)"
