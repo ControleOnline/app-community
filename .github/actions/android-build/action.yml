@@ -282,6 +282,7 @@ runs:
         releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
         track: ${{ inputs.play_track }}
         status: ${{ inputs.play_status }}
+        changesNotSentForReview: ${{ inputs.app_type == 'SERVICE' }}
 
     - name: Restore app.json
       if: always()
