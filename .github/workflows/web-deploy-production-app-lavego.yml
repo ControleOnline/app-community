@@ -3,6 +3,12 @@ name: Deploy Project app.lave-go.com (LEGACY — deprecated)
 # Push trigger removed to avoid dual-fire with the new deploy-lave-go.yml after staging→master.
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: "Destino da publicacao (padrao: POS+SHOP; APP so quando indicado)"
+        type: choice
+        options: [POS+SHOP, APP, POS, SHOP, ALL]
+        default: POS+SHOP
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -51,6 +57,7 @@ jobs:
         run: npx expo export --platform web
 
       - name: Deploy via FTP -> APP
+        if: ${{ inputs.target == 'APP' || inputs.target == 'ALL' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_APPLAVEGO }}
@@ -67,6 +74,7 @@ jobs:
             **/node_modules/**
 
       - name: Deploy via FTP -> POS
+        if: ${{ inputs.target == 'POS+SHOP' || inputs.target == 'POS' || inputs.target == 'ALL' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_POSLAVEGO }}
@@ -83,6 +91,7 @@ jobs:
             **/node_modules/**
 
       - name: Deploy via FTP -> SHOP
+        if: ${{ inputs.target == 'POS+SHOP' || inputs.target == 'SHOP' || inputs.target == 'ALL' }}
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_SHOPLAVEGO }}
