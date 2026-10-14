@@ -10,7 +10,7 @@
     ],
     "jsEngine": "hermes",
     "orientation": "default",
-    "version": "1.10.59",
+    "version": "1.10.61",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
