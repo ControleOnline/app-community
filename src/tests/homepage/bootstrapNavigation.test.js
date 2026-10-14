@@ -38,7 +38,7 @@ const loadProvider = () => {
     };
     if (name.endsWith('/styles/colors')) return {colors: {}};
     if (name === './DefaultProvider.styles') return {__esModule: true,
-      default: {shell: {flex: 1}, translationPending: {opacity: 0}}};
+      default: {shell: {flex: 1}, translationPending: {opacity: 0, visibility: 'hidden'}}};
     return external;
   };
   new Function('require', 'module', 'exports', compile)(dependency, module, module.exports);
@@ -74,12 +74,14 @@ it('keeps navigation mounted during login translation bootstrap without a regist
   expect(() => act(() => {tree = renderer.create(<App />);})).not.toThrow();
   expect(mounts).toBe(1);
   expect(unmounts).toBe(0);
+  expect(tree.root.findAllByType('View')[0].props['aria-hidden']).toBe(true);
   expect(tree.root.findAllByType('View')[0].props.pointerEvents).toBe('none');
-  expect(tree.root.findAllByType('View')[0].props.style).toContainEqual({opacity: 0});
+  expect(tree.root.findAllByType('View')[0].props.style).toContainEqual({opacity: 0, visibility: 'hidden'});
   mockReady = true;
   act(() => tree.update(<App />));
   expect(mounts).toBe(1);
   expect(tree.root.findAllByType('View')[0].props.pointerEvents).toBe('auto');
+  expect(tree.root.findAllByType('View')[0].props['aria-hidden']).toBe(false);
   act(() => tree.unmount());
   expect(unmounts).toBe(1);
 });

@@ -24,6 +24,8 @@ Corrected packages ui-manager 1.0.20 and ui-layout 1.0.19 are published; all 37/
 
 ## Web login bootstrap correction
 
-Dev runtime reproduced React maximum update depth after logout/login without reload. The translation readiness gate unmounted navigation, causing route reset and repeated bottom navigation registration. ui-common 1.2.96 preserves navigation while keeping the shell invisible, non-interactive and hidden from accessibility until existing translations are ready. Business rules, routing, authorization, theme token mappings, native behavior and 70% zoom remain unchanged.
+Dev runtime reproduced React maximum update depth after logout/login without reload. The translation readiness gate unmounted navigation, causing route reset and repeated bottom navigation registration. ui-common 1.2.97 preserves navigation while keeping the shell invisible, non-interactive and hidden from accessibility until existing translations are ready. Business rules, routing, authorization, theme token mappings, native behavior and 70% zoom remain unchanged.
 
-Regression bootstrapNavigation.test.js uses the real provider render/registration code: RED reproduced maximum update depth, GREEN passes with one mount across bootstrap. 44 homepage tests in 9 suites passed. The isolated v1.2.96 source excludes independent Sem Parar work from ui-common dev. Verify exact npm contents and login runtime after consuming the package before staging.
+Regression bootstrapNavigation.test.js uses the real provider render/registration code: RED reproduced maximum update depth, GREEN passes with one mount across bootstrap. 44 homepage tests in 9 suites passed. The isolated v1.2.97 source excludes independent Sem Parar work from ui-common dev. Verify exact npm contents and login runtime after consuming the package before staging.
+
+Pending web content uses visibility:hidden and aria-hidden so keyboard focus is blocked without unmounting navigation. Focused regression passed.
