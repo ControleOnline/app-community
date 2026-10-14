@@ -1,21 +1,13 @@
 {
-  "version": "1.10.59",
-  "rc": 2,
-  "branch": "rc/1.10.59-rc.2",
-  "baseMaster": "1516ee6171ff22420937da4f8ae50521c082a33c",
-  "tasks": [1051, 18, 21],
-  "repositories": {
-    "ControleOnline/app-community": "ebfcb338a40cbf1d6a9ebb4a73e28a763928c3ae",
-    "ControleOnline/ui-common": "5754b47897723c0ad663d355a7c16a56d6e5ce62",
-    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2"
-  },
-  "packages": {
-    "ui-common": {"version": "1.2.93", "gitHead": "5754b47897723c0ad663d355a7c16a56d6e5ce62", "integrity": "sha512-0YRSd25+oE9Q2UfTP4FIH3WOgc/LNeelebT4ubiNAu7EEqohgRN8OWU0sWyc34FOKImRMruObuZ4bNsZdZftFg==", "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.93.tgz"},
-    "ui-shop": {"version": "1.0.19", "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2", "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==", "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz"}
-  },
+  "version": "1.10.61",
+  "rc": 1,
+  "branch": "rc/1.10.61-rc.1",
+  "baseMaster": "8c193279f877f41c752d8c61f1d036a0e83d5333",
+  "tasks": [1063],
+  "repositories": { "ControleOnline/app-community": "3157114de827572efe9eb1888c00fe51804265d0" },
   "compositionNotes": [
-    "Master-based, independent of RC 1.10.60-rc.1 (task 1056, homepage) which is in staging awaiting homologation.",
-    "Only two npm pins change vs master. Emulator-validated with ui-layout 1.0.17 (unchanged)."
+    "CI-only change (manual legacy web deploy workflow). No product code.",
+    "Not promoted to staging: staging holds rc/1.10.60-rc.1 (task 1056) under homologation; promoting would replace it. Requester asked to reach master."
   ],
   "frozen": true
 }
