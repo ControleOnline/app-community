@@ -49,12 +49,45 @@ jobs:
         # ./src/assets/manager_lavego/favicon.png se o arquivo existir
       - name: Build
         run: npx expo export --platform web
-      - name: Deploy via FTP
+
+      - name: Deploy via FTP -> APP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTPHOST_APPLAVEGO }}
           username: ${{ secrets.FTPUSER_APPLAVEGO }}
           password: ${{ secrets.FTPPASS_APPLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist/
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+
+      - name: Deploy via FTP -> POS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_POSLAVEGO }}
+          username: ${{ secrets.FTPUSER_POSLAVEGO }}
+          password: ${{ secrets.FTPPASS_POSLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist/
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+
+      - name: Deploy via FTP -> SHOP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_SHOPLAVEGO }}
+          username: ${{ secrets.FTPUSER_SHOPLAVEGO }}
+          password: ${{ secrets.FTPPASS_SHOPLAVEGO }}
           protocol: ftps
           port: 21
           security: loose
