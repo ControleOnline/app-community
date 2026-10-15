@@ -3,7 +3,9 @@ description: Expo prebuild + Gradle (AAB/APK) + optional publish (Play / GitHub 
 
 inputs:
   app_type:
-    required: true
+    description: "Optional legacy. Prefer domain; type for package/assets is derived from domain host when empty."
+    required: false
+    default: ""
   display_name:
     required: true
   package_name:
@@ -60,7 +62,25 @@ runs:
       shell: bash
       run: |
         set -e
+        DOMAIN_RAW="${{ inputs.domain }}"
+        HOST=$(echo "$DOMAIN_RAW" | sed -E 's#^https?://##; s#/.*##; s#^www\.##')
         APP_TYPE="${{ inputs.app_type }}"
+        if [ -z "$APP_TYPE" ]; then
+          case "$HOST" in
+            admin.*|admin.controleonline.com) APP_TYPE=ADMIN ;;
+            checkout.*|checkout.controleonline.com) APP_TYPE=CHECKOUT ;;
+            crm.*|crm.controleonline.com) APP_TYPE=CRM ;;
+            delivery.*|delivery.controleonline.com) APP_TYPE=DELIVERY ;;
+            menu.*|menu.controleonline.com) APP_TYPE=MENU ;;
+            pos.*|pos.controleonline.com) APP_TYPE=POS ;;
+            ppc.*|ppc.controleonline.com|display.*) APP_TYPE=PPC ;;
+            service.*|service.controleonline.com) APP_TYPE=SERVICE ;;
+            shop.*|shop.controleonline.com) APP_TYPE=SHOP ;;
+            mkt.*|mkt.controleonline.com) APP_TYPE=MKT ;;
+            manager.*|manager.controleonline.com|app.*|app.controleonline.com) APP_TYPE=MANAGER ;;
+            *) APP_TYPE=MANAGER ;;
+          esac
+        fi
         APP_DISPLAY_NAME="${{ inputs.display_name }}"
         APP_LOWER=$(echo "$APP_TYPE" | tr '[:upper:]' '[:lower:]')
         PACKAGE_NAME="${{ inputs.package_name }}"
@@ -107,7 +127,6 @@ runs:
           DOMAIN: '${{ inputs.domain }}',
           MANAGER_APP: '${{ inputs.manager_app }}',
           SOCKET: '${{ inputs.socket }}',
-          APP_TYPE: '${{ inputs.app_type }}',
           ZOOM: ${ZOOM},
           NEW_RELIC: {
             LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',

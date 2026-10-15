@@ -3,7 +3,9 @@ description: Configure env, expo export web, optional FTP deploy (SamKirkland �
 
 inputs:
   app_type:
-    required: true
+    description: "Deprecated — operational type comes from people_domain.app_type at runtime."
+    required: false
+    default: ""
   api_entrypoint:
     required: true
   socket:
@@ -60,7 +62,7 @@ runs:
           SOCKET: '${{ inputs.socket }}',
           ${DOMAIN_LINE}
           ${MANAGER_APP_LINE}
-          APP_TYPE: '${{ inputs.app_type }}',
+          // APP_TYPE not written — runtime defaultCompany.appType
           ZOOM: ${ZOOM},
           NEW_RELIC: {
             LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
