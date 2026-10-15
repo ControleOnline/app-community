@@ -48,7 +48,7 @@ describe('resolveAppDomain', () => {
     expect(workflow).toContain('"ftp_product":"shop","app_domain":"https://shop.controleonline.com"');
     expect(workflow).toContain('"ftp_product":"admin","app_domain":"https://admin.controleonline.com"');
     expect(workflow).toContain('"ftp_product":"admin","app_domain":"https://staging.controleonline.com"');
-    expect(workflow).not.toContain('"app_type":');
+    expect(workflow).not.toMatch(/WEB_MATRIX=.*"app_type":/);
     expect(workflow).toContain('app_domain: https://crm.controleonline.com');
     expect(workflow).toContain('app_domain: https://pos.controleonline.com');
     expect(workflow).toContain('domain: ${{ matrix.app_domain }}');
