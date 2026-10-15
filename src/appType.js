@@ -69,11 +69,41 @@ export const clear_app_type = () => {
   return true;
 };
 
+/**
+ * Derive a bootstrap type from DOMAIN host only when storage is empty.
+ * Source of truth is people_domain.app_type via GET /people/company/default.
+ */
+export const resolve_app_type_from_domain = (domainValue = '') => {
+  const host = String(domainValue || '')
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\/.*$/, '')
+    .replace(/^www\./i, '')
+    .toLowerCase();
+  if (!host) return '';
+  if (host.startsWith('admin.') || host === 'admin.controleonline.com') return 'ADMIN';
+  if (host.startsWith('checkout.')) return 'CHECKOUT';
+  if (host.startsWith('crm.')) return 'CRM';
+  if (host.startsWith('delivery.')) return 'DELIVERY';
+  if (host.startsWith('menu.')) return 'MENU';
+  if (host.startsWith('pos.')) return 'POS';
+  if (host.startsWith('ppc.') || host.startsWith('display.')) return 'PPC';
+  if (host.startsWith('service.')) return 'SERVICE';
+  if (host.startsWith('shop.')) return 'SHOP';
+  if (host.startsWith('mkt.')) return 'MKT';
+  if (host.startsWith('manager.') || host.startsWith('app.') || host === 'app.controleonline.com') {
+    return 'MANAGER';
+  }
+  return '';
+};
+
 export const resolve_base_app_type = (env = APP_ENV) =>
-  normalizeAppType(env?.APP_TYPE) || 'MANAGER';
+  resolve_app_type_from_domain(env?.DOMAIN) || 'MANAGER';
 
 export const resolve_app_type = (env = APP_ENV) => {
-  // Runtime from defaultCompany.appType (localStorage key app-type), then build env.
+  // 1) Runtime from people_domain.app_type (localStorage, set by mainCompany bootstrap / admin)
+  // 2) Host bootstrap from DOMAIN
+  // 3) MANAGER
   const storedAppType = read_app_type();
   if (storedAppType) {
     return storedAppType;
