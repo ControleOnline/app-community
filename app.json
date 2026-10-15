@@ -1,0 +1,107 @@
+{
+  "expo": {
+    "name": "Controle Online",
+    "displayName": "Controle Online",
+    "slug": "controle-online",
+    "platforms": [
+      "android",
+      "ios",
+      "web"
+    ],
+    "jsEngine": "hermes",
+    "version": "1.10.64",
+    "android": {
+      "jsEngine": "hermes",
+      "package": "com.controleonline.app",
+      "versionCode": 11031,
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "VIBRATE",
+        "INTERNET",
+        "WAKE_LOCK",
+        "POST_NOTIFICATIONS",
+        "CAMERA",
+        "NFC"
+      ],
+      "tvBanner": "./src/assets/tv.png"
+    },
+    "icon": "./src/assets/logo.png",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "jsEngine": "hermes",
+      "bundleIdentifier": "com.controleonline.app",
+      "deploymentTarget": "15.1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Necess\u00e1rio para ler c\u00f3digos de barras e QR Codes no PDV.",
+        "NFCReaderUsageDescription": "Necess\u00e1rio para ler tags NFC e RFID no PDV.",
+        "NSMicrophoneUsageDescription": "Necess\u00e1rio para processamento de \u00e1udio.",
+        "NSAppleMusicUsageDescription": "Necess\u00e1rio para emitir alertas sonoros.",
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "_androidAppOptimizationNote": "R8/minify e shrinkResources foram ativados no bloco do plugin expo-build-properties abaixo.",
+    "plugins": [
+      "./withAndroidTV",
+      "./withKioskMode",
+      "./withLauncherMode",
+      "./withBackgroundRuntime",
+      "./withVectorIconsFonts",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.2.0",
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Necess\u00e1rio para ler c\u00f3digos de barras e QR Codes no PDV.",
+          "microphonePermission": "Necess\u00e1rio para processamento de \u00e1udio.",
+          "recordAudioAndroid": false
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "react-native-nfc-manager",
+        {
+          "nfcPermission": "Necess\u00e1rio para ler tags NFC e RFID no PDV."
+        }
+      ],
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./src/assets/sound/caixa.m4a"
+          ]
+        }
+      ],
+      "react-native-iap",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": false
+        }
+      ]
+    ]
+  }
+}
