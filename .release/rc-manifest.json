@@ -3,10 +3,15 @@
   "rc": 1,
   "branch": "rc/1.10.64-rc.1",
   "baseMaster": "58fe3904d15420452a3b72975d029dd1e4f4fc2f",
-  "tasks": [1079],
-  "repositories": { "ControleOnline/app-community": "123d237ce67fc647ecd78c2222c756779b36e669" },
+  "tasks": [
+    1079
+  ],
+  "repositories": {
+    "ControleOnline/app-community": "7d8e568c9369435702e17c35dd92cba60709d65d"
+  },
   "compositionNotes": [
-    "Renomeia a função de URL do avatar para resolveHomeAvatarUrl.js (eliminava conflito de maiúsculas com HomeAvatar.js). Sem mudança de comportamento."
+    "Renomeia a função de URL do avatar para resolveHomeAvatarUrl.js (eliminava conflito de maiúsculas com HomeAvatar.js). Sem mudança de comportamento.",
+    "SHA do app-community = commit que restaura app.json (o commit anterior tinha removido o arquivo por engano)."
   ],
   "frozen": true
 }
