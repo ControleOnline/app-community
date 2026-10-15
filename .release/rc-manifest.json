@@ -1,16 +1,18 @@
 {
-  "version": "1.10.65",
+  "version": "1.10.66",
   "rc": 1,
-  "branch": "rc/1.10.65-rc.1",
-  "baseMaster": "f1a53e139ff7afac4475c1141517f62dc689dbfc",
+  "branch": "rc/1.10.66-rc.1",
+  "baseMaster": "76cbd52e06bef6b9d552b6ff2b4d6cd07f95a541",
   "tasks": [
     1079
   ],
   "repositories": {
-    "ControleOnline/app-community": "d3fda75df425ff1e136c73a17b9c5b39ee917fee"
+    "ControleOnline/app-community": "d915fa74034904cf5a767ad8f19473361553d745"
   },
   "compositionNotes": [
-    "Hotfix: reverte o renomeio de homeAvatar.js (rc 1.10.64). O pacote ui-manager importa components/homeAvatar (funcao) e components/HomeAvatar (componente); o renomeio quebrou o build Android e admin no master."
+    "Funcao de URL do avatar renomeada para resolveHomeAvatarUrl.js; HomeAvatar.js (componente) intacto: sem conflito de maiusculas.",
+    "metro.config.js redireciona o import legado '@controleonline/../../src/components/homeAvatar' do ui-manager@1.0.20 para resolveHomeAvatarUrl.js. Independente da publicacao do ui-manager.",
+    "Validado: expo export --platform android sem erros de resolucao (sem esta alias a 1.10.64 quebrou Android e admin)."
   ],
   "frozen": true
 }
