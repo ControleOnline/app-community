@@ -43,10 +43,12 @@ describe('resolveAppDomain', () => {
     const workflowPath = path.resolve(__dirname, '../../../.github/workflows/deploy.yml');
     const workflow = fs.readFileSync(workflowPath, 'utf8');
 
-    expect(workflow).toContain('"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"');
-    expect(workflow).toContain('"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"');
-    expect(workflow).toContain('"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"');
-    expect(workflow).toContain('"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://staging.controleonline.com"');
+    // app_type is resolved from people_domain.app_type at runtime — workflows only publish domain.
+    expect(workflow).toContain('"ftp_product":"manager","app_domain":"https://manager.controleonline.com"');
+    expect(workflow).toContain('"ftp_product":"shop","app_domain":"https://shop.controleonline.com"');
+    expect(workflow).toContain('"ftp_product":"admin","app_domain":"https://admin.controleonline.com"');
+    expect(workflow).toContain('"ftp_product":"admin","app_domain":"https://staging.controleonline.com"');
+    expect(workflow).not.toContain('"app_type":');
     expect(workflow).toContain('app_domain: https://crm.controleonline.com');
     expect(workflow).toContain('app_domain: https://pos.controleonline.com');
     expect(workflow).toContain('domain: ${{ matrix.app_domain }}');
