@@ -1,13 +1,12 @@
 {
-  "version": "1.10.63",
+  "version": "1.10.64",
   "rc": 1,
-  "branch": "rc/1.10.63-rc.1",
-  "baseMaster": "f1244c5996975d25b65c935835faba9f9c3081ac",
-  "tasks": [1071],
-  "repositories": { "ControleOnline/app-community": "d701ebcb997b4e4814af72f4689d1a167d79b1ec" },
+  "branch": "rc/1.10.64-rc.1",
+  "baseMaster": "58fe3904d15420452a3b72975d029dd1e4f4fc2f",
+  "tasks": [1079],
+  "repositories": { "ControleOnline/app-community": "123d237ce67fc647ecd78c2222c756779b36e669" },
   "compositionNotes": [
-    "Somente CI: .github/workflows/web-deploy-production-app-lavego.yml. Nenhum código de produto.",
-    "Guarda WEB_AUTO_DEPLOY: sem a variável, push em master não executa o job."
+    "Renomeia a função de URL do avatar para resolveHomeAvatarUrl.js (eliminava conflito de maiúsculas com HomeAvatar.js). Sem mudança de comportamento."
   ],
   "frozen": true
 }
