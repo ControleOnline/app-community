@@ -73,13 +73,13 @@ export const resolve_base_app_type = (env = APP_ENV) =>
   normalizeAppType(env?.APP_TYPE) || 'MANAGER';
 
 export const resolve_app_type = (env = APP_ENV) => {
-  const baseAppType = resolve_base_app_type(env);
-
-  if (baseAppType !== 'ADMIN') {
-    return baseAppType;
+  // Runtime from defaultCompany.appType (localStorage key app-type), then build env.
+  const storedAppType = read_app_type();
+  if (storedAppType) {
+    return storedAppType;
   }
 
-  return read_app_type() || baseAppType;
+  return resolve_base_app_type(env);
 };
 
 export const app_type_base = resolve_base_app_type();
