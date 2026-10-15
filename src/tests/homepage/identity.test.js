@@ -1,4 +1,4 @@
-import resolveHomeAvatar from '../../components/homeAvatar';
+import resolveHomeAvatar from '../../components/resolveHomeAvatarUrl';
 import imageHeaders, {resolveHomeImageUrl} from '../../components/homeImageHeaders';
 import companyStyles from '@controleonline/ui-manager/src/react/components/CompanyFilter.styles';
 import legacyStyles from './fixtures/CompanyFilter.styles';

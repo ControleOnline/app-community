@@ -31,4 +31,30 @@ config.resolver.extraNodeModules = {
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };
 
+// Published @controleonline/ui-manager (CompanyFilter) still imports
+// '@controleonline/../../src/components/homeAvatar' (lowercase) for the URL
+// resolver, while the component lives in HomeAvatar.js. Both names differ only
+// by case, which breaks checkouts on macOS/Windows. The resolver file is now
+// resolveHomeAvatarUrl.js; this redirects the legacy lowercase request to it.
+// Remove this alias once ui-manager imports resolveHomeAvatarUrl directly.
+const homeAvatarResolverFile = path.resolve(
+  projectRoot,
+  'src',
+  'components',
+  'resolveHomeAvatarUrl.js',
+);
+const previousResolveRequest = config.resolver.resolveRequest;
+
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (/(^|\/)src\/components\/homeAvatar$/.test(moduleName)) {
+    return {type: 'sourceFile', filePath: homeAvatarResolverFile};
+  }
+
+  return (previousResolveRequest || context.resolveRequest)(
+    context,
+    moduleName,
+    platform,
+  );
+};
+
 module.exports = config;
