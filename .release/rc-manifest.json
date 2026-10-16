@@ -1,18 +1,26 @@
 {
-  "version": "1.10.66",
+  "version": "1.10.67",
   "rc": 1,
-  "branch": "rc/1.10.66-rc.1",
-  "baseMaster": "76cbd52e06bef6b9d552b6ff2b4d6cd07f95a541",
+  "branch": "rc/1.10.67-rc.1",
+  "baseMaster": "8fcb08d5fce70a376ffe6c06335520f62684faa9",
   "tasks": [
     1079
   ],
   "repositories": {
-    "ControleOnline/app-community": "d915fa74034904cf5a767ad8f19473361553d745"
+    "ControleOnline/app-community": "753cbfec443beec13e430d8445616f450abcda10",
+    "ControleOnline/ui-manager": "3a0c787fd5a6347120f7586099731e4506430d0b"
+  },
+  "packages": {
+    "ui-manager": {
+      "version": "1.0.21",
+      "gitHead": "3a0c787fd5a6347120f7586099731e4506430d0b",
+      "integrity": "sha512-+li6+BFGB+GsZb2HM1gYnzuQf64+0nWA8TCz5Ph5aZiJD4WW+A87H1rZaBtOo5b/9m9IxBg2p9WMYmx3NEPK3g==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.21.tgz"
+    }
   },
   "compositionNotes": [
-    "Funcao de URL do avatar renomeada para resolveHomeAvatarUrl.js; HomeAvatar.js (componente) intacto: sem conflito de maiusculas.",
-    "metro.config.js redireciona o import legado '@controleonline/../../src/components/homeAvatar' do ui-manager@1.0.20 para resolveHomeAvatarUrl.js. Independente da publicacao do ui-manager.",
-    "Validado: expo export --platform android sem erros de resolucao (sem esta alias a 1.10.64 quebrou Android e admin)."
+    "Fixa @controleonline/ui-manager 1.0.21 (CompanyFilter importa resolveHomeAvatarUrl) e remove o alias temporario do metro.config.js (rc 1.10.66).",
+    "Validado: expo export --platform android sem erros de resolucao, com ui-manager 1.0.21 e sem o alias."
   ],
   "frozen": true
 }
