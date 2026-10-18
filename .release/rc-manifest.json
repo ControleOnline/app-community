@@ -1,26 +1,39 @@
 {
-  "version": "1.10.67",
+  "version": "1.10.68",
   "rc": 1,
-  "branch": "rc/1.10.67-rc.1",
-  "baseMaster": "8fcb08d5fce70a376ffe6c06335520f62684faa9",
+  "branch": "rc/1.10.68-rc.1",
+  "baseMaster": "481094e393c583519c3385bd22b953612e792224",
   "tasks": [
-    1079
+    1092
   ],
   "repositories": {
-    "ControleOnline/app-community": "753cbfec443beec13e430d8445616f450abcda10",
-    "ControleOnline/ui-manager": "3a0c787fd5a6347120f7586099731e4506430d0b"
+    "ControleOnline/app-community": "5c987766ccc2c646586b12e86b98ed305f9c8efc",
+    "ControleOnline/ui-default": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "ControleOnline/ui-orders": "add7fd6ae76267a852b38169cba5212f30fad554",
+    "ControleOnline/ui-financial": "67c9d125506fe71b18dfd2469f9d5c864794cf87"
   },
   "packages": {
-    "ui-manager": {
-      "version": "1.0.21",
-      "gitHead": "3a0c787fd5a6347120f7586099731e4506430d0b",
-      "integrity": "sha512-+li6+BFGB+GsZb2HM1gYnzuQf64+0nWA8TCz5Ph5aZiJD4WW+A87H1rZaBtOo5b/9m9IxBg2p9WMYmx3NEPK3g==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.21.tgz"
+    "ui-default": {
+      "version": "1.0.280",
+      "gitHead": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+      "integrity": "sha512-SNEoP3e9prHXNQQweJVFZ4lLAlGgyTOMxOc1sxerXygWiRK7CTgETEguK4up72JiJQFBCwzpt/dnRC5fgfGA5A==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.280.tgz"
+    },
+    "ui-orders": {
+      "version": "1.3.46",
+      "gitHead": "add7fd6ae76267a852b38169cba5212f30fad554",
+      "integrity": "sha512-s8csZBXyTiX2EJZn9AKLVAeEaseEiTw2Uew++X2xcojzuz10FbICjtxjlsgneba9BTo6EwgBaQ9QPR7cmqO6bA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.46.tgz"
+    },
+    "ui-financial": {
+      "version": "1.1.42",
+      "gitHead": "67c9d125506fe71b18dfd2469f9d5c864794cf87",
+      "integrity": "sha512-M0f1WKaZ4aDYFCw34lBlaJKUHRgL13FZnf6XYi4VZ0kc4XJw57IS1EDuOAtSRPT1NTheO9G0NMCbLxS1d5XCkg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-financial/-/ui-financial-1.1.42.tgz"
     }
   },
   "compositionNotes": [
-    "Fixa @controleonline/ui-manager 1.0.21 (CompanyFilter importa resolveHomeAvatarUrl) e remove o alias temporario do metro.config.js (rc 1.10.66).",
-    "Validado: expo export --platform android sem erros de resolucao, com ui-manager 1.0.21 e sem o alias."
+    "Task 1092: DefaultTable compact layout as default; Financial Hub and Order History share it. ui-default 1.0.280 also carries the earlier 1092 responsive-cards fix (1.0.279)."
   ],
   "frozen": true
 }
