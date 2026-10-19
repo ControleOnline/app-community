@@ -1,13 +1,13 @@
 {
-  "version": "1.10.68",
-  "rc": 2,
-  "branch": "rc/1.10.68-rc.2",
-  "baseMaster": "481094e393c583519c3385bd22b953612e792224",
+  "version": "1.10.69",
+  "rc": 1,
+  "branch": "rc/1.10.69-rc.1",
+  "baseMaster": "b30349fa3c853e85f8c2a8f24ef4ecded9a6a56e",
   "tasks": [
-    1092
+    1101
   ],
   "repositories": {
-    "ControleOnline/app-community": "7dd8949780ef9c3bab7d63f95856d5a11dcc61a8",
+    "ControleOnline/app-community": "20f7712d834c4d7c6526e13b00c6f11b9279e63e",
     "ControleOnline/ui-default": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
     "ControleOnline/ui-orders": "0ab910830a13b57a721cd8791292dc48a95dde58",
     "ControleOnline/ui-financial": "67c9d125506fe71b18dfd2469f9d5c864794cf87"
@@ -33,7 +33,7 @@
     }
   },
   "compositionNotes": [
-    "Task 1092: DefaultTable compact default (Financial Hub + Order History) and Order History status filter fix (ui-orders 1.3.47). Supersedes rc.1."
+    "Task 1101: Lave-Go FTP deploy workflows stop excluding node_modules so icon fonts (dist/assets/node_modules/**/*.ttf) reach admin.lave-go.com. Workflow-only change; no package/pin changes."
   ],
   "frozen": true
 }
