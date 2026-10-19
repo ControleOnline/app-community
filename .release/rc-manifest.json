@@ -1,14 +1,15 @@
 {
-  "version": "1.10.72",
+  "version": "1.10.73",
   "rc": 1,
-  "branch": "rc/1.10.72-rc.1",
-  "baseMaster": "66e210fcc74b9f3621bbd6bec4e9c2ef8e6d45b5",
+  "branch": "rc/1.10.73-rc.1",
+  "baseMaster": "a22cf68a1c795ce77efacb8c29a000bace7c8b67",
   "tasks": [
-    1100
+    1114
   ],
   "repositories": {
-    "ControleOnline/app-community": "e35a66409547fe3723c7bbbcf9f3e5a843e53dde",
-    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
+    "ControleOnline/app-community": "1b68b4cda84d7833d0e09459912718e27cdb6194",
+    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "ControleOnline/ui-common": "307ac711850569a55987600a5d14195ea12f8e1a"
   },
   "packages": {
     "ui-products": {
@@ -16,10 +17,16 @@
       "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
       "integrity": "sha512-VzYtR9uR1zvhKr7q/4IezDySunbejWIBxDd4julRTgW77KG2eCTVcUlb+K9I6u1J1jjnkI6xRa8k+TIccJmIuQ==",
       "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.37.tgz"
+    },
+    "ui-common": {
+      "version": "1.2.98",
+      "gitHead": "307ac711850569a55987600a5d14195ea12f8e1a",
+      "integrity": "sha512-Wuse7lafer2ANJZBfpavjblhFbYH/GMXM3Fxr6YBmsu0wEaii3I/wWUv5YKq4F00RtckNi2TGfenkb5g036lcQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.98.tgz"
     }
   },
   "compositionNotes": [
-    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product. Supersedes rc/1.10.70-rc.1 (rebased on master 1.10.71)."
+    "Task 1114: consume @controleonline/ui-common 1.2.98 (footer shows …last 2 blocks for non-IPv4 identifier, ui-common#88)."
   ],
   "frozen": true
 }
