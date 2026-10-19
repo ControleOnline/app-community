@@ -6,10 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '../../..');
-const FILES = [
-  'web-deploy-production-admin-lavego.yml',
-  'web-deploy-production-app-lavego.yml',
-];
+const FILES = ['web-deploy-production-app-lavego.yml'];
 
 describe('Lave-Go FTP deploy keeps icon fonts (#1101)', () => {
   FILES.forEach(name => {

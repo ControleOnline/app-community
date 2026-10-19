@@ -1,8 +1,8 @@
 {
-  "version": "1.10.70",
+  "version": "1.10.72",
   "rc": 1,
-  "branch": "rc/1.10.70-rc.1",
-  "baseMaster": "929f537077039bc228fde7d15791e1e8f7622844",
+  "branch": "rc/1.10.72-rc.1",
+  "baseMaster": "66e210fcc74b9f3621bbd6bec4e9c2ef8e6d45b5",
   "tasks": [
     1100
   ],
@@ -19,7 +19,7 @@
     }
   },
   "compositionNotes": [
-    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product (TDZ in ProductForm and missing inlineStyle import)."
+    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product. Supersedes rc/1.10.70-rc.1 (rebased on master 1.10.71)."
   ],
   "frozen": true
 }
