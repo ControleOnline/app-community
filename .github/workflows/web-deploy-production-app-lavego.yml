@@ -196,10 +196,10 @@ jobs:
           local-dir: ./dist/        # o que sobe
           server-dir: /             # destino no servidor FTP
           log-level: standard       # lista no log os arquivos enviados
-          exclude: |                # nunca envia arquivos de git ou node_modules
+          exclude: |                # nunca envia arquivos de git (node_modules liberado: ver #1101)
             **/.git*
             **/.git*/**
-            **/node_modules/**
+          # **/node_modules/** desativado: excluiria dist/assets/node_modules (fontes .ttf dos icones). Ver #1101
 
 
       - name: Confirm upload -> APP
@@ -226,7 +226,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
+          # **/node_modules/** desativado: excluiria dist/assets/node_modules (fontes .ttf dos icones). Ver #1101
 
 
       - name: Confirm upload -> POS
@@ -253,7 +253,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
+          # **/node_modules/** desativado: excluiria dist/assets/node_modules (fontes .ttf dos icones). Ver #1101
 
 
       - name: Confirm upload -> SHOP
