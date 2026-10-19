@@ -1,13 +1,13 @@
 {
-  "version": "1.10.69",
+  "version": "1.10.71",
   "rc": 1,
-  "branch": "rc/1.10.69-rc.1",
-  "baseMaster": "b30349fa3c853e85f8c2a8f24ef4ecded9a6a56e",
+  "branch": "rc/1.10.71-rc.1",
+  "baseMaster": "929f537077039bc228fde7d15791e1e8f7622844",
   "tasks": [
-    1101
+    1108
   ],
   "repositories": {
-    "ControleOnline/app-community": "20f7712d834c4d7c6526e13b00c6f11b9279e63e",
+    "ControleOnline/app-community": "24651ddabe51a89eed33eb3f0cd8fab3cf35c46a",
     "ControleOnline/ui-default": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
     "ControleOnline/ui-orders": "0ab910830a13b57a721cd8791292dc48a95dde58",
     "ControleOnline/ui-financial": "67c9d125506fe71b18dfd2469f9d5c864794cf87"
@@ -33,7 +33,7 @@
     }
   },
   "compositionNotes": [
-    "Task 1101: Lave-Go FTP deploy workflows stop excluding node_modules so icon fonts (dist/assets/node_modules/**/*.ttf) reach admin.lave-go.com. Workflow-only change; no package/pin changes."
+    "Task 1108: Lave-Go web deploy workflow publishes ADMIN (own APP_TYPE ADMIN build) + SHOP by default, adds target=ADMIN, drops POS, removes legacy admin workflow. Workflow-only; no package/pin changes."
   ],
   "frozen": true
 }
