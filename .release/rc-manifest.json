@@ -1,39 +1,25 @@
 {
-  "version": "1.10.69",
+  "version": "1.10.70",
   "rc": 1,
-  "branch": "rc/1.10.69-rc.1",
-  "baseMaster": "b30349fa3c853e85f8c2a8f24ef4ecded9a6a56e",
+  "branch": "rc/1.10.70-rc.1",
+  "baseMaster": "929f537077039bc228fde7d15791e1e8f7622844",
   "tasks": [
-    1101
+    1100
   ],
   "repositories": {
-    "ControleOnline/app-community": "20f7712d834c4d7c6526e13b00c6f11b9279e63e",
-    "ControleOnline/ui-default": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
-    "ControleOnline/ui-orders": "0ab910830a13b57a721cd8791292dc48a95dde58",
-    "ControleOnline/ui-financial": "67c9d125506fe71b18dfd2469f9d5c864794cf87"
+    "ControleOnline/app-community": "e35a66409547fe3723c7bbbcf9f3e5a843e53dde",
+    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
   },
   "packages": {
-    "ui-default": {
-      "version": "1.0.280",
-      "gitHead": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
-      "integrity": "sha512-SNEoP3e9prHXNQQweJVFZ4lLAlGgyTOMxOc1sxerXygWiRK7CTgETEguK4up72JiJQFBCwzpt/dnRC5fgfGA5A==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.280.tgz"
-    },
-    "ui-orders": {
-      "version": "1.3.47",
-      "gitHead": "0ab910830a13b57a721cd8791292dc48a95dde58",
-      "integrity": "sha512-b/ZXsivufgjfJmySmtYyyqHnOHRqRQiiCxJnFo763FSKeQB6Y6JicUR2sFe+bTXeOsXCZ5si//5Pd+r6KhDK4A==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.47.tgz"
-    },
-    "ui-financial": {
-      "version": "1.1.42",
-      "gitHead": "67c9d125506fe71b18dfd2469f9d5c864794cf87",
-      "integrity": "sha512-M0f1WKaZ4aDYFCw34lBlaJKUHRgL13FZnf6XYi4VZ0kc4XJw57IS1EDuOAtSRPT1NTheO9G0NMCbLxS1d5XCkg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-financial/-/ui-financial-1.1.42.tgz"
+    "ui-products": {
+      "version": "1.0.37",
+      "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+      "integrity": "sha512-VzYtR9uR1zvhKr7q/4IezDySunbejWIBxDd4julRTgW77KG2eCTVcUlb+K9I6u1J1jjnkI6xRa8k+TIccJmIuQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.37.tgz"
     }
   },
   "compositionNotes": [
-    "Task 1101: Lave-Go FTP deploy workflows stop excluding node_modules so icon fonts (dist/assets/node_modules/**/*.ttf) reach admin.lave-go.com. Workflow-only change; no package/pin changes."
+    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product (TDZ in ProductForm and missing inlineStyle import)."
   ],
   "frozen": true
 }
