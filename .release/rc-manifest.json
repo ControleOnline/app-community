@@ -1,10 +1,12 @@
 {
   "version": "1.10.75",
-  "rc": 5,
-  "branch": "rc/1.10.75-rc.5",
+  "rc": 6,
+  "branch": "rc/1.10.75-rc.6",
   "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
-    1117
+    1117,
+    1123,
+    1124
   ],
   "repositories": {
     "ControleOnline/app-community": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
@@ -15,7 +17,7 @@
     "ControleOnline/ui-layout": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
     "ControleOnline/ui-login": "89cdd37d8a1586fb303e9710d36912a73a218752",
     "ControleOnline/ui-orders": "df903208c3d23a5a9b7b50afbe9da032e1143888",
-    "ControleOnline/ui-people": "a09acb7764bffa0c747457ef833d80d752d3afa9",
+    "ControleOnline/ui-people": "ac6be7d105f8b3e7caae54febeddcaf00012e045",
     "ControleOnline/ui-products": "bf40a463eb8d6840a18921ea55c49c931d27708d",
     "ControleOnline/ui-translate": "7091c30b458e21cacdbf88505c97b9669778c805",
     "ControleOnline/ui-customers": "506019353f226a1e98c51c805a8f90db96f20d2f"
@@ -64,10 +66,10 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.48.tgz"
     },
     "ui-people": {
-      "version": "1.0.100",
-      "gitHead": "a09acb7764bffa0c747457ef833d80d752d3afa9",
-      "integrity": "sha512-hAEPyF2o49loyjVFXjdzvovex0qwBiPun76fDQmu1dn+dIByqbyg0FjWBD00wItllv9SzcKIhTaYS9/cr3wFsg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.100.tgz"
+      "version": "1.0.101",
+      "gitHead": "ac6be7d105f8b3e7caae54febeddcaf00012e045",
+      "integrity": "sha512-Hyqywo4+W+FUyWRaCg4vdwI+6SyjICrNSGz/ixvv/IQ+Oubo3urZWz7ydkuDAs4zjIbI8mRmwowacZzCspGqWA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.101.tgz"
     },
     "ui-products": {
       "version": "1.0.38",
@@ -92,6 +94,16 @@
       "task": 1117,
       "source": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
       "result": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8"
+    },
+    {
+      "task": 1123,
+      "source": "ControleOnline/ui-people@ac6be7d",
+      "result": "ui-people 1.0.101"
+    },
+    {
+      "task": 1124,
+      "source": "ControleOnline/ui-people@ac6be7d",
+      "result": "ui-people 1.0.101"
     }
   ],
   "stagingReset": {
@@ -107,7 +119,8 @@
     "Supersedes APP RC1: browser test fixture accepts domain-resolved sample; staging browser job explicitly uses modern. Four targeted helper tests pass. API snapshot remains unchanged.",
     "RC3 restores dev/staging ADMIN entry and app selector, with manual choice protected from company bootstrap. No local tests per human instruction. Packages/API unchanged.",
     "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
-    "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction."
+    "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction.",
+    "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged."
   ],
   "frozen": true
 }
