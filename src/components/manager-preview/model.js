@@ -3,15 +3,18 @@ import {Platform} from 'react-native';
 import {app_type} from '@appType';
 import {filterRuntimeMenuModulesByType, resolveRuntimeMenuLabel} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import {resolveMenuRouteName, resolveMenuRouteParams} from '@controleonline/ui-layout/src/react/utils/menuNavigation';
+import {resolveManagerLayout} from '../../../scripts/lib/manager-layout.cjs';
 
-// Activation is explicit per build; app type, company and device rules stay authoritative.
+// Standard Expo defaults to modern; explicit build choices and app type stay authoritative.
 // The legacy preview flag remains loopback-only for existing local workflows.
-export const shouldPreview = ({platform, appType, layout, enabled, nativeEnabled, hostname}) =>
-  appType === 'MANAGER' && layout !== 'legacy' && (
-    (layout === 'modern' && ['web','android'].includes(platform)) ||
+export const shouldPreview = ({platform, appType, layout, enabled, nativeEnabled, hostname}) => {
+  const resolvedLayout = resolveManagerLayout(layout);
+  return appType === 'MANAGER' && resolvedLayout !== 'legacy' && (
+    (resolvedLayout === 'modern' && ['web','android'].includes(platform)) ||
     (platform === 'android' && nativeEnabled === '1') ||
     (platform === 'web' && enabled === '1' && ['localhost', '127.0.0.1', '[::1]'].includes(hostname))
   );
+};
 export const managerPreviewEnabled = shouldPreview({
   platform: Platform.OS, appType: app_type,
   layout: process.env.EXPO_PUBLIC_MANAGER_LAYOUT,
