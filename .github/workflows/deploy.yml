@@ -164,6 +164,8 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   web:
+    env:
+      EXPO_PUBLIC_MANAGER_LAYOUT: ${{ needs.configure.outputs.env == 'master' && (vars.MANAGER_LAYOUT || 'legacy') || 'modern' }}
     name: "2 · Web ${{ matrix.ftp_product }} (${{ needs.configure.outputs.env }})"
     needs: [configure, production-gate]
     runs-on: ubuntu-latest

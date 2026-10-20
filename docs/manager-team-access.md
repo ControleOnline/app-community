@@ -48,3 +48,7 @@ Inventários: manager-module-source-consolidation-20261020.json e manager-api-so
 Os workflows web/Android aplicam manager:prepare antes de compilar. Payloads têm atributos Git -text para preservar os checksums na clonagem. Alguns arquivos históricos .patch preservam espaços de contexto e não devem ser apresentados como falha do código executável.
 
 **Falta para acesso do time e promoção:** publicar as branches task-1117 dos módulos/app/API, integrar e disponibilizar as novas versões oficiais das dependências, atualizar os pins e encaminhar os SHAs ao fluxo Manager/Security → dev → staging → revisão humana. Isso não foi confundido com deploy em produção. A variável MANAGER_LAYOUT permanece sem alteração remota; sua ativação modern precisa acompanhar o alvo Manager aprovado.
+
+## Compatibilidade com a dev existente
+
+A composição preserva o core já existente em dev que resolve app_type pelo domínio/defaultCompany e a proteção de props opcionais do avatar. APP_TYPE fixo não deve ser usado para sobrepor o domínio. O novo visual continua restrito ao tipo MANAGER efetivo. Dev/staging compilam a flag modern; produção continua legacy até ativação explícita aprovada. A apresentação anterior continua disponível pelo comando web:legacy. Os campos da integração Sem Parar que já estavam em dev do ui-common foram preservados na conciliação; um prefixo inválido no import existente foi reparado, sem mudar seus campos ou regras. Essa composição passa a ui-common 1.2.100, substituindo a publicação inicial 1.2.99.
