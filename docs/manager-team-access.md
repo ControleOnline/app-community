@@ -42,3 +42,7 @@ A #1117 publicou seus módulos e dependências e já teve deploy de dev concluí
 Staging depende de Security e revalidação do Manager, seguidos pelo freeze da RC a partir do master remoto atual e promoção do mesmo snapshot. A revisão de Security é executada diretamente nesta sessão, por orientação humana, sem depender do Paperclip; a decisão e a composição exata ficam registradas na #1117. Android e single-item serão homologados pelo responsável em In Review. Não houve publicação desta entrega em produção.
 
 Inventários e limites da auditoria permanecem em `docs/inventory` e na issue ControleOnline/app-community#1117. Os resultados globais de CI da API não devem ser apresentados como aprovados.
+
+## Escala e paleta dos ambientes de teste
+
+Dev e staging usam zoom de aplicação 100, com a paleta ON_MANAGER_NEUTRAL_20261016 vinculada somente aos respectivos domínios. Os temas compartilhados e os vínculos de produção não foram modificados. O zoom próprio do navegador permanece uma preferência do usuário. Avatares de clientes e contatos usam os tokens cardIconBackground/cardIconColor/cardBorder, preservando tamanho e ações próprios de cada contexto.
