@@ -32,7 +32,7 @@
     },
     {
       "file": "src/react/pages/CategoriesPage/HierarchicalCategoryTabs.js",
-      "before": null,
+      "before": "d803d4cf4e2b77b55608b8cf4911ccf5c555ba9ac76284430f4f0719baf70dd1",
       "after": "6b751b3acb74d19ccd683a957d0740c66e1bd71ab189537276996eb7093bffac",
       "payload": "manager-local-category-level-tabs.after.js"
     },
@@ -44,13 +44,13 @@
     },
     {
       "file": "src/react/pages/CategoriesPage/PdvCategoryTabs.js",
-      "before": "0e892286490b574566a15b1c55e42c4f6c6d991c5b1cd74dc4cdef6f58dbac0f",
+      "before": "4c0081a006f8f027d42559d7015031651a3271db21ea97578feac4919a0262a7",
       "after": "24cd17c66721df8e4cdab0553545ded772233c3ea481c3917acdba3f9d75d41a",
       "payload": "manager-local-category-tabs.after.js"
     },
     {
       "file": "src/react/pages/Categories.js",
-      "before": "9c147914b069c00c79dc692b32e6538a2e4c035481b328e133c537333509d968",
+      "before": "02ac389b4d8bb11ba588dff98fa88a5ec99ce97862fea83b3dd4059c885e3e02",
       "after": "78f421816305f93d9b3423af5740671e362ba91f55e6552c0d3b4708b9b57fb4",
       "payload": "manager-local-category-levels.after.js"
     },
@@ -122,7 +122,7 @@
     },
     {
       "file": "src/react/pages/checkout/AddProductScreen.js",
-      "before": "de6b716680edd65dab0a568eedb9138bfb5254075acf55427cc111dde9f1dac0",
+      "before": "d78125f2d02dac3c7df7637ade108d4c76e140efcdad199f4b26973a36cd0c05",
       "after": "69761d10dc8e5d1bcbcf76d484013bf8f55fb5a86eba11302e8cb771e3d7e96c",
       "payload": "manager-local-AddProductScreen.after.js",
       "package": "@controleonline/ui-orders",
