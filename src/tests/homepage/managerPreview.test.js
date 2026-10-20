@@ -78,11 +78,13 @@ it('applies themes without a feedback loop, reapplies domain changes and restore
   await act(async () => {tree.unmount();});
 });
 
-it('never activates for production hosts, native builds or other application types', () => {
-  const valid = {platform: 'web', appType: 'MANAGER', enabled: '1', hostname: 'localhost'};
+it('uses the modern Manager layout with standard Expo on local and official hosts', () => {
+  const valid = {platform: 'web', appType: 'MANAGER', hostname: 'localhost'};
   expect(shouldPreview(valid)).toBe(true);
-  for (const patch of [{hostname: 'app.lave-go.com'}, {hostname: ''}, {platform: 'android'},
-    {platform: 'ios'}, {appType: 'POS'}, {appType: 'PPC'}, {appType: 'ADMIN'}, {enabled: undefined}]) {
+  for (const patch of [{hostname: 'app.lave-go.com'}, {hostname: ''}, {platform: 'android'}]) {
+    expect(shouldPreview({...valid, ...patch})).toBe(true);
+  }
+  for (const patch of [{platform: 'ios'}, {appType: 'POS'}, {appType: 'PPC'}, {appType: 'ADMIN'}]) {
     expect(shouldPreview({...valid, ...patch})).toBe(false);
   }
 });
@@ -125,10 +127,10 @@ it('distinguishes sales and purchase entries without discarding their route para
  expect(managerRouteTitle('Unknown')).toBeUndefined();
 });
 
-it('enables the current Manager presentation only for an explicit Android local preview', () => {
-  const native = {platform:'android',appType:'MANAGER',nativeEnabled:'1'};
+it('defaults standard Android to modern while preserving an explicit legacy choice', () => {
+  const native = {platform:'android',appType:'MANAGER'};
   expect(shouldPreview(native)).toBe(true);
-  expect(shouldPreview({...native,nativeEnabled:undefined})).toBe(false);
+  expect(shouldPreview({...native,layout:'legacy',nativeEnabled:'1'})).toBe(false);
   expect(shouldPreview({...native,platform:'ios'})).toBe(false);
   expect(shouldPreview({...native,appType:'POS'})).toBe(false);
 });

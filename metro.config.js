@@ -34,8 +34,9 @@ config.resolver.extraNodeModules = {
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };
 
-// Local opt-in presentation adapter; all business loading remains in DefaultTable.
-const managerLayout = process.env.EXPO_PUBLIC_MANAGER_LAYOUT;
+// Standard Expo uses the approved Manager layout; legacy remains an explicit override.
+const {resolveManagerLayout} = require('./scripts/lib/manager-layout.cjs');
+const managerLayout = resolveManagerLayout(process.env.EXPO_PUBLIC_MANAGER_LAYOUT);
 const managerWebPreview = managerLayout !== 'legacy' && (managerLayout === 'modern' || process.env.EXPO_PUBLIC_MANAGER_PREVIEW === '1');
 const managerNativePreview = managerLayout !== 'legacy' && (managerLayout === 'modern' || process.env.EXPO_PUBLIC_MANAGER_NATIVE_PREVIEW === '1');
 if (managerWebPreview || managerNativePreview) {
