@@ -1,0 +1,21 @@
+import React from 'react';
+import renderer,{act} from 'react-test-renderer';
+import DefaultInput from '@controleonline/ui-default/src/react/components/inputs/DefaultInput';
+jest.mock('@store',()=>({getAllStores:()=>({})}));
+jest.mock('react-native',()=>({Image:'Image',Text:'Text',TextInput:'TextInput',TouchableOpacity:'TouchableOpacity',View:'View',StyleSheet:{create:v=>v}}));
+jest.mock('react-native-vector-icons/Feather',()=> 'Icon');
+jest.mock('@controleonline/ui-default/src/react/components/extra-data/DefaultExtraData',()=> 'ExtraData');
+jest.mock('@controleonline/ui-default/src/react/components/files/DefaultFileColumn',()=> 'File');
+jest.mock('@controleonline/ui-default/src/react/components/inputs/DefaultColorInput',()=> 'Color');
+jest.mock('@controleonline/ui-default/src/react/components/inputs/DefaultDateInput',()=> 'Date');
+jest.mock('@controleonline/ui-default/src/react/components/inputs/DefaultFeatherIconPicker',()=>({__esModule:true,default:'Picker',normalizeFeatherIconName:v=>v}));
+jest.mock('@controleonline/ui-default/src/react/components/inputs/DefaultSelect',()=> 'Select');
+it('keeps draft editing without autosaving and supports explicit submit and max length',()=>{
+ global.IS_REACT_ACT_ENVIRONMENT=true;const change=jest.fn(),submit=jest.fn(),save=jest.fn();let tree;
+ act(()=>{tree=renderer.create(<DefaultInput variant="form" column={{name:'year',inputType:'number'}} value="2026" autoSave={false} maxLength={4} onChangeValue={change} onSave={save} onSubmitEditing={submit}/>);});
+ expect(tree.root.findByType('TextInput').props.maxLength).toBe(4);
+ act(()=>tree.root.findByType('TextInput').props.onChangeText('2025'));
+ expect(change).toHaveBeenLastCalledWith('2025');expect(submit).not.toHaveBeenCalled();
+ act(()=>tree.root.findByType('TextInput').props.onSubmitEditing());
+ expect(submit).toHaveBeenCalledWith('2025');expect(save).not.toHaveBeenCalled();
+});

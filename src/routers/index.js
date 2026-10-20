@@ -14,7 +14,15 @@ import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/display
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
 import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
-import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout'
+import DefaultLayout from '../components/manager-preview/ManagerLayout'
+import ManagerSignIn from '../components/manager-preview/ManagerSignIn'
+import ManagerPdvPage from '../components/manager-preview/ManagerPdvPage'
+import ManagerDevicesPage from '../components/manager-preview/ManagerDevicesPage'
+import ManagerResultsPage from '../components/manager-preview/ManagerResultsPage'
+import ManagerConfiguratorPage from '../components/manager-preview/ManagerConfiguratorPage'
+import {managerRouteOptions} from '../components/manager-preview/managerRouteOptions'
+import ManagerPreviewProvider from '../components/manager-preview/ManagerPreviewProvider'
+import {managerPreviewEnabled} from '../components/manager-preview/model'
 
 import commonRoutes from '@controleonline/ui-common/src/react/router/routes'
 import contractsRoutes from '@controleonline/ui-contracts/src/react/router/routes'
@@ -122,8 +130,12 @@ export const allRoutes = [
   ...contractsRoutes,
   ...crmRoutes,
   ...customersRoutes,
-  ...loginRoutes,
-  ...managerRoutes,
+  ...loginRoutes.map(route => managerPreviewEnabled && route.name === 'SignInPage' ? {...route, component: ManagerSignIn} : route),
+  ...managerRoutes.map(route => {
+    if (!managerPreviewEnabled) return route;
+    const component = {PdvPage: ManagerPdvPage, DevicesIndex: ManagerDevicesPage, IncomeStatement: ManagerResultsPage, ConfiguratorPage: ManagerConfiguratorPage}[route?.name];
+    return component ? {...route, component} : route;
+  }),
   ...ordersRoutes,
   ...reportRoutes,
   ...employeeRoutes,
@@ -177,7 +189,7 @@ const routeDefinitions = (() => {
 normalizeInitialBrowserPath(globalThis?.window)
 
 const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
-  const resolvedOptions = resolveRouteOptions(screenOptions, {navigation, route})
+  const resolvedOptions = managerRouteOptions(route.name, resolveRouteOptions(screenOptions, {navigation, route}), managerPreviewEnabled)
 
   return React.createElement(
     DefaultLayout,
@@ -251,7 +263,7 @@ const getInitialRouteName = () => {
 }
 
 export default function Routes() {
-  return React.createElement(
+  const navigator = React.createElement(
     Stack.Navigator,
     {
       detachInactiveScreens: true,
@@ -263,8 +275,11 @@ export default function Routes() {
         initialParams: route.initialParams,
         key: index,
         name: route.name,
-        options: args => resolveRouteOptions(route.options, args),
+        options: args => managerRouteOptions(route.name, resolveRouteOptions(route.options, args), managerPreviewEnabled),
       }),
     ),
   )
+  return managerPreviewEnabled
+    ? React.createElement(ManagerPreviewProvider, null, navigator)
+    : navigator
 }
