@@ -9,6 +9,12 @@ function browserEnvSource(source, appType, apiOrigin) {
     SOCKET: `${api.protocol === 'https:' ? 'wss:' : 'ws:'}//${api.host}`,
   };
   let result = source;
+  // Runtime resolves app type by domain; browser fixtures need an explicit type.
+  if (!/\bAPP_TYPE\s*:/.test(result)) {
+    const envObject = /\bconst\s+env\s*=\s*\{/;
+    if (!envObject.test(result)) throw new Error('Unable to override browser APP_TYPE in config/env.local.js');
+    result = result.replace(envObject, match => `${match}\n  APP_TYPE: ${JSON.stringify(appType)},`);
+  }
   for (const [name, value] of Object.entries(values)) {
     const pattern = new RegExp(`${name}:\\s*(?:resolveAppType\\(\\)|['"][^'"]+['"])`);
     if (!pattern.test(result)) {

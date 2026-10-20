@@ -1,0 +1,443 @@
+[
+  {
+    "module": "ui-common",
+    "file": "src/api/index.js",
+    "sha256": "68385ec57371849882d285d27a3e46cad623be583625c70a3de3b5a3adc7cdbe",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/AnimatedModal.js",
+    "sha256": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/BottomNavigationBar.js",
+    "sha256": "4703704e3fd3d08ad47e843080f1bdb6fba22df795bad8ee842e1520d3a49bae",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/BottomNavigationBar.soft.styles.js",
+    "sha256": "b5a64c77da0456210f6f483ceaccd62d8a64fc08e7da56da2cf35f7219d60c74",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/DefaultProvider.styles.js",
+    "sha256": "e680a218f7f6b6b67aa33cda8367a1792aacb810ab5684f946f027a703db6067",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/DefaultProvider.web.js",
+    "sha256": "90451f8f35fb422a77ed59fa147338a6be15b01c7fc56a85d80864a7d3494e1b",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/ProductCatalogCacheService.js",
+    "sha256": "86ffd03ccc4d2d139ce8fca768eb54ff82fcccae16651627f6e823ae7ad6ef64",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/RuntimeBottomNavigationBar.js",
+    "sha256": "de5ef5e5891d676d358cfc679b0c107bfc56a14afd781d8e1cb2ef5a3cd37210",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/RuntimeInfoFooter.home.spacing.js",
+    "sha256": "c660146a603a364682146e245922f3a52fd48bd1c57ec937706f75cd74c230bc",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/RuntimeInfoFooter.js",
+    "sha256": "75a7c840419eb606515e852f8c79ff10326e967cd6b8e56b63e102231350f8d7",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/components/UserAvatar.js",
+    "sha256": "20d1a360de7ba4d702b33d24242ab6c732fdc661267a285cf33e6abd2cb50ea6",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/hooks/useBottomNavigationPreference.js",
+    "sha256": "842029ea4758670e415d123f9a308f8c966355fc52b7c1d0b3bc3c8647700e63",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/pages/Devices.js",
+    "sha256": "31047eb3464458d8f808212ce4932cbd43d0ab91baa55fea69d0ad79fb313d6b",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/pages/Devices/deviceTypes/DeviceGroupCard.js",
+    "sha256": "4d309d97f33082d1eb290a0429e8de138f8c6f338707655b17ac75348b71b8f6",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/pages/Devices/deviceTypes/shared.js",
+    "sha256": "c26cb9e78a447453d12b31450a55b43506c5dd23ca3f83f766fb7407244a0210",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/react/utils/productCatalogCacheRevision.js",
+    "sha256": "e3b579e73468b7ff055adf14f0721980b83ce3594134bd9eda2e7a3f5ba77aa7",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/tests/react/utils/storedSessionToken.test.js",
+    "sha256": "003babeae801aba7e73091baa35175fc161dabad512ee25faed09dce076acc5d",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-common",
+    "file": "src/utils/storedSessionToken.js",
+    "sha256": "f236653aa8bdb3b4b5faba1fc433ba43c42d71e33b6438c5b1132e486753d6d2",
+    "sourceBase": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-config",
+    "file": "src/react/pages/ConfiguratorPage.js",
+    "sha256": "451c784cc90e1fbaefa11ccbb8e81ffc310a38a17ea49e968bf550dc6bbba35e",
+    "sourceBase": "0fdac39f4c8bee4de15c5e399cd3e2076ff49aad",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/cards/DefaultEntityCard.js",
+    "sha256": "fe1b453cb59726e057a978ebf46415a123224e7226186660fa158f00b6a450f8",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/files/DefaultFile.js",
+    "sha256": "fc15f936f0c1151be1444e0340cee61799e4cdb1ceccbd233c4ecbf4d476d0bf",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/inputs/DefaultInput.js",
+    "sha256": "c71e03aabd9492564bf6bf15dd8ede3d5710fe6bb0868184c138b8a2b13205e4",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultColumnMenu.js",
+    "sha256": "b33dd88901306d75a95b528e27f84bc2a8bcb778eb70a26f3f1f0ee108718abb",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultSearchModal.js",
+    "sha256": "9fa73029332823bc1c0c34cd47be2ccd8f96359850a60d1689d88596ec14f216",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTable.js",
+    "sha256": "6e7829f8f5653f4803e16f125894ea1918ae99b758000664cf2e4e672f45cb32",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTable.layoutUtils.js",
+    "sha256": "958911e6c4804332e416169036ee0762f0bd9c253bb3b83770c9993956cc5a08",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTableCards.js",
+    "sha256": "d483eb5e440b4a3a47cc94d1e529abf2cc3b2942a2f015afe443dac906999964",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTableControls.js",
+    "sha256": "06f871c6f28ced25b3db0fee3544494bc01f2bb382da0c44a9f32f6a2dbf933d",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTableInput.js",
+    "sha256": "745511e97475b12e2627c83b3c92f9a284009a00038113e0e41577ed8b2fca81",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTableRows.js",
+    "sha256": "af0e16d7de6a773ae09ddc1acb47ccb3fc8cc67aa81694f9ef6743e500e70018",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/DefaultTableToolbar.js",
+    "sha256": "dbfba4d3cf2dc7b05cc834a9184ea80d5a611600619b4261014eb7ddd1c0a20d",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/useDefaultTablePagination.js",
+    "sha256": "698fc6aec0cdf66e6fda57c227bbea321f2b14de292e8c7548ad2e339977e43f",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/react/components/table/useDefaultTableStoreSync.js",
+    "sha256": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/store/default/actions.js",
+    "sha256": "a5ef6bb307282f29f41b0d20d430777754ae155d038bf119cb8c5d56cda97375",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-default",
+    "file": "src/tests/react/components/table/defaultTableTestSetup.cjs",
+    "sha256": "e7566963834091dfb0ac932fd2b5898bc9fe37ef60142eb01d46ce6aa1206ea5",
+    "sourceBase": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-financial",
+    "file": "src/react/pages/reports/IncomeStatement.js",
+    "sha256": "76c6b73601044fc58bd576cc9fa0d4b95ee6c62ec4b687531a2a787b98c6e24a",
+    "sourceBase": "67c9d125506fe71b18dfd2469f9d5c864794cf87",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-layout",
+    "file": "src/react/layouts/DefaultLayout.js",
+    "sha256": "88ded1e14d8349ab6a1e18fdbd8b416864374c26a6cccd85b616d3ccb0c45cb8",
+    "sourceBase": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-login",
+    "file": "src/react/pages/sign-in/index.js",
+    "sha256": "3a45be4fd57d89468afb6b57b7bab12160786f3f82bb21526cf2feb2213380fc",
+    "sourceBase": "7cd6af6966f02c7334c49dc2d967f694ef622cb3",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-orders",
+    "file": "src/react/pages/checkout/AddProductScreen.js",
+    "sha256": "d78125f2d02dac3c7df7637ade108d4c76e140efcdad199f4b26973a36cd0c05",
+    "sourceBase": "0ab910830a13b57a721cd8791292dc48a95dde58",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-orders",
+    "file": "src/react/pages/orders/OrderHistoryCard.js",
+    "sha256": "3d687d9cbca6d273ce936e53b0e2415fcb739943332fa08d217b30f3e3ee5aae",
+    "sourceBase": "0ab910830a13b57a721cd8791292dc48a95dde58",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-orders",
+    "file": "src/react/pages/orders/OrderHistoryCompactFooter.js",
+    "sha256": "0afafb20916a8c9b273465dfe55432cfe25aeedebf2d8768d0eeddbe2d3797c6",
+    "sourceBase": "0ab910830a13b57a721cd8791292dc48a95dde58",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-people",
+    "file": "src/react/pages/People.js",
+    "sha256": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+    "sourceBase": "d15773cb1bad36003355f0df463565c7873bf665",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/components/products/ProductItem.js",
+    "sha256": "f69381781744043026f381495310f1d5a5e46d868ec0e5c5c4f6547e8a5f9be3",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/Categories.js",
+    "sha256": "02ac389b4d8bb11ba588dff98fa88a5ec99ce97862fea83b3dd4059c885e3e02",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/CategoryCard.js",
+    "sha256": "fae86ed79349b0786ead80c761ce1b321582928d154f8f74697330ccfd5d94ad",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/HierarchicalCategoryTabs.js",
+    "sha256": "d803d4cf4e2b77b55608b8cf4911ccf5c555ba9ac76284430f4f0719baf70dd1",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/NativePdvCategoryEntry.js",
+    "sha256": "75e46f4592fcdf86e24d013b10234404a86780a509ed8dd3166b838ec8388909",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/PdvCategoryTabs.js",
+    "sha256": "4c0081a006f8f027d42559d7015031651a3271db21ea97578feac4919a0262a7",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/PdvProductSearch.js",
+    "sha256": "6726e3737e38feb6db874707631861e1c3e520a73feff482e8b654310a4a5933",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
+    "sha256": "2e90e5038940ca74ace32517708b65c537d9e4c748539cdc6570ac9c07de17d8",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CategoriesPage/useCategoryProductCounts.js",
+    "sha256": "bc02061c24d1d3e247a6fb059d05c9fc4619ffb9a0ea493bb0e6a52ef6864c42",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/CustomizeScreen.js",
+    "sha256": "b06b87e0e63262b302b01fc4c2bbb4f5de69baa3e3017521d23e1a1cafc0c415",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/pages/Products.js",
+    "sha256": "f7af497106393ee1fb01b6a23c163f1073ced538550b23aee1db175362d5a381",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/cachedCatalogActions.js",
+    "sha256": "157cecdc082f46c2cf85ac7268551f69918be8fbac0fa7de6ec7d44d2917f688",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/catalogCacheScope.js",
+    "sha256": "ed830fc7cc6d146ca40613804222cb3fdc59cc5126eb7752cc49388ac97fb96e",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/catalogCacheStorage.js",
+    "sha256": "9786b693de96c97e9eed6d27f8d9f579edadc3cb8e7259b6ff421cb8ae2ef4b7",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/catalogCacheStorage.native.js",
+    "sha256": "8de0bacfed90e17a1b476d563f0d25d2117f677776bd7fecf3f4090661a1fe31",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/catalogSessionFingerprint.js",
+    "sha256": "cc2adbce30fc9c6222785d8785c6e17a7a79b8447c9deae51989902327162b1b",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/react/utils/categoryHierarchy.js",
+    "sha256": "29df96ee439a393634f2832e2944870899a0861b8bda3f153d2cdf6bc28b994c",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": false
+  },
+  {
+    "module": "ui-products",
+    "file": "src/tests/react/components/ProductItemCustomizationRoute.test.js",
+    "sha256": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-products",
+    "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
+    "sha256": "88e823d9a0dc78784fbc03a658db182d3c5b08ed09333e690e394e5d569dec75",
+    "sourceBase": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-translate",
+    "file": "src/react/pages/TranslationReviewRow.js",
+    "sha256": "e3df370cfac966bc1787529d3e8fc95b6a44a5ab2769d231cb21d9f86a530d86",
+    "sourceBase": "ad7c627effde5c568268b08a54c43752fd0197b9",
+    "baselineFilePresent": true
+  },
+  {
+    "module": "ui-translate",
+    "file": "src/react/pages/TranslationsReviewPage.js",
+    "sha256": "80be784a5606c1d54d555823242abd9133dfc70707e8af17fac797b79da1077b",
+    "sourceBase": "ad7c627effde5c568268b08a54c43752fd0197b9",
+    "baselineFilePresent": true
+  }
+]

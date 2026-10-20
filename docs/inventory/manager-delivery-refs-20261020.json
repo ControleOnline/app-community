@@ -1,0 +1,98 @@
+[
+  {
+    "repository": "ControleOnline/api-platform-common",
+    "branch": "task-1117",
+    "head": "0e048950dada1990b1ec319240554cecbc65902d",
+    "master": "360fee249d7beb6942b4eb877abfb9c2d2dab8c2",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/api-platform-people",
+    "branch": "task-1117",
+    "head": "26ccd2bb8283938cf77fa58a6be7cb7a2afff968",
+    "master": "173c066852c3153c435e6f5333a0b4547e07eb4c",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-common",
+    "branch": "task-1117",
+    "head": "07e37064b30bcde08cb4fb1724f8b95dbfd85c3e",
+    "master": "ed2898e5d8181de6236aca398c804373f00372fc",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-config",
+    "branch": "task-1117",
+    "head": "9a78babde0437100d58da0254101f3ff13a8081c",
+    "master": "0fdac39f4c8bee4de15c5e399cd3e2076ff49aad",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-default",
+    "branch": "task-1117",
+    "head": "450baa4cb870346e2009f241420eb0f7c4b743d8",
+    "master": "ac8c0ecc9aca008ab4fd70142374d58eff408135",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-financial",
+    "branch": "task-1117",
+    "head": "45daf701539b16a4f761a3651d007a0d720eef97",
+    "master": "e774f982aefd115f0caa88ca760fa6bb00bd8a4f",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-layout",
+    "branch": "task-1117",
+    "head": "299f037d7f2117e75eeedf6777f279e94e2662d1",
+    "master": "37f1dff3fecf1f08bc8846a319af83c9fcbff502",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-login",
+    "branch": "task-1117",
+    "head": "b5bf7164f9f8800c0b30a2ff3ca91c8c17c7958e",
+    "master": "daab842071d4112de17bf626f376840a2d71ae8d",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-orders",
+    "branch": "task-1117",
+    "head": "64b1294b13e1c4831728446833da6b96eb852c56",
+    "master": "c2ea50ac43fd5dede1bc76157883003c1446d079",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-people",
+    "branch": "task-1117",
+    "head": "39e0b93b0889eeb8802f2b6d7e14f235d8121007",
+    "master": "dcebd738a478e51e575d6799cee16a7d3b92ab72",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-products",
+    "branch": "task-1117",
+    "head": "80ccd391c3935d3d3eca84dca241ccc9e573909a",
+    "master": "31f621157b38c1083674ddd4d3818927e1e0dc83",
+    "includesMaster": true,
+    "remotePublished": false
+  },
+  {
+    "repository": "ControleOnline/ui-translate",
+    "branch": "task-1117",
+    "head": "a86312e0ec8b052b1028c303ace96bdaa8407929",
+    "master": "ad7c627effde5c568268b08a54c43752fd0197b9",
+    "includesMaster": true,
+    "remotePublished": false
+  }
+]

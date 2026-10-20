@@ -1,0 +1,138 @@
+--- a/src/react/components/table/useDefaultTablePagination.js
++++ b/src/react/components/table/useDefaultTablePagination.js
+@@ -75,6 +75,7 @@
+   resolvedActions,
+   showError,
+   storeName,
++  store,
+ }) => {
+   const [currentPage, setCurrentPage] = useState(1);
+   const [autoHasLoaded, setAutoHasLoaded] = useState(false);
+@@ -84,6 +85,7 @@
+   const [autoLastPageCount, setAutoLastPageCount] = useState(0);
+   const autoRequestIdRef = useRef(0);
+   const autoLoadedQueryKeyRef = useRef('');
++  const autoLoadedStoreKeyRef = useRef(null);
+   const autoErroredQueryKeyRef = useRef('');
+   const autoPageRef = useRef(0);
+   const isFetchingRef = useRef(false);
+@@ -116,13 +118,22 @@
+       const query = buildRequestQuery(page, append);
+       if (refresh && resolvedActions.catalogCache) query.__storeMeta = {catalogRefresh: true};
+ 
+-      return Promise.resolve(resolvedActions.getItems(query))
++      const request = resolvedActions.getItems(query);
++      const owningRequestKey = store?.getters?.activeRequestKey;
++      return Promise.resolve(request)
+         .then(response => {
+           if (autoRequestIdRef.current !== requestId) {
+             return response;
+           }
+ 
+           const pageItems = normalizeCollectionItems(response);
++          // A retained screen must not present another screen's shared-store result.
++          if (owningRequestKey && store?.getters?.lastCompletedRequest?.requestKey !== owningRequestKey) {
++            autoLoadedQueryKeyRef.current = '';
++            setAutoHasLoaded(false);
++            return pageItems;
++          }
++          autoLoadedStoreKeyRef.current = owningRequestKey || store?.getters?.lastCompletedRequest?.requestKey || null;
+           autoPageRef.current = Number(response?.catalogPage) || page;
+           setCurrentPage(autoPageRef.current);
+           autoLoadedQueryKeyRef.current = autoQuerySignature;
+@@ -159,6 +170,7 @@
+       resolvedActions,
+       showError,
+       storeName,
++      store,
+     ],
+   );
+ 
+@@ -168,6 +180,7 @@
+     autoHasLoaded,
+     autoLastPageCount,
+     autoLoadedQueryKeyRef,
++    autoLoadedStoreKeyRef,
+     autoLoading,
+     autoLoadingMore,
+     autoRefreshing,
+@@ -188,21 +201,30 @@
+   isFocused,
+   loadAutoPage,
+   resolvedActions,
++  ownsStoreResult,
++  autoPageRef,
+ }) => {
++  const wasFocused = useRef(false);
+   useEffect(() => {
++    const entering = isFocused && !wasFocused.current;
++    wasFocused.current = isFocused;
+     if (!autoMode || !isFocused) return;
+     if (typeof resolvedActions.getItems !== 'function') return;
++    // A failed visit may retry on the next focus, but never spin while still focused.
++    if (entering) autoErroredQueryKeyRef.current = '';
+     if (
+       autoLoading ||
+       autoLoadingMore ||
+-      autoLoadedQueryKeyRef.current === autoQuerySignature ||
++      (autoLoadedQueryKeyRef.current === autoQuerySignature && ownsStoreResult) ||
+       autoErroredQueryKeyRef.current === autoQuerySignature
+     ) {
+       return;
+     }
+ 
+     endReachedLockRef.current = false;
+-    loadAutoPage(1, { append: false });
++    const retainedPage = autoLoadedQueryKeyRef.current === autoQuerySignature && !ownsStoreResult
++      ? Math.max(1, autoPageRef.current) : 1;
++    loadAutoPage(retainedPage, { append: false });
+   }, [
+     autoErroredQueryKeyRef,
+     autoLoadedQueryKeyRef,
+@@ -214,6 +236,8 @@
+     isFocused,
+     loadAutoPage,
+     resolvedActions,
++    ownsStoreResult,
++  autoPageRef,
+   ]);
+ };
+ 
+@@ -284,6 +308,7 @@
+     autoHasLoaded,
+     autoLastPageCount,
+     autoLoadedQueryKeyRef,
++    autoLoadedStoreKeyRef,
+     autoLoading,
+     autoLoadingMore,
+     autoRefreshing,
+@@ -298,7 +323,11 @@
+     resolvedActions,
+     showError,
+     storeName,
++    store,
+   });
++
++  const ownsStoreResult = !autoLoadedStoreKeyRef.current ||
++    autoLoadedStoreKeyRef.current === store?.getters?.lastCompletedRequest?.requestKey;
+ 
+   useAutoPageEffect({
+     autoErroredQueryKeyRef,
+@@ -311,6 +340,8 @@
+     isFocused,
+     loadAutoPage,
+     resolvedActions,
++    ownsStoreResult,
++    autoPageRef,
+   });
+ 
+   useEffect(() => {
+@@ -326,7 +357,7 @@
+     ? autoRefreshing
+     : false;
+   const resolvedData = autoMode
+-    ? (autoHasLoaded && Array.isArray(store?.getters?.items) ? store.getters.items : [])
++    ? (autoHasLoaded && ownsStoreResult && Array.isArray(store?.getters?.items) ? store.getters.items : [])
+     : (Array.isArray(data) ? data : []);
+   const resolvedHasMore = useMemo(
+     () => {

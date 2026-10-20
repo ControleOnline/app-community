@@ -1,0 +1,19 @@
+--- a/useDefaultTablePagination.js
++++ b/useDefaultTablePagination.js
+@@ -215,14 +215,14 @@
+     if (
+       autoLoading ||
+       autoLoadingMore ||
+-      (autoLoadedQueryKeyRef.current === autoQuerySignature && ownsStoreResult) ||
++      (autoLoadedQueryKeyRef.current === autoQuerySignature && ownsStoreResult && !(entering && resolvedActions.catalogCache)) ||
+       autoErroredQueryKeyRef.current === autoQuerySignature
+     ) {
+       return;
+     }
+ 
+     endReachedLockRef.current = false;
+-    const retainedPage = autoLoadedQueryKeyRef.current === autoQuerySignature && !ownsStoreResult
++    const retainedPage = autoLoadedQueryKeyRef.current === autoQuerySignature && (!ownsStoreResult || resolvedActions.catalogCache)
+       ? Math.max(1, autoPageRef.current) : 1;
+     loadAutoPage(retainedPage, { append: false });
+   }, [
