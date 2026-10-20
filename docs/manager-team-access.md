@@ -33,8 +33,8 @@ Dev e staging usam `modern` no pipeline. Os workflows de produção continuam co
 
 ## Estado da entrega
 
-A #1117 publicou seus módulos e dependências e já teve deploy de dev concluído em 20/10/2026. O bloqueio de Traduções foi corrigido em ui-translate 1.1.69; os contratos de módulos e empresa passaram. A mudança do Expo padrão exige sua própria integração em dev antes da revisão da composição final.
+A #1117 publicou seus módulos e dependências e já teve deploy de dev concluído em 20/10/2026. O bloqueio de Traduções foi corrigido em ui-translate 1.1.69; os contratos de módulos e empresa passaram. O Expo padrão foi integrado em dev pelo PR #1126. A composição final usa ui-common 1.2.102 com proteção de origem para credenciais de imagens.
 
-Staging depende de Security e revalidação do Manager, seguidos pelo freeze da RC a partir do master remoto atual e promoção do mesmo snapshot. O executor de Security está aguardando recuperação da autenticação do workspace; não há aceite implícito. Android e single-item serão homologados pelo responsável em In Review. Não houve publicação desta entrega em produção.
+Staging depende de Security e revalidação do Manager, seguidos pelo freeze da RC a partir do master remoto atual e promoção do mesmo snapshot. A revisão de Security é executada diretamente nesta sessão, por orientação humana, sem depender do Paperclip; a decisão e a composição exata ficam registradas na #1117. Android e single-item serão homologados pelo responsável em In Review. Não houve publicação desta entrega em produção.
 
 Inventários e limites da auditoria permanecem em `docs/inventory` e na issue ControleOnline/app-community#1117. Os resultados globais de CI da API não devem ser apresentados como aprovados.
