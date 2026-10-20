@@ -1,6 +1,7 @@
 import {env as APP_ENV} from '@env';
 
 export const app_type_storage_key = 'app-type';
+const admin_app_type_storage_key = 'admin-app-type';
 
 export const app_type_options = Object.freeze([
   'ADMIN',
@@ -57,6 +58,9 @@ export const set_app_type = value => {
   }
 
   globalThis.localStorage.setItem(app_type_storage_key, normalizedAppType);
+  if (app_type_base === 'ADMIN') {
+    globalThis.localStorage.setItem(admin_app_type_storage_key, normalizedAppType);
+  }
   return true;
 };
 
@@ -66,6 +70,7 @@ export const clear_app_type = () => {
   }
 
   globalThis.localStorage.removeItem(app_type_storage_key);
+  globalThis.localStorage.removeItem(admin_app_type_storage_key);
   return true;
 };
 
@@ -81,7 +86,7 @@ export const resolve_app_type_from_domain = (domainValue = '') => {
     .replace(/^www\./i, '')
     .toLowerCase();
   if (!host) return '';
-  if (host.startsWith('admin.') || host === 'admin.controleonline.com') return 'ADMIN';
+  if (host.startsWith('admin.') || ['dev.controleonline.com', 'staging.controleonline.com'].includes(host)) return 'ADMIN';
   if (host.startsWith('checkout.')) return 'CHECKOUT';
   if (host.startsWith('crm.')) return 'CRM';
   if (host.startsWith('delivery.')) return 'DELIVERY';
@@ -98,10 +103,22 @@ export const resolve_app_type_from_domain = (domainValue = '') => {
 };
 
 export const resolve_base_app_type = (env = APP_ENV) =>
-  resolve_app_type_from_domain(env?.DOMAIN) || 'MANAGER';
+  normalizeAppType(env?.APP_TYPE) || resolve_app_type_from_domain(env?.DOMAIN) || 'MANAGER';
 
 export const resolve_app_type = (env = APP_ENV) => {
-  // 1) Runtime from people_domain.app_type (localStorage, set by mainCompany bootstrap / admin)
+  // Admin portals keep their entry point and explicit selector choice. Company
+  // bootstrap writes app-type and must not replace the administrator's choice.
+  if (resolve_base_app_type(env) === 'ADMIN') {
+    try {
+      const selected = canUseLocalStorage()
+        ? normalizeAppType(globalThis.localStorage.getItem(admin_app_type_storage_key))
+        : '';
+      return is_allowed_app_type(selected) ? selected : 'ADMIN';
+    } catch {
+      return 'ADMIN';
+    }
+  }
+  // 1) Runtime from people_domain.app_type (localStorage, set by mainCompany bootstrap)
   // 2) Host bootstrap from DOMAIN
   // 3) MANAGER
   const storedAppType = read_app_type();
