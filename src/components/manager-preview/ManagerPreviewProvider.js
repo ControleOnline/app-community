@@ -4,6 +4,7 @@ import {managerPreviewEnabled, previewModeKey, previewPalette, readPreviewMode} 
 import {missingManagerThemeTokens} from '../../styles/managerTheme';
 import {useAvatarRuntime} from '@experimental-avatar';
 import useExperienceRuntime from './useExperienceRuntime';
+import ManagerCatalogImageCache from './ManagerCatalogImageCache';
 import {app_type} from '@appType';
 import useBottomNavigationPreference from '@controleonline/ui-common/src/react/hooks/useBottomNavigationPreference';
 
@@ -50,6 +51,6 @@ export default function ManagerPreviewProvider({children}) {
     setMode(next);
   };
   return <PreviewContext.Provider value={{bottomBar, themeIssues: missingManagerThemeTokens(base.current, mode), ...avatar, experience, mode, toggleMode, colors: managerPreviewEnabled ? previewPalette(base.current, mode) : incoming}}>
-    {children}
+    <ManagerCatalogImageCache>{children}</ManagerCatalogImageCache>
   </PreviewContext.Provider>;
 }

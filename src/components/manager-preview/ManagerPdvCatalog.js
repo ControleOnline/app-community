@@ -1,11 +1,10 @@
-import React,{useState,useMemo} from 'react';
+import React,{useState} from 'react';
 import {Pressable,Text,View,useWindowDimensions} from 'react-native';
 import DefaultTable from '../../../node_modules/@controleonline/ui-default/src/react/components/table/DefaultTable';
 import {DefaultTableThemeContext} from '../../../node_modules/@controleonline/ui-default/src/react/components/table/useDefaultTableTheme';
 import {managerTableTheme} from './managerTableTheme';
 import {useStore} from '@store';
-import {pdvImageCache} from '../../experience/pdvImageCache';
-import DefaultFile,{DefaultFileCacheContext} from '@controleonline/ui-default/src/react/components/files/DefaultFile';
+import DefaultFile from '@controleonline/ui-default/src/react/components/files/DefaultFile';
 import {groupCategoryCards} from './categoryHierarchy';
 import {useManagerPreview} from './ManagerPreviewProvider';
 
@@ -33,11 +32,9 @@ export function pdvCategoryPresentation(c,advanced,color) {
 }
 export default function ManagerPdvCatalog(props) {
  const {colors:c}=useManagerPreview(),{width}=useWindowDimensions();
- const categoryStore=useStore('categories'),peopleStore=useStore('people');
+ const categoryStore=useStore('categories');
  const configs=categoryStore.getters.configs||{};
  const viewMode=props.nativeCatalogEntry?'cards':configs.effectiveViewMode||configs.viewMode||'cards';
- const company=peopleStore.getters.currentCompany?.id||'';
- const imageCache=useMemo(()=>({load:(uri,headers,load)=>pdvImageCache.load(company,uri,headers,load)}),[company]);
  const sourceColumns=props.columns||categoryStore.getters.columns||[];
  const labels={id:'Código',name:'Categoria',sortOrder:'Ordem de exibição',color:'Cor',icon:'Ícone',categoryFiles:'Imagem',parent:'Categoria principal'};
  const tableColumns=sourceColumns.map(column=>({...column,label:labels[column.name]||column.label}));
@@ -71,7 +68,6 @@ export default function ManagerPdvCatalog(props) {
     <Text style={{color:c.textPrimary,fontSize:12}}>{advanced?'Recolher opções':'Mais opções do catálogo'}</Text>
    </Pressable>
   </View>}
-  <DefaultFileCacheContext.Provider value={imageCache}>
   <DefaultTableThemeContext.Provider value={theme}>
    <DefaultTable {...props} appearance="soft" columns={tableColumns} initialViewMode="cards" viewMode={props.nativeCatalogEntry?'cards':undefined} renderCard={renderCard}
     showToolbarActions={props.nativeCatalogEntry||advanced} showToolbarControls={props.nativeCatalogEntry?false:advanced} showAdministrativeTools={advanced&&!props.nativeCatalogEntry} showRowActions={props.showRowActions} add={advanced?props.add:false}
@@ -79,6 +75,5 @@ export default function ManagerPdvCatalog(props) {
     cardListProps={{...props.cardListProps,transformData:groupCategoryCards,key:`manager-pdv-categories-${columns}`,numColumns:columns,
       columnWrapperStyle:{gap:12,alignItems:'flex-start'},contentContainerStyle:{gap:12,padding:12,paddingBottom:24}}}/>
   </DefaultTableThemeContext.Provider>
-  </DefaultFileCacheContext.Provider>
  </View>;
 }

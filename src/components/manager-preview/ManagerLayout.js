@@ -4,9 +4,11 @@ import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLa
 import {isPublicRoute} from '@controleonline/ui-common/src/react/router/publicRoutes';
 import {managerPreviewEnabled} from './model';
 import ManagerShell from './ManagerShell';
+import ManagerStartup from './ManagerStartup';
 
 export default function ManagerLayout(props) {
   const {isLogged} = useStore('auth').getters;
-  if (!managerPreviewEnabled || !isLogged || isPublicRoute(props.route?.name)) return <DefaultLayout {...props} />;
+  if (!managerPreviewEnabled || isPublicRoute(props.route?.name)) return <DefaultLayout {...props} />;
+  if (!isLogged) return <ManagerStartup />;
   return <ManagerShell {...props} />;
 }
