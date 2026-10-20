@@ -1,30 +1,113 @@
 {
-  "version": "1.10.74",
-  "rc": 1,
-  "branch": "rc/1.10.74-rc.1",
-  "baseMaster": "a22cf68a1c795ce77efacb8c29a000bace7c8b67",
+  "version": "1.10.75",
+  "rc": 5,
+  "branch": "rc/1.10.75-rc.5",
+  "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
-    88
+    1117
   ],
   "repositories": {
-    "ControleOnline/app-community": "44538afb531988a9e7e306fa6671d3032e26aba9",
-    "ControleOnline/ui-common": "88baa2595b6ce2ae42653608ef4b6d66a2bb3c96",
-    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
+    "ControleOnline/app-community": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
+    "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
+    "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
+    "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
+    "ControleOnline/ui-financial": "66b994049db2835361c01e41a649957c41f7f30f",
+    "ControleOnline/ui-layout": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
+    "ControleOnline/ui-login": "89cdd37d8a1586fb303e9710d36912a73a218752",
+    "ControleOnline/ui-orders": "df903208c3d23a5a9b7b50afbe9da032e1143888",
+    "ControleOnline/ui-people": "a09acb7764bffa0c747457ef833d80d752d3afa9",
+    "ControleOnline/ui-products": "bf40a463eb8d6840a18921ea55c49c931d27708d",
+    "ControleOnline/ui-translate": "7091c30b458e21cacdbf88505c97b9669778c805",
+    "ControleOnline/ui-customers": "506019353f226a1e98c51c805a8f90db96f20d2f"
   },
   "packages": {
     "ui-common": {
-      "version": "1.2.101",
-      "gitHead": "88baa2595b6ce2ae42653608ef4b6d66a2bb3c96",
-      "integrity": "sha512-uvfSoVgqX/8EQG08mCsOKbGPmPfCCI2JPBtN5U/9QjcfOQldlfgK84hqjejwqvVyqv4Tpc0Y+u3PLHzgn019cw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.101.tgz"
+      "version": "1.2.102",
+      "gitHead": "a934a580f18614e37df67f7bf9957794cec88c34",
+      "integrity": "sha512-V3nx7idXOlqnHAPV2pW1W4gcVPO3DGMKK3FqVdQ0ev5S2zu3ngFsMxe30AjHtnD7H3sPfxJYRsZJ6Hp0eT1iKw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.102.tgz"
+    },
+    "ui-config": {
+      "version": "1.0.26",
+      "gitHead": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
+      "integrity": "sha512-NeYQC5dHJ4DSQIw6J2NeuvSTGa5PYcBQRyoTYCnuj2k/nqMF2sz7cOYIpa9VGFaxBJaU+bd5u/iWEViX21gaFA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-config/-/ui-config-1.0.26.tgz"
+    },
+    "ui-default": {
+      "version": "1.0.281",
+      "gitHead": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
+      "integrity": "sha512-wvdCjDyqXbJXpDCmBTpKcXf7AKVgOe1M0ypwZUQGR6PTjqHDJWVXVu/dz2excGBgPNaNV5DPCaZq7qZjBjHgYg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.281.tgz"
+    },
+    "ui-financial": {
+      "version": "1.1.43",
+      "gitHead": "66b994049db2835361c01e41a649957c41f7f30f",
+      "integrity": "sha512-YlNJ+tbqf0sGrjSUWVqSWvUU4lvprgd/VVK9hKCmWiyMb3dBL4Ebhv5a9BmmsoVQ5zbZKaNBQcPquuVlM9pKjQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-financial/-/ui-financial-1.1.43.tgz"
+    },
+    "ui-layout": {
+      "version": "1.0.20",
+      "gitHead": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
+      "integrity": "sha512-qcW1kunUHYCZQWxPt1OOHhETHrNPXuIZ54z/I1N8K/eQi38hglZ2/wYOQ0T12O2GwamIirzhWHL+tzt/caOGuA==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.20.tgz"
+    },
+    "ui-login": {
+      "version": "1.0.116",
+      "gitHead": "89cdd37d8a1586fb303e9710d36912a73a218752",
+      "integrity": "sha512-vKoUJNAwuWTATZZkM5yPuFJ9/5nxVLdb7Z4DzrW21k6mZj7z2fMtZ3ik7UbnbXonjngH+0czhDqpCnP/SRQt2g==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.116.tgz"
+    },
+    "ui-orders": {
+      "version": "1.3.48",
+      "gitHead": "df903208c3d23a5a9b7b50afbe9da032e1143888",
+      "integrity": "sha512-Kl8lwykxrlhHuRr/bohMleCI6J8X3l6MaEuADTquEqWDbybOyrCSHmGTcgPQ2AhFrtfGH8L5/ZZm3o9dzz+yRQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.48.tgz"
+    },
+    "ui-people": {
+      "version": "1.0.100",
+      "gitHead": "a09acb7764bffa0c747457ef833d80d752d3afa9",
+      "integrity": "sha512-hAEPyF2o49loyjVFXjdzvovex0qwBiPun76fDQmu1dn+dIByqbyg0FjWBD00wItllv9SzcKIhTaYS9/cr3wFsg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.100.tgz"
     },
     "ui-products": {
-      "version": "1.0.37",
-      "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
+      "version": "1.0.38",
+      "gitHead": "bf40a463eb8d6840a18921ea55c49c931d27708d",
+      "integrity": "sha512-yi5bZQqj5wLvcks3Vmae4wGe0rAiC2umDtd5UUbEzBPKEoiq3wXUTWzHRsJej0fWDgJ/qVLl4EqPOV/xpd8luw==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.38.tgz"
+    },
+    "ui-translate": {
+      "version": "1.1.69",
+      "gitHead": "7091c30b458e21cacdbf88505c97b9669778c805",
+      "integrity": "sha512-8rXDoIfQyuzfWVaOj35l5+qI9I6CQVoHvwJyUKKjcw/rwKPHPx9BsG2vsaNIkWNK4XAUgE/ERP9Pszcs40a46g==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-translate/-/ui-translate-1.1.69.tgz"
+    },
+    "ui-customers": {
+      "version": "1.0.85",
+      "gitHead": "506019353f226a1e98c51c805a8f90db96f20d2f",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-customers/-/ui-customers-1.0.85.tgz"
     }
   },
+  "integrationOrder": [
+    {
+      "task": 1117,
+      "source": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
+      "result": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8"
+    }
+  ],
+  "stagingReset": {
+    "previous": "49642a7e94794b64d538a485d4d6fc0bfe07b4c3",
+    "contentTree": "299e9f7c83c3ca9b67af86eee8d883a467d2c8b1",
+    "mode": "reviewed snapshot via protected PR"
+  },
+  "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
   "compositionNotes": [
-    "ui-common task 88 (footer abbreviates non-IPv4 id). ui-common 1.2.101 = v1.2.97 + #88 only; avoids 1.2.98 (lineage without 1.2.97 / homepage 1056) and 1.2.99+ (task 1117, not reviewed)."
+    "Task #1117 only over current master. Published exact npm versions; approved Manager modern default in standard Expo, explicit legacy contingency.",
+    "Security source review accepted including trusted API image header boundary. No production activation or deployment.",
+    "Known global API CI failures remain disclosed. Android/single-item human review follows staging; local browser remains unavailable.",
+    "Supersedes APP RC1: browser test fixture accepts domain-resolved sample; staging browser job explicitly uses modern. Four targeted helper tests pass. API snapshot remains unchanged.",
+    "RC3 restores dev/staging ADMIN entry and app selector, with manual choice protected from company bootstrap. No local tests per human instruction. Packages/API unchanged.",
+    "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
+    "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction."
   ],
   "frozen": true
 }
