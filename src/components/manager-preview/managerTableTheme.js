@@ -1,0 +1,21 @@
+// Presentation only: every value comes from the current domain theme.
+export const managerTableTheme = colors => ({
+  ...colors,
+  compact: true,
+  background: colors.cardBackground,
+  panelBackground: colors.pageBackground || colors.panelBackground,
+  text: colors.textPrimary,
+  textSecondary: colors.textMuted,
+  primary: colors.buttonBackground,
+  'bg-headers-light': colors.tableHeaderBackground,
+  'bg-odd-light': colors.tableRowOddBackground,
+  'bg-even-light': colors.tableRowEvenBackground,
+  listItemOddRow: colors.tableRowOddBackground,
+  listItemEvenRow: colors.tableRowEvenBackground,
+  tableBorder: colors.cardBorder,
+  tableHeaderBorder: colors.cardBorder,
+  tableRowBorder: colors.cardBorder,
+  inputBackground: colors.cardBackground,
+  inputText: colors.textPrimary,
+  inputBorder: colors.cardBorder,
+});
