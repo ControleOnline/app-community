@@ -8,7 +8,7 @@ it.each(['MANAGER','POS','ADMIN'])('keeps the company payload and stores canonic
  const company={id:3,appType:type};mockFetch.mockResolvedValue(company);const commit=jest.fn();
  try{expect(await mainCompany({commit})).toBe(company);expect(values.get('app-type')).toBe(type);expect(commit).toHaveBeenCalledWith('SET_MAIN_COMPANY',company);
  expect(resolve_app_type({DOMAIN:'https://manager.controleonline.com',APP_TYPE:'MANAGER'})).toBe(type);
- expect(resolve_app_type({APP_TYPE:'ADMIN'})).toBe(type);
+ expect(resolve_app_type({APP_TYPE:'ADMIN'})).toBe('ADMIN');
  }finally{global.localStorage=old;}
 });
 it('retains the single-app-type vocabulary used by domain administration',()=>{expect(saveAppTypeValue({value:'pos'})).toBe('POS');expect(saveAppTypeValue('MANAGER')).toBe('MANAGER');});

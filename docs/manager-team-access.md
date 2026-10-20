@@ -17,6 +17,10 @@ O comando Android inclui a preparação dos módulos e a compatibilidade nativa 
 
 `web:manager`, `web:manager-preview`, `export:manager` e `android:manager` continuam como atalhos compatíveis. O time não precisa escolher entre esses atalhos para obter o visual novo.
 
+## Portais administrativos
+
+`dev.controleonline.com`, `staging.controleonline.com` e o domínio ADMIN entram no ADMIN e mantêm o seletor de apps. Ao selecionar MANAGER, o visual novo é usado. A seleção explícita é persistida separadamente do tipo informado pela empresa, para o bootstrap não sobrescrevê-la. Na primeira carga desta correção, o portal volta ao ADMIN. O tipo por domínio/empresa continua disponível nos demais aplicativos.
+
 ## Contingência
 
 - Web anterior: `npm run web:legacy`.
