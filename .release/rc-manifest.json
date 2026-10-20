@@ -1,13 +1,13 @@
 {
   "version": "1.10.75",
-  "rc": 1,
-  "branch": "rc/1.10.75-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.75-rc.2",
   "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
     1117
   ],
   "repositories": {
-    "ControleOnline/app-community": "e2d6ebfb0449c3669c93b497fb9fc348fe2310e0",
+    "ControleOnline/app-community": "440969c2d4a01a3aa4efbb361fe38fdaab14faa8",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -84,20 +84,21 @@
   "integrationOrder": [
     {
       "task": 1117,
-      "source": "e2d6ebfb0449c3669c93b497fb9fc348fe2310e0",
-      "result": "703fad8ee6f2bed225daaedca6089784903a252b"
+      "source": "440969c2d4a01a3aa4efbb361fe38fdaab14faa8",
+      "result": "440969c2d4a01a3aa4efbb361fe38fdaab14faa8"
     }
   ],
   "stagingReset": {
-    "previous": "9f2df45b74e1045a46393e74ac2a6254dcad1689",
-    "contentTree": "d46549728182decc4aa958efd1a128a8c3b947f8",
+    "previous": "981520c0588dda9ea9a3b0be28d57c4b498f4f5f",
+    "contentTree": "8c9d743dc923b83cdb2832278f9c48f44e7a1f96",
     "mode": "reviewed snapshot via protected PR"
   },
   "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
   "compositionNotes": [
     "Task #1117 only over current master. Published exact npm versions; approved Manager modern default in standard Expo, explicit legacy contingency.",
     "Security source review accepted including trusted API image header boundary. No production activation or deployment.",
-    "Known global API CI failures remain disclosed. Android/single-item human review follows staging; local browser remains unavailable."
+    "Known global API CI failures remain disclosed. Android/single-item human review follows staging; local browser remains unavailable.",
+    "Supersedes APP RC1: browser test fixture accepts domain-resolved sample; staging browser job explicitly uses modern. Four targeted helper tests pass. API snapshot remains unchanged."
   ],
   "frozen": true
 }

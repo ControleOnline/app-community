@@ -229,6 +229,8 @@ jobs:
 
   tests:
     name: "3 · Staging browser tests"
+    env:
+      EXPO_PUBLIC_MANAGER_LAYOUT: modern
     needs: [configure, web]
     if: needs.configure.outputs.env == 'staging'
     runs-on: ubuntu-latest
