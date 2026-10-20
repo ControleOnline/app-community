@@ -1,13 +1,13 @@
 {
   "version": "1.10.75",
-  "rc": 4,
-  "branch": "rc/1.10.75-rc.4",
+  "rc": 5,
+  "branch": "rc/1.10.75-rc.5",
   "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
     1117
   ],
   "repositories": {
-    "ControleOnline/app-community": "81b4773dff4a158f7578f5ee5825cb8ded99ae1e",
+    "ControleOnline/app-community": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -90,13 +90,13 @@
   "integrationOrder": [
     {
       "task": 1117,
-      "source": "81b4773dff4a158f7578f5ee5825cb8ded99ae1e",
-      "result": "81b4773dff4a158f7578f5ee5825cb8ded99ae1e"
+      "source": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
+      "result": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8"
     }
   ],
   "stagingReset": {
-    "previous": "30931bd13010256afcdaf501cf3364de23100688",
-    "contentTree": "ee2a95dc8dbd07b0f575ab46b92c87800fd6fe54",
+    "previous": "49642a7e94794b64d538a485d4d6fc0bfe07b4c3",
+    "contentTree": "299e9f7c83c3ca9b67af86eee8d883a467d2c8b1",
     "mode": "reviewed snapshot via protected PR"
   },
   "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
@@ -106,7 +106,8 @@
     "Known global API CI failures remain disclosed. Android/single-item human review follows staging; local browser remains unavailable.",
     "Supersedes APP RC1: browser test fixture accepts domain-resolved sample; staging browser job explicitly uses modern. Four targeted helper tests pass. API snapshot remains unchanged.",
     "RC3 restores dev/staging ADMIN entry and app selector, with manual choice protected from company bootstrap. No local tests per human instruction. Packages/API unchanged.",
-    "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction."
+    "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
+    "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction."
   ],
   "frozen": true
 }
