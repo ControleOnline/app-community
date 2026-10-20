@@ -98,10 +98,10 @@
     },
     {
       "package": "@controleonline/ui-people",
-      "version": "1.0.100",
+      "version": "1.0.101",
       "file": "src/react/pages/People.js",
-      "before": "a7d1f9f5836805c29fb3887bf397f899ede5e8ab328292af541c8156ef31318a",
-      "after": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+      "before": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+      "after": "d9466f73825ef6cb48da2a937e1cdd4226c0159223d96548cfa4fe14b97b4e3b",
       "payload": "manager-people-shared-card.after.js"
     },
     {

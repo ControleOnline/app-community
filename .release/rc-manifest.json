@@ -1,7 +1,7 @@
 {
   "version": "1.10.75",
-  "rc": 6,
-  "branch": "rc/1.10.75-rc.6",
+  "rc": 7,
+  "branch": "rc/1.10.75-rc.7",
   "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
     1117,
@@ -120,7 +120,8 @@
     "RC3 restores dev/staging ADMIN entry and app selector, with manual choice protected from company bootstrap. No local tests per human instruction. Packages/API unchanged.",
     "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
     "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction.",
-    "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged."
+    "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged.",
+    "RC7 fixes the RC6 staging deploy: the Manager audit overlay pinned ui-people 1.0.100, so patches/manager-audit-fixes.json and its People.js payload now target ui-people 1.0.101 (payload = published 1.0.101 file, sha256 d9466f73...). No other change."
   ],
   "frozen": true
 }
