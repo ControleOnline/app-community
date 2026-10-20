@@ -6,6 +6,10 @@ inputs:
     description: "Deprecated — operational type comes from people_domain.app_type at runtime."
     required: false
     default: ""
+  zoom:
+    description: "Optional presentation scale; defaults to existing environment sample."
+    required: false
+    default: ""
   api_entrypoint:
     required: true
   socket:
@@ -43,9 +47,11 @@ runs:
 
     - name: Creating Config
       shell: bash
+      env:
+        BUILD_ZOOM: ${{ inputs.zoom }}
       run: |
         set -e
-        ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+        ZOOM=$(node -p "process.env.BUILD_ZOOM || require('./config/env.local.sample').env.ZOOM || 100")
         MANAGER_APP=$(node -p "require('./config/env.local.sample').env.MANAGER_APP ?? ''")
         DOMAIN_LINE=""
         MANAGER_APP_LINE=""
