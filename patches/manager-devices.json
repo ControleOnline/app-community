@@ -18,7 +18,7 @@
     {
       "file": "src/react/pages/Devices/deviceTypes/DeviceGroupCard.js",
       "before": "d0d1c6cadc1bb7a34501614c17e84bc529ec888333b5b8f60841c36e217239db",
-      "after": "4d309d97f33082d1eb290a0429e8de138f8c6f338707655b17ac75348b71b8f6",
+      "after": "488c14887b0ffa87acce34713de30389591c8eb8e4689ff5b79a938832a4afdf",
       "payload": "manager-devices-2.after.js"
     }
   ]

@@ -96,7 +96,7 @@ runs:
       shell: bash
       env:
         APP_ENV: production
-      run: npx expo export --platform web
+      run: npm run manager:prepare && npx expo export --platform web
 
     - name: Guard remote_dir (no tilde)
       if: ${{ inputs.skip_ftp != 'true' }}

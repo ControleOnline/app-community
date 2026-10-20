@@ -155,6 +155,8 @@ runs:
         set -euo pipefail
         # Preserve the reviewed lock; never repair dependency versions in CI.
         npm install --legacy-peer-deps --no-package-lock --no-audit --no-fund
+        npm run manager:prepare
+        node scripts/apply-native-screens-patch.cjs
         node -e "require('./node_modules/expo/package.json')"
         APP_ENV=production node scripts/validate-module-contract.cjs --mode=production
 

@@ -180,7 +180,7 @@ jobs:
       # O ADMIN tem build próprio (APP_TYPE ADMIN), mais abaixo, em ./dist-admin/.
       - name: Build (MANAGER)
         if: ${{ steps.targets.outputs.deploy_app == 'true' || steps.targets.outputs.deploy_shop == 'true' }}
-        run: npx expo export --platform web
+        run: npm run manager:prepare && npx expo export --platform web
 
 
       # =======================================================================
@@ -275,7 +275,7 @@ jobs:
 
       - name: Build (ADMIN)
         if: ${{ steps.targets.outputs.deploy_admin == 'true' }}
-        run: npx expo export --platform web --output-dir dist-admin
+        run: npm run manager:prepare && npx expo export --platform web --output-dir dist-admin
 
 
       - name: Deploy via FTP -> ADMIN

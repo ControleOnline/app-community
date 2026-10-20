@@ -10,15 +10,15 @@
   {
     "repository": "ControleOnline/api-platform-people",
     "branch": "task-1117",
-    "head": "73b279e77ea7140d189677bdfbe1ee41edb48a9b",
+    "head": "26ccd2bb8283938cf77fa58a6be7cb7a2afff968",
     "master": "173c066852c3153c435e6f5333a0b4547e07eb4c",
-    "includesMaster": false,
+    "includesMaster": true,
     "remotePublished": false
   },
   {
     "repository": "ControleOnline/ui-common",
     "branch": "task-1117",
-    "head": "145a6e9ceebbe7167be692c185864b77026930d3",
+    "head": "07e37064b30bcde08cb4fb1724f8b95dbfd85c3e",
     "master": "ed2898e5d8181de6236aca398c804373f00372fc",
     "includesMaster": true,
     "remotePublished": false

@@ -40,3 +40,11 @@ O tema Lavego fornece listItemEvenRow, usado pelo DefaultTable. O adaptador Mana
 As execuções anteriores registraram 301 testes Manager, 138 compartilhados + 2 Node, 18 de rodapé, 10 de people e 10 do contrato single-item; as telas foram conferidas na web e AVD conforme o relatório de integração. Nenhuma suíte foi repetida nesta preparação por solicitação humana. As alterações finais de ativação/mapeamento não receberam novo build ou execução de testes nesta rodada. A auditoria API ainda distingue 66 falhas preexistentes; não declarar a suíte global aprovada.
 
 Inventários: manager-module-source-consolidation-20261020.json e manager-api-source-consolidation-20261020.json em docs/inventory. Pacote AVD é localpreview/x86/Debug, não distribuição Android oficial. Não houve deploy nesta preparação.
+
+## Fechamento da preparação em 20/10/2026
+
+63 arquivos de UI foram consolidados em dez módulos fonte, e 11 arquivos PHP nos dois módulos de API; todos têm commits locais task-1117 e incluem seus origin/master confirmados nesta rodada. O app incorporou a master a22cf68a por merge, preservando a composição aprovada. API-community está em task-1117; config/reference.php gerado e .env.dev local foram preservados fora dos commits. Nenhuma migração foi executada. O master atual de api-platform-people foi incorporado somente na cópia de fontes; a API em execução continua com seu pacote instalado e não foi atualizada por essa operação.
+
+Os workflows web/Android aplicam manager:prepare antes de compilar. Payloads têm atributos Git -text para preservar os checksums na clonagem. Alguns arquivos históricos .patch preservam espaços de contexto e não devem ser apresentados como falha do código executável.
+
+**Falta para acesso do time e promoção:** publicar as branches task-1117 dos módulos/app/API, integrar e disponibilizar as novas versões oficiais das dependências, atualizar os pins e encaminhar os SHAs ao fluxo Manager/Security → dev → staging → revisão humana. Isso não foi confundido com deploy em produção. A variável MANAGER_LAYOUT permanece sem alteração remota; sua ativação modern precisa acompanhar o alvo Manager aprovado.
