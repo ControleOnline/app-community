@@ -29,10 +29,10 @@ const renderNav = appearance => {
   return {tree, navigation};
 };
 
-it('leaves default styles untouched when the home appearance is absent', () => {
+it('retains explicit legacy styling for consumers that request it', () => {
   const legacy = {dock: {borderTopLeftRadius: 24}};
   expect(softenStyles(legacy, mockColors)).toBe(legacy);
-  const {tree} = renderNav();
+  const {tree} = renderNav('legacy');
   expect(tree.root.findByProps({testID: 'bottom-navigation'}).props.style.borderTopLeftRadius).toBe(24);
   expect(tree.root.findByType('Footer').props.colors.footerText).toBe('#000000');
   act(() => tree.unmount());
@@ -53,5 +53,28 @@ it('uses flat separators and soft selection while preserving navigation and rest
   expect(footer.colors.footerText).toBe(mockColors.footerText);
   expect(footer.device.id).toBe(7);
   expect(tree.root.findByProps({testID: 'bottom-navigation-footer-slot'}).props.style[1].borderTopWidth).toBe(1);
+  act(() => tree.unmount());
+});
+
+it('uses the same compact modern default off the homepage without shrinking touch targets', () => {
+  const {tree} = renderNav();
+  const flatten = value => Object.assign({}, ...(Array.isArray(value) ? value.flat(Infinity) : [value]));
+  const dock = flatten(tree.root.findByProps({testID: 'bottom-navigation'}).props.style);
+  expect(dock.borderTopLeftRadius).toBe(0);
+  const item = flatten(tree.root.findAllByType('Pressable')[0].props.style({pressed: false}));
+  expect(item.minHeight).toBeGreaterThanOrEqual(44);
+  expect(item.minHeight).toBeLessThan(54);
+  act(() => tree.unmount());
+});
+
+it('does not select Home on an unrelated screen and can occupy normal layout flow', () => {
+  let tree; act(() => {tree = renderer.create(<Navigation navigation={{navigate: jest.fn()}}
+    placement="inline" activeRouteName="PdvPage" colors={mockColors}
+    items={[{route: 'HomePage', label: 'Início', icon: 'home'}]} />);});
+  const button = tree.root.findByType('Pressable');
+  expect(button.props.accessibilityState?.selected).toBe(false);
+  const host = tree.root.findAllByType('View')[0];
+  const style = Object.assign({}, ...[host.props.style].flat(Infinity));
+  expect(style.position).toBe('relative');
   act(() => tree.unmount());
 });

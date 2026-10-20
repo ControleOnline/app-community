@@ -33,6 +33,10 @@ permissions:
   contents: write
   actions: write
 
+# Explicit rollout switch. Keep legacy until the team approves activation.
+env:
+  EXPO_PUBLIC_MANAGER_LAYOUT: ${{ vars.MANAGER_LAYOUT || 'legacy' }}
+
 jobs:
   configure:
     name: "1 · Configure"
@@ -160,6 +164,8 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   web:
+    env:
+      EXPO_PUBLIC_MANAGER_LAYOUT: ${{ needs.configure.outputs.env == 'master' && (vars.MANAGER_LAYOUT || 'legacy') || 'modern' }}
     name: "2 · Web ${{ matrix.ftp_product }} (${{ needs.configure.outputs.env }})"
     needs: [configure, production-gate]
     runs-on: ubuntu-latest

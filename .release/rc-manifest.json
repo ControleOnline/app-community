@@ -1,46 +1,25 @@
 {
-  "version": "1.10.62",
-  "rc": 2,
-  "branch": "rc/1.10.62-rc.2",
-  "baseMaster": "ab30550f4101090a424acc3c2925bfe55ae3a0de",
+  "version": "1.10.72",
+  "rc": 1,
+  "branch": "rc/1.10.72-rc.1",
+  "baseMaster": "66e210fcc74b9f3621bbd6bec4e9c2ef8e6d45b5",
   "tasks": [
-    1056
+    1100
   ],
   "repositories": {
-    "ControleOnline/app-community": "a1e8e5e5a05c3da6b07f2892be17c6df11d2e9dc",
-    "ControleOnline/ui-common": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
-    "ControleOnline/ui-layout": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
-    "ControleOnline/ui-manager": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
-    "ControleOnline/ui-shop": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2"
+    "ControleOnline/app-community": "e35a66409547fe3723c7bbbcf9f3e5a843e53dde",
+    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
   },
   "packages": {
-    "ui-common": {
-      "version": "1.2.97",
-      "gitHead": "e2a4836a861ec863cea23ad812fe84a7b6f8bdcb",
-      "integrity": "sha512-59sutHSD6sku7Tb2Uno7apSB63mtPt4TRONTcu9HCOvNb2l/VVoHOFccVkmY/LJW/4CqDXLFocCyVQcjbMe4AQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.97.tgz"
-    },
-    "ui-layout": {
-      "version": "1.0.19",
-      "gitHead": "dc1e0e2e67a7d502aeb565d4ee989ca576082943",
-      "integrity": "sha512-/Vu3YT/gp/YTVZKdcLCbIJ2KBXOFzLmYsW9kogHdc6aAWcS8CnFvqJT8OqIgFbutzSkZPLrZaSMZwmZ72i2+xQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.19.tgz"
-    },
-    "ui-manager": {
-      "version": "1.0.20",
-      "gitHead": "36ee8edc0c13431dfc01ccf3aecfceb4b904c30b",
-      "integrity": "sha512-sO6oitBjU4ryaGis6/+GLx2W9DJoo6LQB8q2o9I6rW+uA832T76Oz09npxDKEacAGMnD3VhaAnHBbTO4snQVsA==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-manager/-/ui-manager-1.0.20.tgz"
-    },
-    "ui-shop": {
-      "version": "1.0.19",
-      "gitHead": "4b315f1d7a84e03da79681ff39ca95cacd83d4e2",
-      "integrity": "sha512-R3GTRyXLimKQ/MR2MYCc3/Vcbn0wvUOLAfzi2LrkV/iFkpG9TXEi7p0GDR5H7lYdD3Gclljpkkb6pDeFPUfgiw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-shop/-/ui-shop-1.0.19.tgz"
+    "ui-products": {
+      "version": "1.0.37",
+      "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+      "integrity": "sha512-VzYtR9uR1zvhKr7q/4IezDySunbejWIBxDd4julRTgW77KG2eCTVcUlb+K9I6u1J1jjnkI6xRa8k+TIccJmIuQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.37.tgz"
     }
   },
   "compositionNotes": [
-    "Pipeline-only correction: changesNotSentForReview enabled only for SERVICE. Existing version, package pins, signed artifact, track and product layout preserved. Source reviewed by Security; exact failed upload recovered successfully in run 38619947062. No new production build requested."
+    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product. Supersedes rc/1.10.70-rc.1 (rebased on master 1.10.71)."
   ],
   "frozen": true
 }
