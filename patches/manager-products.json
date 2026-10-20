@@ -1,0 +1,18 @@
+{
+  "package": "@controleonline/ui-products",
+  "version": "1.0.37",
+  "files": [
+    {
+      "file": "src/react/components/products/ProductItem.js",
+      "before": "253ea3f9c3934bfe1d24f5c46dbeaacf554c52b0fc5c3d67b322e6efe4a1b742",
+      "after": "f69381781744043026f381495310f1d5a5e46d868ec0e5c5c4f6547e8a5f9be3",
+      "payload": "manager-product-item.after.js"
+    },
+    {
+      "file": "src/react/pages/CustomizeScreen.js",
+      "before": "b6a02a7aee6506d2df5c408c0777a539777b387e8f965400002dbfa7f81a1afc",
+      "after": "b06b87e0e63262b302b01fc4c2bbb4f5de69baa3e3017521d23e1a1cafc0c415",
+      "payload": "manager-customization-cache.after.js"
+    }
+  ]
+}

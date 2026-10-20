@@ -1,0 +1,28 @@
+{
+  "files": [
+    {
+      "package": "@controleonline/ui-financial",
+      "version": "1.1.42",
+      "file": "src/react/pages/reports/IncomeStatement.js",
+      "before": "31b2e04db6805d7b9d63e66c5d2380fad78546d5a86b148f3b3d6cb0f3d5aa27",
+      "after": "76c6b73601044fc58bd576cc9fa0d4b95ee6c62ec4b687531a2a787b98c6e24a",
+      "payload": "manager-results-0.after.js"
+    },
+    {
+      "package": "@controleonline/ui-default",
+      "version": "1.0.280",
+      "file": "src/react/components/inputs/DefaultInput.js",
+      "before": "54d9578bd6acf49efc8dcbfd4102e2d5ff4526a7b0babac614d142919731adb9",
+      "after": "c71e03aabd9492564bf6bf15dd8ede3d5710fe6bb0868184c138b8a2b13205e4",
+      "payload": "manager-results-1.after.js"
+    },
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.98",
+      "file": "src/react/components/AnimatedModal.js",
+      "before": "7c98140b39ce2aaecf2c195b914f45c4ba6d34cf6c63095bd83a360430ae03e2",
+      "after": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",
+      "payload": "manager-results-modal.after.js"
+    }
+  ]
+}

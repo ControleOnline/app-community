@@ -1,0 +1,8 @@
+{
+  "package": "@controleonline/ui-default",
+  "version": "1.0.280",
+  "file": "src/react/components/table/useDefaultTablePagination.js",
+  "before": "6d51deb1c51deb976875fb1c53299bdf03fe64b3687edb8c5af264ede8c517f9",
+  "after": "698fc6aec0cdf66e6fda57c227bbea321f2b14de292e8c7548ad2e339977e43f",
+  "payload": "ui-default-read-ownership.after.js"
+}

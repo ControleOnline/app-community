@@ -1,39 +1,25 @@
 {
-  "version": "1.10.68",
-  "rc": 2,
-  "branch": "rc/1.10.68-rc.2",
-  "baseMaster": "481094e393c583519c3385bd22b953612e792224",
+  "version": "1.10.72",
+  "rc": 1,
+  "branch": "rc/1.10.72-rc.1",
+  "baseMaster": "66e210fcc74b9f3621bbd6bec4e9c2ef8e6d45b5",
   "tasks": [
-    1092
+    1100
   ],
   "repositories": {
-    "ControleOnline/app-community": "7dd8949780ef9c3bab7d63f95856d5a11dcc61a8",
-    "ControleOnline/ui-default": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
-    "ControleOnline/ui-orders": "0ab910830a13b57a721cd8791292dc48a95dde58",
-    "ControleOnline/ui-financial": "67c9d125506fe71b18dfd2469f9d5c864794cf87"
+    "ControleOnline/app-community": "e35a66409547fe3723c7bbbcf9f3e5a843e53dde",
+    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
   },
   "packages": {
-    "ui-default": {
-      "version": "1.0.280",
-      "gitHead": "9c1afbc32ae29f1a75dca67d01f85e90ea7d66ee",
-      "integrity": "sha512-SNEoP3e9prHXNQQweJVFZ4lLAlGgyTOMxOc1sxerXygWiRK7CTgETEguK4up72JiJQFBCwzpt/dnRC5fgfGA5A==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.280.tgz"
-    },
-    "ui-orders": {
-      "version": "1.3.47",
-      "gitHead": "0ab910830a13b57a721cd8791292dc48a95dde58",
-      "integrity": "sha512-b/ZXsivufgjfJmySmtYyyqHnOHRqRQiiCxJnFo763FSKeQB6Y6JicUR2sFe+bTXeOsXCZ5si//5Pd+r6KhDK4A==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.47.tgz"
-    },
-    "ui-financial": {
-      "version": "1.1.42",
-      "gitHead": "67c9d125506fe71b18dfd2469f9d5c864794cf87",
-      "integrity": "sha512-M0f1WKaZ4aDYFCw34lBlaJKUHRgL13FZnf6XYi4VZ0kc4XJw57IS1EDuOAtSRPT1NTheO9G0NMCbLxS1d5XCkg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-financial/-/ui-financial-1.1.42.tgz"
+    "ui-products": {
+      "version": "1.0.37",
+      "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11",
+      "integrity": "sha512-VzYtR9uR1zvhKr7q/4IezDySunbejWIBxDd4julRTgW77KG2eCTVcUlb+K9I6u1J1jjnkI6xRa8k+TIccJmIuQ==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.37.tgz"
     }
   },
   "compositionNotes": [
-    "Task 1092: DefaultTable compact default (Financial Hub + Order History) and Order History status filter fix (ui-orders 1.3.47). Supersedes rc.1."
+    "Task 1100: ui-products 1.0.36 -> 1.0.37 fixes blank screen on Products > New product. Supersedes rc/1.10.70-rc.1 (rebased on master 1.10.71)."
   ],
   "frozen": true
 }

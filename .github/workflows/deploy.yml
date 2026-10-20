@@ -33,6 +33,10 @@ permissions:
   contents: write
   actions: write
 
+# Explicit rollout switch. Keep legacy until the team approves activation.
+env:
+  EXPO_PUBLIC_MANAGER_LAYOUT: ${{ vars.MANAGER_LAYOUT || 'legacy' }}
+
 jobs:
   configure:
     name: "1 · Configure"
