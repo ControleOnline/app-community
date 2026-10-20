@@ -1,12 +1,13 @@
 # =============================================================================
-# Deploy web Lave-Go (APP / POS / SHOP) via FTP
+# Deploy web Lave-Go (APP / ADMIN / SHOP) via FTP
 # -----------------------------------------------------------------------------
 # COMO DISPARA E O QUE PUBLICA
-#   Push no master ............ POS e SHOP   (nunca o APP), SOMENTE se a
+#   Push no master ............ ADMIN e SHOP (nunca o APP), SOMENTE se a
 #                               variável do repositório WEB_AUTO_DEPLOY = true
-#   Manual, sem parâmetro ..... POS e SHOP
+#   Manual, sem parâmetro ..... ADMIN e SHOP
 #   Manual, target=APP ........ somente APP
-#   Manual, target=ALL ........ APP, POS e SHOP
+#   Manual, target=ADMIN ...... somente ADMIN
+#   Manual, target=ALL ........ APP, ADMIN e SHOP
 #
 # SEGURANÇA DO PUSH
 #   Enquanto a variável WEB_AUTO_DEPLOY não existir (ou for diferente de "true"),
@@ -16,9 +17,10 @@
 #   Para desligar, apague a variável ou troque o valor.
 #
 # Manual pelo terminal:
-#   gh workflow run web-deploy-production-app-lavego.yml                 # POS+SHOP
-#   gh workflow run web-deploy-production-app-lavego.yml -f target=APP   # só APP
-#   gh workflow run web-deploy-production-app-lavego.yml -f target=ALL   # todos
+#   gh workflow run web-deploy-production-app-lavego.yml                   # ADMIN+SHOP
+#   gh workflow run web-deploy-production-app-lavego.yml -f target=APP     # só APP
+#   gh workflow run web-deploy-production-app-lavego.yml -f target=ADMIN   # só ADMIN
+#   gh workflow run web-deploy-production-app-lavego.yml -f target=ALL     # todos
 # =============================================================================
 name: Deploy Project app.lave-go.com
 
@@ -34,11 +36,15 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "Destino (padrão: POS+SHOP). APP e ALL só quando indicados."
+        description: "Destino (padrão: ADMIN+SHOP). APP e ALL só quando indicados."
         type: choice
-        options: [POS+SHOP, APP, ALL]
-        default: POS+SHOP     # usado quando você não passa -f
+        options: [ADMIN+SHOP, APP, ADMIN, ALL]
+        default: ADMIN+SHOP     # usado quando você não passa -f
 
+
+# Explicit rollout switch. Keep legacy until the team approves activation.
+env:
+  EXPO_PUBLIC_MANAGER_LAYOUT: ${{ vars.MANAGER_LAYOUT || 'legacy' }}
 
 jobs:
   build:
@@ -55,7 +61,7 @@ jobs:
       # -----------------------------------------------------------------------
       # PASSO 1 - Decide o que vai subir.
       # Lê o tipo de evento (push ou manual) e o parâmetro `target`, e grava
-      # três flags (deploy_app / deploy_pos / deploy_shop) que os passos de FTP
+      # três flags (deploy_app / deploy_admin / deploy_shop) que os passos de FTP
       # consultam mais abaixo. Assim a regra fica em um único lugar.
       # Também escreve a tabela "Plano de publicação" no resumo da execução.
       # -----------------------------------------------------------------------
@@ -65,26 +71,27 @@ jobs:
           set -e
           EVENT="${{ github.event_name }}"      # "push" ou "workflow_dispatch"
           TARGET="${{ inputs.target }}"         # vazio quando o evento é push
-          DEPLOY_APP=false; DEPLOY_POS=false; DEPLOY_SHOP=false
+          DEPLOY_APP=false; DEPLOY_ADMIN=false; DEPLOY_SHOP=false
 
 
           if [ "$EVENT" = "push" ]; then
-            # Push: só POS e SHOP. O APP NUNCA sobe automaticamente,
+            # Push: só ADMIN e SHOP. O APP NUNCA sobe automaticamente,
             # pois deploy_app só vira true no ramo manual abaixo.
-            DEPLOY_POS=true; DEPLOY_SHOP=true
+            DEPLOY_ADMIN=true; DEPLOY_SHOP=true
           else
             # Execução manual: depende do parâmetro.
             case "$TARGET" in
-              APP)  DEPLOY_APP=true ;;                                    # só APP
-              ALL)  DEPLOY_APP=true; DEPLOY_POS=true; DEPLOY_SHOP=true ;; # todos
-              *)    DEPLOY_POS=true; DEPLOY_SHOP=true ;;                  # padrão: POS+SHOP
+              APP)   DEPLOY_APP=true ;;                                      # só APP
+              ADMIN) DEPLOY_ADMIN=true ;;                                    # só ADMIN
+              ALL)   DEPLOY_APP=true; DEPLOY_ADMIN=true; DEPLOY_SHOP=true ;; # todos
+              *)     DEPLOY_ADMIN=true; DEPLOY_SHOP=true ;;                  # padrão: ADMIN+SHOP
             esac
           fi
 
 
           # Publica as flags para os próximos passos.
           echo "deploy_app=$DEPLOY_APP"   >> "$GITHUB_OUTPUT"
-          echo "deploy_pos=$DEPLOY_POS"   >> "$GITHUB_OUTPUT"
+          echo "deploy_admin=$DEPLOY_ADMIN" >> "$GITHUB_OUTPUT"
           echo "deploy_shop=$DEPLOY_SHOP" >> "$GITHUB_OUTPUT"
 
 
@@ -97,13 +104,13 @@ jobs:
             echo "| Destino | Vai publicar? |"
             echo "|---|---|"
             echo "| APP  | $DEPLOY_APP |"
-            echo "| POS  | $DEPLOY_POS |"
+            echo "| ADMIN | $DEPLOY_ADMIN |"
             echo "| SHOP | $DEPLOY_SHOP |"
           } >> "$GITHUB_STEP_SUMMARY"
 
 
           # Anotação em destaque no topo da execução.
-          echo "::notice title=Plano de publicação::APP=$DEPLOY_APP POS=$DEPLOY_POS SHOP=$DEPLOY_SHOP"
+          echo "::notice title=Plano de publicação::APP=$DEPLOY_APP ADMIN=$DEPLOY_ADMIN SHOP=$DEPLOY_SHOP"
 
 
       # PASSO 2 - Baixa o código do repositório na máquina do GitHub.
@@ -122,7 +129,8 @@ jobs:
       # ambiente). A linha ZOOM=$(...) é herdada do arquivo original e não é
       # usada depois (o valor real está fixo em ZOOM: 100 abaixo).
       # -----------------------------------------------------------------------
-      - name: Creating Config
+      - name: Creating Config (MANAGER)
+        if: ${{ steps.targets.outputs.deploy_app == 'true' || steps.targets.outputs.deploy_shop == 'true' }}
         run: |
           set -e
           ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
@@ -166,10 +174,12 @@ jobs:
         run: node scripts/configure-assets.js MANAGER
 
 
-      # PASSO 9 - Gera o site estático na pasta ./dist/. O build roda UMA vez
-      # e o mesmo conteúdo é enviado a todos os destinos escolhidos.
-      - name: Build
-        run: npx expo export --platform web
+      # PASSO 9 - Gera o site estático MANAGER na pasta ./dist/ (APP e SHOP).
+      # O build roda UMA vez e o mesmo conteúdo é enviado a APP e SHOP.
+      # O ADMIN tem build próprio (APP_TYPE ADMIN), mais abaixo, em ./dist-admin/.
+      - name: Build (MANAGER)
+        if: ${{ steps.targets.outputs.deploy_app == 'true' || steps.targets.outputs.deploy_shop == 'true' }}
+        run: npm run manager:prepare && npx expo export --platform web
 
 
       # =======================================================================
@@ -195,10 +205,10 @@ jobs:
           local-dir: ./dist/        # o que sobe
           server-dir: /             # destino no servidor FTP
           log-level: standard       # lista no log os arquivos enviados
-          exclude: |                # nunca envia arquivos de git ou node_modules
+          exclude: |                # nunca envia arquivos de git (node_modules liberado: ver #1101)
             **/.git*
             **/.git*/**
-            **/node_modules/**
+          # **/node_modules/** desativado: excluiria dist/assets/node_modules (fontes .ttf dos icones). Ver #1101
 
 
       - name: Confirm upload -> APP
@@ -206,33 +216,6 @@ jobs:
         run: |
           echo "::notice title=FTP APP::UPLOAD CONCLUÍDO para APP (commit ${GITHUB_SHA::7})"
           echo "- APP: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
-
-
-      # ----- POS: push (com guarda ligada), manual padrão, ou target=ALL -----
-      - name: Deploy via FTP -> POS
-        if: ${{ steps.targets.outputs.deploy_pos == 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTPHOST_POSLAVEGO }}
-          username: ${{ secrets.FTPUSER_POSLAVEGO }}
-          password: ${{ secrets.FTPPASS_POSLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ./dist/
-          server-dir: /
-          log-level: standard
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-
-
-      - name: Confirm upload -> POS
-        if: ${{ steps.targets.outputs.deploy_pos == 'true' }}
-        run: |
-          echo "::notice title=FTP POS::UPLOAD CONCLUÍDO para POS (commit ${GITHUB_SHA::7})"
-          echo "- POS: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
 
 
       # ----- SHOP: push (com guarda ligada), manual padrão, ou target=ALL ----
@@ -252,7 +235,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
-            **/node_modules/**
+          # **/node_modules/** desativado: excluiria dist/assets/node_modules (fontes .ttf dos icones). Ver #1101
 
 
       - name: Confirm upload -> SHOP
@@ -260,3 +243,61 @@ jobs:
         run: |
           echo "::notice title=FTP SHOP::UPLOAD CONCLUÍDO para SHOP (commit ${GITHUB_SHA::7})"
           echo "- SHOP: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
+
+
+      # ----- ADMIN: push (com guarda ligada), manual padrão, target=ADMIN ou ALL
+      # O ADMIN usa APP_TYPE ADMIN, então regera o config e faz build próprio
+      # (saída em ./dist-admin/) sem afetar o ./dist/ de APP e SHOP.
+      - name: Creating Config (ADMIN)
+        if: ${{ steps.targets.outputs.deploy_admin == 'true' }}
+        run: |
+          set -e
+          ZOOM=$(node -p "require('./config/env.local.sample').env.ZOOM ?? 100")
+          cat > ./config/env.local.js << ENVEOF
+          const env = {
+            API_ENTRYPOINT: 'https://apinew.lave-go.com',
+            SOCKET: 'wss://apinew.lave-go.com',
+            APP_TYPE: 'ADMIN',
+            ZOOM: 100,
+            NEW_RELIC: {
+              LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
+              APPLICATION_ID: process.env.NEW_RELIC_APPLICATION_ID || '',
+              ACCOUNT_ID: process.env.NEW_RELIC_ACCOUNT_ID || '',
+              TRUST_KEY: process.env.NEW_RELIC_TRUST_KEY || '',
+              BEACON: process.env.NEW_RELIC_BEACON || '',
+              ERROR_BEACON: process.env.NEW_RELIC_ERROR_BEACON || ''
+            }
+          };
+          module.exports = { env };
+          ENVEOF
+
+
+      - name: Build (ADMIN)
+        if: ${{ steps.targets.outputs.deploy_admin == 'true' }}
+        run: npm run manager:prepare && npx expo export --platform web --output-dir dist-admin
+
+
+      - name: Deploy via FTP -> ADMIN
+        if: ${{ steps.targets.outputs.deploy_admin == 'true' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTPHOST_ADMINLAVEGO }}
+          username: ${{ secrets.FTPUSER_ADMINLAVEGO }}
+          password: ${{ secrets.FTPPASS_ADMINLAVEGO }}
+          protocol: ftps
+          port: 21
+          security: loose
+          local-dir: ./dist-admin/
+          server-dir: /
+          log-level: standard
+          exclude: |
+            **/.git*
+            **/.git*/**
+          # **/node_modules/** desativado: excluiria dist-admin/assets/node_modules (fontes .ttf dos icones). Ver #1101
+
+
+      - name: Confirm upload -> ADMIN
+        if: ${{ steps.targets.outputs.deploy_admin == 'true' }}
+        run: |
+          echo "::notice title=FTP ADMIN::UPLOAD CONCLUÍDO para ADMIN (commit ${GITHUB_SHA::7})"
+          echo "- ADMIN: upload concluído (commit \`${GITHUB_SHA::7}\`)" >> "$GITHUB_STEP_SUMMARY"
