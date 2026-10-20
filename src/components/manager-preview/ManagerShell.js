@@ -52,6 +52,7 @@ export default function ManagerShell({navigation, route, children}) {
   const accountAction = action => () => {closeAccount(); action();};
   const avatar = size => <HomeAvatar imageUrl={resolveHomeAvatar(user, currentCompany)} name={getAvatarDisplayName(user)} size={size} backgroundColor={c.cardIconBackground} borderColor={c.cardBorder} textColor={c.textPrimary} />;
   const [open, setOpen] = useState(false);
+  const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
   const compact = !mobile && (width <= 1060 || collapsed);
@@ -78,7 +79,15 @@ export default function ManagerShell({navigation, route, children}) {
     experience.setCapabilities(items.map(item => item.name));
     experience.present(route.name);
   }, [focused, route.name, menus, experience, currentCompany?.id, user?.id]);
-  const go = item => { setOpen(false); experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params); };
+  const go = item => {
+    setOpen(false);
+    experience?.begin(item.name, 'click');
+    // Reselecting the focused PDV does not trigger a navigation focus event.
+    const params = item.name === 'PdvPage'
+      ? {...item.params, catalogResetKey: `menu:${Date.now()}:${++catalogEntrySequence.current}`}
+      : item.params;
+    navigation.navigate(item.name, params);
+  };
   const icon = (value, size = 18, color = c.navigationIcon) => <HomeIcon name={value || 'grid'} size={size} color={color} />;
   const navItem = (item, key) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';

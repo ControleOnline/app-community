@@ -1,7 +1,7 @@
 {
   "version": "1.10.75",
-  "rc": 7,
-  "branch": "rc/1.10.75-rc.7",
+  "rc": 9,
+  "branch": "rc/1.10.75-rc.9",
   "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
     1117,
@@ -9,16 +9,16 @@
     1124
   ],
   "repositories": {
-    "ControleOnline/app-community": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
+    "ControleOnline/app-community": "ff11e13c9fefcd644c7bc97af0ce57a8ca839d0e",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
     "ControleOnline/ui-financial": "66b994049db2835361c01e41a649957c41f7f30f",
     "ControleOnline/ui-layout": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
     "ControleOnline/ui-login": "89cdd37d8a1586fb303e9710d36912a73a218752",
-    "ControleOnline/ui-orders": "df903208c3d23a5a9b7b50afbe9da032e1143888",
+    "ControleOnline/ui-orders": "cc5261988c54118fe0345172d9becfb4850f8c0c",
     "ControleOnline/ui-people": "ac6be7d105f8b3e7caae54febeddcaf00012e045",
-    "ControleOnline/ui-products": "bf40a463eb8d6840a18921ea55c49c931d27708d",
+    "ControleOnline/ui-products": "c6e56eda27fbde8e9da0bd1ec691708319192b39",
     "ControleOnline/ui-translate": "7091c30b458e21cacdbf88505c97b9669778c805",
     "ControleOnline/ui-customers": "506019353f226a1e98c51c805a8f90db96f20d2f"
   },
@@ -92,8 +92,8 @@
   "integrationOrder": [
     {
       "task": 1117,
-      "source": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8",
-      "result": "ac13afb1c01c5c5172a072cfffb45ddc59f3c5c8"
+      "source": "ff11e13c9fefcd644c7bc97af0ce57a8ca839d0e",
+      "result": "86910335bbf803f390830a3b3da01406e1cb98aa"
     },
     {
       "task": 1123,
@@ -107,9 +107,8 @@
     }
   ],
   "stagingReset": {
-    "previous": "49642a7e94794b64d538a485d4d6fc0bfe07b4c3",
-    "contentTree": "299e9f7c83c3ca9b67af86eee8d883a467d2c8b1",
-    "mode": "reviewed snapshot via protected PR"
+    "previous": "5c28cef6fbe1585d4afd5be073a3b81a2ca7465b",
+    "mode": "reviewed snapshot via protected PR; RC ref aligned to resulting staging merge without tree changes"
   },
   "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
   "compositionNotes": [
@@ -121,7 +120,16 @@
     "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
     "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction.",
     "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged.",
-    "RC7 fixes the RC6 staging deploy: the Manager audit overlay pinned ui-people 1.0.100, so patches/manager-audit-fixes.json and its People.js payload now target ui-people 1.0.101 (payload = published 1.0.101 file, sha256 d9466f73...). No other change."
+    "RC7 fixes the RC6 staging deploy: the Manager audit overlay pinned ui-people 1.0.100, so patches/manager-audit-fixes.json and its People.js payload now target ui-people 1.0.101 (payload = published 1.0.101 file, sha256 d9466f73...). No other change.",
+    "RC9: #1117 unifies shared PDV controls above category/subcategory rows, resets root navigation on menu entry, presents session startup without the legacy flash and reuses the existing scoped image cache. Exact published npm pins retained with version/hash-guarded source overlays. Preserves RC7 ui-people 1.0.101 and matching audit payload for #1123/#1124 byte-for-byte. No API or ERP write/business-rule changes. No local suites by human request. Production excluded. Supersedes unpromoted RC8 after clean dev build exposed four before hashes from pre-publication sources; these now match the published package bytes.",
+    "Protected staging history reconciled before freeze: only rc-manifest.json conflicted, resolved to the reviewed RC9 inventory; all product files match the master-plus-individual-task composition. Previous staging content outside the approved PDV delta preserved."
   ],
-  "frozen": true
+  "frozen": true,
+  "sourceOverlays": {
+    "manifest": "patches/manager-pdv.json",
+    "packagesRemainPublishedExactVersions": true,
+    "ui-products": "c6e56eda27fbde8e9da0bd1ec691708319192b39",
+    "ui-orders": "cc5261988c54118fe0345172d9becfb4850f8c0c",
+    "note": "Seven PDV payloads match canonical source commits; before hashes verified against the exact published package files. Preparation on fresh package files and repeated preparation succeeded."
+  }
 }
