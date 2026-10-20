@@ -121,9 +121,10 @@
     "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction.",
     "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged.",
     "RC7 fixes the RC6 staging deploy: the Manager audit overlay pinned ui-people 1.0.100, so patches/manager-audit-fixes.json and its People.js payload now target ui-people 1.0.101 (payload = published 1.0.101 file, sha256 d9466f73...). No other change.",
-    "RC9: #1117 unifies shared PDV controls above category/subcategory rows, resets root navigation on menu entry, presents session startup without the legacy flash and reuses the existing scoped image cache. Exact published npm pins retained with version/hash-guarded source overlays. Preserves RC7 ui-people 1.0.101 and matching audit payload for #1123/#1124 byte-for-byte. No API or ERP write/business-rule changes. No local suites by human request. Production excluded. Supersedes unpromoted RC8 after clean dev build exposed four before hashes from pre-publication sources; these now match the published package bytes."
+    "RC9: #1117 unifies shared PDV controls above category/subcategory rows, resets root navigation on menu entry, presents session startup without the legacy flash and reuses the existing scoped image cache. Exact published npm pins retained with version/hash-guarded source overlays. Preserves RC7 ui-people 1.0.101 and matching audit payload for #1123/#1124 byte-for-byte. No API or ERP write/business-rule changes. No local suites by human request. Production excluded. Supersedes unpromoted RC8 after clean dev build exposed four before hashes from pre-publication sources; these now match the published package bytes.",
+    "Protected staging history reconciled before freeze: only rc-manifest.json conflicted, resolved to the reviewed RC9 inventory; all product files match the master-plus-individual-task composition. Previous staging content outside the approved PDV delta preserved."
   ],
-  "frozen": false,
+  "frozen": true,
   "sourceOverlays": {
     "manifest": "patches/manager-pdv.json",
     "packagesRemainPublishedExactVersions": true,
