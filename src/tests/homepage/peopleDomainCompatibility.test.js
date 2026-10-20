@@ -7,7 +7,7 @@ it.each(['MANAGER','POS','ADMIN'])('keeps the company payload and stores canonic
  const old=global.localStorage;const values=new Map();global.localStorage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)};
  const company={id:3,appType:type};mockFetch.mockResolvedValue(company);const commit=jest.fn();
  try{expect(await mainCompany({commit})).toBe(company);expect(values.get('app-type')).toBe(type);expect(commit).toHaveBeenCalledWith('SET_MAIN_COMPANY',company);
- expect(resolve_app_type({APP_TYPE:'MANAGER'})).toBe('MANAGER');
+ expect(resolve_app_type({DOMAIN:'https://manager.controleonline.com',APP_TYPE:'MANAGER'})).toBe(type);
  expect(resolve_app_type({APP_TYPE:'ADMIN'})).toBe(type);
  }finally{global.localStorage=old;}
 });
