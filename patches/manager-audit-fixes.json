@@ -34,7 +34,7 @@
     },
     {
       "package": "@controleonline/ui-translate",
-      "version": "1.1.65",
+      "version": "1.1.68",
       "file": "src/react/pages/TranslationsReviewPage.js",
       "before": "384d433f37d49bafa20820cfae096699ebb245efcd6665042e20860960b15d3f",
       "after": "80be784a5606c1d54d555823242abd9133dfc70707e8af17fac797b79da1077b",
@@ -106,7 +106,7 @@
     },
     {
       "package": "@controleonline/ui-translate",
-      "version": "1.1.65",
+      "version": "1.1.68",
       "file": "src/react/pages/TranslationReviewRow.js",
       "before": "7f83a370c0caea17707ed39799d516ccc4291f785b2c0ed5cb83e10abde4359e",
       "after": "e3df370cfac966bc1787529d3e8fc95b6a44a5ab2769d231cb21d9f86a530d86",
