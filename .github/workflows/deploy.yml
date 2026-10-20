@@ -33,6 +33,10 @@ permissions:
   contents: write
   actions: write
 
+# Explicit rollout switch. Keep legacy until the team approves activation.
+env:
+  EXPO_PUBLIC_MANAGER_LAYOUT: ${{ vars.MANAGER_LAYOUT || 'legacy' }}
+
 jobs:
   configure:
     name: "1 · Configure"
@@ -60,7 +64,7 @@ jobs:
               MANAGER_DOMAIN=https://dev.controleonline.com
               FTP=dev
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://dev.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"ftp_product":"admin","app_domain":"https://dev.controleonline.com"}]}'
               ;;
             staging)
               API=https://s.controleonline.com
@@ -69,7 +73,7 @@ jobs:
               MANAGER_DOMAIN=https://staging.controleonline.com
               FTP=staging
               NATIVE=false
-              WEB_MATRIX='{"include":[{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://staging.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"ftp_product":"admin","app_domain":"https://staging.controleonline.com"}]}'
               ;;
             master)
               API=https://api.controleonline.com
@@ -78,7 +82,7 @@ jobs:
               MANAGER_DOMAIN=https://manager.controleonline.com
               FTP=production
               NATIVE=true
-              WEB_MATRIX='{"include":[{"app_type":"MANAGER","ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"app_type":"SHOP","ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"app_type":"MKT","ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
+              WEB_MATRIX='{"include":[{"ftp_product":"manager","app_domain":"https://manager.controleonline.com"},{"ftp_product":"shop","app_domain":"https://shop.controleonline.com"},{"ftp_product":"admin","app_domain":"https://admin.controleonline.com"},{"ftp_product":"mkt","app_domain":"https://mkt.controleonline.com"}]}'
               ;;
             *)
               echo "Ambiente inválido: $ENV (use dev|staging|master)"
@@ -160,7 +164,9 @@ jobs:
           echo "Production deploy allowed ($ALLOW_REASON): $ALLOW_URL"
 
   web:
-    name: "2 · Web ${{ matrix.app_type }} (${{ needs.configure.outputs.env }})"
+    env:
+      EXPO_PUBLIC_MANAGER_LAYOUT: ${{ needs.configure.outputs.env == 'master' && (vars.MANAGER_LAYOUT || 'legacy') || 'modern' }}
+    name: "2 · Web ${{ matrix.ftp_product }} (${{ needs.configure.outputs.env }})"
     needs: [configure, production-gate]
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -208,7 +214,8 @@ jobs:
           fi
       - uses: ./.github/actions/web-export-deploy
         with:
-          app_type: ${{ matrix.app_type }}
+          app_type: ""
+          zoom: ${{ needs.configure.outputs.env != 'master' && '100' || '' }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
@@ -223,6 +230,8 @@ jobs:
 
   tests:
     name: "3 · Staging browser tests"
+    env:
+      EXPO_PUBLIC_MANAGER_LAYOUT: modern
     needs: [configure, web]
     if: needs.configure.outputs.env == 'staging'
     runs-on: ubuntu-latest
@@ -244,7 +253,7 @@ jobs:
         run: npm run test:browser -- all
 
   android:
-    name: "3 · Android ${{ matrix.app_type }}"
+    name: "3 · Android ${{ matrix.app_domain }}"
     needs: [configure, production-gate]
     if: needs.configure.outputs.env == 'master' && needs.configure.outputs.publish_native == 'true'
     runs-on: ubuntu-latest
@@ -252,49 +261,40 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - app_type: CHECKOUT
-            display_name: Checkout
+          - display_name: Checkout
             app_domain: https://checkout.controleonline.com
             track: internal
             release_status: draft
-          - app_type: CRM
-            display_name: CRM
+          - display_name: CRM
             app_domain: https://crm.controleonline.com
             track: internal
             release_status: completed
-          - app_type: DELIVERY
-            display_name: Delivery
+          - display_name: Delivery
             app_domain: https://delivery.controleonline.com
             track: internal
             release_status: draft
-          - app_type: MANAGER
-            display_name: Gestor
+          - display_name: Gestor
             app_domain: https://manager.controleonline.com
             track: internal
             release_status: completed
-          - app_type: MENU
-            display_name: Menu
+          - display_name: Menu
             app_domain: https://menu.controleonline.com
             track: internal
             release_status: completed
             publish_play: "false"
-          - app_type: POS
-            display_name: PDV
+          - display_name: PDV
             app_domain: https://pos.controleonline.com
             track: internal
             release_status: completed
-          - app_type: PPC
-            display_name: PCP
+          - display_name: PCP
             app_domain: https://ppc.controleonline.com
             track: internal
             release_status: completed
-          - app_type: SERVICE
-            display_name: Service
+          - display_name: Service
             app_domain: https://service.controleonline.com
             track: internal
             release_status: completed
-          - app_type: MKT
-            display_name: Marketing
+          - display_name: Marketing
             app_domain: https://mkt.controleonline.com
             track: internal
             release_status: draft
@@ -303,7 +303,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/android-build
         with:
-          app_type: ${{ matrix.app_type }}
+          app_type: ""
           display_name: ${{ matrix.display_name }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           domain: ${{ matrix.app_domain }}

@@ -1,0 +1,28 @@
+{
+  "new": {
+    "repository": {
+      "issue": {
+        "number": 1117,
+        "state": "OPEN",
+        "projectItems": {
+          "nodes": [
+            {
+              "id": "PVTI_lADOAI_-Cs4BHEWFzhB_StY",
+              "project": {
+                "number": 1
+              },
+              "fieldValueByName": {
+                "name": "Ready"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "removedOldProjectItems": [
+    "PVTI_lADOAI_-Cs4BHEWFzhB1o-s",
+    "PVTI_lADOAI_-Cs4BHEWFzhB3ct4"
+  ],
+  "oldIssuesRetainedClosed": true
+}

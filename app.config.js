@@ -48,8 +48,29 @@ module.exports = () => {
     return expo;
   }
 
+  // Build-time identity: DOMAIN host first; APP_TYPE env only as last-resort legacy.
+  // Runtime operational type comes from people_domain.app_type (DB).
+  const domainHost = String(localEnv.DOMAIN || process.env.DOMAIN || '')
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\/.*$/, '')
+    .toLowerCase();
+  const fromDomain = (() => {
+    if (domainHost.startsWith('admin.')) return 'ADMIN';
+    if (domainHost.startsWith('checkout.')) return 'CHECKOUT';
+    if (domainHost.startsWith('crm.')) return 'CRM';
+    if (domainHost.startsWith('delivery.')) return 'DELIVERY';
+    if (domainHost.startsWith('menu.')) return 'MENU';
+    if (domainHost.startsWith('pos.')) return 'POS';
+    if (domainHost.startsWith('ppc.') || domainHost.startsWith('display.')) return 'PPC';
+    if (domainHost.startsWith('service.')) return 'SERVICE';
+    if (domainHost.startsWith('shop.')) return 'SHOP';
+    if (domainHost.startsWith('mkt.')) return 'MKT';
+    if (domainHost.startsWith('manager.') || domainHost.startsWith('app.')) return 'MANAGER';
+    return '';
+  })();
   const appType = String(
-    localEnv.APP_TYPE || process.env.APP_TYPE || DEFAULT_APP_TYPE,
+    fromDomain || localEnv.APP_TYPE || process.env.APP_TYPE || DEFAULT_APP_TYPE,
   ).toUpperCase();
   const appLower = appType.toLowerCase();
   const assetsFolder = String(
