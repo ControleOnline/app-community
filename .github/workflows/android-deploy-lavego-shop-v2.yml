@@ -140,7 +140,6 @@ jobs:
           DOMAIN: 'https://shop.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
           SOCKET: 'wss://apinew.lave-go.com',\
-          APP_TYPE: 'shop',\
           NEW_RELIC:{\
             LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
             APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\

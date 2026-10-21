@@ -14,6 +14,9 @@ const productionModules = process.env.APP_ENV !== 'dev';
 
 config.useWatchman = false;
 
+const avatarModule = require('./scripts/lib/experimental-avatar.cjs').resolveExperimentalAvatar({projectRoot});
+if (avatarModule.watchFolder) config.watchFolders = [...(config.watchFolders || []), avatarModule.watchFolder];
+
 config.resolver.nodeModulesPaths = [
   appNodeModules,
   workspaceNodeModules,
@@ -31,4 +34,33 @@ config.resolver.extraNodeModules = {
   'react-native': path.resolve(appNodeModules, 'react-native'),
 };
 
+// Standard Expo uses the approved Manager layout; legacy remains an explicit override.
+const {resolveManagerLayout} = require('./scripts/lib/manager-layout.cjs');
+const managerLayout = resolveManagerLayout(process.env.EXPO_PUBLIC_MANAGER_LAYOUT);
+const managerWebPreview = managerLayout !== 'legacy' && (managerLayout === 'modern' || process.env.EXPO_PUBLIC_MANAGER_PREVIEW === '1');
+const managerNativePreview = managerLayout !== 'legacy' && (managerLayout === 'modern' || process.env.EXPO_PUBLIC_MANAGER_NATIVE_PREVIEW === '1');
+if (managerWebPreview || managerNativePreview) {
+  const {withManagerApiMiddleware} = require('./scripts/lib/manager-api-proxy.cjs');
+  const originalEnhance = config.server.enhanceMiddleware;
+  if (managerWebPreview) config.server.enhanceMiddleware = (middleware, server) => withManagerApiMiddleware(
+    require('./config/env.local.js').env.API_ENTRYPOINT,
+    originalEnhance ? originalEnhance(middleware,server) : middleware,
+  );
+  const previousResolve = config.resolver.resolveRequest;
+  config.resolver.resolveRequest = (context, moduleName, platform) => {
+    if (managerWebPreview && platform === 'web' && moduleName === '@controleonline/ui-common/src/api/fetch')
+      return {type:'sourceFile',filePath:path.join(projectRoot,'src/components/manager-preview/ManagerApiFetch.web.js')};
+    if (((managerWebPreview && platform === 'web') || (managerNativePreview && platform === 'android')) && moduleName === '@controleonline/ui-common/src/react/components/RuntimeInfoFooter')
+      return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/components/manager-preview/ManagerRuntimeFooter.js')};
+    if (((managerWebPreview && platform === 'web') || (managerNativePreview && platform === 'android')) && moduleName === '@controleonline/ui-default/src/react/components/table/DefaultTable')
+      return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/components/manager-preview/ManagerDefaultTable.js')};
+    return previousResolve ? previousResolve(context, moduleName, platform) : context.resolveRequest(context, moduleName, platform);
+  };
+}
+
+const resolveBeforeAvatar = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === '@experimental-avatar') return {type: 'sourceFile', filePath: avatarModule.entry};
+  return resolveBeforeAvatar ? resolveBeforeAvatar(context, moduleName, platform) : context.resolveRequest(context, moduleName, platform);
+};
 module.exports = config;

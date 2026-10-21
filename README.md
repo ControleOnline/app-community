@@ -27,7 +27,7 @@ npm run test:browser:install
 npm run test:browser
 ```
 
-The browser suite now exports the web app once per `APP_TYPE`, serves each export with a tiny static server, and runs the grouped Playwright smoke tests from `src/tests/browser/<app_type>/`.
+The browser suite exports the web app per **domain / operational mode** (aligned with `people_domain.app_type`), serves each export with a tiny static server, and runs the grouped Playwright smoke tests from `src/tests/browser/<app_type>/`.
 
 To run a single group:
 ```bash

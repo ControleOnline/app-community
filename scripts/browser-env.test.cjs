@@ -16,3 +16,12 @@ test('browser environment requires an explicit mock API origin', () => {
 test('changed environment format fails instead of running against the old API', () => {
   assert.throws(() => browserEnvSource("APP_TYPE: 'MANAGER'", 'POS', 'https://s.controleonline.com'), /API_ENTRYPOINT/);
 });
+
+test('domain-resolved sample receives fixture type without changing the sample', () => {
+  const fs = require('node:fs');
+  const sample = fs.readFileSync(require('node:path').join(__dirname, '../config/env.local.sample'), 'utf8');
+  const result = browserEnvSource(sample, 'MANAGER', 'https://s.controleonline.com');
+  assert.match(result, /APP_TYPE: "MANAGER"/);
+  assert.match(result, /API_ENTRYPOINT: "https:\/\/s.controleonline.com"/);
+  assert.doesNotMatch(sample, /APP_TYPE:/);
+});
