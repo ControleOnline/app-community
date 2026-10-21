@@ -34,7 +34,10 @@ function validateCompanyContract(root, {mode = process.env.APP_ENV === 'dev' ? '
       const file = path.join(dir, entry.name);
       if (entry.isDirectory()) scan(file);
       else if (/\.(?:[cm]?js|jsx|tsx?|vue)$/.test(entry.name)) {
-        const text = fs.readFileSync(file, 'utf8');
+        const text = fs.readFileSync(file, 'utf8')
+          // Ignore documentation mentions; only code identifiers count.
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/(^|[\s;{}()])\/\/.*$/gm, '$1');
         for (const name of legacyNames) {
           if (new RegExp(`\\b${name}\\b`).test(text)) {
             errors.push(`Legacy company identifier ${name}: ${path.relative(root, file)}`);
