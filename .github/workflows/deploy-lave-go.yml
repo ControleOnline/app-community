@@ -65,7 +65,7 @@ jobs:
           ref: master
       - uses: ./.github/actions/web-export-deploy
         with:
-          app_type: ""
+          app_type: MANAGER
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
           domain: ${{ needs.configure.outputs.domain }}
@@ -109,7 +109,7 @@ jobs:
           ref: master
       - uses: ./.github/actions/android-build
         with:
-          app_type: ""
+          app_type: POS
           display_name: PDV
           package_name: com.lavego.app
           expo_name: Lave-Go

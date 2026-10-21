@@ -1,6 +1,6 @@
-# Staging web — domínio ADMIN (domain-first)
+# Staging web — APP_TYPE ADMIN
 
-> Espelho versionado no Git. Fonte primária de leitura: [wiki Staging web — domínio ADMIN](https://github.com/ControleOnline/app-community/wiki/staging-web-app-type-admin).
+> Espelho versionado no Git. Fonte primária de leitura: [wiki Staging web — APP_TYPE ADMIN](https://github.com/ControleOnline/app-community/wiki/staging-web-app-type-admin).
 
 Documentação técnica da publicação do app **ADMIN** em `https://staging.controleonline.com` (em vez de MANAGER).
 
@@ -32,7 +32,7 @@ Arquivo canônico do pipeline:
 WEB_MATRIX='{"include":[{"app_type":"ADMIN","ftp_product":"admin","app_domain":"https://staging.controleonline.com"}]}'
 ```
 
-O job web consome a matrix (`matrix.app_type`, `matrix.ftp_product`, `matrix.app_domain`) e exporta o build com **domínio** (`app_domain`); o tipo operacional em runtime vem de `people_domain.app_type`.
+O job web consome a matrix (`matrix.app_type`, `matrix.ftp_product`, `matrix.app_domain`) e exporta o build com `APP_TYPE` correspondente.
 
 ## Teste de contrato
 
@@ -52,7 +52,7 @@ npx jest src/tests/scripts/resolveAppDomain.test.js --runInBand
 
 Qualquer regressão que volte staging para MANAGER (ou altere o domínio sem atualizar o teste) falha o contrato.
 
-## Encaixe em people_domain.app_type / modos
+## Encaixe em APP_TYPE / modos
 
 Conforme [MODOS_OPERACAO.md](https://github.com/ControleOnline/app-community/blob/master/MODOS_OPERACAO.md):
 

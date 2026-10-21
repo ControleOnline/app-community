@@ -31,6 +31,7 @@ runs:
           DOMAIN: 'https://ppc.controleonline.com',
           MANAGER_APP: 'https://app.controleonline.com',
           SOCKET: 'wss://api.controleonline.com',
+          APP_TYPE: 'PPC',
           ZOOM: ${ZOOM},
           NEW_RELIC: {
             LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',

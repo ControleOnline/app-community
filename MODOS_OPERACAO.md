@@ -1,15 +1,14 @@
 # Visoes e Modos de Operacao do App Community
 
 ## Objetivo
-- Este arquivo centraliza a leitura funcional do **tipo operacional do app** (`people_domain.app_type` no banco, exposto em `GET /people/company/default` como `appType`), dos tipos operacionais de device e dos modos internos do `POS`.
-- **Fonte canônica:** coluna `people_domain.app_type` (admin edita em Domínios). Não usar `people_domain.app_type` de `.env` como fonte de produto.
+- Este arquivo centraliza a leitura funcional do `APP_TYPE`, dos tipos operacionais de device e dos modos internos do `POS`.
 - O app muda de visao conforme o modo, mas continua sendo o mesmo sistema, compartilhando modulos, stores e regras de negocio.
 - Antes de criar tela, store, rota, filtro, permissao ou regra nova, primeiro identifique em qual modo ela pertence.
 - Quando uma regra for compartilhada, ela deve continuar vivendo em um unico modulo dono, sem duplicacao por tela.
 
 ## Leitura rapida
-- `people_domain.app_type` / runtime com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
-- `SERVICE` e um `people_domain.app_type` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
+- `APP_TYPE` com `HomePage` ativa hoje no roteador principal: `MANAGER`, `CRM`, `POS`, `PPC`, `SHOP`, `DELIVERY` e `SERVICE`.
+- `SERVICE` e um `APP_TYPE` separado, com package `com.controleonline.service`; sua home fica em `ui-support`, e e operacional, com menus vindos do backend e primeiro atalho para `LabelsPage`.
 - `DELIVERY` nao e modo operacional de PDV, nao e tipo operacional de device e nao deve entrar em `pos-operation-mode`.
 - `DELIVERY` usa `ui-logistic` como home e a tela inicial e um menu operacional com gate de onboarding do motoboy. Dali o usuario acessa a lista de pedidos de entrega, o relatorio de recebiveis, a listagem de empresas homologadas e as tabelas de entrega imutaveis.
 - O runtime de device tambem reconhece aliases operacionais como `PDV`, `DISPLAY`, `KDS`, `TOTEM`, `PRINT` e `PRINTER`.
@@ -20,7 +19,7 @@
 - `CRM` e a visao comercial.
 - `SHOP` e a visao cliente-facing.
 
-## Modos principais por `people_domain.app_type`
+## Modos principais por APP_TYPE
 
 ### MANAGER
 - Publico: dono, gerente, administrador e backoffice.
@@ -35,7 +34,7 @@
 - Cadastros administrativos e modelos estruturais.
 - Limites:
 - Nao deve virar uma copia do `POS`.
-- Mesmo quando abrir a tela de PDV, em `app_type=MANAGER` (banco) o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
+- Mesmo quando abrir a tela de PDV, em `APP_TYPE=MANAGER` o checkout nao deve cobrar localmente no proprio device; o fluxo deve usar device remoto configurado ou pagamento na entrega.
 - Nao deve concentrar responsabilidades de atendimento comercial do `CRM` nem fluxo cliente-facing do `SHOP`.
 - O cadastro de menus por perfil nao pertence mais ao `MANAGER`; ele foi movido para o `ADMIN`.
 
@@ -118,7 +117,7 @@
 
 ### DELIVERY
 - Publico: operacao de entrega/retirada quando a empresa quiser abrir um app focado nisso.
-- Nivel: `people_domain.app_type`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
+- Nivel: `APP_TYPE`, equivalente a `MANAGER`, `CRM`, `POS`, `PPC` e `SHOP`.
 - Estado atual:
 - Usa `ui-logistic` como home dedicada, com menu operacional.
 - A entrada do app fica travada ate existir pelo menos um veiculo completo na tabela propria de veiculos do courier.
@@ -158,10 +157,10 @@
 - Nao deve ser usado como tipo de device.
 - `provider_id`/`provider` identifica o motoboy da lista; `delivery_people_id` segue sendo a pessoa que recebe a entrega.
 - Fluxos de entrega, retirada, codigos de handover e acompanhamento podem reaproveitar `ui-orders`, mas o recorte `DELIVERY` continua sendo uma visao de app.
-- Quando o assunto for canal de venda, pagamento na entrega ou logistica, usar nomes especificos para evitar confusao com `app_type=DELIVERY` (banco).
+- Quando o assunto for canal de venda, pagamento na entrega ou logistica, usar nomes especificos para evitar confusao com `APP_TYPE=DELIVERY`.
 
 ## Tipos operacionais de device
-- Estes tipos nao substituem o `people_domain.app_type`; eles complementam a identidade operacional do runtime e dos devices.
+- Estes tipos nao substituem o `APP_TYPE`; eles complementam a identidade operacional do runtime e dos devices.
 - `PDV`: device de venda e cobranca.
 - `DISPLAY`: device de exibicao operacional.
 - `KDS`: device de cozinha/preparo.
@@ -220,7 +219,7 @@
 - Nucleo de pedido do `ui-orders`.
 - Catalogo e filtros de categoria compartilhados.
 - Regras de canal do catalogo, ja que o sistema ja possui categorias por canal como `Balcao`, `Totem` e `Delivery`.
-- Nesse ponto, `Delivery` e canal de catalogo/pedido; nao e modo operacional do PDV nem substitui `app_type=DELIVERY` (banco).
+- Nesse ponto, `Delivery` e canal de catalogo/pedido; nao e modo operacional do PDV nem substitui `APP_TYPE=DELIVERY`.
 - Configuracoes de modo, device e comportamento expostas no `MANAGER`.
 - Regras de negocio iniciais:
 - O fluxo deve expor apenas o necessario para o cliente montar e revisar o pedido.
@@ -263,7 +262,7 @@
 ### VENDA UNITARIA
 - Visao:
 - Variante de `POS` para venda unitária, ao lado de totem, garcom, mesa e balcao.
-- Nao e um novo `app_type` de domínio; e apenas um modo operacional do `PDV`.
+- Nao e um novo `APP_TYPE`; e apenas um modo operacional do `PDV`.
 - Modulos base:
 - `ui-orders` para pedido, checkout e retorno para a lista de pedidos.
 - `ui-products` para o catalogo direto, sem tela de categoria intermediaria.
@@ -285,13 +284,13 @@
 - O `SHOP` e separado do POS no papel do usuario, mas compartilha regras centrais de pedido, pagamento e empresa quando isso fizer sentido.
 
 ## Direcao para proximas implementacoes
-- Quando um prompt falar em "modo" ou "visao", primeiro decidir se ele e `people_domain.app_type`, tipo operacional de device ou tipo de atividade dentro do `POS`.
+- Quando um prompt falar em "modo" ou "visao", primeiro decidir se ele e `APP_TYPE`, tipo operacional de device ou tipo de atividade dentro do `POS`.
 - Quando um prompt falar em `PDV`, validar se ele quer dizer:
 - a visao `POS`,
 - o tipo operacional de device `PDV`,
 - ou a atividade de caixa dentro do POS.
 - Quando um prompt falar em `DELIVERY`, validar se ele quer dizer:
-- o `app_type=DELIVERY` (banco),
+- o `APP_TYPE=DELIVERY`,
 - o canal de venda/entrega de um pedido,
 - pagamento na entrega,
 - ou regras logisticas de entrega.
