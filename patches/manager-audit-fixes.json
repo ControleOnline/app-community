@@ -1,0 +1,116 @@
+{
+  "files": [
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/api/index.js",
+      "before": "2409ff01f2771fc7f8c77de5bd064e2558675b8cbf0b9e55e8d7d4cfbd88a948",
+      "after": "68385ec57371849882d285d27a3e46cad623be583625c70a3de3b5a3adc7cdbe",
+      "payload": "audit-common-api.after.js"
+    },
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/react/components/UserAvatar.js",
+      "before": "4a83fee669b7f845031cbd9e0c71367c6f51b9058e48203db17cf182c204339f",
+      "after": "3ba4d61092876229a23c84ea47b6c3d2a4fbd640961c3d1e21ee0fe4438e79c2",
+      "payload": "audit-user-avatar.after.js"
+    },
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/utils/storedSessionToken.js",
+      "before": null,
+      "after": "f236653aa8bdb3b4b5faba1fc433ba43c42d71e33b6438c5b1132e486753d6d2",
+      "payload": "audit-session-token.after.js"
+    },
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/tests/react/utils/storedSessionToken.test.js",
+      "before": null,
+      "after": "003babeae801aba7e73091baa35175fc161dabad512ee25faed09dce076acc5d",
+      "payload": "audit-session-token-test.after.js"
+    },
+    {
+      "package": "@controleonline/ui-translate",
+      "version": "1.1.69",
+      "file": "src/react/pages/TranslationsReviewPage.js",
+      "before": "384d433f37d49bafa20820cfae096699ebb245efcd6665042e20860960b15d3f",
+      "after": "80be784a5606c1d54d555823242abd9133dfc70707e8af17fac797b79da1077b",
+      "payload": "audit-translations-review.after.js"
+    },
+    {
+      "package": "@controleonline/ui-default",
+      "version": "1.0.281",
+      "file": "src/react/components/table/useDefaultTableStoreSync.js",
+      "before": "6b77e6ecd7d8583ed5749b91caf37986312e77fc58c7545df688d6e9a8fd086b",
+      "after": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
+      "payload": "audit-table-store-sync.after.js"
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.40",
+      "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
+      "before": null,
+      "after": "2e90e5038940ca74ace32517708b65c537d9e4c748539cdc6570ac9c07de17d8",
+      "payload": "audit-category-palette.after.js"
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.40",
+      "file": "src/react/pages/Products.js",
+      "before": "d649ccb605e67ea1ff8c1eef22599c6b0bdf94460f074b2f1f4e254b26480fd5",
+      "after": "f7af497106393ee1fb01b6a23c163f1073ced538550b23aee1db175362d5a381",
+      "payload": "audit-products-page-theme.after.js"
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.40",
+      "file": "src/tests/react/components/ProductItemCustomizationRoute.test.js",
+      "before": "a47614a763bf000339608bea9156f078dd6e3eb271d0bcdafd9b5f7c7ad7bfe7",
+      "after": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
+      "payload": "audit-product-customization-test.after.js"
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.40",
+      "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
+      "before": "fd9ca375b92536374a640cd534be906a9a5988f6a677512bc1c9346268b69315",
+      "after": "88e823d9a0dc78784fbc03a658db182d3c5b08ed09333e690e394e5d569dec75",
+      "payload": "audit-waiter-recovery-test.after.js"
+    },
+    {
+      "package": "@controleonline/ui-orders",
+      "version": "1.3.48",
+      "file": "src/react/pages/orders/OrderHistoryCard.js",
+      "before": "ce86c3337f09974c69d6f98c072854430f471e4881216c715e122b47a78b8d39",
+      "after": "3d687d9cbca6d273ce936e53b0e2415fcb739943332fa08d217b30f3e3ee5aae",
+      "payload": "manager-order-history-density.after.js"
+    },
+    {
+      "package": "@controleonline/ui-orders",
+      "version": "1.3.48",
+      "file": "src/react/pages/orders/OrderHistoryCompactFooter.js",
+      "before": "e966fe3249f3666fd0dbca1a0c4c001eb85a60a7603e5a6c2439f55191e5bd3e",
+      "after": "0afafb20916a8c9b273465dfe55432cfe25aeedebf2d8768d0eeddbe2d3797c6",
+      "payload": "manager-order-history-footer-density.after.js"
+    },
+    {
+      "package": "@controleonline/ui-people",
+      "version": "1.0.101",
+      "file": "src/react/pages/People.js",
+      "before": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+      "after": "d9466f73825ef6cb48da2a937e1cdd4226c0159223d96548cfa4fe14b97b4e3b",
+      "payload": "manager-people-shared-card.after.js"
+    },
+    {
+      "package": "@controleonline/ui-translate",
+      "version": "1.1.69",
+      "file": "src/react/pages/TranslationReviewRow.js",
+      "before": "7f83a370c0caea17707ed39799d516ccc4291f785b2c0ed5cb83e10abde4359e",
+      "after": "e3df370cfac966bc1787529d3e8fc95b6a44a5ab2769d231cb21d9f86a530d86",
+      "payload": "audit-translation-review-row.after.js"
+    }
+  ]
+}
