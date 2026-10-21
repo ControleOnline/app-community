@@ -50,7 +50,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.38",
+      "version": "1.0.40",
       "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
       "before": null,
       "after": "2e90e5038940ca74ace32517708b65c537d9e4c748539cdc6570ac9c07de17d8",
@@ -58,7 +58,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.38",
+      "version": "1.0.40",
       "file": "src/react/pages/Products.js",
       "before": "d649ccb605e67ea1ff8c1eef22599c6b0bdf94460f074b2f1f4e254b26480fd5",
       "after": "f7af497106393ee1fb01b6a23c163f1073ced538550b23aee1db175362d5a381",
@@ -66,7 +66,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.38",
+      "version": "1.0.40",
       "file": "src/tests/react/components/ProductItemCustomizationRoute.test.js",
       "before": "a47614a763bf000339608bea9156f078dd6e3eb271d0bcdafd9b5f7c7ad7bfe7",
       "after": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
@@ -74,7 +74,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.38",
+      "version": "1.0.40",
       "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
       "before": "fd9ca375b92536374a640cd534be906a9a5988f6a677512bc1c9346268b69315",
       "after": "88e823d9a0dc78784fbc03a658db182d3c5b08ed09333e690e394e5d569dec75",
@@ -98,10 +98,10 @@
     },
     {
       "package": "@controleonline/ui-people",
-      "version": "1.0.100",
+      "version": "1.0.101",
       "file": "src/react/pages/People.js",
-      "before": "a7d1f9f5836805c29fb3887bf397f899ede5e8ab328292af541c8156ef31318a",
-      "after": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+      "before": "6d3dc83be8d9c2690dc81f6e20a2a3d4714aced0abaf0ed813509082cb802d68",
+      "after": "d9466f73825ef6cb48da2a937e1cdd4226c0159223d96548cfa4fe14b97b4e3b",
       "payload": "manager-people-shared-card.after.js"
     },
     {

@@ -1,15 +1,15 @@
 {
-  "version": "1.10.74",
+  "version": "1.10.76",
   "rc": 1,
-  "branch": "rc/1.10.74-rc.1",
-  "baseMaster": "a22cf68a1c795ce77efacb8c29a000bace7c8b67",
+  "branch": "rc/1.10.76-rc.1",
+  "baseMaster": "bf4fdfeec2d12b2c348da171321af55e4adb9b3c",
   "tasks": [
-    88
+    1142
   ],
   "repositories": {
-    "ControleOnline/app-community": "44538afb531988a9e7e306fa6671d3032e26aba9",
-    "ControleOnline/ui-common": "88baa2595b6ce2ae42653608ef4b6d66a2bb3c96",
-    "ControleOnline/ui-products": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
+    "ControleOnline/app-community": "83a2c97b2e1b98cbb109361f2322b472d3569065",
+    "ControleOnline/ui-products": "c13d7db1c7aec6bcabf09257b8338f2c244df94c",
+    "ControleOnline/ui-common": "88baa2595b6ce2ae42653608ef4b6d66a2bb3c96"
   },
   "packages": {
     "ui-common": {
@@ -19,12 +19,14 @@
       "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.101.tgz"
     },
     "ui-products": {
-      "version": "1.0.37",
-      "gitHead": "d32c4b36f0bbf17984a8e773adf3dbbdf77d4d11"
+      "version": "1.0.39",
+      "gitHead": "c13d7db1c7aec6bcabf09257b8338f2c244df94c",
+      "integrity": "sha512-TxOU4p32Ypm1vtogocT4FmSoMgEXn6K0cFR9dym61SmpGy6wDRUABcuXVRPKHDlxN55E07hqk3BZeyChx6qrNg==",
+      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.39.tgz"
     }
   },
   "compositionNotes": [
-    "ui-common task 88 (footer abbreviates non-IPv4 id). ui-common 1.2.101 = v1.2.97 + #88 only; avoids 1.2.98 (lineage without 1.2.97 / homepage 1056) and 1.2.99+ (task 1117, not reviewed)."
+    "HOTFIX task 1142: ui-products 1.0.39 (v1.0.37 lineage + fix) corrects undefined identifiers in ProductForm (uniqueCategoryIds, extractCategoryIdValue, syncProductCategories, useMemo). Does not include task 1117 ui-products changes (1.0.38)."
   ],
   "frozen": true
 }
