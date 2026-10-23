@@ -1,17 +1,13 @@
 {
-  "version": "1.10.77",
+  "version": "1.10.78",
   "rc": 1,
-  "branch": "rc/1.10.77-rc.1",
-  "baseMaster": "0a9cc0320bf08c1d0a4437d061a04a9ee452a0af",
+  "branch": "rc/1.10.78-rc.1",
+  "baseMaster": "b7da3d13cd3bbd96f34cd11ba748cba3c435b9ab",
   "tasks": [
-    1117,
-    1123,
-    1124,
-    1142,
-    1145
+    1150
   ],
   "repositories": {
-    "ControleOnline/app-community": "3044da7b41e94c88d7c89a6eb5067d52620af921",
+    "ControleOnline/app-community": "7d4995b9e137487f12ebf2c851660d4466cad0b3",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -129,10 +125,12 @@
   ],
   "frozen": true,
   "sourceOverlays": {
-    "manifest": "patches/manager-pdv.json",
     "packagesRemainPublishedExactVersions": true,
-    "ui-products": "7050ccab02bc1bb2b6e3c8e8c0d5f074b261cbf1",
-    "ui-orders": "cc5261988c54118fe0345172d9becfb4850f8c0c",
-    "note": "ui-products 1.0.40 publishes the advanced Manager source and product-form hotfix together. Existing APP payloads remain identical to approved RC9. Version guards target the exact published package; clean preparation and repeated preparation verified."
+    "manifests": {
+      "patches/admin-bootstrap.json": "237cc9b8ac56a4b512c8757bdb3751e568516d5facda798b05738d04e3843541",
+      "patches/manager-header.json": "2f6c3c8b4e018e298effe7ee1f60e0eee86d78e7e554a4d91e1a926ca7db99cc",
+      "patches/manager-package-reconciliation.json": "9fe7272062b5197c0b2948fbc995d80711f97bb4fefa2c9c3a214378a27423ae"
+    },
+    "note": "Task 1150 adds app-owned presentation/bootstrap overlays over exact stable published packages. No package version or dependency source changed."
   }
 }
