@@ -1,13 +1,13 @@
 {
-  "version": "1.10.78",
-  "rc": 2,
-  "branch": "rc/1.10.78-rc.2",
-  "baseMaster": "b7da3d13cd3bbd96f34cd11ba748cba3c435b9ab",
+  "version": "1.10.79",
+  "rc": 1,
+  "branch": "rc/1.10.79-rc.1",
+  "baseMaster": "e4fa6784c80b383484eeb9c2f5d8d33c2e2f76fd",
   "tasks": [
-    1150
+    1156
   ],
   "repositories": {
-    "ControleOnline/app-community": "ae0d61fb20e95eae04129a69f157e704245000fe",
+    "ControleOnline/app-community": "40e9f8d6d0dccbd1c4e0e3762d14c40eff684c06",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -89,20 +89,18 @@
   },
   "integrationOrder": [
     {
-      "task": 1150,
-      "source": "b75403e43df9c359cdbcaf836847caff490eb3d4",
-      "result": "6bc4480ea56d8480be29bca607559f29ae0e1c64"
+      "task": 1156,
+      "source": "16b52341fc6c2e3bc7002d0abdec83d11cf508c8",
+      "result": "40e9f8d6d0dccbd1c4e0e3762d14c40eff684c06"
     }
   ],
   "stagingReset": {
-    "previous": "b336c6c0f3bd502bd6bbdbc492180954c23da66d",
-    "mode": "protected PR; master-plus-task composition with prior staging ancestry reconciled before freeze; product files equal task-1150"
+    "previous": "a664eaf8cac07bd484c7b508e45b14b38dfec45a",
+    "mode": "fast-forward ancestry via protected PR; only #1156 and release metadata delta"
   },
   "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
   "compositionNotes": [
-    "Task #1150 over current master; exact published package pins and existing approved Manager composition retained. No API changes or production publication.",
-    "Supersedes 1.10.78 RC1 after human feedback: passive PDV draft recovery no longer writes orderId into the public menu-entry route. Internal cart context, explicit order links, resume/new order and linked check startup preserved.",
-    "80 focused composition tests plus 10 category/context/draft-storage tests pass. Published ui-orders 1.3.48 original hash, clean overlay and repeated application verified. source-policy and baseline checks pass; broad smoke limitations remain disclosed in #1150. Human staging homologation remains pending."
+    "Only #1156 over the published 1.10.78 master. Web build domain now comes from each matrix entry; regression executes actual configure for dev/staging/master and is included in CI baseline. Domain-first app selection, native domains, API/socket, FTP and product layouts unchanged. Twelve focused tests pass. No package pin or source overlay changes."
   ],
   "frozen": true,
   "sourceOverlays": {
