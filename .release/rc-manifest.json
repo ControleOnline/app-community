@@ -1,17 +1,13 @@
 {
-  "version": "1.10.77",
-  "rc": 1,
-  "branch": "rc/1.10.77-rc.1",
-  "baseMaster": "0a9cc0320bf08c1d0a4437d061a04a9ee452a0af",
+  "version": "1.10.78",
+  "rc": 2,
+  "branch": "rc/1.10.78-rc.2",
+  "baseMaster": "b7da3d13cd3bbd96f34cd11ba748cba3c435b9ab",
   "tasks": [
-    1117,
-    1123,
-    1124,
-    1142,
-    1145
+    1150
   ],
   "repositories": {
-    "ControleOnline/app-community": "3044da7b41e94c88d7c89a6eb5067d52620af921",
+    "ControleOnline/app-community": "ae0d61fb20e95eae04129a69f157e704245000fe",
     "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -93,46 +89,30 @@
   },
   "integrationOrder": [
     {
-      "task": 1142,
-      "source": "origin/master@0a9cc0320bf08c1d0a4437d061a04a9ee452a0af",
-      "result": "already in base; product-form fixes retained through combined ui-products 1.0.40"
-    },
-    {
-      "task": 1145,
-      "source": "3044da7b41e94c88d7c89a6eb5067d52620af921",
-      "result": "99d0e0d22c7708f55ef57bca0e7b02ff7abfbc65",
-      "restoresApprovedTasks": [
-        1117,
-        1123,
-        1124
-      ]
+      "task": 1150,
+      "source": "b75403e43df9c359cdbcaf836847caff490eb3d4",
+      "result": "6bc4480ea56d8480be29bca607559f29ae0e1c64"
     }
   ],
   "stagingReset": {
-    "previous": "7fb03395f942b17c80e7610dd4e750f835157dac",
-    "mode": "protected PR; reviewed master-plus-task composition"
+    "previous": "b336c6c0f3bd502bd6bbdbc492180954c23da66d",
+    "mode": "protected PR; master-plus-task composition with prior staging ancestry reconciled before freeze; product files equal task-1150"
   },
   "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
   "compositionNotes": [
-    "Task #1117 only over current master. Published exact npm versions; approved Manager modern default in standard Expo, explicit legacy contingency.",
-    "Security source review accepted including trusted API image header boundary. No production activation or deployment.",
-    "Known global API CI failures remain disclosed. Android/single-item human review follows staging; local browser remains unavailable.",
-    "Supersedes APP RC1: browser test fixture accepts domain-resolved sample; staging browser job explicitly uses modern. Four targeted helper tests pass. API snapshot remains unchanged.",
-    "RC3 restores dev/staging ADMIN entry and app selector, with manual choice protected from company bootstrap. No local tests per human instruction. Packages/API unchanged.",
-    "RC4: zoom 100 only in dev/staging builds; published ui-customers1.0.85 standardizes avatar tokens. Domain-scoped theme bindings use the approved 184-token palette; ADMIN/selector and production unchanged. Registry availability is required before promotion. No local tests per human instruction.",
-    "RC5 aligns only home chart frame with home border/surface and disables inherited fixed report shadow. Data/counters/API/modules/ADMIN-selector unchanged. No local tests per human instruction.",
-    "RC6 adds only @controleonline/ui-people 1.0.101 on top of staging RC5: #1123 (employees-index table mode rendered blank rows in the legacy layout) and #1124 (web employee-details URL no longer carries client=[object Object]). Validated locally on web against staging API in the legacy layout. Everything else unchanged.",
-    "RC7 fixes the RC6 staging deploy: the Manager audit overlay pinned ui-people 1.0.100, so patches/manager-audit-fixes.json and its People.js payload now target ui-people 1.0.101 (payload = published 1.0.101 file, sha256 d9466f73...). No other change.",
-    "RC9: #1117 unifies shared PDV controls above category/subcategory rows, resets root navigation on menu entry, presents session startup without the legacy flash and reuses the existing scoped image cache. Exact published npm pins retained with version/hash-guarded source overlays. Preserves RC7 ui-people 1.0.101 and matching audit payload for #1123/#1124 byte-for-byte. No API or ERP write/business-rule changes. No local suites by human request. Production excluded. Supersedes unpromoted RC8 after clean dev build exposed four before hashes from pre-publication sources; these now match the published package bytes.",
-    "Protected staging history reconciled before freeze: only rc-manifest.json conflicted, resolved to the reviewed RC9 inventory; all product files match the master-plus-individual-task composition. Previous staging content outside the approved PDV delta preserved.",
-    "1.10.77 RC1 reconciles the approved RC9 Manager composition (#1117/#1123/#1124) with #1142 on current master through task #1145. New ui-products 1.0.40 combines advanced catalog source and the four product-form corrections; no downgrade to the 1.0.37 lineage. All other advanced pins retained. Layout/runtime sources match approved RC9 byte-for-byte. ADMIN/selector retained. No production publication; no new local suites by human request. Broad CI failures disclosed separately."
+    "Task #1150 over current master; exact published package pins and existing approved Manager composition retained. No API changes or production publication.",
+    "Supersedes 1.10.78 RC1 after human feedback: passive PDV draft recovery no longer writes orderId into the public menu-entry route. Internal cart context, explicit order links, resume/new order and linked check startup preserved.",
+    "80 focused composition tests plus 10 category/context/draft-storage tests pass. Published ui-orders 1.3.48 original hash, clean overlay and repeated application verified. source-policy and baseline checks pass; broad smoke limitations remain disclosed in #1150. Human staging homologation remains pending."
   ],
   "frozen": true,
   "sourceOverlays": {
-    "manifest": "patches/manager-pdv.json",
     "packagesRemainPublishedExactVersions": true,
-    "ui-products": "7050ccab02bc1bb2b6e3c8e8c0d5f074b261cbf1",
-    "ui-orders": "cc5261988c54118fe0345172d9becfb4850f8c0c",
-    "note": "ui-products 1.0.40 publishes the advanced Manager source and product-form hotfix together. Existing APP payloads remain identical to approved RC9. Version guards target the exact published package; clean preparation and repeated preparation verified."
+    "manifests": {
+      "patches/admin-bootstrap.json": "237cc9b8ac56a4b512c8757bdb3751e568516d5facda798b05738d04e3843541",
+      "patches/manager-header.json": "2f6c3c8b4e018e298effe7ee1f60e0eee86d78e7e554a4d91e1a926ca7db99cc",
+      "patches/manager-package-reconciliation.json": "9fe7272062b5197c0b2948fbc995d80711f97bb4fefa2c9c3a214378a27423ae",
+      "patches/manager-pdv.json": "c17e01702341d5bbf6b0bdf3c02c4630a9229dfdf2cc7e26e0f2e39de1e989c2"
+    },
+    "note": "Task 1150 adds app-owned presentation/bootstrap overlays over exact stable published packages. No package version or dependency source changed."
   }
 }
