@@ -54,3 +54,17 @@ export const normalizeInitialBrowserPath = currentWindow => {
   history.replaceState(history.state, '', nextPath)
   return true
 }
+
+// Internal catalog refresh signals stay in navigation state, outside shareable URLs.
+export const publicNavigationPath = path => {
+  const hashIndex = path.indexOf('#')
+  const address = hashIndex < 0 ? path : path.slice(0, hashIndex)
+  const fragment = hashIndex < 0 ? '' : path.slice(hashIndex)
+  const queryIndex = address.indexOf('?')
+  if (queryIndex < 0) return path
+
+  const query = address.slice(queryIndex + 1).split('&')
+    .filter(part => part.split('=')[0] !== 'catalogResetKey')
+    .join('&')
+  return `${address.slice(0, queryIndex)}${query ? `?${query}` : ''}${fragment}`
+}

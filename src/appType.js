@@ -118,9 +118,12 @@ export const resolve_app_type = (env = APP_ENV) => {
       return 'ADMIN';
     }
   }
-  // 1) Runtime from people_domain.app_type (localStorage, set by mainCompany bootstrap)
-  // 2) Host bootstrap from DOMAIN
-  // 3) MANAGER
+  // An explicitly configured application keeps its identity. Only ADMIN offers
+  // application switching; company bootstrap must not turn a Manager build into Admin.
+  const configuredAppType = normalizeAppType(env?.APP_TYPE);
+  if (configuredAppType) return configuredAppType;
+
+  // Domain-driven builds still use people_domain.app_type from company bootstrap.
   const storedAppType = read_app_type();
   if (storedAppType) {
     return storedAppType;
