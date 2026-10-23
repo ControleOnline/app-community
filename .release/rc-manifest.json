@@ -1,13 +1,13 @@
 {
-  "version": "1.10.80",
+  "version": "1.10.81",
   "rc": 1,
-  "branch": "rc/1.10.80-rc.1",
-  "baseMaster": "b38d8e5c80fea68c7d7649db400b2c338242fa8f",
+  "branch": "rc/1.10.81-rc.1",
+  "baseMaster": "b92bbf43059f4717dfbeaf106dd1a556d469460b",
   "tasks": [
     1160
   ],
   "repositories": {
-    "ControleOnline/app-community": "1e2ecc1cdc740b8001b3626ce2ea85f88743e1e6",
+    "ControleOnline/app-community": "PENDING",
     "ControleOnline/ui-common": "915fc7e82206ef47eff1671ca94b6277edbdec7b",
     "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
     "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
@@ -88,9 +88,9 @@
     }
   },
   "compositionNotes": [
-    "Only app-community#1160 over published 1.10.79 master: ui-common fileUrl ignores API host in path segment and uses tenant app-domain (erp/loja.jaguncos.com.br).",
-    "Pin @controleonline/ui-common 1.2.102 -> 1.2.103. No other package or source overlay changes."
+    "Hotfix deploy unblock after 1.10.80: update shared-module overlay pins from ui-common 1.2.102 to 1.2.103 so apply-bottom-navigation-patch and related overlays accept the published package.",
+    "Product delta remains #1160 fileUrl app-domain fix already on master 1.10.80."
   ],
   "frozen": true,
-  "createdAt": "2026-10-23T21:04:09Z"
+  "createdAt": "2026-10-23T21:16:02Z"
 }

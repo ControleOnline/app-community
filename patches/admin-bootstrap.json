@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/react/components/DefaultProvider.web.configuration.js",
       "before": "85f7beb422934a45382d911f971882373b949322057bac7636ac43df2de016db",
       "after": "14609d4dc96b1e7c0e6c64501ff0ca43f9ef529a891046f4ea8ef4d29a9fe1a3",
@@ -35,7 +35,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/react/components/DefaultProvider.web.js",
       "before": "90451f8f35fb422a77ed59fa147338a6be15b01c7fc56a85d80864a7d3494e1b",
       "after": "47447ab9590beb71933c625d5823b8acc734271f983ff430c4c5ac7b2ecc4e6c",

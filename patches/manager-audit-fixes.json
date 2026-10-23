@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/api/index.js",
       "before": "2409ff01f2771fc7f8c77de5bd064e2558675b8cbf0b9e55e8d7d4cfbd88a948",
       "after": "68385ec57371849882d285d27a3e46cad623be583625c70a3de3b5a3adc7cdbe",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/react/components/UserAvatar.js",
       "before": "4a83fee669b7f845031cbd9e0c71367c6f51b9058e48203db17cf182c204339f",
       "after": "3ba4d61092876229a23c84ea47b6c3d2a4fbd640961c3d1e21ee0fe4438e79c2",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/utils/storedSessionToken.js",
       "before": null,
       "after": "f236653aa8bdb3b4b5faba1fc433ba43c42d71e33b6438c5b1132e486753d6d2",
@@ -26,7 +26,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.102",
+      "version": "1.2.103",
       "file": "src/tests/react/utils/storedSessionToken.test.js",
       "before": null,
       "after": "003babeae801aba7e73091baa35175fc161dabad512ee25faed09dce076acc5d",

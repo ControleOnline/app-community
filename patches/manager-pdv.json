@@ -110,7 +110,7 @@
       "after": "e3b579e73468b7ff055adf14f0721980b83ce3594134bd9eda2e7a3f5ba77aa7",
       "payload": "manager-productCatalogCacheRevision.after.js",
       "package": "@controleonline/ui-common",
-      "version": "1.2.102"
+      "version": "1.2.103"
     },
     {
       "file": "src/react/components/ProductCatalogCacheService.js",
@@ -118,7 +118,7 @@
       "after": "86ffd03ccc4d2d139ce8fca768eb54ff82fcccae16651627f6e823ae7ad6ef64",
       "payload": "manager-ProductCatalogCacheService.after.js",
       "package": "@controleonline/ui-common",
-      "version": "1.2.102"
+      "version": "1.2.103"
     },
     {
       "file": "src/react/pages/checkout/AddProductScreen.js",
