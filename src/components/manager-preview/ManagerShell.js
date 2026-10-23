@@ -55,6 +55,7 @@ export default function ManagerShell({navigation, route, children}) {
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
+  const separateAppSwitcher = app_type_base === 'ADMIN' && width < 1100;
   const compact = !mobile && (width <= 1060 || collapsed);
   const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
   const toolbar = managerMenu(menus, navigation.getState().routeNames, global.t?.t, 'toolbar')
@@ -127,7 +128,8 @@ export default function ManagerShell({navigation, route, children}) {
   return <View style={[s.shell, {backgroundColor: c.pageBackground}]}>
     {!mobile && sidebar}
     <View collapsable={false} style={s.main}>
-      <View style={[s.topbar, {backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder}, mobile && s.mobileTop]}>
+      <View style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
+      <View style={[s.topbar, mobile && s.mobileTop]}>
         <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
           onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon('menu')}</Pressable>
         {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início do On Manager"
@@ -138,12 +140,14 @@ export default function ManagerShell({navigation, route, children}) {
           MANAGER  /  {section?.title || 'Início'}  /  <Text style={{color: c.textPrimary, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
         </Text></View>}
         <View style={s.topActions}>
-          <View style={s.companySlot}><CompanyFilter navigation={navigation} appearance="soft" mode="icon" compact /></View>
-          <Pressable accessibilityRole="button" accessibilityLabel={mode === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'}
-            onPress={toggleMode} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon(mode === 'light' ? 'moon' : 'sun')}</Pressable>
+          <View style={s.companySlot}><CompanyFilter navigation={navigation} appearance="soft" mode="icon" compact wrapLabel /></View>
           <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'header'}} onPress={() => openAccount('header')}>{avatar(38)}</Pressable>
-          {app_type_base === 'ADMIN' && <AppTypeSwitcher />}
         </View>
+        {app_type_base === 'ADMIN' && !separateAppSwitcher && <AppTypeSwitcher />}
+      </View>
+      {separateAppSwitcher && <View style={[s.appSwitcherRow, mobile && s.mobileSwitcherRow]}>
+        <AppTypeSwitcher />
+      </View>}
       </View>
       {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
@@ -183,9 +187,11 @@ const s = StyleSheet.create({
   navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
   navText: {fontSize: 12, fontWeight: '600', flexShrink: 1}, center: {justifyContent: 'center', paddingHorizontal: 0},
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 10},
-  main: {flex: 1, minWidth: 0}, topbar: {minHeight: 74, paddingHorizontal: 28, gap: 14, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1},
+  main: {flex: 1, minWidth: 0}, topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, gap: 14, flexDirection: 'row', alignItems: 'center'},
   mobileTop: {paddingHorizontal: 12, gap: 8, minHeight: 64}, breadcrumb: {flex: 1, minWidth: 0},
-  topActions: {marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1, flexGrow: 1, minWidth: 0, maxWidth: 360},
+  topActions: {marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0},
+  appSwitcherRow: {alignItems: 'flex-end', paddingHorizontal: 28, paddingBottom: 10},
+  mobileSwitcherRow: {paddingHorizontal: 12},
   companySlot: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   homeButton: {width: 44, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
