@@ -19,7 +19,9 @@ export default function HomeChrome({navigation, showCompany, showAppType}) {
       borderBottomColor: palette.headerBorder, marginTop: -insets.top, paddingTop: insets.top, flexDirection: mobile ? 'column' : 'row'}]}>
       {focused && Platform.OS !== 'web' && <StatusBar
         barStyle="dark-content" backgroundColor={palette.headerBackground} />}
-      {showCompany && <CompanyFilter navigation={navigation} appearance="soft" compact={mobile} />}
+      {showCompany && <View style={styles.identity}>
+        <CompanyFilter navigation={navigation} appearance="soft" compact={mobile} wrapLabel />
+      </View>}
       {showAppType && <View style={[styles.tools, mobile && styles.mobileTools]}>
         <AppTypeSwitcher />
       </View>}
@@ -29,6 +31,7 @@ export default function HomeChrome({navigation, showCompany, showAppType}) {
 
 const styles = StyleSheet.create({
   header: {alignItems: 'stretch', flexShrink: 0, borderBottomWidth: 1, paddingHorizontal: 16},
+  identity: {flex: 1, minWidth: 0},
   tools: {justifyContent: 'center', paddingVertical: 12, paddingLeft: 20},
   mobileTools: {paddingTop: 0, paddingLeft: 0, alignItems: 'flex-end'},
 });
