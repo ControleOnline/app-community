@@ -1,0 +1,107 @@
+{
+  "files": [
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/react/components/DefaultProvider.web.configuration.js",
+      "before": "85f7beb422934a45382d911f971882373b949322057bac7636ac43df2de016db",
+      "after": "14609d4dc96b1e7c0e6c64501ff0ca43f9ef529a891046f4ea8ef4d29a9fe1a3",
+      "replacements": [
+        [
+          "export function useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse}) {",
+          "export function useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse, menuContextKey, setMenuLoad}) {"
+        ],
+        [
+          "      actions.setMenus([]);\n      return undefined;",
+          "      actions.setMenus([]);\n      setMenuLoad?.({key: menuContextKey, status: 'idle'});\n      return undefined;"
+        ],
+        [
+          "    let cancelled = false;\n\n    api\n      .fetch('menus-people'",
+          "    let cancelled = false;\n    setMenuLoad?.({key: menuContextKey, status: 'loading'});\n\n    api\n      .fetch('menus-people'"
+        ],
+        [
+          "          actions.setMenus(normalizeRuntimeMenuResponse(result, {appType}));",
+          "          actions.setMenus(normalizeRuntimeMenuResponse(result, {appType}));\n          setMenuLoad?.({key: menuContextKey, status: result?.response?.success === false ? 'error' : 'ready'});"
+        ],
+        [
+          "          actions.setMenus(normalizeRuntimeMenuResponse(null, {appType}));",
+          "          actions.setMenus(normalizeRuntimeMenuResponse(null, {appType}));\n          setMenuLoad?.({key: menuContextKey, status: 'error'});"
+        ],
+        [
+          "  }, [actions, appType, currentCompany?.id, isLogged]);",
+          "  }, [actions, appType, currentCompany?.id, isLogged, menuContextKey, setMenuLoad]);"
+        ]
+      ]
+    },
+    {
+      "package": "@controleonline/ui-common",
+      "version": "1.2.102",
+      "file": "src/react/components/DefaultProvider.web.js",
+      "before": "90451f8f35fb422a77ed59fa147338a6be15b01c7fc56a85d80864a7d3494e1b",
+      "after": "47447ab9590beb71933c625d5823b8acc734271f983ff430c4c5ac7b2ecc4e6c",
+      "replacements": [
+        [
+          "import {useWebTranslationRefresh",
+          "import {adminBootstrapState} from '@controleonline/../../src/components/bootstrap/adminBootstrapState';\nimport {useWebTranslationRefresh"
+        ],
+        [
+          "  const [translateReady, setTranslateReady] = useState(false);",
+          "  const [menuLoad, setMenuLoad] = useState({key: '', status: 'idle'});\n  const menuContextKey = `${appType}:${user?.id || user?.people || user?.username || ''}:${currentCompany?.id || ''}`;\n  const [translateReady, setTranslateReady] = useState(false);"
+        ],
+        [
+          "  useWebBootstrapReady({isLogged, hasCurrentCompany, currentRouteName, isTranslateBootstrapReady, onBootstrapReady});",
+          "  const adminBootstrap = appType === 'ADMIN' ? adminBootstrapState({\n    routeName: currentRouteName, publicRoute: isPublicRouteActive,\n    sessionChecked: authGetters.sessionChecked, isLogged, hasCompany: hasCurrentCompany,\n    translationReady: isTranslateBootstrapReady, menuContextKey, menuLoad, companyError: peopleGetters.error,\n  }) : null;\n  useEffect(() => {\n    if (adminBootstrap) onBootstrapReady?.(!adminBootstrap.pending, adminBootstrap.error);\n  }, [adminBootstrap?.pending, adminBootstrap?.error, onBootstrapReady]);\n  useWebBootstrapReady({isLogged, hasCurrentCompany, currentRouteName, isTranslateBootstrapReady,\n    onBootstrapReady: appType === 'ADMIN' ? undefined : onBootstrapReady});"
+        ],
+        [
+          "  useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse});",
+          "  useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse,\n    menuContextKey: appType === 'ADMIN' ? menuContextKey : undefined,\n    setMenuLoad: appType === 'ADMIN' ? setMenuLoad : undefined});"
+        ],
+        [
+          "  const translationPending = requiresTranslateBootstrap && !isTranslateBootstrapReady;",
+          "  const translationPending = requiresTranslateBootstrap && !isTranslateBootstrapReady;\n  const interfacePending = translationPending || Boolean(adminBootstrap?.pending);"
+        ],
+        [
+          "pointerEvents={translationPending ? 'none' : 'auto'}",
+          "pointerEvents={interfacePending ? 'none' : 'auto'}"
+        ],
+        [
+          "aria-hidden={translationPending}",
+          "aria-hidden={interfacePending}"
+        ],
+        [
+          "translationPending && providerStyles.translationPending",
+          "interfacePending && providerStyles.translationPending"
+        ],
+        [
+          "export const useTheme =",
+          "// Metro skips Refresh hook signatures for node_modules. Force a fresh provider\n// on development updates instead of preserving an incompatible hook sequence.\nif (typeof __DEV__ !== 'undefined' && __DEV__) {\n  require('react-refresh/runtime').setSignature(DefaultProvider, 'admin-bootstrap', true);\n}\n\nexport const useTheme ="
+        ]
+      ]
+    },
+    {
+      "package": "@controleonline/ui-layout",
+      "version": "1.0.20",
+      "file": "src/react/App.js",
+      "before": "fa6ba3339a78c1c94e5a8d3f91aa6888d47f531581719c5bf0db3f537d07f41e",
+      "after": "c1ef5c56dcdb2b9603dd96b1f271df9e2e79f5dba9ba0ab3334156a162dd5a67",
+      "replacements": [
+        [
+          "import React, { useState",
+          "import AdminBootstrapLoading from '@controleonline/../../src/components/bootstrap/AdminBootstrapLoading'\nimport React, { useState"
+        ],
+        [
+          "  const [bootstrapReady, setBootstrapReady] = useState(false)",
+          "  const [bootstrapReady, setBootstrapReady] = useState(false)\n  const [bootstrapError, setBootstrapError] = useState('')\n  const handleBootstrapReady = useCallback((ready = true, error = '') => {\n    setBootstrapReady(ready)\n    setBootstrapError(error)\n  }, [])"
+        ],
+        [
+          "onBootstrapReady={() => setBootstrapReady(true)}",
+          "onBootstrapReady={handleBootstrapReady}"
+        ],
+        [
+          "        {shouldShowSplash && (",
+          "        {shouldShowSplash && Platform.OS === 'web' && appType === 'ADMIN' ? (\n          <AdminBootstrapLoading error={bootstrapError} onRetry={() => window.location.reload()} />\n        ) : shouldShowSplash && ("
+        ]
+      ]
+    }
+  ]
+}
