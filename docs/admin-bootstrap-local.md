@@ -107,3 +107,21 @@ janela cronometrada dos testes assíncronos; a rodada final de 66 testes passou 
 As ações das stores mantêm referências estáveis nas mutações do adaptador Zustand.
 O teste do provider confirmou uma consulta de menus ao completar o contexto, sem
 remontar a navegação a cada atualização de estado de carregamento.
+
+## Retorno da homologação: ID de rascunho na entrada do PDV (#1150)
+
+Em 23/10/2026, o usuário mostrou Home → PDV com `orderId` na primeira entrada
+e URL limpa no segundo clique. O `AddProductScreen` recuperava o rascunho por
+`loadStoredDraftOrder` e `persistCatalogOrderId` chamava `navigation.setParams`.
+Na reentrada, o pedido já ativo impedia essa recuperação; por isso a diferença.
+
+O teste `pdvDraftNavigation.test.js` reproduziu a escrita indevida antes da correção.
+A recuperação passiva agora atualiza somente o contexto interno e os parâmetros
+fornecidos ao catálogo. Não apaga rascunhos, não cria uma venda nova, não modifica
+stores, configuração de dispositivo ou regras comerciais. Links explícitos,
+retomada, início de pedido e inicialização de comanda mantêm seus parâmetros.
+
+Validação local: 18 testes de navegação/Manager e 10 testes de categorias,
+contexto ativo e armazenamento de rascunho aprovados. Overlay versionado e hash
+atualizados; aplicação repetida aprovada. Isso é evidência controlada, não prova
+de reprodução autenticada do pedido da captura em staging.

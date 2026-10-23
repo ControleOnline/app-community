@@ -123,7 +123,7 @@
     {
       "file": "src/react/pages/checkout/AddProductScreen.js",
       "before": "d78125f2d02dac3c7df7637ade108d4c76e140efcdad199f4b26973a36cd0c05",
-      "after": "69761d10dc8e5d1bcbcf76d484013bf8f55fb5a86eba11302e8cb771e3d7e96c",
+      "after": "cad048ac889ace2592d41a13cfecc88f6cddc70348420b5a722d54b8bf9b81eb",
       "payload": "manager-local-AddProductScreen.after.js",
       "package": "@controleonline/ui-orders",
       "version": "1.3.48"
