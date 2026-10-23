@@ -218,7 +218,8 @@ jobs:
           zoom: ${{ needs.configure.outputs.env != 'master' && '100' || '' }}
           api_entrypoint: ${{ needs.configure.outputs.api }}
           socket: ${{ needs.configure.outputs.socket }}
-          domain: ${{ needs.configure.outputs.domain || matrix.app_domain }}
+          # Each vhost must bootstrap its own application identity.
+          domain: ${{ matrix.app_domain }}
           remote_dir: "public_html/"
         env:
           NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}

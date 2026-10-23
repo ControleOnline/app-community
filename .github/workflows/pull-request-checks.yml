@@ -40,7 +40,7 @@ jobs:
         run: node --test scripts/validate-company-contract.test.cjs scripts/browser-module-paths.test.cjs scripts/browser-env.test.cjs scripts/validate-smoke-flow-catalog.test.cjs scripts/validate-dev-api-target.test.cjs
 
       - name: Verify deployment domain and API endpoints
-        run: node node_modules/jest/bin/jest.js --config='{"testEnvironment":"node","transform":{},"testPathIgnorePatterns":["/node_modules/"]}' src/tests/scripts/resolveAppDomain.test.js --runInBand
+        run: node node_modules/jest/bin/jest.js --config='{"testEnvironment":"node","transform":{},"testPathIgnorePatterns":["/node_modules/"]}' src/tests/scripts/resolveAppDomain.test.js src/tests/workflows/webDeployDomains.test.js src/tests/workflows/webExportDeployConfig.test.js --runInBand
 
       - name: Verify published card layout regression coverage
         run: npm run test:cards-layout
