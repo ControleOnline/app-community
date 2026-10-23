@@ -3,6 +3,7 @@ import renderer, {act} from 'react-test-renderer';
 import fs from 'fs';
 import path from 'path';
 import {transformSync} from '@babel/core';
+import {adminBootstrapState} from '../../components/bootstrap/adminBootstrapState';
 
 // Run the real provider; leave external translation bootstrap pending.
 const sourcePath = path.join(process.env.CONTROLEONLINE_HOME_MODULES_ROOT ||
@@ -13,6 +14,8 @@ const compile = transformSync(fs.readFileSync(sourcePath, 'utf8'), {
   presets: [['@babel/preset-react', {runtime: 'classic'}]],
   plugins: ['@babel/plugin-transform-modules-commonjs'],
 }).code;
+const hookSource = fs.readFileSync(path.join(path.dirname(sourcePath), 'DefaultProvider.web.configuration.js'), 'utf8');
+const hookCode = transformSync(hookSource, {babelrc: false, configFile: false, plugins: ['@babel/plugin-transform-modules-commonjs']}).code;
 const noop = () => {};
 const external = new Proxy({__esModule: true, default: noop},
   {get: (target, key) => key in target ? target[key] : noop});
@@ -22,13 +25,17 @@ const stores = {
   auth: {getters: {isLogged: true, user: {people: 10}}, actions: {}},
   people: {getters: {currentCompany: {id: 1}, mainCompany: {id: 1}, companies: []}, actions: {}},
 };
-const loadProvider = () => {
+const loadProvider = ({appType = 'MANAGER', api, menuHook, refreshRuntime} = {}) => {
   const module = {exports: {}};
   const dependency = name => {
     if (name === 'react') return React;
+    if (name === 'react-refresh/runtime') return refreshRuntime;
     if (name === 'react-native') return {View: 'View'};
     if (name === '@store') return {useStore: name => stores[name] || {getters: {}, actions: {}}};
-    if (name === '@appType') return {app_type: 'MANAGER'};
+    if (name === '@appType') return {app_type: appType};
+    if (name.endsWith('/adminBootstrapState')) return {adminBootstrapState};
+    if (name === '@controleonline/ui-common/src/api' && api) return {api};
+    if (name === './DefaultProvider.web.configuration' && menuHook) return new Proxy({useWebMenus: menuHook}, {get: (value, key) => value[key] || noop});
     if (name === '@env') return {env: {ZOOM: 70}};
     if (name === '@package') return {__esModule: true, default: {version: 'test'}};
     if (name.endsWith('/publicRoutes')) return {isPublicRoute: name => name === 'SignInPage'};
@@ -51,6 +58,33 @@ beforeEach(() => {
   global.localStorage = {getItem: () => '{}'};
 });
 afterEach(() => {delete global.localStorage;});
+
+it('forces a fresh provider on development updates instead of reusing an obsolete hook sequence', () => {
+  const refreshRuntime = jest.requireActual('react-refresh/runtime');
+  const previousDev = global.__DEV__;
+  try {
+    global.__DEV__ = false;
+    const untrackedBefore = loadProvider().DefaultProvider;
+    refreshRuntime.register(untrackedBefore, 'bootstrap-without-signature');
+    const untrackedAfter = loadProvider().DefaultProvider;
+    refreshRuntime.register(untrackedAfter, 'bootstrap-without-signature');
+    expect(refreshRuntime.performReactRefresh().updatedFamilies.has(
+      refreshRuntime.getFamilyByType(untrackedAfter),
+    )).toBe(true);
+    global.__DEV__ = true;
+    const before = loadProvider({refreshRuntime}).DefaultProvider;
+    refreshRuntime.register(before, 'bootstrap-refresh-regression');
+    const after = loadProvider({refreshRuntime}).DefaultProvider;
+    refreshRuntime.register(after, 'bootstrap-refresh-regression');
+    const update = refreshRuntime.performReactRefresh();
+    const family = refreshRuntime.getFamilyByType(after);
+    expect(update.staleFamilies.has(family)).toBe(true);
+    expect(update.updatedFamilies.has(family)).toBe(false);
+  } finally {
+    if (previousDev === undefined) delete global.__DEV__;
+    else global.__DEV__ = previousDev;
+  }
+});
 
 it('keeps navigation mounted during login translation bootstrap without a registration loop', () => {
   const {DefaultProvider, useTheme} = loadProvider();
@@ -84,4 +118,39 @@ it('keeps navigation mounted during login translation bootstrap without a regist
   expect(tree.root.findAllByType('View')[0].props['aria-hidden']).toBe(false);
   act(() => tree.unmount());
   expect(unmounts).toBe(1);
+});
+
+
+it('keeps ADMIN covered until session, company, menus and translations are ready without remounting navigation', async () => {
+  const hookModule = {exports: {}};
+  new Function('require', 'module', 'exports', hookCode)(() => React, hookModule, hookModule.exports);
+  let resolveMenus;
+  const api = {fetch: jest.fn(() => new Promise(resolve => {resolveMenus = resolve;}))};
+  const actions = {setMenus: jest.fn()}; stores.theme.actions = actions;
+  const oldAuth = stores.auth.getters, oldPeople = stores.people.getters;
+  stores.auth.getters = {isLogged: false, sessionChecked: false};
+  stores.people.getters = {currentCompany: {}, mainCompany: {}, companies: []};
+  const onReady = jest.fn(); let mounts = 0, unmounts = 0, tree;
+  const {DefaultProvider} = loadProvider({appType: 'ADMIN', api, menuHook: hookModule.exports.useWebMenus});
+  function Navigator() {useLayoutEffect(() => {mounts++; return () => {unmounts++;};}, []); return <span>Real navigation remains mounted</span>;}
+  const view = () => <DefaultProvider currentRouteName="HomePage" onBootstrapReady={onReady}><Navigator /></DefaultProvider>;
+  try {
+    await act(async () => {tree = renderer.create(view());});
+    expect(onReady).toHaveBeenLastCalledWith(false, '');
+    expect(api.fetch).not.toHaveBeenCalled();
+    stores.auth.getters = {isLogged: true, sessionChecked: true, user: {id: 10}};
+    await act(async () => tree.update(view()));
+    expect(onReady).toHaveBeenLastCalledWith(false, '');
+    stores.people.getters = {...stores.people.getters, currentCompany: {id: 3}};
+    await act(async () => tree.update(view()));
+    expect(api.fetch).toHaveBeenCalledTimes(1);
+    expect(onReady).toHaveBeenLastCalledWith(false, '');
+    await act(async () => resolveMenus({modules: {}}));
+    expect(onReady).toHaveBeenLastCalledWith(false, '');
+    mockReady = true;
+    await act(async () => tree.update(view()));
+    expect(onReady).toHaveBeenLastCalledWith(true, '');
+    expect(mounts).toBe(1); expect(unmounts).toBe(0);
+    act(() => tree.unmount());
+  } finally {stores.auth.getters = oldAuth; stores.people.getters = oldPeople; stores.theme.actions = {};}
 });

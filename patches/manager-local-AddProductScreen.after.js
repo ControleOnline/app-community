@@ -108,7 +108,7 @@ const CheckoutContent = ({navigation, route: routeProp}) => {
   });
   const activeOrderId = activeOrder?.id || activeOrder?.['@id'] || null;
   const persistCatalogOrderId = useCallback(
-    order => {
+    (order, {updateRoute = true} = {}) => {
       const {orderId} = buildAddProductCatalogRouteParams({
         activeOrderId: order,
         routeParams: route?.params || {},
@@ -121,7 +121,7 @@ const CheckoutContent = ({navigation, route: routeProp}) => {
           order,
         });
         setCatalogOrderId(orderId);
-        if (String(route?.params?.orderId || '') !== orderId) {
+        if (updateRoute && String(route?.params?.orderId || '') !== orderId) {
           navigation.setParams({orderId});
         }
       }
@@ -364,7 +364,8 @@ const CheckoutContent = ({navigation, route: routeProp}) => {
 
             if (storedDraftOrder) {
               linkedSessionBootstrappedRef.current = true;
-              persistCatalogOrderId(storedDraftOrder);
+              // Passive recovery keeps the cart context without turning menu entry into an order link.
+              persistCatalogOrderId(storedDraftOrder, {updateRoute: false});
               return;
             }
 

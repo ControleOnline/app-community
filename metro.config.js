@@ -3,6 +3,8 @@ const { getDefaultConfig } = require('expo/metro-config');
 const packageConfig = require('./package.json');
 
 const projectRoot = __dirname;
+require('./scripts/apply-admin-bootstrap-patch.cjs');
+require('./scripts/apply-manager-header-patch.cjs');
 const moduleRoot = process.env.APP_ENV === 'dev'
   ? packageConfig.moduleResolution.source
   : packageConfig.moduleResolution.published;
@@ -60,6 +62,8 @@ if (managerWebPreview || managerNativePreview) {
 
 const resolveBeforeAvatar = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === '@controleonline/ui-common/src/react/components/AppTypeSwitcher')
+    return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/components/AuthenticatedAppTypeSwitcher.js')};
   if (moduleName === '@experimental-avatar') return {type: 'sourceFile', filePath: avatarModule.entry};
   return resolveBeforeAvatar ? resolveBeforeAvatar(context, moduleName, platform) : context.resolveRequest(context, moduleName, platform);
 };

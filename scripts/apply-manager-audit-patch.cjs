@@ -9,7 +9,8 @@ for(const file of [...require('../patches/manager-audit-fixes.json').files,...re
  const target=path.join(moduleRoot,file.file),current=fs.existsSync(target)?hash(fs.readFileSync(target)):null;
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
  if(hash(payload)!==file.after)throw Error('Audit overlay payload checksum differs.');
- if(current===file.after)continue;
+ const bootstrap=require('../patches/admin-bootstrap.json').files.find(item=>item.package===file.package && item.file===file.file && item.before===file.after);
+ if(current===file.after || (bootstrap && current===bootstrap.after))continue;
  if(current!==file.before)throw Error(`Unrelated changes in ${file.package}/${file.file}; no files overwritten.`);
  changes.push({target,payload});
 }

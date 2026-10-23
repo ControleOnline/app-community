@@ -28,8 +28,9 @@ jest.mock('@controleonline/ui-common/src/react/components/AppTypeSwitcher', () =
 jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
   useManagerPreview: () => ({bottomBar: mockBottomBar, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
 }));
+let mockExtraMenus = [];
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'theme'
-  ? {menus: [{id: 'settings', label: 'Configurações', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}]}]}
+  ? {menus: [{id: 'settings', label: 'Configurações', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
   : {user: {name: 'Usuário local'}}, actions: {logOut: mockLogout}})}));
 const navigation = {navigate: mockGo, getState: () => ({routeNames: ['HomePage', 'DevicesIndex', 'ProfilePage']})};
 const view = route => <ManagerShell navigation={navigation} route={{name: route || 'HomePage'}}><content /></ManagerShell>;
@@ -38,6 +39,7 @@ const labeled = (tree, label) => tree.root.findAllByType('Pressable').filter(x =
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
+  mockExtraMenus = [];
   mockBottomBar = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
 afterEach(() => {delete global.window;});
@@ -52,13 +54,16 @@ it('provides the Manager identity to a shared table on any module route',()=>{
   act(()=>tree.unmount());
 });
 
-it('navigates to the actual devices route with its parameters and exposes the theme control', () => {
+it('keeps company selection in the header and theme switching in the account menu', () => {
   let tree; act(() => {tree = renderer.create(view());});
   act(() => {labeled(tree, 'Dispositivos')[0].props.onPress();});
   expect(mockGo).toHaveBeenCalledWith('DevicesIndex', {source: 'manager'});
-  act(() => {labeled(tree, 'Ativar tema escuro')[0].props.onPress();});
+  expect(labeled(tree, 'Ativar tema escuro')).toHaveLength(0);
+  act(() => labeled(tree, 'Abrir opções do usuário')[1].props.onPress());
+  act(() => labeled(tree, 'Usar tema escuro')[0].props.onPress());
   expect(mockToggle).toHaveBeenCalledTimes(1);
   expect(tree.root.findAllByType('CompanyFilter')).toHaveLength(1);
+  expect(tree.root.findByType('CompanyFilter').props.wrapLabel).toBe(true);
   act(() => tree.unmount());
 });
 
@@ -149,5 +154,20 @@ it('mounts one inline toolbar only for the focused mobile screen and exposes bot
   mockBottomBar = {...mockBottomBar, visible: true}; mockFocused = false;
   act(() => tree.update(view('DevicesIndex')));
   expect(tree.root.findAllByType('RuntimeToolbar')).toHaveLength(0);
+  act(() => tree.unmount());
+});
+
+
+it('keeps a fresh internal catalog reset signal when reselecting the focused PDV', () => {
+  mockExtraMenus = [{id: 'pdv', label: 'PDV', route: 'PdvPage', menuType: 'home', routeParams: {orderId: '70'}}];
+  const pdvNavigation = {...navigation, getState: () => ({routeNames: ['HomePage', 'PdvPage']})};
+  let tree;
+  act(() => {tree = renderer.create(<ManagerShell navigation={pdvNavigation} route={{name: 'PdvPage'}} />);});
+  act(() => labeled(tree, 'PDV')[0].props.onPress());
+  act(() => labeled(tree, 'PDV')[0].props.onPress());
+  const [first, second] = mockGo.mock.calls;
+  expect(first).toEqual(['PdvPage', {orderId: '70', catalogResetKey: expect.stringMatching(/^menu:/)}]);
+  expect(second[1].orderId).toBe('70');
+  expect(second[1].catalogResetKey).not.toBe(first[1].catalogResetKey);
   act(() => tree.unmount());
 });
