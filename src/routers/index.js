@@ -1,6 +1,6 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import {getStateFromPath as defaultGetStateFromPath} from '@react-navigation/native'
+import {getStateFromPath as defaultGetStateFromPath, getPathFromState as defaultGetPathFromState} from '@react-navigation/native'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import {Pressable, StyleSheet} from 'react-native'
 
@@ -41,6 +41,7 @@ import testsRoutes from '@controleonline/ui-tests/src/react/router/routes'
 import {app_type} from '@appType'
 import {
   normalizeInitialBrowserPath,
+  publicNavigationPath,
   normalizeProductDetailsTabPath,
 } from './browserPath'
 import {createStableRouteComponents} from './stableRouteComponents'
@@ -221,6 +222,9 @@ export const linking = (() => {
   return {
     prefixes: ['/', 'http://localhost:19006'],
     config: { screens },
+    getPathFromState(state, options) {
+      return publicNavigationPath(defaultGetPathFromState(state, options))
+    },
     getStateFromPath(path, options) {
       let normalizedPath = String(path || '').replace(/^\/?shop\/q=/, 'shop/search/')
       normalizedPath = normalizeProductDetailsTabPath(normalizedPath)

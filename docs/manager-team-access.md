@@ -17,6 +17,8 @@ O comando Android inclui a preparação dos módulos e a compatibilidade nativa 
 
 `web:manager`, `web:manager-preview`, `export:manager` e `android:manager` continuam como atalhos compatíveis. O time não precisa escolher entre esses atalhos para obter o visual novo.
 
+Quando `APP_TYPE` está definido em `config/env.local.js`, o aplicativo mantém esse tipo: `MANAGER` abre o Manager e `POS` abre o PDV. Somente a entrada `ADMIN` permite escolher outro aplicativo pelo seletor. Quando `APP_TYPE` não está definido, o tipo informado pelo domínio/empresa continua sendo utilizado.
+
 ## Portais administrativos
 
 `dev.controleonline.com`, `staging.controleonline.com` e o domínio ADMIN entram no ADMIN e mantêm o seletor de apps. Ao selecionar MANAGER, o visual novo é usado. A seleção explícita é persistida separadamente do tipo informado pela empresa, para o bootstrap não sobrescrevê-la. Na primeira carga desta correção, o portal volta ao ADMIN. O tipo por domínio/empresa continua disponível nos demais aplicativos.
