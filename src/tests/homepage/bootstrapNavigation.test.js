@@ -86,8 +86,8 @@ it('forces a fresh provider on development updates instead of reusing an obsolet
   }
 });
 
-it('keeps navigation mounted during login translation bootstrap without a registration loop', () => {
-  const {DefaultProvider, useTheme} = loadProvider();
+it('keeps navigation mounted during translation bootstrap in apps without the managed menu barrier', () => {
+  const {DefaultProvider, useTheme} = loadProvider({appType: 'CRM'});
   let mounts = 0;
   let unmounts = 0;
   let tree;
@@ -121,17 +121,17 @@ it('keeps navigation mounted during login translation bootstrap without a regist
 });
 
 
-it('keeps ADMIN covered until session, company, menus and translations are ready without remounting navigation', async () => {
+it.each(['ADMIN', 'MANAGER', 'POS'])('keeps %s covered until session, company, menus and translations are ready without remounting navigation', async appType => {
   const hookModule = {exports: {}};
   new Function('require', 'module', 'exports', hookCode)(() => React, hookModule, hookModule.exports);
-  let resolveMenus;
-  const api = {fetch: jest.fn(() => new Promise(resolve => {resolveMenus = resolve;}))};
+  const resolveMenus = [];
+  const api = {fetch: jest.fn(() => new Promise(resolve => {resolveMenus.push(resolve);} ))};
   const actions = {setMenus: jest.fn()}; stores.theme.actions = actions;
   const oldAuth = stores.auth.getters, oldPeople = stores.people.getters;
   stores.auth.getters = {isLogged: false, sessionChecked: false};
   stores.people.getters = {currentCompany: {}, mainCompany: {}, companies: []};
   const onReady = jest.fn(); let mounts = 0, unmounts = 0, tree;
-  const {DefaultProvider} = loadProvider({appType: 'ADMIN', api, menuHook: hookModule.exports.useWebMenus});
+  const {DefaultProvider} = loadProvider({appType, api, menuHook: hookModule.exports.useWebMenus});
   function Navigator() {useLayoutEffect(() => {mounts++; return () => {unmounts++;};}, []); return <span>Real navigation remains mounted</span>;}
   const view = () => <DefaultProvider currentRouteName="HomePage" onBootstrapReady={onReady}><Navigator /></DefaultProvider>;
   try {
@@ -141,11 +141,11 @@ it('keeps ADMIN covered until session, company, menus and translations are ready
     stores.auth.getters = {isLogged: true, sessionChecked: true, user: {id: 10}};
     await act(async () => tree.update(view()));
     expect(onReady).toHaveBeenLastCalledWith(false, '');
-    stores.people.getters = {...stores.people.getters, currentCompany: {id: 3}};
+    stores.people.getters = {...stores.people.getters, currentCompany: {id: 3}, mainCompany: {id: 3}};
     await act(async () => tree.update(view()));
-    expect(api.fetch).toHaveBeenCalledTimes(1);
+    expect(api.fetch).toHaveBeenCalledTimes(2);
     expect(onReady).toHaveBeenLastCalledWith(false, '');
-    await act(async () => resolveMenus({modules: {}}));
+    await act(async () => {resolveMenus.forEach(resolve => resolve({modules: {}}));});
     expect(onReady).toHaveBeenLastCalledWith(false, '');
     mockReady = true;
     await act(async () => tree.update(view()));

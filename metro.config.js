@@ -4,6 +4,7 @@ const packageConfig = require('./package.json');
 
 const projectRoot = __dirname;
 require('./scripts/apply-admin-bootstrap-patch.cjs');
+require('./scripts/apply-single-item-patch.cjs');
 require('./scripts/apply-manager-header-patch.cjs');
 const moduleRoot = process.env.APP_ENV === 'dev'
   ? packageConfig.moduleResolution.source

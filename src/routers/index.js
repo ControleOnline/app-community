@@ -8,13 +8,13 @@ import {Pressable, StyleSheet} from 'react-native'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '../pages/OnGestorHome'
 import {homepageAppearanceForApp} from '../pages/homeAppearance'
-import POSHomePage from '@controleonline/ui-orders/src/react/pages/home/index'
+import POSHomePage from '../components/single-item/SingleItemHome'
 import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
 import ShopHomePage from '@controleonline/ui-shop/src/react/pages/ShopLandingPage'
 import ServiceHomePage from '@controleonline/ui-support/src/react/pages/home/index'
 
-import DefaultLayout from '../components/manager-preview/ManagerLayout'
+import DefaultLayout from '../components/single-item/SingleItemLayout'
 import ManagerSignIn from '../components/manager-preview/ManagerSignIn'
 import ManagerPdvPage from '../components/manager-preview/ManagerPdvPage'
 import ManagerDevicesPage from '../components/manager-preview/ManagerDevicesPage'
@@ -283,7 +283,7 @@ export default function Routes() {
       }),
     ),
   )
-  return managerPreviewEnabled
+  return managerPreviewEnabled || normalizedAppType === 'POS'
     ? React.createElement(ManagerPreviewProvider, null, navigator)
     : navigator
 }

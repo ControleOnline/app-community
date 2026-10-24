@@ -85,3 +85,10 @@ test('linked check startup retains its existing order initialization', async () 
   expect(mockSession.ensureActiveOrder).toHaveBeenCalledTimes(1);
   expect(navigation.setParams).toHaveBeenCalledWith({orderId: '900'});
 });
+
+test('Single Item fresh catalog does not resume a previous pending sale', async () => {
+  mockSession.activeOrder = {id:72986,orderProducts:[{product:{id:1147}}]};
+  await open({singleItemHome:true,singleItemMode:true,startNewOrder:true});
+  expect(mockSession.ensureActiveOrder).toHaveBeenCalledWith(undefined,expect.objectContaining({forceNew:true}));
+  expect(mockSession.loadStoredDraftOrder).not.toHaveBeenCalled();
+});
