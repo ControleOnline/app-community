@@ -8,7 +8,12 @@ export async function recoverManagerContext({people, theme, api, isCurrent, getP
   if (!isCurrent()) return;
   const companyId = getPeople().getters.currentCompany?.id;
   if (!companyId) throw new Error('Nenhuma empresa acessível foi retornada.');
-  const response = await api.fetch('menus-people', {params:{myCompany:companyId,appType:'MANAGER',menuType:'home'}});
+  const responses = await Promise.all(['home', 'toolbar'].map(menuType =>
+    api.fetch('menus-people', {params: {myCompany: companyId, appType: 'MANAGER', menuType}}),
+  ));
   if (!isCurrent() || String(getPeople().getters.currentCompany?.id) !== String(companyId)) return;
-  theme.actions.setMenus(normalizeRuntimeMenuResponse(response,{appType:'MANAGER',allowFallback:false}));
+  if (responses.some(response => response?.response?.success === false)) throw new Error('Não foi possível carregar os menus.');
+  theme.actions.setMenus(responses.flatMap(response =>
+    normalizeRuntimeMenuResponse(response, {appType: 'MANAGER', allowFallback: false}),
+  ));
 }

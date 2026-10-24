@@ -15,7 +15,7 @@ for (const file of files) {
   const payload = fs.readFileSync(path.join(root, 'patches', file.payload));
   if (hash(payload) !== file.after) throw Error('Navigation payload hash mismatch; nothing was written.');
   if (current === file.after) continue;
-  if (current !== file.before) throw Error('Navigation has unrelated changes; nothing was overwritten.');
+  if (current !== file.before && !file.previousAfter?.includes(current)) throw Error('Navigation has unrelated changes; nothing was overwritten.');
   changes.push({target, payload});
 }
 for (const {target, payload} of changes) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import UserAvatar from '@controleonline/ui-common/src/react/components/UserAvatar';
+jest.mock('@env', () => ({env: {API_ENTRYPOINT: 'http://localhost:8000/localhost%3A8081', DOMAIN: 'localhost:8081'}}));
 jest.mock('react-native', () => ({Platform: {OS: 'web'}, Image: 'Image', Text: 'Text', View: 'View', StyleSheet: {create: value => value}}));
 it.each(['token', 'api_key'])('authenticates private web images with wrapped-session %s', async field => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
