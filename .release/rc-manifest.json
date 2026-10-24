@@ -1,15 +1,15 @@
 {
   "version": "1.10.82",
-  "rc": 1,
-  "branch": "rc/1.10.82-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.82-rc.2",
   "baseMaster": "52f7aed0571ea3381781d636b8f19bb7008b8f97",
   "tasks": [
     1164
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "8ea1564f040f10ffedf1516d0bf7313ef6a60b53",
-    "ControleOnline/api-community": "e1710ed0df1d998e430d67cfdaba7f31f508f2cf",
+    "ControleOnline/app-community": "ccd0c03c24653205e4c1485e14419ac7d4e47742",
+    "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "74e5c987d5f5009d838b7e0d2280e49dc89474c6",
     "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
@@ -53,9 +53,9 @@
     }
   },
   "frozen": true,
-  "contentCommit": "7a03261ff2a55ddbae522aa15bb0d2a3a84719e2",
+  "contentCommit": "ccbc141cc4dfc6d671709dc7d592a5695f232069",
   "stagingReset": {
-    "previous": "18ef37d3d5ce79ac315f49925f3d029e401087f0",
+    "previous": "248ee1ccb12a2ce27808a231c969db24cd1b8e17",
     "mode": "reviewed snapshot via protected PR; fast-forward RC to resulting merge without content change"
   },
   "validation": {
@@ -64,6 +64,7 @@
     "apiWaiterTests": 114,
     "apiFocusedTests": 60,
     "security": "accepted",
-    "production": "not authorized"
+    "production": "not authorized",
+    "adminSelectorTests": 17
   }
 }
