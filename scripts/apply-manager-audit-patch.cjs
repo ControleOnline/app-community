@@ -10,8 +10,9 @@ for(const file of [...require('../patches/manager-audit-fixes.json').files,...re
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
  if(hash(payload)!==file.after)throw Error('Audit overlay payload checksum differs.');
  const bootstrap=require('../patches/admin-bootstrap.json').files.find(item=>item.package===file.package && item.file===file.file && item.before===file.after);
- if(current===file.after || (bootstrap && current===bootstrap.after))continue;
- if(current!==file.before)throw Error(`Unrelated changes in ${file.package}/${file.file}; no files overwritten.`);
+ const singleItem=require('../patches/single-item.json').files.find(item=>item.package===file.package && item.file===file.file && item.before===file.after);
+ if(current===file.after || (bootstrap && current===bootstrap.after) || (singleItem && current===singleItem.after))continue;
+ if(current!==file.before && !file.previousAfter?.includes(current))throw Error(`Unrelated changes in ${file.package}/${file.file}; no files overwritten.`);
  changes.push({target,payload});
 }
 for(const {target,payload} of changes){fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,payload);}

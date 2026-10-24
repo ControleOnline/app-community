@@ -14,6 +14,38 @@ const loadHooks = () => {
 const deferred = () => {let resolve, reject; const promise = new Promise((yes, no) => {resolve = yes; reject = no;}); return {promise, resolve, reject};};
 beforeEach(() => {global.IS_REACT_ACT_ENVIRONMENT = true;});
 
+it('publishes home and toolbar together to the existing menu store only after both authorized responses arrive', async () => {
+  const {useWebMenus} = loadHooks(); const home = deferred(), toolbar = deferred(), report = jest.fn();
+  const props = {isLogged: true, currentCompany: {id: 3}, actions: {setMenus: jest.fn()},
+    api: {fetch: jest.fn((url, options) => options.params.menuType === 'home' ? home.promise : toolbar.promise)},
+    appType: 'POS', normalizeRuntimeMenuResponse: value => value, includeToolbar: true,
+    menuContextKey: 'POS:user:3', setMenuLoad: report};
+  function Probe() {useWebMenus(props); return null;}
+  let tree; await act(async () => {tree = renderer.create(<Probe />);});
+  await act(async () => home.resolve([{id: 'home', menus: []}]));
+  expect(report).toHaveBeenLastCalledWith({key: props.menuContextKey, status: 'loading'});
+  expect(props.actions.setMenus).not.toHaveBeenCalled();
+  await act(async () => toolbar.resolve([{id: 'toolbar', menus: []}]));
+  expect(props.actions.setMenus).toHaveBeenLastCalledWith([{id: 'home', menus: []}, {id: 'toolbar', menus: []}]);
+  expect(report).toHaveBeenLastCalledWith({key: props.menuContextKey, status: 'ready'});
+  expect(props.api.fetch).toHaveBeenCalledTimes(2);
+  act(() => tree.unmount());
+});
+
+it('never publishes a partial business menu when the toolbar endpoint denies the context', async () => {
+  const {useWebMenus} = loadHooks(); const report = jest.fn();
+  const props = {isLogged: true, currentCompany: {id: 3}, actions: {setMenus: jest.fn()},
+    api: {fetch: jest.fn((url, options) => Promise.resolve(options.params.menuType === 'home'
+      ? [{id: 'private-business-menu'}] : {response: {success: false}}))},
+    appType: 'MANAGER', normalizeRuntimeMenuResponse: value => value, includeToolbar: true,
+    menuContextKey: 'MANAGER:user:3', setMenuLoad: report};
+  function Probe() {useWebMenus(props); return null;}
+  let tree; await act(async () => {tree = renderer.create(<Probe />);});
+  expect(props.actions.setMenus).toHaveBeenLastCalledWith([]);
+  expect(report).toHaveBeenLastCalledWith({key: props.menuContextKey, status: 'error'});
+  act(() => tree.unmount());
+});
+
 it('reports menu completion only after the real request resolves, including a genuinely empty result', async () => {
   const {useWebMenus} = loadHooks(); const request = deferred(); const report = jest.fn();
   const props = {isLogged: true, currentCompany: {id: 3}, actions: {setMenus: jest.fn()}, api: {fetch: () => request.promise}, appType: 'ADMIN', normalizeRuntimeMenuResponse: x => x, menuContextKey: 'ADMIN:user:3', setMenuLoad: report};

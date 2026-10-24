@@ -6,6 +6,7 @@ import {useAvatarRuntime} from '@experimental-avatar';
 import useExperienceRuntime from './useExperienceRuntime';
 import ManagerCatalogImageCache from './ManagerCatalogImageCache';
 import {app_type} from '@appType';
+import {isPosSingleItemMode} from '@controleonline/ui-common/src/react/config/deviceConfigBootstrap';
 import useBottomNavigationPreference from '@controleonline/ui-common/src/react/hooks/useBottomNavigationPreference';
 
 const PreviewContext = createContext(null);
@@ -19,7 +20,9 @@ export default function ManagerPreviewProvider({children}) {
   const base = useRef(incoming || {});
   const applied = useRef(null);
   const [mode, setMode] = useState(readPreviewMode);
-  const active = managerPreviewEnabled && !!auth.getters.isLogged;
+  const {item: device} = useStore('device_config').getters;
+  const singleItemActive = app_type === 'POS' && isPosSingleItemMode(device?.configs);
+  const active = (managerPreviewEnabled || singleItemActive) && !!auth.getters.isLogged;
   const bottomBar = useBottomNavigationPreference({enabled: active,
     principal: String(auth.getters.user?.id || auth.getters.user?.username || ''), appType: app_type});
   const avatar = useAvatarRuntime({active: managerPreviewEnabled,
@@ -31,11 +34,12 @@ export default function ManagerPreviewProvider({children}) {
     // Reapply after the real provider loads a domain theme or changes company.
     if (incoming !== applied.current) base.current = incoming || {};
     const next = previewPalette(base.current, mode);
+    if (singleItemActive) Object.assign(next, {'cart-bottom-bg': next.cardBackground, 'cart-bottom-border': next.cardBorder, 'cart-bottom-total-bg': next.cardBackground, 'cart-bottom-label': next.textSecondary, 'cart-bottom-text': next.textPrimary, radioText: next.textPrimary, radioBorder: next.textSecondary, radioSelectedBorder: next.buttonBackground, radioSelectedDot: next.buttonBackground});
     if (JSON.stringify(incoming) !== JSON.stringify(next)) {
       applied.current = next;
       theme.actions.setColors(next);
     } else applied.current = incoming;
-  }, [active, incoming, mode, theme.actions]);
+  }, [active, incoming, mode, singleItemActive, theme.actions]);
   useEffect(() => () => {
     if (applied.current) theme.actions.setColors(base.current);
   }, [theme.actions]);
@@ -50,7 +54,7 @@ export default function ManagerPreviewProvider({children}) {
     try { localStorage.setItem(previewModeKey, next); } catch { /* In-memory preference remains usable. */ }
     setMode(next);
   };
-  return <PreviewContext.Provider value={{bottomBar, themeIssues: missingManagerThemeTokens(base.current, mode), ...avatar, experience, mode, toggleMode, colors: managerPreviewEnabled ? previewPalette(base.current, mode) : incoming}}>
+  return <PreviewContext.Provider value={{bottomBar, themeIssues: missingManagerThemeTokens(base.current, mode), ...avatar, experience, mode, toggleMode, colors: active ? previewPalette(base.current, mode) : incoming}}>
     <ManagerCatalogImageCache>{children}</ManagerCatalogImageCache>
   </PreviewContext.Provider>;
 }

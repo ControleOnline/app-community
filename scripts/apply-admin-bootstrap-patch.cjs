@@ -10,6 +10,16 @@ for (const file of require('../patches/admin-bootstrap.json').files) {
   const target = path.join(moduleRoot, file.file);
   let bytes = fs.readFileSync(target);
   if (hash(bytes) === file.after) continue;
+  const previous = file.previous?.find(item => item.after === hash(bytes));
+  if (previous) {
+    let source = bytes.toString();
+    for (const [before, after] of [...previous.replacements].reverse()) {
+      if (source.split(after).length !== 2) throw Error('Previous bootstrap overlay changed; no files overwritten.');
+      source = source.replace(after, before);
+    }
+    bytes = Buffer.from(source);
+    if (hash(bytes) !== file.before) throw Error('Previous bootstrap base checksum mismatch; no files overwritten.');
+  }
   if (hash(bytes) !== file.before) {
     const prerequisite = require('../patches/manager-package-reconciliation.json').files.find(item =>
       item.package === file.package && item.file === file.file && item.version === file.version && item.after === file.before);

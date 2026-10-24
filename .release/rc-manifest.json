@@ -1,116 +1,69 @@
 {
-  "version": "1.10.79",
+  "version": "1.10.82",
   "rc": 1,
-  "branch": "rc/1.10.79-rc.1",
-  "baseMaster": "e4fa6784c80b383484eeb9c2f5d8d33c2e2f76fd",
+  "branch": "rc/1.10.82-rc.1",
+  "baseMaster": "52f7aed0571ea3381781d636b8f19bb7008b8f97",
   "tasks": [
-    1156
+    1164
   ],
+  "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "40e9f8d6d0dccbd1c4e0e3762d14c40eff684c06",
-    "ControleOnline/ui-common": "a934a580f18614e37df67f7bf9957794cec88c34",
-    "ControleOnline/ui-config": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
-    "ControleOnline/ui-default": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
-    "ControleOnline/ui-financial": "66b994049db2835361c01e41a649957c41f7f30f",
-    "ControleOnline/ui-layout": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
-    "ControleOnline/ui-login": "89cdd37d8a1586fb303e9710d36912a73a218752",
-    "ControleOnline/ui-orders": "cc5261988c54118fe0345172d9becfb4850f8c0c",
-    "ControleOnline/ui-people": "ac6be7d105f8b3e7caae54febeddcaf00012e045",
-    "ControleOnline/ui-products": "7050ccab02bc1bb2b6e3c8e8c0d5f074b261cbf1",
-    "ControleOnline/ui-translate": "7091c30b458e21cacdbf88505c97b9669778c805",
-    "ControleOnline/ui-customers": "506019353f226a1e98c51c805a8f90db96f20d2f"
+    "ControleOnline/app-community": "8ea1564f040f10ffedf1516d0bf7313ef6a60b53",
+    "ControleOnline/api-community": "e1710ed0df1d998e430d67cfdaba7f31f508f2cf",
+    "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
+    "ControleOnline/ui-common": "74e5c987d5f5009d838b7e0d2280e49dc89474c6",
+    "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
+    "ControleOnline/ui-manager": "9105c9f9388ef3c800a1e773a665574dc0d87b44",
+    "ControleOnline/ui-people": "25aad29efd3a3b346baf21387a1ba0d190ad9e44",
+    "ControleOnline/ui-products": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820",
+    "ControleOnline/ui-orders": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e",
+    "ControleOnline/api-platform-common": "0e048950dada1990b1ec319240554cecbc65902d",
+    "ControleOnline/api-platform-people": "26ccd2bb8283938cf77fa58a6be7cb7a2afff968",
+    "ControleOnline/api-platform-mcp": "290f1c0abe291e97fb427b263815d021466cb357",
+    "ControleOnline/api-platform-users": "41daafcdf7941602c83a097ff5aa75bc032aa277"
   },
   "packages": {
     "ui-common": {
-      "version": "1.2.102",
-      "gitHead": "a934a580f18614e37df67f7bf9957794cec88c34",
-      "integrity": "sha512-V3nx7idXOlqnHAPV2pW1W4gcVPO3DGMKK3FqVdQ0ev5S2zu3ngFsMxe30AjHtnD7H3sPfxJYRsZJ6Hp0eT1iKw==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-common/-/ui-common-1.2.102.tgz"
-    },
-    "ui-config": {
-      "version": "1.0.26",
-      "gitHead": "8c6e55e7a23352f1a836a756a9606a4104a6ad65",
-      "integrity": "sha512-NeYQC5dHJ4DSQIw6J2NeuvSTGa5PYcBQRyoTYCnuj2k/nqMF2sz7cOYIpa9VGFaxBJaU+bd5u/iWEViX21gaFA==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-config/-/ui-config-1.0.26.tgz"
+      "version": "1.2.104",
+      "source": "74e5c987d5f5009d838b7e0d2280e49dc89474c6"
     },
     "ui-default": {
-      "version": "1.0.281",
-      "gitHead": "aaf91d4345db60eb0bd8949fad398bac59985fc4",
-      "integrity": "sha512-wvdCjDyqXbJXpDCmBTpKcXf7AKVgOe1M0ypwZUQGR6PTjqHDJWVXVu/dz2excGBgPNaNV5DPCaZq7qZjBjHgYg==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-default/-/ui-default-1.0.281.tgz"
+      "version": "1.0.282",
+      "source": "aa9fad75c5d47903a7c833e54c90890c6795d482"
     },
-    "ui-financial": {
-      "version": "1.1.43",
-      "gitHead": "66b994049db2835361c01e41a649957c41f7f30f",
-      "integrity": "sha512-YlNJ+tbqf0sGrjSUWVqSWvUU4lvprgd/VVK9hKCmWiyMb3dBL4Ebhv5a9BmmsoVQ5zbZKaNBQcPquuVlM9pKjQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-financial/-/ui-financial-1.1.43.tgz"
-    },
-    "ui-layout": {
-      "version": "1.0.20",
-      "gitHead": "3f2ed5c069105cf3eee91ef1e4528a020d47bba1",
-      "integrity": "sha512-qcW1kunUHYCZQWxPt1OOHhETHrNPXuIZ54z/I1N8K/eQi38hglZ2/wYOQ0T12O2GwamIirzhWHL+tzt/caOGuA==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-layout/-/ui-layout-1.0.20.tgz"
-    },
-    "ui-login": {
-      "version": "1.0.116",
-      "gitHead": "89cdd37d8a1586fb303e9710d36912a73a218752",
-      "integrity": "sha512-vKoUJNAwuWTATZZkM5yPuFJ9/5nxVLdb7Z4DzrW21k6mZj7z2fMtZ3ik7UbnbXonjngH+0czhDqpCnP/SRQt2g==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-login/-/ui-login-1.0.116.tgz"
-    },
-    "ui-orders": {
-      "version": "1.3.48",
-      "gitHead": "df903208c3d23a5a9b7b50afbe9da032e1143888",
-      "integrity": "sha512-Kl8lwykxrlhHuRr/bohMleCI6J8X3l6MaEuADTquEqWDbybOyrCSHmGTcgPQ2AhFrtfGH8L5/ZZm3o9dzz+yRQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-orders/-/ui-orders-1.3.48.tgz"
+    "ui-manager": {
+      "version": "1.0.23",
+      "source": "9105c9f9388ef3c800a1e773a665574dc0d87b44"
     },
     "ui-people": {
-      "version": "1.0.101",
-      "gitHead": "ac6be7d105f8b3e7caae54febeddcaf00012e045",
-      "integrity": "sha512-Hyqywo4+W+FUyWRaCg4vdwI+6SyjICrNSGz/ixvv/IQ+Oubo3urZWz7ydkuDAs4zjIbI8mRmwowacZzCspGqWA==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-people/-/ui-people-1.0.101.tgz"
+      "version": "1.0.102",
+      "source": "25aad29efd3a3b346baf21387a1ba0d190ad9e44"
     },
     "ui-products": {
-      "version": "1.0.40",
-      "gitHead": "7050ccab02bc1bb2b6e3c8e8c0d5f074b261cbf1",
-      "integrity": "sha512-s2vm1RENkBu/qPK+QfPJ6YKk7CDBBjdqm8TJSR7T7yvaUFHGpKZBq8lt80OiiBT0ToStLISe9+1TQOfKwvZlOQ==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-products/-/ui-products-1.0.40.tgz"
+      "version": "1.0.41",
+      "source": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820"
     },
-    "ui-translate": {
-      "version": "1.1.69",
-      "gitHead": "7091c30b458e21cacdbf88505c97b9669778c805",
-      "integrity": "sha512-8rXDoIfQyuzfWVaOj35l5+qI9I6CQVoHvwJyUKKjcw/rwKPHPx9BsG2vsaNIkWNK4XAUgE/ERP9Pszcs40a46g==",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-translate/-/ui-translate-1.1.69.tgz"
+    "ui-orders": {
+      "version": "1.3.49",
+      "source": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e"
     },
-    "ui-customers": {
-      "version": "1.0.85",
-      "gitHead": "506019353f226a1e98c51c805a8f90db96f20d2f",
-      "tarball": "https://registry.npmjs.org/@controleonline/ui-customers/-/ui-customers-1.0.85.tgz"
+    "controleonline/orders": {
+      "version": "1.0.5",
+      "source": "adf023f697e3f64782fa36c3855655364f74847a"
     }
   },
-  "integrationOrder": [
-    {
-      "task": 1156,
-      "source": "16b52341fc6c2e3bc7002d0abdec83d11cf508c8",
-      "result": "40e9f8d6d0dccbd1c4e0e3762d14c40eff684c06"
-    }
-  ],
-  "stagingReset": {
-    "previous": "a664eaf8cac07bd484c7b508e45b14b38dfec45a",
-    "mode": "fast-forward ancestry via protected PR; only #1156 and release metadata delta"
-  },
-  "apiStaging": "d380bc00e9f6456e8f3098b2f84e340198bd2e01",
-  "compositionNotes": [
-    "Only #1156 over the published 1.10.78 master. Web build domain now comes from each matrix entry; regression executes actual configure for dev/staging/master and is included in CI baseline. Domain-first app selection, native domains, API/socket, FTP and product layouts unchanged. Twelve focused tests pass. No package pin or source overlay changes."
-  ],
   "frozen": true,
-  "sourceOverlays": {
-    "packagesRemainPublishedExactVersions": true,
-    "manifests": {
-      "patches/admin-bootstrap.json": "237cc9b8ac56a4b512c8757bdb3751e568516d5facda798b05738d04e3843541",
-      "patches/manager-header.json": "2f6c3c8b4e018e298effe7ee1f60e0eee86d78e7e554a4d91e1a926ca7db99cc",
-      "patches/manager-package-reconciliation.json": "9fe7272062b5197c0b2948fbc995d80711f97bb4fefa2c9c3a214378a27423ae",
-      "patches/manager-pdv.json": "c17e01702341d5bbf6b0bdf3c02c4630a9229dfdf2cc7e26e0f2e39de1e989c2"
-    },
-    "note": "Task 1150 adds app-owned presentation/bootstrap overlays over exact stable published packages. No package version or dependency source changed."
+  "contentCommit": "7a03261ff2a55ddbae522aa15bb0d2a3a84719e2",
+  "stagingReset": {
+    "previous": "18ef37d3d5ce79ac315f49925f3d029e401087f0",
+    "mode": "reviewed snapshot via protected PR; fast-forward RC to resulting merge without content change"
+  },
+  "validation": {
+    "appFocusedTests": 108,
+    "appBuild": "expo web export passed",
+    "apiWaiterTests": 114,
+    "apiFocusedTests": 60,
+    "security": "accepted",
+    "production": "not authorized"
   }
 }
