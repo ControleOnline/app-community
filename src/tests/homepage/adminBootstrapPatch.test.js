@@ -49,3 +49,18 @@ it('refuses unrelated changes before writing any file', () => {
     expect(fs.readFileSync(target, 'utf8')).toContain('unrelated local work');
   } finally {fs.rmSync(folder, {recursive: true, force: true});}
 });
+
+it('upgrades the exact previous local overlay without resetting unrelated work', () => {
+  const folder = fixture();
+  try {
+    for (const file of manifest.files.filter(entry => entry.previous?.length)) {
+      const previous = file.previous[0];
+      let source = original(file);
+      for (const [before, after] of previous.replacements) source = source.replace(before, after);
+      expect(hash(source)).toBe(previous.after);
+      fs.writeFileSync(path.join(folder, 'node_modules', file.package, file.file), source);
+    }
+    execFileSync(process.execPath, [path.join(folder, 'scripts/apply.cjs')]);
+    for (const file of manifest.files) expect(hash(fs.readFileSync(path.join(folder, 'node_modules', file.package, file.file)))).toBe(file.after);
+  } finally {fs.rmSync(folder, {recursive: true, force: true});}
+});

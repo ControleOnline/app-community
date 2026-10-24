@@ -76,6 +76,7 @@ const DefaultTable = ({
   showSearch = null,
   showRowActions = true,
   showToolbar = true,
+  showCompactCaption = true,
   showAdministrativeTools = true,
   showToolbarActions = null,
   showToolbarControls = null,
@@ -285,6 +286,7 @@ const DefaultTable = ({
       showRowActions: presentationColumns !== null ? showRowActions : storeDeclaredConfigs.showRowActions === false ? false : showRowActions,
       showAdministrativeTools,
       showToolbar,
+      showCompactCaption,
       showToolbarActions:
         showToolbarActions === null
           ? storeDeclaredConfigs.showToolbarActions !== false
@@ -357,6 +359,7 @@ const DefaultTable = ({
       showRowActions,
       showAdministrativeTools,
       showToolbar,
+      showCompactCaption,
       showToolbarActions,
       showToolbarControls,
       showTotalItemsInCompactToolbar,
@@ -401,6 +404,7 @@ const DefaultTable = ({
         showRowActions,
         showAdministrativeTools,
         showToolbar,
+      showCompactCaption,
         showToolbarActions,
         showToolbarControls,
         showTotalItemsInCompactToolbar,
@@ -442,6 +446,7 @@ const DefaultTable = ({
       showRowActions,
       showAdministrativeTools,
       showToolbar,
+      showCompactCaption,
       showToolbarActions,
       showToolbarControls,
       showTotalItemsInCompactToolbar,

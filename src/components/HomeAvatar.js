@@ -26,6 +26,7 @@ export default function HomeAvatar(props) {
       imageUrl={imageUrl}
       useGravatar={false}
       imageHeaders={imageHeaders}
+      imageAuthContext={session?.api_key || session?.token || ''}
     />
   );
 }

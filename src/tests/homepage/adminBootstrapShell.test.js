@@ -11,7 +11,7 @@ const noop = () => {};
 let ready, error, mounts, unmounts;
 const source = fs.readFileSync(path.resolve(__dirname, '../../../node_modules/@controleonline/ui-layout/src/react/App.js'), 'utf8');
 const code = transformSync(source, {babelrc: false, configFile: false, presets: [['@babel/preset-react', {runtime: 'classic'}]], plugins: ['@babel/plugin-transform-modules-commonjs']}).code;
-const loadApp = () => {
+const loadApp = (appType = 'ADMIN') => {
   const module = {exports: {}};
   const Pass = ({children}) => children;
   const Navigator = React.forwardRef(({children, onReady}, ref) => {
@@ -29,7 +29,7 @@ const loadApp = () => {
     if (name === 'react') return React;
     if (name === 'react-native') return {Platform: {OS: 'web'}, View: 'View', StatusBar: 'StatusBar'};
     if (name.endsWith('/AdminBootstrapLoading')) return {__esModule: true, default: AdminBootstrapLoading};
-    if (name === '@appType') return {app_type: 'ADMIN'};
+    if (name === '@appType') return {app_type: appType};
     if (name === '@react-navigation/native') return {NavigationContainer: Navigator};
     if (name.endsWith('/src/routers')) return {__esModule: true, default: Routes, linking: {}};
     if (name.endsWith('/DefaultProvider')) return {DefaultProvider: Provider};
@@ -46,8 +46,8 @@ const loadApp = () => {
 };
 beforeEach(() => {global.IS_REACT_ACT_ENVIRONMENT = true; ready = false; error = ''; mounts = 0; unmounts = 0;});
 
-it('shows one loading surface, releases it when ready and keeps the navigator mounted', async () => {
-  const App = loadApp(); let tree;
+it.each(['ADMIN', 'MANAGER', 'POS'])('keeps one loading surface in %s until context is ready without remounting navigation', async appType => {
+  const App = loadApp(appType); let tree;
   await act(async () => {tree = renderer.create(<App />);});
   expect(tree.root.findAllByType('ActivityIndicator')).toHaveLength(1);
   expect(tree.root.findByProps({accessibilityLabel: 'Carregando aplicativo'}).props.style).toContainEqual({backgroundColor: '#f5f5f5'});
