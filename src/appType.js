@@ -46,6 +46,17 @@ export const read_app_type = () => {
   }
 };
 
+const resetAdminAppEntry = () => {
+  if (
+    app_type_base === 'ADMIN' &&
+    typeof window !== 'undefined' &&
+    typeof window.history?.replaceState === 'function'
+  ) {
+    // Explicit app switches must not reload a route owned by the previous app.
+    window.history.replaceState(null, '', '/');
+  }
+};
+
 export const set_app_type = value => {
   const normalizedAppType = normalizeAppType(value);
 
@@ -61,6 +72,7 @@ export const set_app_type = value => {
   if (app_type_base === 'ADMIN') {
     globalThis.localStorage.setItem(admin_app_type_storage_key, normalizedAppType);
   }
+  resetAdminAppEntry();
   return true;
 };
 
@@ -71,6 +83,7 @@ export const clear_app_type = () => {
 
   globalThis.localStorage.removeItem(app_type_storage_key);
   globalThis.localStorage.removeItem(admin_app_type_storage_key);
+  resetAdminAppEntry();
   return true;
 };
 

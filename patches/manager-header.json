@@ -1,29 +1,8 @@
 {
   "package": "@controleonline/ui-manager",
-  "version": "1.0.21",
+  "version": "1.0.23",
   "file": "src/react/components/CompanyFilter.js",
-  "before": "56edfe85947c2a408527bbae1e0840385968fb72bfeb41da5cc85304fff5acf4",
-  "after": "8526d96e88d5dbc4235efb47d11f10a7bb0a27b2822e9ae8986693ccb2aab404",
-  "replacements": [
-    [
-      "appearance = 'legacy', compact = false })",
-      "appearance = 'legacy', compact = false, wrapLabel = false })"
-    ],
-    [
-      "numberOfLines={1}\n          ellipsizeMode=\"tail\"",
-      "numberOfLines={wrapLabel ? undefined : 1}\n          ellipsizeMode=\"tail\""
-    ],
-    [
-      "styles.iconButtonExpanded]",
-      "styles.iconButtonExpanded, wrapLabel && {height: 'auto', minHeight: 36, paddingVertical: 8}]"
-    ],
-    [
-      "styles.iconButtonExpanded,\n              ]",
-      "styles.iconButtonExpanded,\n                wrapLabel && {height: 'auto', minHeight: 36, paddingVertical: 8},\n              ]"
-    ],
-    [
-      "<View>\n            <Text style={styles.greeting}>",
-      "<View style={wrapLabel ? {flex: 1, minWidth: 0} : undefined}>\n            <Text style={styles.greeting}>"
-    ]
-  ]
+  "before": "c30130af29a0d2fadd120cb6c260ec93836d2ebe2de5e48c0288add776969c07",
+  "after": "c30130af29a0d2fadd120cb6c260ec93836d2ebe2de5e48c0288add776969c07",
+  "replacements": []
 }

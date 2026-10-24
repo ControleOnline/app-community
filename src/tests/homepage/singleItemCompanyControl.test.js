@@ -1,0 +1,30 @@
+import React from 'react';
+import renderer, {act} from 'react-test-renderer';
+import Control from '../../components/single-item/SingleItemCompanyControl';
+jest.mock('react-native',()=>({Modal:'Modal',Pressable:'Pressable',Text:'Text',View:'View'}));
+jest.mock('@controleonline/ui-manager/src/react/components/CompanyFilter',()=>props=>require('react').createElement('CompanyFilter',props));
+const a={id:3,alias:'A'},b={id:2,alias:'B'};
+let tree;
+beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;});
+afterEach(()=>act(()=>tree?.unmount()));
+it('keeps the sale and company unchanged until the operator confirms, and can cancel',()=>{
+ const switchCompany=jest.fn();act(()=>{tree=renderer.create(<Control people={{currentCompany:a,companies:[a,b]}} order={{id:10,price:5}} colors={{}} onSwitch={switchCompany}/>);});
+ act(()=>tree.root.findByType('CompanyFilter').props.onSelectCompany(b));
+ expect(switchCompany).not.toHaveBeenCalled();expect(tree.root.findByType('Modal').props.visible).toBe(true);
+ act(()=>tree.root.findByProps({accessibilityLabel:'Continuar nesta empresa'}).props.onPress());
+ expect(tree.root.findByType('Modal').props.visible).toBe(false);expect(switchCompany).not.toHaveBeenCalled();
+ act(()=>tree.root.findByType('CompanyFilter').props.onSelectCompany(b));
+ act(()=>tree.root.findByProps({accessibilityLabel:'Trocar empresa'}).props.onPress());
+ expect(switchCompany).toHaveBeenCalledWith(b);
+});
+it('refuses a switch while a payment is in progress or company becomes unavailable',()=>{
+ const switchCompany=jest.fn();const props={people:{currentCompany:a,companies:[a,b]},order:{id:10},saleScreen:true,colors:{},onSwitch:switchCompany};
+ act(()=>{tree=renderer.create(<Control {...props} busy/>);});
+ act(()=>tree.root.findByType('CompanyFilter').props.onSelectCompany(b));
+ expect(tree.root.findByType('Modal').props.visible).toBe(false);
+ act(()=>tree.update(<Control {...props} busy={false}/>));
+ act(()=>tree.root.findByType('CompanyFilter').props.onSelectCompany(b));
+ act(()=>tree.update(<Control {...props} people={{currentCompany:a,companies:[a,{...b,panel_enabled:false}]}}/>));
+ act(()=>tree.root.findByProps({accessibilityLabel:'Trocar empresa'}).props.onPress());
+ expect(switchCompany).not.toHaveBeenCalled();
+});
