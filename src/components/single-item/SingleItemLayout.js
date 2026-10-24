@@ -84,13 +84,13 @@ function SingleItemShell({navigation,route,children}) {
           <HomeAvatar imageUrl={resolveHomeAvatar(user,currentCompany)} name={getAvatarDisplayName(user)} size={32} backgroundColor={c.cardIconBackground} borderColor={c.cardBorder} textColor={c.textPrimary}/>
         </Pressable>
       </View>
+      {app_type_base === 'ADMIN' && <View style={{backgroundColor:c.headerBackground,paddingHorizontal:12,paddingVertical:8,borderBottomWidth:1,borderColor:c.headerBorder}}><AppTypeSwitcher/></View>}
       {!primary && <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={goBack} style={s.back}><Text style={{color:c.textPrimary}}>← Voltar</Text></Pressable>}
       {route.name === 'OrderHistoryPage' && <View style={s.titleRow}><Text style={[s.title,{color:c.textPrimary}]}>Pedidos{total !== null ? ` · ${total}` : ''}</Text>{items.some(item=>item.route==='HomePage') && <Pressable accessibilityRole="button" accessibilityLabel="Nova venda" onPress={()=>navigation.navigate('PdvPage',{startNewOrder:true,showBottomCart:false,interactionMode:'pdv'})} style={{minHeight:44,paddingHorizontal:12,borderRadius:10,backgroundColor:c.buttonBackground,justifyContent:'center'}}><Text style={{color:c.buttonText,fontWeight:'600'}}>+ Nova venda</Text></Pressable>}</View>}
       {route.name === 'OrderHistoryPage' && <SingleItemStatusCounts summary={summary} colors={c}/>}
       <CompanySwitchContext.Provider value={setPaymentBusy}><View key={String(currentCompany?.id)} style={s.content}>{wrongCompany ? <View style={{padding:20,gap:16}}><Text style={{color:c.textPrimary}}>Este pedido pertence a outra empresa.</Text><Pressable accessibilityRole="button" onPress={()=>{orders.actions.setItem({});products.actions.setItems([]);navigation.reset({index:0,routes:[{name:'HomePage'}]});}}><Text style={{color:c.textPrimary}}>Voltar ao catálogo</Text></Pressable></View> : children}</View></CompanySwitchContext.Provider>
       {bottomBar?.visible && <BottomNavigationBar navigation={navigation} colors={c} items={items} activeRouteName={active} appearance="soft" placement="inline"/>}
       <PosKioskBarcodeListener navigation={navigation}/>
-      {app_type_base === 'ADMIN' && route.name === 'ProfilePage' && <View style={{backgroundColor:c.cardBackground,padding:8}}><AppTypeSwitcher/></View>}
     </View>
     <ManagerAccountMenu anchor={focused && accountOpen ? 'header' : null} mobile colors={c} name={getAvatarDisplayName(user)} mode={mode} canOpenProfile
       bottomBar={bottomBar}
