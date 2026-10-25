@@ -3,8 +3,10 @@ import renderer, {act} from 'react-test-renderer';
 import RuntimeBar from '@controleonline/ui-common/src/react/components/RuntimeBottomNavigationBar';
 const mockFetch = jest.fn();
 let mockCompany;
+let mockRuntimeMenus;
 const mockBarRenders = [];
 jest.mock('@appType', () => ({app_type: 'MANAGER'}));
+jest.mock('@controleonline/ui-common/src/react/components/DefaultProvider', () => ({useTheme: () => ({runtimeMenus: mockRuntimeMenus})}));
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'people' ? {currentCompany: mockCompany} : {colors: {}}})}));
 jest.mock('@controleonline/ui-common/src/api', () => ({api: {fetch: (...args) => mockFetch(...args)}}));
 jest.mock('@react-navigation/native', () => ({useNavigationState: select => select({index: 0, routes: [{name: 'PdvPage'}]})}));
@@ -13,7 +15,22 @@ jest.mock('@controleonline/ui-common/src/react/components/BottomNavigationBar', 
   return props => {mockBarRenders.push({company: mockCompany.id, routes: props.items.map(item => item.route)}); return React.createElement('Bar', props);};
 });
 const response = routes => ({modules: {tools: {menus: routes.map((route, i) => ({route, menuKey: route, label: route, menuType: 'toolbar', sortOrder: i}))}}});
-beforeEach(() => {global.IS_REACT_ACT_ENVIRONMENT = true; mockCompany = {id: 3}; mockFetch.mockReset(); mockBarRenders.length = 0;});
+beforeEach(() => {global.IS_REACT_ACT_ENVIRONMENT = true; mockCompany = {id: 3}; mockRuntimeMenus = undefined; mockFetch.mockReset(); mockBarRenders.length = 0;});
+
+it('uses the provider store snapshot only after its authorized toolbar is ready, without another fetch or temporary preset', async () => {
+  mockCompany = {};
+  mockRuntimeMenus = {managed: true, ready: false, modules: []};
+  let tree; await act(async () => {tree = renderer.create(<RuntimeBar presetKey="managerToolbar" />);});
+  expect(tree.root.findAllByType('Bar')).toHaveLength(0);
+  mockCompany = {id: 3};
+  await act(async () => tree.update(<RuntimeBar presetKey="managerToolbar" />));
+  expect(tree.root.findAllByType('Bar')).toHaveLength(0);
+  mockRuntimeMenus = {managed: true, ready: true, modules: [{menus: [{route: 'ProfilePage', menuType: 'toolbar'}]}]};
+  await act(async () => tree.update(<RuntimeBar presetKey="managerToolbar" />));
+  expect(tree.root.findByType('Bar').props.items.map(item => item.route)).toEqual(['ProfilePage']);
+  expect(mockFetch).not.toHaveBeenCalled();
+  act(() => tree.unmount());
+});
 
 it('renders only the configured role-aware toolbar, including a profile-only POS-shaped result', async () => {
   mockFetch.mockResolvedValue(response(['ProfilePage']));
