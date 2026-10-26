@@ -2,10 +2,10 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import {resolveOrderHistoryStatusColor} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryStatusColor';
 
-export default function SingleItemStatusCounts({summary, colors}) {
+export default function SingleItemStatusCounts({summary, colors, style}) {
   const statuses = Array.isArray(summary?.statuses) ? summary.statuses.filter(status => Number(status.quantity) > 0) : [];
   if (!statuses.length) return null;
-  return <View accessibilityLabel="Quantidade de pedidos por status" style={{flexDirection:'row',flexWrap:'wrap',gap:6,paddingHorizontal:16,paddingTop:4,paddingBottom:10}}>
+  return <View accessibilityLabel="Quantidade de pedidos por status" style={[{flexDirection:'row',flexWrap:'wrap',gap:6,paddingHorizontal:16,paddingTop:4,paddingBottom:10}, style]}>
     {statuses.map(status => {
       const color = resolveOrderHistoryStatusColor(status, colors);
       const label = global.t?.t('orders','status',String(status.status).toLowerCase()) || status.status;
