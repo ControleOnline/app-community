@@ -125,7 +125,7 @@ it('reuses guide, appearance and logout actions from the account menu', () => {
 it('offers a direct branded home control on mobile and names the drawer destination Início', () => {
   mockWidth = 360;
   let tree; act(() => {tree = renderer.create(view('DevicesIndex'));});
-  act(() => labeled(tree, 'Ir para o início do On Manager')[0].props.onPress());
+  act(() => labeled(tree, 'Ir para o início')[0].props.onPress());
   expect(mockGo).toHaveBeenLastCalledWith('HomePage', undefined);
   act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
   expect(labeled(tree, 'Início')).toHaveLength(1);
