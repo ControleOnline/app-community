@@ -1,14 +1,14 @@
 {
   "version": "1.10.83",
-  "rc": 3,
-  "branch": "rc/1.10.83-rc.3",
+  "rc": 4,
+  "branch": "rc/1.10.83-rc.4",
   "baseMaster": "12fd716a1ef8a02ce7afe4f24296a4ec5c57f335",
   "tasks": [
     1164
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "6c33db6a43c360755be1b1ce15ed23286ab9b013",
+    "ControleOnline/app-community": "3fcc90db4b95512f0128ecc39c648f148ac55813",
     "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
@@ -53,26 +53,29 @@
     }
   },
   "frozen": true,
-  "contentCommit": "d5ed7226d3a39a8fb40cfdb8846c91d21d13ffaa",
+  "contentCommit": "f95fbfc0e11eab5310dcd11df82099d202ea357c",
   "validation": {
-    "focusedTests": 8,
-    "previousBrandingFocusedTests": 22,
-    "previousCompositionTests": 56,
+    "focusedTests": 34,
     "lint": "passed",
-    "security": "accepted on final dev SHA",
+    "patchInstall": "idempotent checksum verified",
+    "security": "accepted on dev 71b49438930fbba5a31f4057daa7d517099cf3b8",
     "browser": {
-      "360x800": {
-        "headerHeight": 64,
-        "overlap": false,
-        "horizontalOverflow": false
-      },
-      "320x640": {
-        "headerHeight": 74,
-        "overlap": false,
-        "horizontalOverflow": false
-      },
-      "newSaleMinHeight": 44
+      "environment": "localhost development with profiler",
+      "beforeScriptSeconds": 12.753307,
+      "afterScriptSeconds": 3.43211,
+      "beforeNetworkChainSeconds": 12.821767,
+      "afterNetworkChainSeconds": 4.470402,
+      "discoveryCallsBefore": 2,
+      "discoveryCallsAfter": 1,
+      "paymentTypesCallsBefore": 2,
+      "paymentTypesCallsAfter": 1,
+      "stamp": "CPF screen verified; no charge",
+      "limit": "before none, after stamp; not a controlled staging benchmark"
     },
-    "production": "not authorized; awaiting staging review"
+    "production": "not authorized"
+  },
+  "stagingReset": {
+    "previous": "b60aeb19c3831bc220c8f197f4148d71bb02f742",
+    "mode": "reviewed frozen snapshot via protected PR; RC fast-forward to matching staging merge"
   }
 }
