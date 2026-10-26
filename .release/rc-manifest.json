@@ -1,14 +1,14 @@
 {
   "version": "1.10.83",
-  "rc": 1,
-  "branch": "rc/1.10.83-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.83-rc.2",
   "baseMaster": "12fd716a1ef8a02ce7afe4f24296a4ec5c57f335",
   "tasks": [
     1164
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "604c58c0bc27e55be059c6199bd792ae3160c920",
+    "ControleOnline/app-community": "a6001e5636148f241fe01c7138b05e7b6b3bfa38",
     "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
@@ -53,13 +53,13 @@
     }
   },
   "frozen": true,
-  "contentCommit": "4314f887e8b2fa2cb44c4d140805fc882594d82f",
+  "contentCommit": "1b9d69c20a39e9b27c6a1c6839100f6e8130f5df",
   "validation": {
-    "focusedTests": 56,
-    "managerPrepare": "passed with installed ui-common 1.2.105",
+    "focusedTests": 22,
+    "previousCompositionTests": 56,
     "lint": "passed",
-    "browser": "localhost POS images; Manager desktop/mobile brand and home navigation",
     "security": "accepted on final dev SHA",
-    "production": "not authorized; awaiting staging review"
+    "browser": "local selected GYROS branding verified; cross-company reactions covered by component tests, other local companies unavailable",
+    "production": "not authorized; waiting for human staging review"
   }
 }

@@ -3,23 +3,26 @@ import {Image, StyleSheet, Text, View} from 'react-native';
 import {useStore} from '@store';
 import DefaultFile from '@controleonline/ui-default/src/react/components/files/DefaultFile';
 
-// Application branding follows the domain owner, never the selected franchise.
+// Follow the selected tenant; domain media is only a fallback for missing media.
 export default function ManagerBrand({colors: c, home = false, compact = false}) {
-  const {mainCompany} = useStore('people').getters;
-  const file = home
-    ? mainCompany?.icon || mainCompany?.logo
-    : mainCompany?.logo || mainCompany?.icon;
-  const identity = JSON.stringify([mainCompany?.id, file]);
+  const {currentCompany, mainCompany} = useStore('people').getters;
+  const selectedCompany = currentCompany?.id ? currentCompany : mainCompany;
+  const pickFile = company => home
+    ? company?.icon || company?.logo
+    : company?.logo || company?.icon;
+  const owner = pickFile(selectedCompany) ? selectedCompany : mainCompany;
+  const file = pickFile(owner);
+  const identity = JSON.stringify([selectedCompany?.id, owner?.id, file]);
   const [failed, setFailed] = useState(null);
   const [loaded, setLoaded] = useState(null);
-  const label = mainCompany?.alias || mainCompany?.name || 'On Manager';
+  const label = selectedCompany?.alias || selectedCompany?.name || 'On Manager';
   const imageStyle = home ? s.homeLogo : s.brandIcon;
   const fallback = home
     ? require('../../assets/manager/logo 512x512 r.png')
     : require('../../assets/manager/logo.png');
   const image = <View style={imageStyle}>
     {(loaded !== identity || failed === identity) && <Image source={fallback} accessibilityLabel={file ? undefined : 'Logo On Manager'} resizeMode="contain" style={imageStyle} />}
-    {file && failed !== identity && <DefaultFile key={identity} file={file} company={mainCompany}
+    {file && failed !== identity && <DefaultFile key={identity} file={file} company={owner}
         accessibilityLabel={`Logo ${label}`} resizeMode="contain"
         style={[imageStyle, s.remote]} onLoad={() => setLoaded(identity)} onError={() => setFailed(identity)} />}
   </View>;
