@@ -40,8 +40,8 @@ export default function ManagerBrand({colors: c, home = false, compact = false})
 const s = StyleSheet.create({
   brand: {flexDirection: 'row', alignItems: 'center', gap: 11, flex: 1, minWidth: 0},
   label: {flex: 1, minWidth: 0},
-  brandIcon: {width: 40, height: 40, borderRadius: 10, flexShrink: 0},
-  homeLogo: {width: 28, height: 28},
+  brandIcon: {width: 40, height: 40, borderRadius: 20, overflow: 'hidden', flexShrink: 0},
+  homeLogo: {width: 28, height: 28, borderRadius: 14, overflow: 'hidden'},
   remote: {position: 'absolute', top: 0, left: 0},
   title: {fontWeight: '700', fontSize: 17},
   subtitle: {fontSize: 9, letterSpacing: 1.5, marginTop: 4},
