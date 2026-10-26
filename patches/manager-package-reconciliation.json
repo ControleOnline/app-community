@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.104",
+      "version": "1.2.105",
       "file": "src/react/components/RuntimeInfoFooter.js",
       "before": "75a7c840419eb606515e852f8c79ff10326e967cd6b8e56b63e102231350f8d7",
       "after": "75a7c840419eb606515e852f8c79ff10326e967cd6b8e56b63e102231350f8d7",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.104",
+      "version": "1.2.105",
       "file": "src/react/components/RuntimeInfoFooter.home.spacing.js",
       "before": "c660146a603a364682146e245922f3a52fd48bd1c57ec937706f75cd74c230bc",
       "after": "c660146a603a364682146e245922f3a52fd48bd1c57ec937706f75cd74c230bc",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.104",
+      "version": "1.2.105",
       "file": "src/react/components/DefaultProvider.styles.js",
       "before": "e680a218f7f6b6b67aa33cda8367a1792aacb810ab5684f946f027a703db6067",
       "after": "e680a218f7f6b6b67aa33cda8367a1792aacb810ab5684f946f027a703db6067",
@@ -26,7 +26,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.104",
+      "version": "1.2.105",
       "file": "src/react/components/DefaultProvider.web.js",
       "before": "90451f8f35fb422a77ed59fa147338a6be15b01c7fc56a85d80864a7d3494e1b",
       "after": "a7b667eb97979d60a4e4fb69fbda920fa884d550569a437c43eb12e92dedf9fa",

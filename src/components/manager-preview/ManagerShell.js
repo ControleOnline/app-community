@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useStore, getAllStores} from '@store';
 import {api} from '@controleonline/ui-common/src/api';
@@ -19,6 +19,7 @@ import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
 import ManagerBottomNavigation from './ManagerBottomNavigation';
 import useJourneyReadiness from './useJourneyReadiness';
+import ManagerBrand from './ManagerBrand';
 
 export default function ManagerShell({navigation, route, children}) {
   const {width} = useWindowDimensions();
@@ -106,9 +107,7 @@ export default function ManagerShell({navigation, route, children}) {
   const sidebar = <View style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
     width: compact ? 76 : 254}, mobile && s.drawer]}>
     <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início" onPress={() => go({name: 'HomePage'})} style={s.brand}>
-      <Image source={require('../../assets/manager/logo.png')} accessibilityLabel="Logo On Manager" resizeMode="contain" style={s.brandIcon} />
-      {!compact && <View><Text style={[s.brandTitle, {color: c.textPrimary}]}>On Manager</Text>
-        <Text style={[s.brandSub, {color: c.textMuted}]}>GESTÃO INTEGRADA</Text></View>}
+      <ManagerBrand colors={c} compact={compact} />
     </Pressable>
     {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={s.close}>{icon('x')}</Pressable>}
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
@@ -132,9 +131,9 @@ export default function ManagerShell({navigation, route, children}) {
       <View style={[s.topbar, mobile && s.mobileTop]}>
         <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
           onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon('menu')}</Pressable>
-        {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início do On Manager"
+        {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
           onPress={() => go({name: 'HomePage'})} style={s.homeButton}>
-          <Image source={require('../../assets/manager/logo 512x512 r.png')} resizeMode="contain" style={s.homeLogo} />
+          <ManagerBrand colors={c} home />
         </Pressable>}
         {!mobile && <View style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.textMuted, fontSize: 12}}>
           MANAGER  /  {section?.title || 'Início'}  /  <Text style={{color: c.textPrimary, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
@@ -180,8 +179,6 @@ const s = StyleSheet.create({
   // Keep elevated catalog descendants below the mobile drawer on Android.
   drawerOverlay: {zIndex: 100, elevation: 24},
   brand: {height: 89, flexShrink: 0, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 11},
-  brandIcon: {width: 40, height: 40, borderRadius: 10, flexShrink: 0},
-  brandTitle: {fontWeight: '700', fontSize: 17}, brandSub: {fontSize: 9, letterSpacing: 1.5, marginTop: 4},
   close: {alignSelf: 'flex-end', marginRight: 12, padding: 8}, menu: {flex: 1, minHeight: 0}, group: {marginTop: 22},
   caption: {fontSize: 10, fontWeight: '700', letterSpacing: 1.3, textTransform: 'uppercase', margin: 12},
   navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
@@ -195,6 +192,5 @@ const s = StyleSheet.create({
   companySlot: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   homeButton: {width: 44, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
-  homeLogo: {width: 28, height: 28},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });

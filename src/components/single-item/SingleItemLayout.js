@@ -23,7 +23,7 @@ import {useManagerPreview} from '../manager-preview/ManagerPreviewProvider';
 import DefaultTooltip from '@controleonline/ui-default/src/react/components/help/DefaultTooltip';
 import {buildPosOperationInfo} from '@controleonline/ui-orders/src/react/utils/posOperationInfo';
 import HomeIcon from '../HomeIcon';
-import SingleItemStatusCounts from './SingleItemStatusCounts';
+import SingleItemHistoryHeader from './SingleItemHistoryHeader';
 import {isSingleItemPos, SINGLE_ITEM_ROUTES, singleItemNavigation} from './policy';
 
 export default function SingleItemLayout(props) {
@@ -73,7 +73,6 @@ function SingleItemShell({navigation,route,children}) {
   const providerId = String(provider?.id || provider?.['@id'] || provider || '').replace(/\D/g,'');
   const wrongCompany = !!providerId && providerId !== String(currentCompany?.id);
   const summary = orders.getters.summary?.operational;
-  const total = Number.isInteger(summary?.total) && summary.total >= 0 ? summary.total : null;
   const active = catalog?'HomePage':route.name==='OrderDetails'?'OrderHistoryPage':route.name;
   return <DefaultTableThemeContext.Provider value={tableTheme}>
     <View style={[s.root,{backgroundColor:c.pageBackground,paddingTop:insets.top}]}>
@@ -86,8 +85,9 @@ function SingleItemShell({navigation,route,children}) {
       </View>
       {app_type_base === 'ADMIN' && <View style={{backgroundColor:c.headerBackground,paddingHorizontal:12,paddingVertical:8,borderBottomWidth:1,borderColor:c.headerBorder}}><AppTypeSwitcher/></View>}
       {!primary && <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={goBack} style={s.back}><Text style={{color:c.textPrimary}}>← Voltar</Text></Pressable>}
-      {route.name === 'OrderHistoryPage' && <View style={s.titleRow}><Text style={[s.title,{color:c.textPrimary}]}>Pedidos{total !== null ? ` · ${total}` : ''}</Text>{items.some(item=>item.route==='HomePage') && <Pressable accessibilityRole="button" accessibilityLabel="Nova venda" onPress={()=>navigation.navigate('PdvPage',{startNewOrder:true,showBottomCart:false,interactionMode:'pdv'})} style={{minHeight:44,paddingHorizontal:12,borderRadius:10,backgroundColor:c.buttonBackground,justifyContent:'center'}}><Text style={{color:c.buttonText,fontWeight:'600'}}>+ Nova venda</Text></Pressable>}</View>}
-      {route.name === 'OrderHistoryPage' && <SingleItemStatusCounts summary={summary} colors={c}/>}
+      {route.name === 'OrderHistoryPage' && <SingleItemHistoryHeader summary={summary} colors={c}
+        canCreate={items.some(item=>item.route==='HomePage')}
+        onNewSale={()=>navigation.navigate('PdvPage',{startNewOrder:true,showBottomCart:false,interactionMode:'pdv'})}/>}
       <CompanySwitchContext.Provider value={setPaymentBusy}><View key={String(currentCompany?.id)} style={s.content}>{wrongCompany ? <View style={{padding:20,gap:16}}><Text style={{color:c.textPrimary}}>Este pedido pertence a outra empresa.</Text><Pressable accessibilityRole="button" onPress={()=>{orders.actions.setItem({});products.actions.setItems([]);navigation.reset({index:0,routes:[{name:'HomePage'}]});}}><Text style={{color:c.textPrimary}}>Voltar ao catálogo</Text></Pressable></View> : children}</View></CompanySwitchContext.Provider>
       {bottomBar?.visible && <BottomNavigationBar navigation={navigation} colors={c} items={items} activeRouteName={active} appearance="soft" placement="inline"/>}
       <PosKioskBarcodeListener navigation={navigation}/>
@@ -101,4 +101,4 @@ function SingleItemShell({navigation,route,children}) {
       onLogout={!busy && auth.actions?.logOut ? ()=>{setAccountOpen(false);auth.actions.logOut();} : undefined}/>
   </DefaultTableThemeContext.Provider>;
 }
-const s=StyleSheet.create({root:{flex:1,minHeight:0},header:{minHeight:56,paddingHorizontal:12,paddingVertical:6,borderBottomWidth:1,flexDirection:'row',alignItems:'center',gap:12},company:{fontSize:16,fontWeight:'600'},content:{flex:1,minHeight:0},back:{minHeight:44,paddingHorizontal:18,alignSelf:'flex-start',justifyContent:'center'},titleRow:{paddingHorizontal:16,paddingTop:10,paddingBottom:4,flexDirection:'row',justifyContent:'space-between',alignItems:'center'},title:{fontSize:20,fontWeight:'600'}});
+const s=StyleSheet.create({root:{flex:1,minHeight:0},header:{minHeight:56,paddingHorizontal:12,paddingVertical:6,borderBottomWidth:1,flexDirection:'row',alignItems:'center',gap:12},company:{fontSize:16,fontWeight:'600'},content:{flex:1,minHeight:0},back:{minHeight:44,paddingHorizontal:18,alignSelf:'flex-start',justifyContent:'center'}});

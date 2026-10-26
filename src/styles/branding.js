@@ -1,3 +1,4 @@
+import {invalidateWebThemeColors} from './webThemeColorCache';
 import {colors as defaultColors} from './colors';
 
 const CSS_VAR_FALLBACK_HEX_REGEX =
@@ -215,6 +216,7 @@ export const applyThemeCssVariables = ({
       root.style.setProperty(`--${key}`, value || TRANSPARENT_COLOR_VALUE);
     }
   });
+  invalidateWebThemeColors();
 };
 
 export const buildAssetUrl = asset => {
