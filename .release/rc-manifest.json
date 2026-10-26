@@ -1,14 +1,14 @@
 {
   "version": "1.10.83",
-  "rc": 2,
-  "branch": "rc/1.10.83-rc.2",
+  "rc": 3,
+  "branch": "rc/1.10.83-rc.3",
   "baseMaster": "12fd716a1ef8a02ce7afe4f24296a4ec5c57f335",
   "tasks": [
     1164
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "a6001e5636148f241fe01c7138b05e7b6b3bfa38",
+    "ControleOnline/app-community": "6c33db6a43c360755be1b1ce15ed23286ab9b013",
     "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
@@ -53,13 +53,26 @@
     }
   },
   "frozen": true,
-  "contentCommit": "1b9d69c20a39e9b27c6a1c6839100f6e8130f5df",
+  "contentCommit": "d5ed7226d3a39a8fb40cfdb8846c91d21d13ffaa",
   "validation": {
-    "focusedTests": 22,
+    "focusedTests": 8,
+    "previousBrandingFocusedTests": 22,
     "previousCompositionTests": 56,
     "lint": "passed",
     "security": "accepted on final dev SHA",
-    "browser": "local selected GYROS branding verified; cross-company reactions covered by component tests, other local companies unavailable",
-    "production": "not authorized; waiting for human staging review"
+    "browser": {
+      "360x800": {
+        "headerHeight": 64,
+        "overlap": false,
+        "horizontalOverflow": false
+      },
+      "320x640": {
+        "headerHeight": 74,
+        "overlap": false,
+        "horizontalOverflow": false
+      },
+      "newSaleMinHeight": 44
+    },
+    "production": "not authorized; awaiting staging review"
   }
 }
