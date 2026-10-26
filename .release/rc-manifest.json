@@ -1,14 +1,14 @@
 {
   "version": "1.10.83",
-  "rc": 4,
-  "branch": "rc/1.10.83-rc.4",
+  "rc": 5,
+  "branch": "rc/1.10.83-rc.5",
   "baseMaster": "12fd716a1ef8a02ce7afe4f24296a4ec5c57f335",
   "tasks": [
     1164
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "3fcc90db4b95512f0128ecc39c648f148ac55813",
+    "ControleOnline/app-community": "070743cbedf1057dfaa03c5f382dd76590b46968",
     "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
@@ -53,7 +53,7 @@
     }
   },
   "frozen": true,
-  "contentCommit": "f95fbfc0e11eab5310dcd11df82099d202ea357c",
+  "contentCommit": "e9189195892577abb36d320be690fe5a701b3624",
   "validation": {
     "focusedTests": 34,
     "lint": "passed",
@@ -72,10 +72,16 @@
       "stamp": "CPF screen verified; no charge",
       "limit": "before none, after stamp; not a controlled staging benchmark"
     },
-    "production": "not authorized"
+    "production": "not authorized",
+    "roundBrand": {
+      "focusedTests": 16,
+      "lint": "passed with JSX no-unused-vars disabled",
+      "browser": "light/dark; home 28px radius14, drawer40px radius20, overflow hidden; selected logo preserved",
+      "scope": "two style lines only"
+    }
   },
   "stagingReset": {
-    "previous": "b60aeb19c3831bc220c8f197f4148d71bb02f742",
+    "previous": "a1e0f57af3fcefdab3517d984f75070dffd57339",
     "mode": "reviewed frozen snapshot via protected PR; RC fast-forward to matching staging merge"
   }
 }
