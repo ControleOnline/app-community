@@ -1,14 +1,14 @@
 {
-  "version": "1.10.83",
-  "rc": 5,
-  "branch": "rc/1.10.83-rc.5",
-  "baseMaster": "12fd716a1ef8a02ce7afe4f24296a4ec5c57f335",
+  "version": "1.10.84",
+  "rc": 1,
+  "branch": "rc/1.10.84-rc.1",
+  "baseMaster": "49254c42e60bc4c8f2cda9d6199edcdc32d133fd",
   "tasks": [
-    1164
+    1185
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "070743cbedf1057dfaa03c5f382dd76590b46968",
+    "ControleOnline/app-community": "da9938e9ead3191e051f21ceb0325def79f28645",
     "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
@@ -53,35 +53,13 @@
     }
   },
   "frozen": true,
-  "contentCommit": "e9189195892577abb36d320be690fe5a701b3624",
+  "contentCommit": "da9938e9ead3191e051f21ceb0325def79f28645",
   "validation": {
-    "focusedTests": 34,
-    "lint": "passed",
-    "patchInstall": "idempotent checksum verified",
-    "security": "accepted on dev 71b49438930fbba5a31f4057daa7d517099cf3b8",
-    "browser": {
-      "environment": "localhost development with profiler",
-      "beforeScriptSeconds": 12.753307,
-      "afterScriptSeconds": 3.43211,
-      "beforeNetworkChainSeconds": 12.821767,
-      "afterNetworkChainSeconds": 4.470402,
-      "discoveryCallsBefore": 2,
-      "discoveryCallsAfter": 1,
-      "paymentTypesCallsBefore": 2,
-      "paymentTypesCallsAfter": 1,
-      "stamp": "CPF screen verified; no charge",
-      "limit": "before none, after stamp; not a controlled staging benchmark"
-    },
-    "production": "not authorized",
-    "roundBrand": {
-      "focusedTests": 16,
-      "lint": "passed with JSX no-unused-vars disabled",
-      "browser": "light/dark; home 28px radius14, drawer40px radius20, overflow hidden; selected logo preserved",
-      "scope": "two style lines only"
-    }
-  },
-  "stagingReset": {
-    "previous": "a1e0f57af3fcefdab3517d984f75070dffd57339",
-    "mode": "reviewed frozen snapshot via protected PR; RC fast-forward to matching staging merge"
+    "scope": "one line: DOMAIN app.lave-go.com -> pos.lave-go.com in .github/workflows/cielo-deploy-pdv-lavego-STAGING.yml",
+    "yamlValid": true,
+    "workflowTests": "13 passed, 1 failed (deploy-lave-go-testar.yml missing; same failure on master, pre-existing)",
+    "security": "accepted (agent:security:accepted, app-community#1185)",
+    "packagesAndSubmodules": "unchanged from master manifest (no downgrade)",
+    "production": "not authorized"
   }
 }
