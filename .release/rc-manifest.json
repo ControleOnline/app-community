@@ -1,7 +1,7 @@
 {
   "version": "1.10.85",
-  "rc": 1,
-  "branch": "rc/1.10.85-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.85-rc.2",
   "baseMaster": "aeffee34585da4b8c7507fc52d4f2c5311c49537",
   "tasks": [
     1187
@@ -9,7 +9,7 @@
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
     "ControleOnline/app-community": "e780278942821c8f8c0210843ed045c964f55960",
-    "ControleOnline/api-community": "b5231babbaf4c0d9bb101b29ae851985c9e6ab52",
+    "ControleOnline/api-community": "39ca4de110f1d75ab4ada1854e9830bfb94d26ff",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
     "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
@@ -18,7 +18,7 @@
     "ControleOnline/ui-products": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820",
     "ControleOnline/ui-orders": "9fafa1827741cc719df32c5a8bd1dc86d5713ed1",
     "ControleOnline/api-platform-common": "0e048950dada1990b1ec319240554cecbc65902d",
-    "ControleOnline/api-platform-people": "57b4836d3bc4333808387e2271ae5a6bf6c91c74",
+    "ControleOnline/api-platform-people": "cd0077e5c27a043cc99fb1e996d8303e12e2230b",
     "ControleOnline/api-platform-mcp": "290f1c0abe291e97fb427b263815d021466cb357",
     "ControleOnline/api-platform-users": "41daafcdf7941602c83a097ff5aa75bc032aa277"
   },
@@ -55,12 +55,12 @@
   "frozen": true,
   "contentCommit": "e780278942821c8f8c0210843ed045c964f55960",
   "validation": {
-    "scope": "ui-orders 1.3.49 -> 1.3.50 (checkout CPF fidelidade: lookup so com CPF completo valido, vinculo cliente na current company, popup de cadastro) + overlay guards retargeted to 1.3.50",
+    "scope": "ui-orders 1.3.49 -> 1.3.50 (checkout CPF fidelidade: lookup so com CPF completo valido, vinculo cliente na current company, popup de cadastro) + overlay guards retargeted to 1.3.50 | rc.2: no app code change; API snapshot updated to api-community rc.2 (people 1.0.11) that fixes the HTTP 500 of the checkout CPF lookup found on staging with rc.1",
     "security": "accepted (agent:security:accepted, app-community#1187); PII finding fixed in people 1.0.10",
     "tests": "ui-orders jest 162 ok (1 suite preexistente falha por parse); overlay hashes of 5 files verified against published 1.3.50; npm run manager:prepare passes",
     "ciNotes": "browser-smoke ui-employee failures preexisting (also on #1185 PR); api CI baseline failures unchanged",
     "packagesAndSubmodules": "only ui-orders pin changed (no downgrade)",
     "production": "not authorized"
   },
-  "apiStaging": "b5231babbaf4c0d9bb101b29ae851985c9e6ab52"
+  "apiStaging": "39ca4de110f1d75ab4ada1854e9830bfb94d26ff"
 }
