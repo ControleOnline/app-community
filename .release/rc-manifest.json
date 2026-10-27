@@ -1,24 +1,24 @@
 {
-  "version": "1.10.84",
+  "version": "1.10.85",
   "rc": 1,
-  "branch": "rc/1.10.84-rc.1",
-  "baseMaster": "49254c42e60bc4c8f2cda9d6199edcdc32d133fd",
+  "branch": "rc/1.10.85-rc.1",
+  "baseMaster": "aeffee34585da4b8c7507fc52d4f2c5311c49537",
   "tasks": [
-    1185
+    1187
   ],
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
-    "ControleOnline/app-community": "da9938e9ead3191e051f21ceb0325def79f28645",
-    "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
+    "ControleOnline/app-community": "e780278942821c8f8c0210843ed045c964f55960",
+    "ControleOnline/api-community": "c1f883a367b12c63eaf9b3763d131d4bcb026965",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
     "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
     "ControleOnline/ui-manager": "9105c9f9388ef3c800a1e773a665574dc0d87b44",
     "ControleOnline/ui-people": "25aad29efd3a3b346baf21387a1ba0d190ad9e44",
     "ControleOnline/ui-products": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820",
-    "ControleOnline/ui-orders": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e",
+    "ControleOnline/ui-orders": "9fafa1827741cc719df32c5a8bd1dc86d5713ed1",
     "ControleOnline/api-platform-common": "0e048950dada1990b1ec319240554cecbc65902d",
-    "ControleOnline/api-platform-people": "26ccd2bb8283938cf77fa58a6be7cb7a2afff968",
+    "ControleOnline/api-platform-people": "57b4836d3bc4333808387e2271ae5a6bf6c91c74",
     "ControleOnline/api-platform-mcp": "290f1c0abe291e97fb427b263815d021466cb357",
     "ControleOnline/api-platform-users": "41daafcdf7941602c83a097ff5aa75bc032aa277"
   },
@@ -44,8 +44,8 @@
       "source": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820"
     },
     "ui-orders": {
-      "version": "1.3.49",
-      "source": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e"
+      "version": "1.3.50",
+      "source": "9fafa1827741cc719df32c5a8bd1dc86d5713ed1"
     },
     "controleonline/orders": {
       "version": "1.0.5",
@@ -53,13 +53,14 @@
     }
   },
   "frozen": true,
-  "contentCommit": "da9938e9ead3191e051f21ceb0325def79f28645",
+  "contentCommit": "e780278942821c8f8c0210843ed045c964f55960",
   "validation": {
-    "scope": "one line: DOMAIN app.lave-go.com -> pos.lave-go.com in .github/workflows/cielo-deploy-pdv-lavego-STAGING.yml",
-    "yamlValid": true,
-    "workflowTests": "13 passed, 1 failed (deploy-lave-go-testar.yml missing; same failure on master, pre-existing)",
-    "security": "accepted (agent:security:accepted, app-community#1185)",
-    "packagesAndSubmodules": "unchanged from master manifest (no downgrade)",
+    "scope": "ui-orders 1.3.49 -> 1.3.50 (checkout CPF fidelidade: lookup so com CPF completo valido, vinculo cliente na current company, popup de cadastro) + overlay guards retargeted to 1.3.50",
+    "security": "accepted (agent:security:accepted, app-community#1187); PII finding fixed in people 1.0.10",
+    "tests": "ui-orders jest 162 ok (1 suite preexistente falha por parse); overlay hashes of 5 files verified against published 1.3.50; npm run manager:prepare passes",
+    "ciNotes": "browser-smoke ui-employee failures preexisting (also on #1185 PR); api CI baseline failures unchanged",
+    "packagesAndSubmodules": "only ui-orders pin changed (no downgrade)",
     "production": "not authorized"
-  }
+  },
+  "apiStaging": "c1f883a367b12c63eaf9b3763d131d4bcb026965"
 }
