@@ -9,7 +9,7 @@
   "taskRepository": "ControleOnline/app-community",
   "repositories": {
     "ControleOnline/app-community": "e780278942821c8f8c0210843ed045c964f55960",
-    "ControleOnline/api-community": "c1f883a367b12c63eaf9b3763d131d4bcb026965",
+    "ControleOnline/api-community": "b5231babbaf4c0d9bb101b29ae851985c9e6ab52",
     "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
     "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
     "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
@@ -62,5 +62,5 @@
     "packagesAndSubmodules": "only ui-orders pin changed (no downgrade)",
     "production": "not authorized"
   },
-  "apiStaging": "c1f883a367b12c63eaf9b3763d131d4bcb026965"
+  "apiStaging": "b5231babbaf4c0d9bb101b29ae851985c9e6ab52"
 }
