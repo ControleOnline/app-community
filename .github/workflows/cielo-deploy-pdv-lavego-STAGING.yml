@@ -48,7 +48,7 @@ jobs:
         run: |
           echo "const env = {\
           API_ENTRYPOINT: 'https://apinew.lave-go.com',\
-          DOMAIN: 'https://app.lave-go.com',\
+          DOMAIN: 'https://pos.lave-go.com',\
           MANAGER_APP: 'https://app.lave-go.com',\
           SOCKET: 'wss://apinew.lave-go.com',\
           NEW_RELIC:{\
