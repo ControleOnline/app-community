@@ -82,7 +82,7 @@
     },
     {
       "package": "@controleonline/ui-orders",
-      "version": "1.3.49",
+      "version": "1.3.51",
       "file": "src/react/pages/orders/OrderHistoryCard.js",
       "before": "3d687d9cbca6d273ce936e53b0e2415fcb739943332fa08d217b30f3e3ee5aae",
       "after": "3d687d9cbca6d273ce936e53b0e2415fcb739943332fa08d217b30f3e3ee5aae",
@@ -90,7 +90,7 @@
     },
     {
       "package": "@controleonline/ui-orders",
-      "version": "1.3.49",
+      "version": "1.3.51",
       "file": "src/react/pages/orders/OrderHistoryCompactFooter.js",
       "before": "0afafb20916a8c9b273465dfe55432cfe25aeedebf2d8768d0eeddbe2d3797c6",
       "after": "0afafb20916a8c9b273465dfe55432cfe25aeedebf2d8768d0eeddbe2d3797c6",
