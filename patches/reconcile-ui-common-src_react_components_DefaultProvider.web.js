@@ -1,4 +1,3 @@
-import {adminBootstrapState} from '@controleonline/../../src/components/bootstrap/adminBootstrapState';
 import {useWebTranslationRefresh, useWebTranslationReset, useWebDeviceConfigReset, useWebRuntimeIp, useWebWebDeviceIdentity, useWebMainCompany, useWebDeviceRegistration, useWebPrinters, useWebPaymentTypes} from './DefaultProvider.web.lifecycle';
 import {useWebDeviceConfigFetch, useWebDeviceConfigSync, useWebMainConfigReset, useWebMainConfigDiscovery, useWebMainConfigSeed, useWebTranslationBootstrap, useWebBootstrapReady, useWebCompanies, useWebMenus, useWebThemeFetch, useWebThemePalette} from './DefaultProvider.web.configuration';
 import {resolveDomainThemeColors} from './resolveDomainThemeColors';
@@ -7,7 +6,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -35,7 +33,7 @@ import {
   applyPaletteToRuntimeColors,
   applyThemeCssVariables,
   resolveThemePalette,
-} from '@controleonline/../../src/styles/branding';
+} from '@controleonline/ui-layout/src/styles/branding';
 import { colors as runtimeColors } from '@controleonline/ui-layout/src/styles/colors';
 import {
   buildDefaultDeviceConfigs,
@@ -166,7 +164,6 @@ export const DefaultProvider = ({
 }) => {
   const appType = String(app_type || '').toUpperCase();
   const isShopClientApp = appType === 'SHOP';
-  const hasManagedBootstrap = ['ADMIN', 'MANAGER', 'POS'].includes(appType);
   const themeStore = useStore('theme');
   const getters = themeStore.getters;
   const actions = themeStore.actions;
@@ -206,8 +203,6 @@ export const DefaultProvider = ({
   const hasCurrentCompany =
     !!currentCompany && Object.entries(currentCompany).length > 0;
 
-  const [menuLoad, setMenuLoad] = useState({key: '', status: 'idle'});
-  const menuContextKey = `${appType}:${user?.id || user?.people || user?.username || ''}:${currentCompany?.id || ''}`;
   const [translateReady, setTranslateReady] = useState(false);
   const [activeTranslateBootstrapKey, setActiveTranslateBootstrapKey] =
     useState('');
@@ -299,11 +294,6 @@ export const DefaultProvider = ({
     () => ({
       colors,
       menus,
-      runtimeMenus: {
-        managed: hasManagedBootstrap,
-        ready: menuLoad.key === menuContextKey && menuLoad.status === 'ready',
-        modules: menuLoad.key === menuContextKey && menuLoad.status === 'ready' ? menus : [],
-      },
       runtimeFooter: isShopClientApp
         ? null
         : {
@@ -325,7 +315,6 @@ export const DefaultProvider = ({
       device,
       isShopClientApp,
       menus,
-      hasManagedBootstrap, menuLoad, menuContextKey,
       registerBottomNavigation,
     ],
   );
@@ -396,40 +385,28 @@ export const DefaultProvider = ({
 
   useWebTranslationBootstrap({currentRouteName, isPublicRouteActive, isLogged, hasCurrentCompany, deviceConfigFetched, expectedTranslateBootstrapKey, translateBootstrapKeyRef, companies, currentCompany, mainCompany, setActiveTranslateBootstrapKey, setTranslateReady, configuredTranslationLanguage, Translate, stores, translateStore});
 
-  const adminBootstrap = hasManagedBootstrap ? adminBootstrapState({
-    routeName: currentRouteName, publicRoute: isPublicRouteActive,
-    sessionChecked: authGetters.sessionChecked, isLogged, hasCompany: hasCurrentCompany && Boolean(mainCompany?.id),
-    translationReady: isTranslateBootstrapReady, menuContextKey, menuLoad, companyError: peopleGetters.error,
-  }) : null;
-  useLayoutEffect(() => {
-    if (adminBootstrap) onBootstrapReady?.(!adminBootstrap.pending, adminBootstrap.error);
-  }, [adminBootstrap?.pending, adminBootstrap?.error, onBootstrapReady]);
-  useWebBootstrapReady({isLogged, hasCurrentCompany, currentRouteName, isTranslateBootstrapReady,
-    onBootstrapReady: hasManagedBootstrap ? undefined : onBootstrapReady});
+  useWebBootstrapReady({isLogged, hasCurrentCompany, currentRouteName, isTranslateBootstrapReady, onBootstrapReady});
 
   useWebCompanies({device, isLogged, peopleActions});
 
-  useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse,
-    menuContextKey: hasManagedBootstrap ? menuContextKey : undefined,
-    setMenuLoad: hasManagedBootstrap ? setMenuLoad : undefined, includeToolbar: hasManagedBootstrap});
+  useWebMenus({isLogged, currentCompany, actions, api, appType, normalizeRuntimeMenuResponse});
 
   useWebThemeFetch({api, parseThemeCss, setBaseThemeColors, actions, currentCompany, mainCompany, device});
 
   useWebThemePalette({resolveDomainThemeColors, baseThemeColors, mainCompany, resolveThemePalette, runtimeColors, applyPaletteToRuntimeColors, applyThemeCssVariables, actions, currentCompany, isShopClientApp});
 
   const translationPending = requiresTranslateBootstrap && !isTranslateBootstrapReady;
-  const interfacePending = translationPending || Boolean(adminBootstrap?.pending);
 
   return (
       <ThemeContext.Provider value={themeContextValue}>
         <View
-          pointerEvents={interfacePending ? 'none' : 'auto'}
-          aria-hidden={interfacePending}
+          pointerEvents={translationPending ? 'none' : 'auto'}
+          aria-hidden={translationPending}
           style={[
             providerStyles.shell,
             // Keep navigation mounted while translations load. Unmounting it
             // resets the login route and repeatedly registers the bottom bar.
-            interfacePending && providerStyles.translationPending,
+            translationPending && providerStyles.translationPending,
             {
               backgroundColor: colors?.background || runtimeColors.background,
             },
@@ -456,12 +433,6 @@ export const DefaultProvider = ({
     </ThemeContext.Provider>
   );
 };
-
-// Metro skips Refresh hook signatures for node_modules. Force a fresh provider
-// on development updates instead of preserving an incompatible hook sequence.
-if (typeof __DEV__ !== 'undefined' && __DEV__) {
-  require('react-refresh/runtime').setSignature(DefaultProvider, 'admin-bootstrap', true);
-}
 
 export const useTheme = () => useContext(ThemeContext);
 // TODO(store-first): quando este arquivo for mexido, mover a leitura para stores, remover api.fetch e evitar repassar dados em objetos quando o store ja resolver isso.

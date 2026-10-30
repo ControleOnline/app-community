@@ -37,7 +37,7 @@
       "version": "1.1.69",
       "file": "src/react/pages/TranslationsReviewPage.js",
       "before": "384d433f37d49bafa20820cfae096699ebb245efcd6665042e20860960b15d3f",
-      "after": "80be784a5606c1d54d555823242abd9133dfc70707e8af17fac797b79da1077b",
+      "after": "f95aba0bba8ef72f373d41d2537b74060eec90991bef3c3cfcf615acf19e7f1d",
       "payload": "audit-translations-review.after.js"
     },
     {
@@ -52,16 +52,16 @@
       "package": "@controleonline/ui-products",
       "version": "1.0.41",
       "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
-      "before": "2e90e5038940ca74ace32517708b65c537d9e4c748539cdc6570ac9c07de17d8",
-      "after": "2e90e5038940ca74ace32517708b65c537d9e4c748539cdc6570ac9c07de17d8",
+      "before": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
+      "after": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
       "payload": "audit-category-palette.after.js"
     },
     {
       "package": "@controleonline/ui-products",
       "version": "1.0.41",
       "file": "src/react/pages/Products.js",
-      "before": "e41f566b49ec2b2c7d27879fe515ea4c317b789edff386dbde9040ee377c5d3a",
-      "after": "e41f566b49ec2b2c7d27879fe515ea4c317b789edff386dbde9040ee377c5d3a",
+      "before": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
+      "after": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
       "payload": "audit-products-page-theme.after.js"
     },
     {
@@ -76,8 +76,8 @@
       "package": "@controleonline/ui-products",
       "version": "1.0.41",
       "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
-      "before": "88e823d9a0dc78784fbc03a658db182d3c5b08ed09333e690e394e5d569dec75",
-      "after": "88e823d9a0dc78784fbc03a658db182d3c5b08ed09333e690e394e5d569dec75",
+      "before": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
+      "after": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
       "payload": "audit-waiter-recovery-test.after.js"
     },
     {
