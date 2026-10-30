@@ -2,6 +2,7 @@ import React from 'react';
 import {api} from '@controleonline/ui-common/src/api';
 import renderer, {act} from 'react-test-renderer';
 import useContext from '@controleonline/ui-orders/src/react/pages/checkout/useCheckoutContextState';
+import useLookup from '@controleonline/ui-orders/src/react/pages/checkout/useCheckoutLoyaltyCpfLookup';
 import useLoyalty from '@controleonline/ui-orders/src/react/pages/checkout/useCheckoutLoyaltyEffects';
 import useSelection from '@controleonline/ui-orders/src/react/pages/checkout/useCheckoutPaymentSelection';
 jest.mock('@appType', () => ({app_type: 'POS'}));
@@ -26,6 +27,7 @@ function LoyaltyHarness({order, personId = null, companyId = 3}) {
   const [person,setPerson] = React.useState(personId ? {id: personId} : null);
   const [loading,setLoading] = React.useState(false), [error,setError] = React.useState('');
   const [input,setInput] = React.useState(''), [results,setResults] = React.useState([]), [,setSearch] = React.useState(false), [card,setCard] = React.useState(null);
+  useLookup({currentCompany:{id:companyId},loyaltyCpfDigits:input.replace(/\D/g,''),loyaltyCpfStepCompleted:done,requiresLoyaltyCpfStep:true,selectedLoyaltyPerson:person,setLoyaltyCpfInput:setInput,setLoyaltyCpfLoading:setSearch,setLoyaltyCpfResults:setResults,setLoyaltyCpfStepSkipped:setSkipped,setSelectedLoyaltyPerson:setPerson});
   changeCpf=setInput;result = {done,skipped,loading,error,card,results};skip=()=>{setPerson(null);setDone(true);setSkipped(true);};
   useLoyalty({order, mainCompany: company, currentCompany: {id: companyId}, ordersActions: actions, requiresLoyaltyCpfStep:true,
     loadingLoyaltySnapshot:loading,loyaltyCpfDigits:input,loyaltyCpfStepCompleted:done,loyaltyCpfStepSkipped:skipped,
@@ -67,16 +69,28 @@ it('ignores a late fidelity result after the operator skips identification', asy
   expect(result).toMatchObject({done:true,skipped:true,loading:false,card:null});
 });
 
-it('shows the CPF returned by the people API collection', async () => {
-  jest.useFakeTimers();
-  try {
-    api.fetch.mockResolvedValue({member:[{id:105801,name:'QA SINGLE ITEM LOCAL',document:[{document:'99900012356',documentType:{documentType:'CPF'}}]}]});
-    await act(async () => {tree=renderer.create(<LoyaltyHarness order={{id:1}}/>);});
-    await act(async () => changeCpf('99900012356'));
-    await act(async () => {jest.advanceTimersByTime(300);});
-    expect(api.fetch).toHaveBeenCalledWith('people', expect.objectContaining({params:expect.objectContaining({search:'99900012356',context:'loyalty-cpf'})}));
-    expect(result.results).toEqual([expect.objectContaining({id:105801,cpf:'99900012356'})]);
-  } finally {jest.useRealTimers();}
+it.each(['52998', '11111111111'])('does not query incomplete or invalid CPF: %s', async cpf => {
+  api.fetch.mockReset();
+  await act(async () => {tree=renderer.create(<LoyaltyHarness order={{id:1}}/>);});
+  await act(async () => changeCpf(cpf));
+  expect(api.fetch).not.toHaveBeenCalled();
+});
+
+it('looks up an exact valid CPF and selects the linked client', async () => {
+  api.fetch.mockReset();
+  api.fetch.mockImplementation(resource => Promise.resolve(resource === 'people'
+    ? {member:[{id:105801,name:'QA SINGLE ITEM LOCAL',document:[{document:'52998224725',documentType:{documentType:'CPF'}}]}]}
+    : {member:[{id:1}]}));
+  actions.getFidelitySnapshot.mockResolvedValue({member:[]});
+  await act(async () => {tree=renderer.create(<LoyaltyHarness order={{id:1}}/>);});
+  await act(async () => changeCpf('52998224725'));
+  expect(api.fetch).toHaveBeenCalledWith('people', expect.objectContaining({params:expect.objectContaining({
+    search:'52998224725', context:'checkout-cpf-lookup', company:'/people/3',
+  })}));
+  expect(api.fetch).toHaveBeenCalledWith('people_links', expect.objectContaining({params:expect.objectContaining({
+    company:'/people/3',people:'/people/105801',linkType:['client'],
+  })}));
+  expect(actions.getFidelitySnapshot).toHaveBeenCalledWith(expect.objectContaining({clientId:105801}));
 });
 
 it('offers only the full loyalty card owned by the sale company', async () => {
