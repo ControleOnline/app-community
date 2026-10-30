@@ -26,7 +26,7 @@
     },
     {
       "package": "@controleonline/ui-layout",
-      "version": "1.0.20",
+      "version": "1.0.21",
       "file": "src/react/layouts/DefaultLayout.js",
       "before": "a6a316df59831373819861024e8b3640cece3389809b0503fc426f1a490ba30d",
       "payload": "bottom-navigation-3.after.js",
