@@ -1,8 +1,9 @@
 {
-  "version": "1.10.89",
-  "rc": 3,
-  "branch": "rc/1.10.89-rc.3",
-  "baseMaster": "46e8722d225c6b606af7ef0a4a1a3b37ec878bf9",
+  "branch": "rc/1.10.91-rc.1",
+  "version": "1.10.91",
+  "rc": 1,
+  "frozen": true,
+  "baseMaster": "71930fc8641c3ba34b62d10e7fb07e042f97e903",
   "tasks": [
     1221,
     1227
@@ -10,15 +11,7 @@
   "frozen": true,
   "contentCommit": "474ddd50bfbb5dc230f948bf4d5875b826cf4a9e",
   "repositories": {
-    "ControleOnline/app-community": "474ddd50bfbb5dc230f948bf4d5875b826cf4a9e"
-  },
-  "packages": {
-    "@controleonline/ui-common": "1.2.108"
-  },
-  "validation": {
-    "scope": "Web staging build repair preserving Kim #1221 and existing POS overlays",
-    "tests": "Clean installation, manager:prepare, Expo production web export and 39 focused tests passed.",
-    "api": "API staging repair is separate api-community#287 and api-platform-mcp#65; login remains pending API package publication.",
-    "production": "Not authorized by this staging-repair request."
+    "ControleOnline/app-community": "8a2e371c390e8324a9da407345475f08de616f57",
+    "ControleOnline/ui-common": "3d53b6e35d019789b30884c38890aa6fcec7c742"
   }
 }
