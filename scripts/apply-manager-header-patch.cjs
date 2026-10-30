@@ -11,11 +11,20 @@ if (JSON.parse(fs.readFileSync(path.join(root, 'package.json'))).version !== pat
   throw Error('Review company header patch: package version changed.');
 const downstream = require('../patches/single-item.json').files.find(e => e.package === patch.package && e.file === patch.file && e.before === patch.after);
 if (hash(source) !== patch.after && !(downstream && hash(source) === downstream.after)) {
-  if (hash(source) !== patch.before) console.warn('Company selector has unrelated changes; nothing overwritten.'); continue;
-  for (const [before, after] of patch.replacements) {
-    if (source.split(before).length !== 2) throw Error('Company header patch anchor changed.');
-    source = source.replace(before, after);
+  if (hash(source) !== patch.before) {
+    console.warn('Company selector has unrelated changes; nothing overwritten.');
+  } else {
+    for (const [before, after] of patch.replacements) {
+      if (source.split(before).length !== 2) {
+        console.warn('Company header patch anchor changed.');
+        break;
+      }
+      source = source.replace(before, after);
+    }
+    if (hash(source) !== patch.after) {
+      console.warn('Company header patch checksum mismatch.');
+    } else {
+      fs.writeFileSync(target, source);
+    }
   }
-  if (hash(source) !== patch.after) console.warn('Company header patch checksum mismatch.'); continue;
-  fs.writeFileSync(target, source);
 }
