@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.107",
+      "version": "1.2.109",
       "file": "src/react/components/AnimatedModal.js",
       "before": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",
       "after": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",
