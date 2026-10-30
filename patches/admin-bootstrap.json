@@ -23,7 +23,7 @@
     },
     {
       "package": "@controleonline/ui-layout",
-      "version": "1.0.20",
+      "version": "1.0.21",
       "file": "src/react/App.js",
       "before": "fa6ba3339a78c1c94e5a8d3f91aa6888d47f531581719c5bf0db3f537d07f41e",
       "after": "17436f95bee5437d8dd13264fa6f209ebc1bb64389c1f832381ceb6b5d5e961e",
