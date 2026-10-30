@@ -1,5 +1,5 @@
 import {invalidateWebThemeColors} from './webThemeColorCache';
-import {colors as defaultColors} from './colors';
+import {colors as defaultColors} from '@controleonline/ui-layout/src/styles/colors';
 
 const CSS_VAR_FALLBACK_HEX_REGEX =
   /^var\([^,]+,\s*(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8})\s*\)$/;
