@@ -3,7 +3,7 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {useStore} from '@store';
-import {resolveThemePalette} from '@controleonline/../../src/styles/branding';
+import {resolveThemePalette} from '@controleonline/ui-layout/src/styles/branding';
 import {colors} from '@controleonline/ui-layout/src/styles/colors';
 import CompactFilterSelector from '@controleonline/ui-default/src/react/components/filters/CompactFilterSelector';
 import {PDV_DEVICE_TYPE} from '@controleonline/ui-common/src/react/utils/printerDevices';
