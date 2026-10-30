@@ -141,6 +141,7 @@ runs:
         server-dir: ${{ inputs.remote_dir }}
         state-name: .ftp-deploy-state.json
         log-level: standard
+        timeout: 600000
         exclude: |
           **/.git*
           **/.git*/**
