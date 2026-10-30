@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.92",
+  "version": "1.10.93",
   "private": true,
   "scripts": {
     "android": "npm run manager:prepare && node scripts/apply-native-screens-patch.cjs && expo run:android",
@@ -50,7 +50,7 @@
     "@controleonline/react-native-infinitepay-payment": "1.0.5",
     "@controleonline/ui-accounting": "1.0.19",
     "@controleonline/ui-carrier": "1.0.29",
-    "@controleonline/ui-common": "1.2.109",
+    "@controleonline/ui-common": "1.2.110",
     "@controleonline/ui-config": "1.0.26",
     "@controleonline/ui-contracts": "1.6.81",
     "@controleonline/ui-crm": "1.0.44",
@@ -58,7 +58,7 @@
     "@controleonline/ui-default": "1.0.282",
     "@controleonline/ui-employee": "1.0.28",
     "@controleonline/ui-financial": "1.1.43",
-    "@controleonline/ui-layout": "1.0.20",
+    "@controleonline/ui-layout": "1.0.21",
     "@controleonline/ui-login": "1.0.116",
     "@controleonline/ui-logistic": "1.0.41",
     "@controleonline/ui-manager": "1.0.23",
