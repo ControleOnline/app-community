@@ -23,8 +23,7 @@ for (const file of require('../patches/admin-bootstrap.json').files) {
   if (hash(bytes) !== file.before) {
     const prerequisite = require('../patches/manager-package-reconciliation.json').files.find(item =>
       item.package === file.package && item.file === file.file && item.version === file.version && item.after === file.before);
-    if (!prerequisite || hash(bytes) !== prerequisite.before)
-      console.warn(`Unrelated changes; skip`); continue;
+    if (!prerequisite || hash(bytes) !== prerequisite.before) { console.warn(`Unrelated changes; skip`); continue; }
     bytes = fs.readFileSync(path.join(root, 'patches', prerequisite.payload));
     if (hash(bytes) !== file.before) console.warn('Bootstrap prerequisite checksum mismatch; no files overwritten.'); continue;
   }
