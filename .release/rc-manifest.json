@@ -1,1 +1,13 @@
-{"branch":"rc/1.10.99-rc.1","version":"1.10.99","rc":1,"frozen":true,"baseMaster":"","tasks":[1221],"repositories":{"ControleOnline/app-community":"PENDING"}}
+{
+  "branch": "rc/1.10.99-rc.1",
+  "version": "1.10.99",
+  "rc": 1,
+  "frozen": true,
+  "baseMaster": "",
+  "tasks": [
+    1221
+  ],
+  "repositories": {
+    "ControleOnline/app-community": "c3297db1ea65b4d6c70456ed1add535906ac21f5"
+  }
+}
