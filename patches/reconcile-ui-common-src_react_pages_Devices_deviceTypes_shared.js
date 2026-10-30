@@ -24,7 +24,7 @@ import {
 } from '@controleonline/ui-common/src/react/utils/paymentDevices';
 import {resolveOperationalDeviceType} from '@controleonline/ui-common/src/react/utils/deviceRuntime';
 import {resolveThemePalette, withOpacity} from '@controleonline/../../src/styles/branding';
-import {colors} from '@controleonline/../../src/styles/colors';
+import {colors} from '@controleonline/ui-layout/src/styles/colors';
 import Icon from 'react-native-vector-icons/Feather';
 import DefaultTable from '@controleonline/ui-default/src/react/components/table/DefaultTable';
 import {

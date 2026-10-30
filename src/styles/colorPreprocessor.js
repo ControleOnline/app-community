@@ -1,7 +1,7 @@
 import {isConfiguredWebThemeColor} from './webThemeColorCache';
 import React from 'react';
 import {Platform, StyleSheet, processColor} from 'react-native';
-import {colors as runtimeColors} from './colors';
+import {colors as runtimeColors} from '@controleonline/ui-layout/src/styles/colors';
 
 if (!global.__coThemeColorPatched) {
   global.__coThemeColorPatched = true;
