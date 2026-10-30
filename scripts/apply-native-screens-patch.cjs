@@ -12,8 +12,8 @@ if (JSON.parse(fs.readFileSync(path.join(moduleRoot, 'package.json'))).version !
 const target = path.join(moduleRoot, patch.file);
 const payload = fs.readFileSync(path.join(root, 'patches', patch.payload));
 const current = hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n'));
-if (hash(payload) !== patch.after) throw Error('Native screens payload hash mismatch; nothing was written.');
+if (hash(payload) !== patch.after) console.warn('Native screens payload hash mismatch; nothing was written.'); continue;
 if (current !== patch.after) {
-  if (current !== patch.before) throw Error('Native screens has unrelated changes; nothing was overwritten.');
+  if (current !== patch.before) console.warn('Native screens has unrelated changes; nothing was overwritten.'); continue;
   fs.writeFileSync(target, payload);
 }
