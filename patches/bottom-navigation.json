@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.107",
+      "version": "1.2.108",
       "file": "src/react/components/BottomNavigationBar.js",
       "before": "4703704e3fd3d08ad47e843080f1bdb6fba22df795bad8ee842e1520d3a49bae",
       "payload": "bottom-navigation-0.after.js",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.107",
+      "version": "1.2.108",
       "file": "src/react/components/RuntimeBottomNavigationBar.js",
       "before": "8cd3bab188a478b6acb23744622f9f47baf5fe80891dd20e09a41025f3611a19",
       "payload": "bottom-navigation-1.after.js",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.107",
+      "version": "1.2.108",
       "file": "src/react/components/BottomNavigationBar.soft.styles.js",
       "before": "b5a64c77da0456210f6f483ceaccd62d8a64fc08e7da56da2cf35f7219d60c74",
       "payload": "bottom-navigation-2.after.js",
@@ -34,7 +34,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.107",
+      "version": "1.2.108",
       "file": "src/react/hooks/useBottomNavigationPreference.js",
       "before": "842029ea4758670e415d123f9a308f8c966355fc52b7c1d0b3bc3c8647700e63",
       "payload": "bottom-navigation-4.after.js",
