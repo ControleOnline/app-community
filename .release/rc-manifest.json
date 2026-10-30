@@ -1,65 +1,12 @@
 {
-  "version": "1.10.84",
+  "branch": "rc/1.10.88-rc.1",
+  "version": "1.10.88",
   "rc": 1,
-  "branch": "rc/1.10.84-rc.1",
-  "baseMaster": "49254c42e60bc4c8f2cda9d6199edcdc32d133fd",
-  "tasks": [
-    1185
-  ],
-  "taskRepository": "ControleOnline/app-community",
-  "repositories": {
-    "ControleOnline/app-community": "da9938e9ead3191e051f21ceb0325def79f28645",
-    "ControleOnline/api-community": "8d59294259c1be99e0c0eba65a5f5885e6d60366",
-    "ControleOnline/api-platform-orders": "adf023f697e3f64782fa36c3855655364f74847a",
-    "ControleOnline/ui-common": "1a8a994bf7215c47608e5aa040fd0dc92cbcd5b0",
-    "ControleOnline/ui-default": "aa9fad75c5d47903a7c833e54c90890c6795d482",
-    "ControleOnline/ui-manager": "9105c9f9388ef3c800a1e773a665574dc0d87b44",
-    "ControleOnline/ui-people": "25aad29efd3a3b346baf21387a1ba0d190ad9e44",
-    "ControleOnline/ui-products": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820",
-    "ControleOnline/ui-orders": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e",
-    "ControleOnline/api-platform-common": "0e048950dada1990b1ec319240554cecbc65902d",
-    "ControleOnline/api-platform-people": "26ccd2bb8283938cf77fa58a6be7cb7a2afff968",
-    "ControleOnline/api-platform-mcp": "290f1c0abe291e97fb427b263815d021466cb357",
-    "ControleOnline/api-platform-users": "41daafcdf7941602c83a097ff5aa75bc032aa277"
-  },
-  "packages": {
-    "ui-common": {
-      "version": "1.2.105",
-      "source": "1018edc4e9fd05fbf553a3f4bb77584091b9ac3a"
-    },
-    "ui-default": {
-      "version": "1.0.282",
-      "source": "aa9fad75c5d47903a7c833e54c90890c6795d482"
-    },
-    "ui-manager": {
-      "version": "1.0.23",
-      "source": "9105c9f9388ef3c800a1e773a665574dc0d87b44"
-    },
-    "ui-people": {
-      "version": "1.0.102",
-      "source": "25aad29efd3a3b346baf21387a1ba0d190ad9e44"
-    },
-    "ui-products": {
-      "version": "1.0.41",
-      "source": "4b204cafdb524dfdbcf5fb2c5ae0be8b64d10820"
-    },
-    "ui-orders": {
-      "version": "1.3.49",
-      "source": "4b8dfb0eb748b80ce9a158f9df7ce94288b6a06e"
-    },
-    "controleonline/orders": {
-      "version": "1.0.5",
-      "source": "adf023f697e3f64782fa36c3855655364f74847a"
-    }
-  },
   "frozen": true,
-  "contentCommit": "da9938e9ead3191e051f21ceb0325def79f28645",
-  "validation": {
-    "scope": "one line: DOMAIN app.lave-go.com -> pos.lave-go.com in .github/workflows/cielo-deploy-pdv-lavego-STAGING.yml",
-    "yamlValid": true,
-    "workflowTests": "13 passed, 1 failed (deploy-lave-go-testar.yml missing; same failure on master, pre-existing)",
-    "security": "accepted (agent:security:accepted, app-community#1185)",
-    "packagesAndSubmodules": "unchanged from master manifest (no downgrade)",
-    "production": "not authorized"
+  "baseMaster": "8aaae9bc963495a970e0d23fae90e4357ad6dcc4",
+  "tasks": [1199],
+  "repositories": {
+    "ControleOnline/app-community": "29eb47bb25c8e9198da6b1470f93ab35ab0bbf3d",
+    "ControleOnline/ui-common": "93774605e0ca8e93cf4eab72f0b7ab50f46006e4"
   }
 }
