@@ -63,6 +63,11 @@ if (managerWebPreview || managerNativePreview) {
 
 const resolveBeforeAvatar = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // Legacy host path still present in some published UI packages during migration to ui-layout.
+  if (moduleName === '@controleonline/../../src/styles/colors')
+    return {type: 'sourceFile', filePath: path.join(appNodeModules, '@controleonline/ui-layout/src/styles/colors.js')};
+  if (moduleName === '@controleonline/../../src/styles/branding')
+    return {type: 'sourceFile', filePath: path.join(appNodeModules, '@controleonline/ui-layout/src/styles/branding.js')};
   if (moduleName === '@controleonline/ui-common/src/react/components/AppTypeSwitcher')
     return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/components/AuthenticatedAppTypeSwitcher.js')};
   if (moduleName === '@experimental-avatar') return {type: 'sourceFile', filePath: avatarModule.entry};
