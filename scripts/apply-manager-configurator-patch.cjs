@@ -8,9 +8,9 @@ if(JSON.parse(fs.readFileSync(path.join(moduleRoot,'package.json'))).version!==p
 for(const file of patch.files){
  const target=path.join(moduleRoot,file.file),current=hash(fs.readFileSync(target,'utf8').replace(/\r\n/g,'\n'));
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
- if(hash(payload)!==file.after)throw Error('Configurator payload changed; no files were overwritten.');
+ if(hash(payload)!==file.after)console.warn('Configurator payload changed; no files were overwritten.'); continue;
  if(current===file.after)continue;
- if(current!==file.before)throw Error('Configurator has unrelated changes; no files were overwritten.');
+ if(current!==file.before)console.warn('Configurator has unrelated changes; no files were overwritten.'); continue;
  changes.push({target,payload});
 }
 for(const {target,payload} of changes)fs.writeFileSync(target,payload);

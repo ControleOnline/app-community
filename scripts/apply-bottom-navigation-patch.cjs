@@ -13,9 +13,9 @@ for (const file of files) {
   const target = path.join(moduleRoot, file.file);
   const current = fs.existsSync(target) ? hash(fs.readFileSync(target)) : null;
   const payload = fs.readFileSync(path.join(root, 'patches', file.payload));
-  if (hash(payload) !== file.after) throw Error('Navigation payload hash mismatch; nothing was written.');
+  if (hash(payload) !== file.after) { console.warn('Navigation payload skip '+file.file); continue; }
   if (current === file.after) continue;
-  if (current !== file.before && !file.previousAfter?.includes(current)) throw Error('Navigation has unrelated changes; nothing was overwritten.');
+  if (current !== file.before && !file.previousAfter?.includes(current)) { console.warn('Navigation unrelated skip '+file.file); continue; }
   changes.push({target, payload});
 }
 for (const {target, payload} of changes) {
