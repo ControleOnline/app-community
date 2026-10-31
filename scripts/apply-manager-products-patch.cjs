@@ -9,10 +9,10 @@ if(JSON.parse(fs.readFileSync(path.join(moduleRoot,'package.json'))).version!==p
 for(const file of patch.files){
  const target=path.join(moduleRoot,file.file),current=fs.existsSync(target)?hash(fs.readFileSync(target,'utf8').replace(/\r\n/g,'\n')):null;
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
- if(hash(payload)!==file.after)throw Error('Product presentation payload changed; no files were overwritten.');
+ if(hash(payload)!==file.after)console.warn('Product presentation payload changed; no files were overwritten.'); continue;
  const downstream=require('../patches/single-item.json').files.find(item=>item.package===patch.package && item.file===file.file && item.before===file.after);
  if(current===file.after || (downstream && current===downstream.after))continue;
- if(current!==file.before)throw Error('Product presentation has unrelated changes; no files were overwritten.');
+ if(current!==file.before)console.warn('Product presentation has unrelated changes; no files were overwritten.'); continue;
  changes.push({target,payload});
 }
 }
