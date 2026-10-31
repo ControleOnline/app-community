@@ -1,7 +1,7 @@
 {
-  "branch": "rc/1.10.104-rc.1",
+  "branch": "rc/1.10.104-rc.2",
   "version": "1.10.104",
-  "rc": 1,
+  "rc": 2,
   "frozen": true,
   "baseMaster": "21b2e04a069fd11f20018343f4552a156c14b351",
   "tasks": [
