@@ -9,7 +9,7 @@ import {resolveManagerLayout} from '../../../scripts/lib/manager-layout.cjs';
 // The legacy preview flag remains loopback-only for existing local workflows.
 export const shouldPreview = ({platform, appType, layout, enabled, nativeEnabled, hostname}) => {
   const resolvedLayout = resolveManagerLayout(layout);
-  return appType === 'MANAGER' && resolvedLayout !== 'legacy' && (
+  return ['ADMIN', 'MANAGER'].includes(appType) && resolvedLayout !== 'legacy' && (
     (resolvedLayout === 'modern' && ['web','android'].includes(platform)) ||
     (platform === 'android' && nativeEnabled === '1') ||
     (platform === 'web' && enabled === '1' && ['localhost', '127.0.0.1', '[::1]'].includes(hostname))

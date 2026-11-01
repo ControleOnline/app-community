@@ -1,3 +1,4 @@
+import {useManagementPageTitle} from './ManagementPageTitleContext';
 import React,{useMemo,useState} from 'react';
 import {Pressable,Text,View,useWindowDimensions} from 'react-native';
 import {useStore} from '@store';
@@ -9,6 +10,7 @@ import {presentProduct,productColumns,productPresentation} from './productPresen
 import {managerTableTheme} from './managerTableTheme';
 
 export default function ManagerProductsTable(props) {
+ const ownsTitle=useManagementPageTitle();
  const route=useRoute(),{width}=useWindowDimensions(),{colors:c}=useManagerPreview();
  const store=useStore('products');
  const pdv=(props.interactionModeOverride||route.params?.interactionMode)==='pdv',mobile=width<=760;
@@ -32,8 +34,8 @@ export default function ManagerProductsTable(props) {
   style={{minHeight:44,borderWidth:1,borderColor:c.cardBorder,borderRadius:10,paddingHorizontal:12,justifyContent:'center',backgroundColor:c.cardBackground}}><Text style={{color:c.textPrimary,fontSize:12}}>{label}</Text></Pressable>;
  return <View style={{flex:1,minHeight:0,backgroundColor:c.pageBackground}}>
   {!props.externalCatalogToolbar && !(mobile&&pdv&&props.inlineCatalog)&&<View style={{padding:mobile?12:18,gap:10,flexDirection:'row',flexWrap:'wrap',alignItems:'center'}}>
-   <View style={{flex:1,minWidth:180}}><Text accessibilityRole="header" style={{fontSize:18,fontWeight:'700',color:c.textPrimary}}>{props.catalogTitle||(pdv?'Adicionar produtos ao pedido':'Produtos')}</Text>
-</View>
+   {!(ownsTitle && route.name==='ProductsPage') && <View style={{flex:1,minWidth:180}}><Text accessibilityRole="header" style={{fontSize:18,fontWeight:'700',color:c.textPrimary}}>{props.catalogTitle||(pdv?'Adicionar produtos ao pedido':'Produtos')}</Text>
+</View>}
    {!pdv&&props.add&&button('Novo produto',props.onAdd)}
    {!pdv&&button(advanced?'Recolher opções administrativas':'Opções administrativas',()=>setAdvanced(!advanced))}
   </View>}

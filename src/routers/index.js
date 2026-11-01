@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {getStateFromPath as defaultGetStateFromPath, getPathFromState as defaultGetPathFromState} from '@react-navigation/native'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
@@ -8,6 +8,7 @@ import {Pressable, StyleSheet} from 'react-native'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import ManagerHomePage from '../pages/OnGestorHome'
 import {homepageAppearanceForApp} from '../pages/homeAppearance'
+import SingleItemOrdersPage from '../components/single-item/SingleItemOrdersPage'
 import POSHomePage from '../components/single-item/SingleItemHome'
 import DeliveryHomePage from '@controleonline/ui-logistic/src/react/pages/home/index'
 import PPCHomePage from '@controleonline/ui-ppc/src/react/pages/displays/displayPage'
@@ -20,7 +21,9 @@ import ManagerPdvPage from '../components/manager-preview/ManagerPdvPage'
 import ManagerDevicesPage from '../components/manager-preview/ManagerDevicesPage'
 import ManagerResultsPage from '../components/manager-preview/ManagerResultsPage'
 import ManagerConfiguratorPage from '../components/manager-preview/ManagerConfiguratorPage'
-import {managerRouteOptions} from '../components/manager-preview/managerRouteOptions'
+import ManagerScreen from '../components/manager-preview/ManagerScreen'
+import ManagerPdvOperationProvider from '../components/manager-preview/ManagerPdvOperationProvider'
+import {managerRouteOptions, isManagementRoute} from '../components/manager-preview/managerRouteOptions'
 import ManagerPreviewProvider from '../components/manager-preview/ManagerPreviewProvider'
 import {managerPreviewEnabled} from '../components/manager-preview/model'
 
@@ -75,7 +78,7 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
     nativeOptions.title = nativeOptions.title(args)
   }
 
-  if (headerBackFallback && nativeOptions.headerShown !== false) {
+  if (!managerPreviewEnabled && headerBackFallback && nativeOptions.headerShown !== false) {
     nativeOptions.headerBackVisible = false
     nativeOptions.headerLeft = () => (
       React.createElement(
@@ -123,6 +126,7 @@ const resolveRouteOptions = (screenOptions, args = {}) => {
   return {
     ...DEFAULT_ROUTE_OPTIONS,
     ...nativeOptions,
+    headerBackFallback,
   }
 }
 
@@ -133,11 +137,12 @@ export const allRoutes = [
   ...customersRoutes,
   ...loginRoutes.map(route => managerPreviewEnabled && route.name === 'SignInPage' ? {...route, component: ManagerSignIn} : route),
   ...managerRoutes.map(route => {
+    if (route?.name === 'PdvPage') return {...route,component:ManagerPdvPage};
     if (!managerPreviewEnabled) return route;
     const component = {PdvPage: ManagerPdvPage, DevicesIndex: ManagerDevicesPage, IncomeStatement: ManagerResultsPage, ConfiguratorPage: ManagerConfiguratorPage}[route?.name];
     return component ? {...route, component} : route;
   }),
-  ...ordersRoutes,
+  ...ordersRoutes.map(route => route?.name === 'OrderHistoryPage' ? {...route, component:SingleItemOrdersPage} : route),
   ...reportRoutes,
   ...employeeRoutes,
   ...logisticRoutes,
@@ -189,14 +194,13 @@ const routeDefinitions = (() => {
 
 normalizeInitialBrowserPath(globalThis?.window)
 
-const WrappedComponent = (screenOptions, Component) => ({ navigation, route }) => {
-  const resolvedOptions = managerRouteOptions(route.name, resolveRouteOptions(screenOptions, {navigation, route}), managerPreviewEnabled)
-
-  return React.createElement(
-    DefaultLayout,
-    {navigation, options: resolvedOptions, route},
-    React.createElement(Component, {navigation, route}),
-  )
+const WrappedComponent = (screenOptions, Component) => {
+ const OperationalPage = props => <ManagerPdvOperationProvider {...props} Component={Component}/>;
+ return ({ navigation, route }) => {
+  const resolvedOptions = useMemo(() => resolveRouteOptions(screenOptions, {navigation, route}), [navigation, route]);
+  return <ManagerScreen navigation={navigation} route={route} options={resolvedOptions}
+    enabled={managerPreviewEnabled && isManagementRoute(route.name)} Layout={DefaultLayout} Component={OperationalPage} />
+ }
 }
 
 const stableRouteComponents = createStableRouteComponents(

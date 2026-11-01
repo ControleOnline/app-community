@@ -84,7 +84,7 @@ it('uses the modern Manager layout with standard Expo on local and official host
   for (const patch of [{hostname: 'app.lave-go.com'}, {hostname: ''}, {platform: 'android'}]) {
     expect(shouldPreview({...valid, ...patch})).toBe(true);
   }
-  for (const patch of [{platform: 'ios'}, {appType: 'POS'}, {appType: 'PPC'}, {appType: 'ADMIN'}]) {
+  for (const patch of [{platform: 'ios'}, {appType: 'POS'}, {appType: 'PPC'}]) {
     expect(shouldPreview({...valid, ...patch})).toBe(false);
   }
 });
@@ -139,6 +139,12 @@ it('supports explicit official-domain builds and an overriding legacy build',()=
  const official={platform:'web',appType:'MANAGER',hostname:'app.lave-go.com',layout:'modern'};
  expect(shouldPreview(official)).toBe(true);
  expect(shouldPreview({...official,layout:'legacy',enabled:'1'})).toBe(false);
- for(const appType of ['ADMIN','POS','SHOP'])expect(shouldPreview({...official,appType})).toBe(false);
+ for(const appType of ['POS','SHOP'])expect(shouldPreview({...official,appType})).toBe(false);
  expect(shouldPreview({...official,platform:'android'})).toBe(true);
+});
+
+it('uses the same modern presentation for ADMIN while preserving legacy opt-out',()=>{
+ const admin={platform:'web',appType:'ADMIN'};
+ expect(shouldPreview(admin)).toBe(true);
+ expect(shouldPreview({...admin,layout:'legacy'})).toBe(false);
 });

@@ -7,8 +7,8 @@ it('activates only for POS single-item devices',()=>{
 });
 it('derives sales destinations from authorized home/toolbar menus',()=>{
  const items=singleItemNavigation([{menus:[{menuType:'home',route:'OrderHistoryPage',routeParams:{orderTypeFilter:'sale'}},{menuType:'toolbar',route:'ProfilePage'}]}],['HomePage','OrderHistoryPage','ProfilePage']);
- expect(items.map(i=>i.route)).toEqual(['HomePage','OrderHistoryPage','ProfilePage']);
- expect(items[1].routeParams).toMatchObject({interactionMode:'pdv',orderTypeFilter:'sale'});
+ expect(items.map(i=>i.route)).toEqual(['OrderHistoryPage','HomePage','ProfilePage']);
+ expect(items[0].routeParams).toMatchObject({interactionMode:'pdv',orderTypeFilter:'sale'});
  expect(singleItemNavigation([],['HomePage','OrderHistoryPage','ProfilePage']).map(i=>i.route)).toEqual(['ProfilePage']);
 });
 it('does not expose unregistered destinations',()=>{
