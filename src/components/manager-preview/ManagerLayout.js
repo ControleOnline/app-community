@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {useStore} from '@store';
 import DefaultLayout from '@controleonline/ui-layout/src/react/layouts/DefaultLayout';
-import {isPublicRoute} from '@controleonline/ui-common/src/react/router/publicRoutes';
+import {isManagementRoute} from './managerRouteOptions';
 import {managerPreviewEnabled} from './model';
 import ManagerShell from './ManagerShell';
 import ManagerStartup from './ManagerStartup';
@@ -39,7 +39,7 @@ export default function ManagerLayout(props) {
     );
   }
 
-  if (isPublicRoute(routeName)) {
+  if (!isManagementRoute(routeName)) {
     return <DefaultLayout {...props} />;
   }
 

@@ -1,19 +1,10 @@
 import {managerRouteOptions} from '../../components/manager-preview/managerRouteOptions';
-it('uses the shared preview header on adapted lists but preserves native detail actions',()=>{
-  const options={headerShown:true,headerRight:()=>null,title:'Original'};
-  expect(managerRouteOptions('ClientsIndex',options,true)).toEqual({...options,headerShown:false});
-  expect(managerRouteOptions('EmployeesIndex',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('MyCompaniesPage',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('MyCompaniesPage',options,false)).toBe(options);
-  expect(managerRouteOptions('MyCompanyDetails',options,true)).toBe(options);
-  expect(managerRouteOptions('PdvPage',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('DevicesIndex',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('DevicesIndex',options,false)).toBe(options);
-  expect(managerRouteOptions('IncomeStatement',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('IncomeStatement',options,false)).toBe(options);
-  expect(managerRouteOptions('ConfiguratorPage',options,true).headerShown).toBe(false);
-  expect(managerRouteOptions('ConfiguratorPage',options,false)).toBe(options);
-  expect(managerRouteOptions('GeneralSettings',options,true)).toBe(options);
-  expect(managerRouteOptions('DeviceDetails',options,true)).toBe(options);
-  expect(managerRouteOptions('ClientsIndex',options,false)).toBe(options);
+jest.mock('@appType',()=>({app_type:'MANAGER'}));
+it.each(['LinkedOrderSettlementPage','FinancialHubPage','MyCompanyDetails','GeneralSettings','ProductDetails','DevicesIndex','HomePage'])('hides the native strip for modern private route %s',name=>{
+ const options={headerShown:true,title:'Original',headerRight:()=>null};
+ expect(managerRouteOptions(name,options,true)).toEqual({...options,headerShown:false});
+ expect(managerRouteOptions(name,options,false)).toBe(options);
+});
+it.each(['SignInPage','ShopCheckoutPage','PaylistPage'])('preserves navigation outside management: %s',name=>{
+ const options={headerShown:true};expect(managerRouteOptions(name,options,true)).toBe(options);
 });

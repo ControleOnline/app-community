@@ -85,7 +85,7 @@ it('looks up an exact valid CPF and selects the linked client', async () => {
   await act(async () => {tree=renderer.create(<LoyaltyHarness order={{id:1}}/>);});
   await act(async () => changeCpf('52998224725'));
   expect(api.fetch).toHaveBeenCalledWith('people', expect.objectContaining({params:expect.objectContaining({
-    search:'52998224725', context:'checkout-cpf-lookup', company:'/people/3',
+    cpf:'52998224725', context:'checkout-cpf-lookup', company:'/people/3',
   })}));
   expect(api.fetch).toHaveBeenCalledWith('people_links', expect.objectContaining({params:expect.objectContaining({
     company:'/people/3',people:'/people/105801',linkType:['client'],
