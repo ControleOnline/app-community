@@ -24,19 +24,19 @@ beforeEach(() => {
   mockCurrentCompany = {id: 99, alias: 'Franquia selecionada', logo: {id: 99}, icon: {id: 98}};
 });
 
-it('uses the selected company logo and label in the drawer', () => {
+it('uses the selected company icon and label in the drawer', () => {
   const tree = render();
-  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 99});
+  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 98});
   expect(tree.root.findByType('DefaultFile').props.company).toBe(mockCurrentCompany);
   expect(JSON.stringify(tree.toJSON())).toContain('Franquia selecionada');
   expect(JSON.stringify(tree.toJSON())).not.toContain('LAVE-GO - FRANQUIAS');
 });
-it('prefers the icon in the compact home link, with logo as an alternative', () => {
+it('prefers the logo in the centered home link, with icon as an alternative', () => {
   const tree = render({home: true});
-  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 98});
-  mockCurrentCompany = {...mockCurrentCompany, icon: null};
-  act(() => tree.update(<ManagerBrand colors={{}} home />));
   expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 99});
+  mockCurrentCompany = {...mockCurrentCompany, logo: null};
+  act(() => tree.update(<ManagerBrand colors={{}} home />));
+  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 98});
 });
 it('keeps the existing image when the owner has no media or a download fails', () => {
   const tree = render();
@@ -69,13 +69,13 @@ it('updates the brand when the selected company changes without changing the dom
 it('uses domain media when the selected company has none, while preserving the selected label', () => {
   mockCurrentCompany = {id: 99, alias: 'Franquia sem marca'};
   const tree = render();
-  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 1});
+  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 2});
   expect(tree.root.findByType('DefaultFile').props.company).toBe(mockMainCompany);
   expect(JSON.stringify(tree.toJSON())).toContain('Franquia sem marca');
 });
 it('uses the domain identity while there is no selected company', () => {
   mockCurrentCompany = null;
   const tree = render({home: true});
-  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 2});
+  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 1});
   expect(tree.root.findByType('DefaultFile').props.company).toBe(mockMainCompany);
 });
