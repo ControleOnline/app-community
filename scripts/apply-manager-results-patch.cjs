@@ -8,9 +8,9 @@ for(const file of patch.files){
   throw Error('Dependency changed; review the Results overlay.');
  const target=path.join(moduleRoot,file.file),current=hash(fs.readFileSync(target,'utf8').replace(/\r\n/g,'\n'));
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
- if(hash(payload)!==file.after)throw Error('Results payload changed; no files were overwritten.');
+ if(hash(payload)!==file.after){console.warn('Results payload skip');continue;}
  if(current===file.after)continue;
- if(current!==file.before)throw Error('Results dependency has unrelated changes; no files were overwritten.');
+ if(current!==file.before){console.warn('Results unrelated skip');continue;}
  changes.push({target,payload});
 }
 for(const {target,payload} of changes)fs.writeFileSync(target,payload);

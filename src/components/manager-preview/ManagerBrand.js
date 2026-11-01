@@ -4,7 +4,7 @@ import {useStore} from '@store';
 import DefaultFile from '@controleonline/ui-default/src/react/components/files/DefaultFile';
 
 // Follow the selected tenant; domain media is only a fallback for missing media.
-export default function ManagerBrand({colors: c, home = false, compact = false}) {
+export default function ManagerBrand({colors: c, home = false, compact = false, subtitle = true, wrapLabel = false}) {
   const {currentCompany, mainCompany} = useStore('people').getters;
   const selectedCompany = currentCompany?.id ? currentCompany : mainCompany;
   const pickFile = company => home
@@ -31,8 +31,8 @@ export default function ManagerBrand({colors: c, home = false, compact = false})
   return <View style={s.brand}>
     {image}
     {!compact && <View style={s.label}>
-      <Text numberOfLines={2} style={[s.title, {color: c.textPrimary}]}>{label}</Text>
-      <Text style={[s.subtitle, {color: c.textMuted}]}>GESTÃO INTEGRADA</Text>
+      <Text numberOfLines={wrapLabel ? undefined : 2} style={[s.title, {color: c.textPrimary}]}>{label}</Text>
+      {subtitle && <Text style={[s.subtitle, {color: c.textMuted}]}>GESTÃO INTEGRADA</Text>}
     </View>}
   </View>;
 }

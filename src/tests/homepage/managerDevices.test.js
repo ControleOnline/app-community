@@ -12,8 +12,7 @@ it('passes the domain palette to the existing device filters and groups without 
  const navigation={canGoBack:()=>true,goBack:jest.fn()};
  const tree=mount({route,navigation});const page=tree.root.findByType('ExistingDevices');
  expect(page.props.route).toBe(route);expect(page.props.themePalette.background).toBe('page');
- act(()=>tree.root.findByProps({accessibilityLabel:'Voltar'}).props.onPress());
- expect(navigation.goBack).toHaveBeenCalledTimes(1);
+ expect(tree.root.findAllByProps({accessibilityLabel:'Voltar'})).toHaveLength(0);
 });
 it('does not invent back navigation on a directly opened list',()=>{
  const tree=mount({navigation:{canGoBack:()=>false,goBack:jest.fn()}});

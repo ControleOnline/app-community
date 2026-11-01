@@ -1,3 +1,4 @@
+import {ManagementPageTitleContext} from '../../components/manager-preview/ManagementPageTitleContext';
 import React from 'react';
 import renderer,{act} from 'react-test-renderer';
 import Table from '../../components/manager-preview/ManagerDefaultTable';
@@ -177,4 +178,26 @@ it('keeps client composition compact and preserves module actions in the shared 
  expect(JSON.stringify(tree.toJSON())).not.toContain('Consulta solicitada');
  expect(JSON.stringify(tree.toJSON())).not.toContain('Recolher opções');
  act(()=>props.toolbarActions[0].onPress());expect(add).toHaveBeenCalledTimes(1);act(()=>tree.unmount());
+});
+
+it.each([['ClientsIndex','people'],['EmployeesIndex','people_link'],['ProvidersIndex','people'],['FranchiseesIndex','people'],['MyCompaniesPage','people']])('deduplicates %s headings without changing table contracts', (name,storeName)=>{
+ mockRoute=name;mockWidth=400;
+ const params={company:3,context:'all',peopleType:'F'},onRowPress=jest.fn(),onFilterChange=jest.fn(),actions={getItems:jest.fn()};let tree;
+ const content=<Table storeName={storeName} requestParams={params} actions={actions} onRowPress={onRowPress} onFilterChange={onFilterChange}/>;
+ act(()=>{tree=renderer.create(<ManagementPageTitleContext.Provider value>{content}</ManagementPageTitleContext.Provider>);});
+ expect(tree.root.findAllByProps({accessibilityRole:'header'})).toHaveLength(0);
+ const props=tree.root.findByType('ExistingTable').props;
+ expect(props.requestParams).toMatchObject(params);expect(params.context).toBe('all');
+ expect(props.onRowPress).toBe(onRowPress);expect(props.onFilterChange).toBe(onFilterChange);expect(props.actions).toBe(actions);
+ act(()=>tree.update(<ManagementPageTitleContext.Provider value={false}>{content}</ManagementPageTitleContext.Provider>));
+ expect(tree.root.findAllByProps({accessibilityRole:'header'})).toHaveLength(1);
+ act(()=>tree.unmount());
+});
+it('keeps product add and administrative tools when the shell owns the page title',()=>{
+ mockRoute='ProductsPage';let tree;
+ act(()=>{tree=renderer.create(<ManagementPageTitleContext.Provider value><Table storeName="products" add onAdd={onAdd}/></ManagementPageTitleContext.Provider>);});
+ expect(tree.root.findAllByProps({accessibilityRole:'header'})).toHaveLength(0);
+ act(()=>tree.root.findByProps({accessibilityLabel:'Novo produto'}).props.onPress());expect(onAdd).toHaveBeenCalledTimes(1);
+ act(()=>tree.root.findByProps({accessibilityLabel:'Opções administrativas'}).props.onPress());
+ expect(tree.root.findByType('ExistingTable').props.showAdministrativeTools).toBe(true);act(()=>tree.unmount());
 });

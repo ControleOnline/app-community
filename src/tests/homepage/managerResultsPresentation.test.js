@@ -1,3 +1,4 @@
+import {ManagementPageTitleContext} from '../../components/manager-preview/ManagementPageTitleContext';
 import React from 'react';
 import {Text} from 'react-native';
 import renderer,{act} from 'react-test-renderer';
@@ -26,7 +27,7 @@ it('passes the original route to the report and delegates year editing to Defaul
  const onChangeText=jest.fn(),onSubmitEditing=jest.fn();
  const input=report.props.presentation.renderYearInput({value:'2026',onChangeText,onSubmitEditing});
  expect(input.type).toBe('DefaultInput');expect(input.props.autoSave).toBe(false);expect(input.props.onChangeValue).toBe(onChangeText);expect(input.props.onSubmitEditing).toBe(onSubmitEditing);
- act(()=>tree.root.findByProps({accessibilityLabel:'Voltar'}).props.onPress());expect(navigation.goBack).toHaveBeenCalledTimes(1);
+ expect(tree.root.findAllByProps({accessibilityLabel:'Voltar'})).toHaveLength(0);
 });
 
 it('hosts report details in the ui-common modal with the configured overlay',()=>{
@@ -36,4 +37,12 @@ it('hosts report details in the ui-common modal with the configured overlay',()=
  const shared=modal.root.findByType('SharedModal');expect(shared.props.visible).toBe(true);
  expect(shared.props.overlayColor).toBe(mockPreview.colors.modalOverlay);
  act(()=>shared.props.onRequestClose());expect(close).toHaveBeenCalledTimes(1);
+});
+
+it('hides only its page title when the shared layout owns it',()=>{
+ global.IS_REACT_ACT_ENVIRONMENT=true;let tree;
+ act(()=>{tree=renderer.create(<ManagementPageTitleContext.Provider value><ManagerResultsPage navigation={{}}/></ManagementPageTitleContext.Provider>);});
+ const presentation=tree.root.findByType('ExistingReport').props.presentation;
+ expect(presentation.styles.pageTitle.display).toBe('none');
+ act(()=>tree.unmount());
 });

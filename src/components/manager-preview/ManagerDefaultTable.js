@@ -1,3 +1,4 @@
+import {useManagementPageTitle} from './ManagementPageTitleContext';
 import ManagerProductsTable from './ManagerProductsTable';
 import ManagerPdvCatalog from './ManagerPdvCatalog';
 import React,{useEffect,useMemo,useRef} from 'react';
@@ -21,6 +22,7 @@ const employeeLinkColumns = [
 ];
 const routes={ProductsPage:['Produtos','Novo produto'],ClientsIndex:['Clientes','Novo cliente'],ProvidersIndex:['Fornecedores','Novo fornecedor'],FranchiseesIndex:['Franquias','Nova franquia'],EmployeesIndex:['Colaboradores','Novo colaborador'],MyCompaniesPage:['Minhas empresas','Nova empresa']};
 export default function ManagerDefaultTable(props) {
+  const ownsTitle=useManagementPageTitle();
   const route=useRoute(), {width}=useWindowDimensions();
   const preview=useManagerPreview();
   const profile=routes[route.name];
@@ -55,7 +57,7 @@ export default function ManagerDefaultTable(props) {
   if(!enabled) return <DefaultTable {...props}/>;
   const addAction = props.onAdd || props.toolbarActions?.find(action=>action.key==='add')?.onPress;
   return <View style={{flex:1,minHeight:0,backgroundColor:c.pageBackground}}>
-    <View style={{paddingHorizontal:12,paddingVertical:8}}><Text accessibilityRole="header" style={{color:c.textPrimary,fontSize:18,fontWeight:'700'}}>{profile[0]}</Text></View>
+    {!ownsTitle && <View style={{paddingHorizontal:12,paddingVertical:8}}><Text accessibilityRole="header" style={{color:c.textPrimary,fontSize:18,fontWeight:'700'}}>{profile[0]}</Text></View>}
     <CollectionReadStatus catalog={preview?.experience?.catalog} endpoint={tableStore?.getters?.resourceEndpoint} color={c.textMuted} onlyProblems/>
     <DefaultTableThemeContext.Provider value={tableColors}>
     <DefaultTable {...props} columns={columns} paginationMode="pages" compactBreakpoint={760}

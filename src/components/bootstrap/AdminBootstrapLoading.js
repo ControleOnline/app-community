@@ -1,7 +1,7 @@
 import React from 'react';
 import {ActivityIndicator, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useStore} from '@store';
-import {colors as runtimeColors} from '../../styles/colors';
+import {colors as runtimeColors} from '@controleonline/ui-layout/src/styles/colors';
 
 export default function AdminBootstrapLoading({error, onRetry}) {
   const {colors = {}} = useStore('theme').getters;

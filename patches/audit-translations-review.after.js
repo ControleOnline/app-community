@@ -16,7 +16,7 @@ import DefaultExternalFilters from '@controleonline/ui-default/src/react/compone
 import DefaultTable from '@controleonline/ui-default/src/react/components/table/DefaultTable';
 import useToastMessage from '@controleonline/ui-crm/src/react/hooks/useToastMessage';
 import {useStore} from '@store';
-import {colors} from '@controleonline/../../src/styles/colors';
+import {colors} from '@controleonline/ui-layout/src/styles/colors';
 import {resolveThemePalette} from '@controleonline/../../src/styles/branding';
 import styles from './TranslationsReviewPage.styles';
 import TranslationReviewRow from './TranslationReviewRow';

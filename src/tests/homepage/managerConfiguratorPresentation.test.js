@@ -1,3 +1,4 @@
+import {ManagementPageTitleContext} from '../../components/manager-preview/ManagementPageTitleContext';
 import React from 'react';
 import renderer,{act} from 'react-test-renderer';
 import ManagerConfiguratorPage,{configuratorPresentation} from '../../components/manager-preview/ManagerConfiguratorPage';
@@ -16,11 +17,11 @@ it.each(['light','dark'])('maps the hub surfaces and text to the configured %s t
  expect(p.styles.actionCard.flexGrow).toBe(0);
  expect(configuratorPresentation(c,393).styles.actionCard.flexBasis).toBe('100%');
 });
-it('keeps the route, offers back when available and passes the mobile layout',()=>{
+it('keeps the route, delegates back to the shell and passes the mobile layout',()=>{
  global.IS_REACT_ACT_ENVIRONMENT=true;const navigation={canGoBack:()=>true,goBack:jest.fn()},route={name:'ConfiguratorPage'};let tree;
  act(()=>{tree=renderer.create(<ManagerConfiguratorPage route={route} navigation={navigation}/>);});
  const page=tree.root.findByType('ExistingConfigurator');expect(page.props.route).toBe(route);expect(page.props.presentation.styles.actionCard.flexBasis).toBe('100%');
- act(()=>tree.root.findByProps({accessibilityLabel:'Voltar'}).props.onPress());expect(navigation.goBack).toHaveBeenCalledTimes(1);
+ expect(tree.root.findAllByProps({accessibilityLabel:'Voltar'})).toHaveLength(0);
 });
 
 it('provides Portuguese labels and descriptions keyed to the eight existing destinations',()=>{
@@ -30,4 +31,12 @@ it('provides Portuguese labels and descriptions keyed to the eight existing dest
  expect(p.actionText.CronJobsPage.label).toBe('Agendamentos');
  expect(p.actionText.ThemeManagerPage.label).toBe('Temas');
  expect(Object.values(p.actionText).every(item=>item.label&&item.description&&item.label!==item.description)).toBe(true);
+});
+
+it('hides only its page title when the shared layout owns it',()=>{
+ global.IS_REACT_ACT_ENVIRONMENT=true;let tree;
+ act(()=>{tree=renderer.create(<ManagementPageTitleContext.Provider value><ManagerConfiguratorPage navigation={{}}/></ManagementPageTitleContext.Provider>);});
+ const presentation=tree.root.findByType('ExistingConfigurator').props.presentation;
+ expect(presentation.styles.heroTitle.display).toBe('none');
+ act(()=>tree.unmount());
 });
