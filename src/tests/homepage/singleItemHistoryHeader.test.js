@@ -3,6 +3,7 @@ import renderer, {act} from 'react-test-renderer';
 const {beforeAll, expect, it} = global;
 const {jest} = require('@jest/globals');
 jest.mock('react-native', () => ({View: 'View', Text: 'Text', Pressable: 'Pressable', StyleSheet: {create: value => value}}));
+jest.mock('@controleonline/ui-default/src/react/components/filters/DefaultSearch',()=>props=>require('react').createElement('Search',props));
 const Header = require('../../components/single-item/SingleItemHistoryHeader').default;
 const summary = {total: 76, statuses: [{id: 1, status: 'Open', quantity: 56}, {id: 2, status: 'Preparing', quantity: 20}]};
 const render = props => {
@@ -31,4 +32,17 @@ it('keeps new sale available when no pending status has a positive count', () =>
   const tree = render({summary: {total: 0, statuses: []}, canCreate: true});
   expect(tree.root.findAllByType('Pressable')).toHaveLength(1);
   expect(tree.root.findAllByProps({accessibilityLabel: 'Quantidade de pedidos por status'})).toHaveLength(0);
+});
+
+it('puts the existing search and new-sale action in one row',()=>{
+ const filters={search:'73076'}, onChangeFilters=jest.fn();
+ const tree=render({canCreate:true,filters,onChangeFilters});
+ const row=tree.root.findByProps({testID:'single-item-search-row'});
+ expect(row.props.style.flexDirection).toBe('row');
+ const search=row.findByType('Search');
+ expect(search.props.filters).toBe(filters);
+ act(()=>search.props.onChangeFilters({search:'73075'}));
+ expect(onChangeFilters).toHaveBeenCalledWith({search:'73075'});
+ expect(row.findByProps({accessibilityLabel:'Nova venda'})).toBeTruthy();
+ act(()=>tree.unmount());
 });

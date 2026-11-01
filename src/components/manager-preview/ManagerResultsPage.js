@@ -1,5 +1,6 @@
+import {useManagementPageTitle} from './ManagementPageTitleContext';
 import React,{useMemo} from 'react';
-import {Pressable,Text,View} from 'react-native';
+import {Text,View} from 'react-native';
 import IncomeStatement from '@controleonline/ui-financial/src/react/pages/reports/IncomeStatement';
 import AnimatedModal from '@controleonline/ui-common/src/react/components/AnimatedModal';
 import DefaultInput from '@controleonline/ui-default/src/react/components/inputs/DefaultInput';
@@ -14,9 +15,10 @@ function ResultsDetailsModal({visible,onRequestClose,children,colors}) {
 }
 
 export default function ManagerResultsPage(props) {
+  const ownsTitle=useManagementPageTitle();
   const preview=useManagerPreview();
   const c=preview?.colors;
-  const styles=useMemo(()=>c ? managerResultsStyles(c) : null,[c]);
+  const styles=useMemo(()=>{if(!c)return null;const base=managerResultsStyles(c);return ownsTitle?{...base,pageTitle:{...base.pageTitle,display:'none'}}:base;},[c,ownsTitle]);
   const ModalComponent=useMemo(()=>function ThemedDetailsModal(modalProps){return <ResultsDetailsModal {...modalProps} colors={c}/>;},[c]);
   if(!preview)return <IncomeStatement {...props}/>;
   const presentation={styles,colors:c,ModalComponent,title:'Resultados',
@@ -27,10 +29,7 @@ export default function ManagerResultsPage(props) {
       autoFocus={false} autoSave={false} maxLength={4} accentColor={c.buttonBackground}
       onChangeValue={onChangeText} onSubmitEditing={onSubmitEditing} inputStyle={styles.yearInput}/>};
   return <View style={{flex:1,minHeight:0,backgroundColor:c.pageBackground}}>
-    {props.navigation.canGoBack?.()&&<Pressable accessibilityRole="button" accessibilityLabel="Voltar"
-      onPress={()=>props.navigation.goBack()} style={{minHeight:44,paddingHorizontal:26,justifyContent:'center',alignSelf:'flex-start'}}>
-      <Text style={{color:c.textPrimary}}>← Voltar</Text>
-    </Pressable>}
+
     <IncomeStatement {...props} presentation={presentation}/>
   </View>;
 }

@@ -1,0 +1,58 @@
+{
+  "files": [
+    {
+      "package": "@controleonline/ui-orders",
+      "version": "1.3.53",
+      "file": "src/react/pages/orders/OrderHistoryPage.js",
+      "payload": "single-item-flow/orderHistoryPage.js",
+      "before": "7d329c0a629e5b00544a17c9c5bf38bdb9dfb3b6f6c071a53d6a121850f3dd17",
+      "after": "3802778767376878b8b7d3f0c066e1c1fa6decc42cbe2f44acf63635ca5ad8d8"
+    },
+    {
+      "package": "@controleonline/ui-orders",
+      "version": "1.3.53",
+      "file": "src/react/pages/checkout/useCheckoutNavigation.js",
+      "payload": "single-item-flow/checkoutNavigation.js",
+      "before": "9f6316c5f95096fc5654396f3bc9ffafc5d3a23a376f439233432dbcd28fd3e6",
+      "after": "d5756b5395a982b0af4c9bf074cc117939ad35c74e8cbc0027961dc245bd6abe"
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.41",
+      "file": "src/react/pages/Products.js",
+      "payload": "single-item-flow/productsPage.js",
+      "before": "e41f566b49ec2b2c7d27879fe515ea4c317b789edff386dbde9040ee377c5d3a",
+      "after": "264a0dc30795f575cbaaf51e6a0141f631035a7e461c248fcf7156781ee3e950",
+      "variants": {
+        "1.0.42": {
+          "before": "f03164a7d0c8b8efa06c6d54b369c914df570965c440284726c9616704e354ee",
+          "after": "ed8a44e32137be2d5351ce89da63f0f2cb23ce1aa46723a50e05673083112e49",
+          "payload": "single-item-flow/productsPage-1.0.42.js"
+        }
+      }
+    },
+    {
+      "package": "@controleonline/ui-products",
+      "version": "1.0.41",
+      "file": "src/react/components/products/SingleItemProductCard.js",
+      "payload": "single-item-flow/singleItemProductCard.js",
+      "before": "995721f5ce60a03b96cb95fd280067cf4d947b59218cb658409d8ebdee0d11e1",
+      "after": "306918d53f5c257c18c3a3389c2f3fc80e52cb2f849ef2b43e74a9f75d7ad8e2",
+      "variants": {
+        "1.0.42": {
+          "before": "995721f5ce60a03b96cb95fd280067cf4d947b59218cb658409d8ebdee0d11e1",
+          "after": "306918d53f5c257c18c3a3389c2f3fc80e52cb2f849ef2b43e74a9f75d7ad8e2",
+          "payload": "single-item-flow/singleItemProductCard.js"
+        }
+      }
+    },
+    {
+      "package": "@controleonline/ui-orders",
+      "version": "1.3.53",
+      "file": "src/react/pages/checkout/Checkout.js",
+      "payload": "single-item-flow/checkout.js",
+      "before": "8105924b0917c87bc7ae041f083c496c157acc6e7ccf10deadc47db946cd29db",
+      "after": "f46e01c7896b584bc854f8cf5dcdb84a8d5b973ab03189ca65f5fc16afb490a9"
+    }
+  ]
+}

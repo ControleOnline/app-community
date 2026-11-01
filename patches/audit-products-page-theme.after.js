@@ -11,7 +11,7 @@ import DefaultTable from '@controleonline/ui-default/src/react/components/table/
 import StateStore from '@controleonline/ui-common/src/react/components/StateStore';
 import { api } from '@controleonline/ui-common/src/api';
 import { resolveThemePalette } from '@controleonline/../../src/styles/branding';
-import { colors } from '@controleonline/../../src/styles/colors';
+import { colors } from '@controleonline/ui-layout/src/styles/colors';
 import ProductItem, {
   getProductTypeLabel,
 } from '@controleonline/ui-products/src/react/components/products/ProductItem';

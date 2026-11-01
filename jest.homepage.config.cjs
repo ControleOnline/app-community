@@ -1,6 +1,7 @@
 const base = require('./jest.waiter.config.cjs');
 module.exports = {...base, roots: ['<rootDir>/src/tests/homepage'],
   moduleNameMapper: {
+    '^@controleonline/../../src/styles/colors$': '<rootDir>/node_modules/@controleonline/ui-layout/src/styles/colors.js',
     '^@experimental-avatar$': process.env.SHENLONG_TESTS === '1'
       ? '<rootDir>/../.codex/experiments/shenlong/src/index.js'
       : '<rootDir>/src/components/manager-preview/DisabledAvatar.js',

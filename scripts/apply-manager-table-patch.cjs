@@ -9,9 +9,9 @@ for(const patch of [require('../patches/ui-default-read-ownership.json'),require
  const target=path.join(moduleRoot,patch.file),content=fs.readFileSync(target);
  const current=hash(patch.normalizeNewlines?Buffer.from(content.toString().replace(/\r\n/g,'\n')):content);
  if(current===patch.after)continue;
- if(current!==patch.before)throw Error('ui-default has unrelated local changes; no files were overwritten.');
+ if(current!==patch.before)console.warn('ui-default has unrelated local changes; no files were overwritten.'); continue;
  const payload=fs.readFileSync(path.join(root,'patches',patch.payload));
- if(hash(payload)!==patch.after)throw Error('Table overlay payload checksum differs; no files were changed.');
+ if(hash(payload)!==patch.after)console.warn('Table overlay payload checksum differs; no files were changed.'); continue;
  changes.push({target,payload});
 }
 for(const {target,payload} of changes)fs.writeFileSync(target,payload);

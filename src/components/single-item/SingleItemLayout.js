@@ -20,10 +20,8 @@ import {readPreviewMode} from '../manager-preview/model';
 import DefaultLayout from '../manager-preview/ManagerLayout';
 import ManagerAccountMenu from '../manager-preview/ManagerAccountMenu';
 import {useManagerPreview} from '../manager-preview/ManagerPreviewProvider';
-import DefaultTooltip from '@controleonline/ui-default/src/react/components/help/DefaultTooltip';
-import {buildPosOperationInfo} from '@controleonline/ui-orders/src/react/utils/posOperationInfo';
+import SingleItemOperationInfo from './SingleItemOperationInfo';
 import HomeIcon from '../HomeIcon';
-import SingleItemHistoryHeader from './SingleItemHistoryHeader';
 import {isSingleItemPos, SINGLE_ITEM_ROUTES, singleItemNavigation} from './policy';
 
 export default function SingleItemLayout(props) {
@@ -65,19 +63,19 @@ function SingleItemShell({navigation,route,children}) {
   const c = useMemo(()=>resolveManagerTheme(colors,mode),[colors,mode]);
   const tableTheme = useMemo(()=>managerTableTheme(c),[c]);
   const items = singleItemNavigation(menus,navigation.getState().routeNames);
-  const catalog = ['HomePage','PdvPage','AddProductScreen','ProductsPage'].includes(route.name);
-  const primary = catalog || route.name === 'OrderHistoryPage' || route.name === 'ProfilePage';
-  useLayoutEffect(()=>{if(focused) navigation.setOptions({headerShown:false,title:catalog ? 'Catálogo' : route.name === 'OrderHistoryPage' ? 'Pedidos' : undefined});},[focused,navigation,catalog,route.name]);
+  const ordersHome = route.name === 'HomePage' && !route.params?.singleItemCatalog && !route.params?.orderId && !route.params?.startNewOrder && items.some(item=>item.route==='OrderHistoryPage');
+  const catalog = !ordersHome && ['HomePage','PdvPage','AddProductScreen','ProductsPage'].includes(route.name);
+  const primary = ordersHome || catalog || route.name === 'OrderHistoryPage' || route.name === 'ProfilePage';
+  useLayoutEffect(()=>{if(focused) navigation.setOptions({headerShown:false,title:catalog ? 'Catálogo' : (ordersHome || route.name === 'OrderHistoryPage') ? 'Pedidos' : undefined});},[focused,navigation,catalog,ordersHome,route.name]);
   const goBack=()=>{if(navigation.canGoBack?.())navigation.goBack();else navigation.navigate('HomePage');};
   const provider = orders.getters.item?.provider;
   const providerId = String(provider?.id || provider?.['@id'] || provider || '').replace(/\D/g,'');
   const wrongCompany = !!providerId && providerId !== String(currentCompany?.id);
-  const summary = orders.getters.summary?.operational;
-  const active = catalog?'HomePage':route.name==='OrderDetails'?'OrderHistoryPage':route.name;
+  const active = ordersHome ? 'OrderHistoryPage' : catalog?'HomePage':route.name==='OrderDetails'?'OrderHistoryPage':route.name;
   return <DefaultTableThemeContext.Provider value={tableTheme}>
     <View style={[s.root,{backgroundColor:c.pageBackground,paddingTop:insets.top}]}>
       <View style={[s.header,{backgroundColor:c.headerBackground,borderColor:c.headerBorder}]}>
-        <View style={{minWidth:96,alignSelf:'stretch',justifyContent:'center',alignItems:'center'}}><View style={{flexDirection:'row',alignItems:'center',gap:8}}><Text style={{fontSize:11,color:c.textMuted}}>Single Item</Text><DefaultTooltip accessibilityLabel="Ver configuração do PDV" title="Configuração do PDV" label={<HomeIcon name="info" size={14} color={c.textMuted}/>} rows={buildPosOperationInfo({currentCompany,deviceConfig:device})} closeLabel="×" closeAccessibilityLabel="Fechar configuração do PDV" accentColor={c.textMuted} hitSlop={{top:8,bottom:8,left:8,right:8}} style={{width:20,height:20,borderWidth:0,backgroundColor:'transparent'}} dialogTestID="operation-info-dialog"/></View></View>
+        <View style={{minWidth:96,alignSelf:'stretch',justifyContent:'center',alignItems:'center'}}><View style={{flexDirection:'row',alignItems:'center',gap:8}}><Text style={{fontSize:11,color:c.textMuted}}>Single Item</Text><SingleItemOperationInfo currentCompany={currentCompany} deviceConfig={device} color={c.textMuted}/></View></View>
         <View style={{flex:1,minWidth:0}}><SingleItemCompanyControl navigation={navigation} people={people.getters} order={orders.getters.item} busy={busy} colors={c} onSwitch={switchCompany} saleScreen={!primary}/></View>
         <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" onPress={()=>setAccountOpen(true)} style={{padding:4}}>
           <HomeAvatar imageUrl={resolveHomeAvatar(user,currentCompany)} name={getAvatarDisplayName(user)} size={32} backgroundColor={c.cardIconBackground} borderColor={c.cardBorder} textColor={c.textPrimary}/>
@@ -85,9 +83,6 @@ function SingleItemShell({navigation,route,children}) {
       </View>
       {app_type_base === 'ADMIN' && <View style={{backgroundColor:c.headerBackground,paddingHorizontal:12,paddingVertical:8,borderBottomWidth:1,borderColor:c.headerBorder}}><AppTypeSwitcher/></View>}
       {!primary && <Pressable accessibilityRole="button" accessibilityLabel="Voltar" onPress={goBack} style={s.back}><Text style={{color:c.textPrimary}}>← Voltar</Text></Pressable>}
-      {route.name === 'OrderHistoryPage' && <SingleItemHistoryHeader summary={summary} colors={c}
-        canCreate={items.some(item=>item.route==='HomePage')}
-        onNewSale={()=>navigation.navigate('PdvPage',{startNewOrder:true,showBottomCart:false,interactionMode:'pdv'})}/>}
       <CompanySwitchContext.Provider value={setPaymentBusy}><View key={String(currentCompany?.id)} style={s.content}>{wrongCompany ? <View style={{padding:20,gap:16}}><Text style={{color:c.textPrimary}}>Este pedido pertence a outra empresa.</Text><Pressable accessibilityRole="button" onPress={()=>{orders.actions.setItem({});products.actions.setItems([]);navigation.reset({index:0,routes:[{name:'HomePage'}]});}}><Text style={{color:c.textPrimary}}>Voltar ao catálogo</Text></Pressable></View> : children}</View></CompanySwitchContext.Provider>
       {bottomBar?.visible && <BottomNavigationBar navigation={navigation} colors={c} items={items} activeRouteName={active} appearance="soft" placement="inline"/>}
       <PosKioskBarcodeListener navigation={navigation}/>

@@ -1,5 +1,6 @@
+import {useManagementPageTitle} from './ManagementPageTitleContext';
 import React from 'react';
-import {Pressable,Text,View} from 'react-native';
+import {Text,View} from 'react-native';
 import Devices from '@controleonline/ui-common/src/react/pages/Devices';
 import {useManagerPreview} from './ManagerPreviewProvider';
 
@@ -13,16 +14,14 @@ export function managerDevicePalette(colors) {
     deviceAccent:colors.cardIconColor};
 }
 export default function ManagerDevicesPage(props) {
+  const ownsTitle=useManagementPageTitle();
   const preview=useManagerPreview();
   if(!preview)return <Devices {...props}/>;
   const c=preview.colors;
   return <View style={{flex:1,minHeight:0,backgroundColor:c.pageBackground}}>
     <View style={{paddingHorizontal:16,paddingVertical:12,gap:8}}>
-      {props.navigation.canGoBack?.()&&<Pressable accessibilityRole="button" accessibilityLabel="Voltar"
-        onPress={()=>props.navigation.goBack()} style={{minHeight:44,alignSelf:'flex-start',justifyContent:'center',paddingHorizontal:10}}>
-        <Text style={{color:c.textPrimary}}>← Voltar</Text>
-      </Pressable>}
-      <Text accessibilityRole="header" style={{color:c.textPrimary,fontSize:18,fontWeight:'700'}}>Dispositivos</Text>
+
+      {!ownsTitle && <Text accessibilityRole="header" style={{color:c.textPrimary,fontSize:18,fontWeight:'700'}}>Dispositivos</Text>}
       <Text style={{color:c.textMuted,fontSize:12}}>Consulte os aparelhos e suas configurações por tipo.</Text>
     </View>
     <Devices {...props} themePalette={managerDevicePalette(c)}/>

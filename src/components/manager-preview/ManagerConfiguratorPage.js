@@ -1,5 +1,6 @@
+import {useManagementPageTitle} from './ManagementPageTitleContext';
 import React,{useMemo} from 'react';
-import {Pressable,Text,View,useWindowDimensions} from 'react-native';
+import {Text,View,useWindowDimensions} from 'react-native';
 import Configurator from '@controleonline/ui-config/src/react/pages/ConfiguratorPage';
 import {createStyles} from '@controleonline/ui-config/src/react/pages/ConfiguratorPage.styles';
 import {useManagerPreview} from './ManagerPreviewProvider';
@@ -36,14 +37,13 @@ export function configuratorPresentation(c,width) {
   }};
 }
 export default function ManagerConfiguratorPage(props) {
+  const ownsTitle=useManagementPageTitle();
   const preview=useManagerPreview(),{width}=useWindowDimensions();
   const presentation=useMemo(()=>preview?configuratorPresentation(preview.colors,width):null,[preview?.colors,width]);
+  const scopedPresentation=useMemo(()=>presentation && ownsTitle ? {...presentation,styles:{...presentation.styles,heroTitle:{...presentation.styles.heroTitle,display:'none'}}} : presentation,[presentation,ownsTitle]);
   if(!preview)return <Configurator {...props}/>;
   return <View style={{flex:1,minHeight:0,backgroundColor:preview.colors.pageBackground}}>
-    {props.navigation.canGoBack?.()&&<Pressable accessibilityRole="button" accessibilityLabel="Voltar"
-      onPress={()=>props.navigation.goBack()} style={{minHeight:44,paddingHorizontal:26,justifyContent:'center',alignSelf:'flex-start'}}>
-      <Text style={{color:preview.colors.textPrimary}}>← Voltar</Text>
-    </Pressable>}
-    <Configurator {...props} presentation={presentation}/>
+
+    <Configurator {...props} presentation={scopedPresentation}/>
   </View>;
 }
