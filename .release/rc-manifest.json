@@ -1,13 +1,15 @@
 {
-  "branch": "rc/1.10.105-rc.1",
-  "version": "1.10.105",
+  "version": "1.10.106",
   "rc": 1,
-  "frozen": true,
-  "baseMaster": "7905daa86a4942a7fb4c73a8fa4108d695a35848",
-  "tasks": [
-    1271
-  ],
+  "branch": "rc/1.10.106-rc.1",
+  "baseMaster": "f77fe19f84d18ae66e1f2eac80967f094f944482",
+  "tasks": [1277],
   "repositories": {
-    "ControleOnline/app-community": "5fbb5a1cb08ee597e624ad5339dc46a210f1f4be"
+    "ControleOnline/app-community": "f77fe19f84d18ae66e1f2eac80967f094f944482"
+  },
+  "frozen": true,
+  "contentCommit": "f77fe19f84d18ae66e1f2eac80967f094f944482",
+  "pins": {
+    "@controleonline/ui-login": "1.0.119"
   }
 }
