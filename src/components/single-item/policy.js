@@ -10,11 +10,11 @@ export function singleItemNavigation(modules = [], availableRoutes = []) {
     .map(item => resolveMenuRouteName(item.route)));
   const registered = new Set(availableRoutes);
   const items = [];
-  if (registered.has('HomePage') && (allowed.has('OrderHistoryPage') || allowed.has('PdvPage'))) items.push({route:'HomePage',icon:'grid',label:'Catálogo'});
   if (registered.has('OrderHistoryPage') && allowed.has('OrderHistoryPage')) {
     const source = modules.flatMap(group => group.menus || []).find(item => resolveMenuRouteName(item.route) === 'OrderHistoryPage');
     items.push({route:'OrderHistoryPage',icon:'shopping-bag',label:'Pedidos',routeParams:{...resolveMenuRouteParams(source?.routeParams),interactionMode:'pdv',showBottomToolBar:true}});
   }
+  if (registered.has('HomePage') && (allowed.has('OrderHistoryPage') || allowed.has('PdvPage'))) items.push({route:'HomePage',icon:'grid',label:'Catálogo',routeParams:{singleItemCatalog:true}});
   if (registered.has('ProfilePage')) items.push({route:'ProfilePage',icon:'user',label:'Perfil'});
   return items;
 }

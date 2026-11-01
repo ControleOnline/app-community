@@ -23,7 +23,7 @@ jest.mock('@appType', () => ({app_type: 'MANAGER', app_type_base: 'MANAGER'}));
 jest.mock('../../components/manager-preview/ManagerBottomNavigation', () => 'RuntimeToolbar');
 jest.mock('../../components/HomeIcon', () => 'Icon');
 jest.mock('../../components/HomeAvatar', () => 'HomeAvatar');
-jest.mock('@controleonline/ui-manager/src/react/components/CompanyFilter', () => 'CompanyFilter');
+jest.mock('../../components/manager-preview/ManagerCompanySelector', () => 'ManagerCompanySelector');
 jest.mock('@controleonline/ui-common/src/react/components/AppTypeSwitcher', () => 'AppTypeSwitcher');
 jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
   useManagerPreview: () => ({bottomBar: mockBottomBar, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
@@ -54,7 +54,7 @@ it('provides the Manager identity to a shared table on any module route',()=>{
   act(()=>tree.unmount());
 });
 
-it('keeps company selection in the header and theme switching in the account menu', () => {
+it('keeps company selection in the sidebar and theme switching in the account menu', () => {
   let tree; act(() => {tree = renderer.create(view());});
   act(() => {labeled(tree, 'Dispositivos')[0].props.onPress();});
   expect(mockGo).toHaveBeenCalledWith('DevicesIndex', {source: 'manager'});
@@ -62,8 +62,9 @@ it('keeps company selection in the header and theme switching in the account men
   act(() => labeled(tree, 'Abrir opções do usuário')[1].props.onPress());
   act(() => labeled(tree, 'Usar tema escuro')[0].props.onPress());
   expect(mockToggle).toHaveBeenCalledTimes(1);
-  expect(tree.root.findAllByType('CompanyFilter')).toHaveLength(1);
-  expect(tree.root.findByType('CompanyFilter').props.wrapLabel).toBe(true);
+  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID: 'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID: 'manager-topbar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
   act(() => tree.unmount());
 });
 
@@ -170,4 +171,28 @@ it('keeps a fresh internal catalog reset signal when reselecting the focused PDV
   expect(second[1].orderId).toBe('70');
   expect(second[1].catalogResetKey).not.toBe(first[1].catalogResetKey);
   act(() => tree.unmount());
+});
+
+it('keeps selection inside the mobile drawer and home in the header', () => {
+  mockWidth = 400;
+  let tree; act(() => {tree = renderer.create(view());});
+  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(0);
+  expect(labeled(tree, 'Ir para o início')).toHaveLength(1);
+  act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
+  expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  act(() => tree.unmount());
+});
+
+it.each([1440,900])('keeps desktop navigation beside the menu at width %s without a second breadcrumb row', width=>{
+ mockWidth=width;let tree;act(()=>{tree=renderer.create(view('DevicesIndex'));});
+ const topbar=tree.root.findByProps({testID:'manager-topbar'});
+ const breadcrumb=tree.root.findByProps({testID:'manager-breadcrumb'});
+ expect(topbar.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(1);
+ expect(breadcrumb.parent).toBe(labeled(tree,'Alternar menu compacto')[0].parent);
+ act(()=>tree.unmount());
+});
+it('keeps the mobile header free of desktop breadcrumbs',()=>{
+ mockWidth=400;let tree;act(()=>{tree=renderer.create(view());});
+ expect(tree.root.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(0);
+ act(()=>tree.unmount());
 });

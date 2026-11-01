@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useStore, getAllStores} from '@store';
@@ -10,9 +10,9 @@ import resolveHomeAvatar from '../resolveHomeAvatarUrl';
 import {DefaultTableThemeContext} from '../../../node_modules/@controleonline/ui-default/src/react/components/table/useDefaultTableTheme';
 import {managerTableTheme} from './managerTableTheme';
 import {getAvatarDisplayName} from '@controleonline/ui-common/src/react/utils/userAvatar';
-import CompanyFilter from '@controleonline/ui-manager/src/react/components/CompanyFilter';
+import ManagerCompanySelector from './ManagerCompanySelector';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
-import {app_type_base} from '@appType';
+import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
@@ -20,12 +20,15 @@ import ManagerAccountMenu from './ManagerAccountMenu';
 import ManagerBottomNavigation from './ManagerBottomNavigation';
 import useJourneyReadiness from './useJourneyReadiness';
 import ManagerBrand from './ManagerBrand';
+import {ManagementPageTitleContext} from './ManagementPageTitleContext';
+import ManagerScreenNavigation from './ManagerScreenNavigation';
 
-export default function ManagerShell({navigation, route, children}) {
+export default function ManagerShell({navigation, route, options, children}) {
   const {width} = useWindowDimensions();
   const focused = useIsFocused();
   const {colors: c, themeIssues = [], mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar} = useManagerPreview();
   useJourneyReadiness({experience, route: route.name, focused});
+  const tableTheme = useMemo(() => managerTableTheme(c), [c]);
   const themeStore = useStore('theme');
   const {menus} = themeStore.getters;
   const auth = useStore('auth');
@@ -56,7 +59,6 @@ export default function ManagerShell({navigation, route, children}) {
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
-  const separateAppSwitcher = app_type_base === 'ADMIN' && width < 1100;
   const compact = !mobile && (width <= 1060 || collapsed);
   const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
   const toolbar = managerMenu(menus, navigation.getState().routeNames, global.t?.t, 'toolbar')
@@ -104,12 +106,12 @@ export default function ManagerShell({navigation, route, children}) {
       {!compact && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
     </Pressable>;
   };
-  const sidebar = <View style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
+  const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
     width: compact ? 76 : 254}, mobile && s.drawer]}>
-    <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início" onPress={() => go({name: 'HomePage'})} style={s.brand}>
-      <ManagerBrand colors={c} compact={compact} />
-    </Pressable>
     {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={s.close}>{icon('x')}</Pressable>}
+    <View style={[s.brand, compact && s.compactBrand]}>
+      <ManagerCompanySelector colors={c} compact={compact} />
+    </View>
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
       {!compact && <Text style={[s.caption, {color: c.textMuted}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
@@ -128,32 +130,34 @@ export default function ManagerShell({navigation, route, children}) {
     {!mobile && sidebar}
     <View collapsable={false} style={s.main}>
       <View style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
-      <View style={[s.topbar, mobile && s.mobileTop]}>
-        <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
-          onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon('menu')}</Pressable>
-        {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
+      <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
+        <View style={[s.headerSide, s.headerLeft]}>
+          <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
+            onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon('menu')}</Pressable>
+        {!mobile && <View testID="manager-breadcrumb" style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.textMuted, fontSize: 12}}>
+          {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.textPrimary, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
+        </Text></View>}
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
           onPress={() => go({name: 'HomePage'})} style={s.homeButton}>
           <ManagerBrand colors={c} home />
-        </Pressable>}
-        {!mobile && <View style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.textMuted, fontSize: 12}}>
-          MANAGER  /  {section?.title || 'Início'}  /  <Text style={{color: c.textPrimary, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
-        </Text></View>}
-        <View style={s.topActions}>
-          <View style={s.companySlot}><CompanyFilter navigation={navigation} appearance="soft" mode="icon" compact wrapLabel /></View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'header'}} onPress={() => openAccount('header')}>{avatar(38)}</Pressable>
+        </Pressable>
+        <View style={[s.headerSide, s.headerRight]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'header'}} onPress={() => openAccount('header')} style={s.accountButton}>{avatar(38)}</Pressable>
         </View>
-        {app_type_base === 'ADMIN' && !separateAppSwitcher && <AppTypeSwitcher />}
       </View>
-      {separateAppSwitcher && <View style={[s.appSwitcherRow, mobile && s.mobileSwitcherRow]}>
-        <AppTypeSwitcher />
+      {app_type_base === 'ADMIN' && <View style={[s.headerDetails, mobile && s.mobileDetails]}>
+
+        {app_type_base === 'ADMIN' && <AppTypeSwitcher />}
       </View>}
       </View>
+      <ManagerScreenNavigation navigation={navigation} route={route} options={options} colors={c} />
       {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
         <Text style={{color:c.textPrimary}}>{recoveryError || (!currentCompany?.id ? 'A empresa ainda não foi carregada.' : 'Nenhum menu foi carregado para este contexto.')}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:44,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
       </View>}
-      <View style={s.content}><DefaultTableThemeContext.Provider value={managerTableTheme(c)}>{children}</DefaultTableThemeContext.Provider></View>
+      <View style={s.content}><DefaultTableThemeContext.Provider value={tableTheme}><ManagementPageTitleContext.Provider value={route.name !== 'HomePage' && !(route.name === 'DisplayDetails' && options?.headerShown === false)}>{children}</ManagementPageTitleContext.Provider></DefaultTableThemeContext.Provider></View>
       {mobile && focused && bottomBar?.visible && <ManagerBottomNavigation navigation={navigation} route={route} colors={c} />}
     </View>
     {focused && !open && !accountAnchor && <ManagerGuide navigation={navigation} route={route} items={items} />}
@@ -178,18 +182,20 @@ const s = StyleSheet.create({
   sidebar: {borderRightWidth: 1, flexShrink: 0, minHeight: 0, alignSelf: 'stretch'}, drawer: {height: '100%'},
   // Keep elevated catalog descendants below the mobile drawer on Android.
   drawerOverlay: {zIndex: 100, elevation: 24},
-  brand: {height: 89, flexShrink: 0, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 11},
+  brand: {flexShrink: 0, padding: 12}, compactBrand: {paddingHorizontal: 8},
   close: {alignSelf: 'flex-end', marginRight: 12, padding: 8}, menu: {flex: 1, minHeight: 0}, group: {marginTop: 22},
   caption: {fontSize: 10, fontWeight: '700', letterSpacing: 1.3, textTransform: 'uppercase', margin: 12},
   navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
   navText: {fontSize: 12, fontWeight: '600', flexShrink: 1}, center: {justifyContent: 'center', paddingHorizontal: 0},
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 10},
-  main: {flex: 1, minWidth: 0}, topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, gap: 14, flexDirection: 'row', alignItems: 'center'},
-  mobileTop: {paddingHorizontal: 12, gap: 8, minHeight: 64}, breadcrumb: {flex: 1, minWidth: 0},
-  topActions: {marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0},
-  appSwitcherRow: {alignItems: 'flex-end', paddingHorizontal: 28, paddingBottom: 10},
-  mobileSwitcherRow: {paddingHorizontal: 12},
-  companySlot: {flex: 1, minWidth: 0},
+  main: {flex: 1, minWidth: 0},
+  topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
+  mobileTop: {paddingHorizontal: 12, minHeight: 64},
+  headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
+  accountButton: {width: 44, height: 44, alignItems: 'center', justifyContent: 'center'},
+  headerDetails: {paddingHorizontal: 28, paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16},
+  mobileDetails: {paddingHorizontal: 12, justifyContent: 'flex-end'},
+  breadcrumb: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   homeButton: {width: 44, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   content: {flex: 1, minHeight: 0, minWidth: 0},
