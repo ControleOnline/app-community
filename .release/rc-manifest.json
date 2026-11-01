@@ -7,10 +7,10 @@
     1277
   ],
   "repositories": {
-    "ControleOnline/app-community": "e0b822ef14ae49b989d2baac48f214acea8a8191"
+    "ControleOnline/app-community": "8ece7d0e0215e3987330e5ddd1d02c42f0973fc2"
   },
   "frozen": true,
-  "contentCommit": "e0b822ef14ae49b989d2baac48f214acea8a8191",
+  "contentCommit": "8ece7d0e0215e3987330e5ddd1d02c42f0973fc2",
   "pins": {
     "@controleonline/ui-login": "1.0.119"
   }
