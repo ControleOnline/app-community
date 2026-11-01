@@ -138,6 +138,9 @@ jobs:
           const env = {
             API_ENTRYPOINT: 'https://apinew.lave-go.com',
             SOCKET: 'wss://apinew.lave-go.com',
+            DOMAIN: 'https://app.lave-go.com',
+            MANAGER_APP: 'https://app.lave-go.com',
+            APP_TYPE: 'MANAGER',
             ZOOM: 100,
             NEW_RELIC: {
               LICENSE_KEY: process.env.NEW_RELIC_LICENSE_KEY || '',
@@ -257,6 +260,8 @@ jobs:
           const env = {
             API_ENTRYPOINT: 'https://apinew.lave-go.com',
             SOCKET: 'wss://apinew.lave-go.com',
+            DOMAIN: 'https://app.lave-go.com',
+            MANAGER_APP: 'https://app.lave-go.com',
             APP_TYPE: 'ADMIN',
             ZOOM: 100,
             NEW_RELIC: {
