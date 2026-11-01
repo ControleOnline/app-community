@@ -7,9 +7,10 @@ import DefaultFile from '@controleonline/ui-default/src/react/components/files/D
 export default function ManagerBrand({colors: c, home = false, compact = false, subtitle = true, wrapLabel = false}) {
   const {currentCompany, mainCompany} = useStore('people').getters;
   const selectedCompany = currentCompany?.id ? currentCompany : mainCompany;
+  // Company selector (drawer) shows the ICON media; the centered home link shows the LOGO media.
   const pickFile = company => home
-    ? company?.icon || company?.logo
-    : company?.logo || company?.icon;
+    ? company?.logo || company?.icon
+    : company?.icon || company?.logo;
   const owner = pickFile(selectedCompany) ? selectedCompany : mainCompany;
   const file = pickFile(owner);
   const identity = JSON.stringify([selectedCompany?.id, owner?.id, file]);
