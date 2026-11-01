@@ -3,12 +3,14 @@
   "rc": 1,
   "branch": "rc/1.10.106-rc.1",
   "baseMaster": "f77fe19f84d18ae66e1f2eac80967f094f944482",
-  "tasks": [1277],
+  "tasks": [
+    1277
+  ],
   "repositories": {
-    "ControleOnline/app-community": "f77fe19f84d18ae66e1f2eac80967f094f944482"
+    "ControleOnline/app-community": "e0b822ef14ae49b989d2baac48f214acea8a8191"
   },
   "frozen": true,
-  "contentCommit": "f77fe19f84d18ae66e1f2eac80967f094f944482",
+  "contentCommit": "e0b822ef14ae49b989d2baac48f214acea8a8191",
   "pins": {
     "@controleonline/ui-login": "1.0.119"
   }
