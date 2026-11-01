@@ -1,13 +1,13 @@
 {
-  "branch": "rc/1.10.105-rc.1",
-  "version": "1.10.105",
+  "version": "1.10.108",
   "rc": 1,
-  "frozen": true,
-  "baseMaster": "7905daa86a4942a7fb4c73a8fa4108d695a35848",
+  "branch": "rc/1.10.108-rc.1",
+  "baseMaster": "215c19c807e0156ee7b21c8a8556bb844faa77dd",
   "tasks": [
-    1271
+    1275
   ],
   "repositories": {
-    "ControleOnline/app-community": "5fbb5a1cb08ee597e624ad5339dc46a210f1f4be"
-  }
+    "ControleOnline/app-community": "215c19c807e0156ee7b21c8a8556bb844faa77dd"
+  },
+  "frozen": true
 }
