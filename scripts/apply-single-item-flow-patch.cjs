@@ -6,10 +6,15 @@ const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 function applySingleItemFlow(root = path.resolve(__dirname, '..')) {
   const writes = [];
   const {files} = JSON.parse(fs.readFileSync(path.join(root, 'patches/single-item-flow.json')));
-  for (const entry of files) {
+  for (const source of files) {
+    const entry = {...source};
     const moduleRoot = path.join(root, 'node_modules', entry.package);
     const version = JSON.parse(fs.readFileSync(path.join(moduleRoot, 'package.json'))).version;
-    if (version !== entry.version) throw Error(`Review Single Item flow for ${entry.package} ${version}.`);
+    if (version !== entry.version) {
+      const variant = source.variants?.[version];
+      if (!variant) throw Error(`Review Single Item flow for ${entry.package} ${version}.`);
+      Object.assign(entry, variant);
+    }
     const target = path.join(moduleRoot, entry.file);
     const payload = fs.readFileSync(path.join(root, 'patches', entry.payload));
     if (hash(payload) !== entry.after) throw Error(`Single Item flow payload changed: ${entry.payload}`);
