@@ -24,6 +24,18 @@
     [
       "                {global.t?.t('auth', 'label', 'createAccount') || 'Criar conta'}",
       "                {createAccountLabel || global.t?.t('auth', 'label', 'createAccount') || 'Criar conta'}"
+    ],
+    [
+      "            <Animatable.Text\n              animation=\"fadeIn\"\n              delay={400}\n              style={styles.subtitle}>",
+      "            {introMessage !== null && <Animatable.Text\n              animation=\"fadeIn\"\n              delay={400}\n              style={styles.subtitle}>"
+    ],
+    [
+      "              ) || 'Entre com suas credenciais para acessar'}\n            </Animatable.Text>",
+      "              ) || 'Entre com suas credenciais para acessar'}\n            </Animatable.Text>}"
+    ],
+    [
+      "                style={styles.logoContainer}>",
+      "                style={[styles.logoContainer, introMessage === null && {marginBottom: 0}]}>"
     ]
   ]
 }
