@@ -1,0 +1,22 @@
+{
+  "profiles": [
+    {
+      "domain": "dev.controleonline.com",
+      "api": "dd.controleonline.com",
+      "theme": "manager",
+      "valueMetric": "sales"
+    },
+    {
+      "domain": "staging.controleonline.com",
+      "api": "s.controleonline.com",
+      "theme": "manager",
+      "valueMetric": "sales"
+    },
+    {
+      "domain": "app.lave-go.com",
+      "api": "apinew.lave-go.com",
+      "theme": "lave-go",
+      "valueMetric": "paidOrders"
+    }
+  ]
+}
