@@ -1,17 +1,18 @@
 {
-  "version": "1.10.113",
+  "version": "1.10.114",
   "rc": 1,
-  "branch": "rc/1.10.113-rc.1",
-  "baseMaster": "23aea714e116e8b997ba22b2bd5df9f800256d20",
+  "branch": "rc/1.10.114-rc.1",
+  "baseMaster": "810b16c325c88e336b6212dd1a63f4e736d5f9be",
   "tasks": [
-    1312
+    1296
   ],
+  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "47065f480dac628a193cb3be7ff45fa777fb1c1c"
+    "ControleOnline/app-community": "PENDING"
   },
-  "packages": {
-    "@controleonline/ui-crm": "1.0.54",
-    "@controleonline/ui-common": "1.2.110"
+  "validation": {
+    "scope": "Only task 1296 delta: ConfiguratorPage overlay reads configurator menus (fixed list = fallback on request error) + tests. Requires API RC rc/1.10.111-rc.1 (common 1.0.8 migration).",
+    "checks": "managerConfigurator + managerConfiguratorPresentation: 13 tests pass."
   }
 }
