@@ -1,14 +1,25 @@
 {
-  "version": "1.10.108",
-  "rc": 3,
-  "branch": "rc/1.10.108-rc.3",
-  "baseMaster": "215c19c807e0156ee7b21c8a8556bb844faa77dd",
+  "version": "1.10.110",
+  "rc": 1,
+  "branch": "rc/1.10.110-rc.1",
+  "baseMaster": "23d662842175b1e12a98a23d5198274d525d88fd",
   "tasks": [
-    1275,
-    1283
+    1284
   ],
+  "taskRepository": "ControleOnline/app-community",
+  "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "215c19c807e0156ee7b21c8a8556bb844faa77dd"
+    "ControleOnline/app-community": "e1ebc39de3b044fc67a6402ac214c034947ad52c",
+    "ControleOnline/ui-crm": "574aaafc011bb9a20683ca5805d6518d3fa6a930"
   },
-  "frozen": true
+  "packages": {
+    "@controleonline/ui-crm": "1.0.45",
+    "controleonline/mcp": "1.0.18",
+    "controleonline/tasks": "1.0.3"
+  },
+  "validation": {
+    "scope": "Only task 1284 delta from current master; not whole dev.",
+    "notes": "Frontend /mcp route + AI providers; backend MCP chat + tasks type=ia on module tags."
+  },
+  "contentCommit": "e1ebc39de3b044fc67a6402ac214c034947ad52c"
 }
