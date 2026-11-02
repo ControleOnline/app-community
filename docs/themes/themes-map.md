@@ -362,3 +362,12 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `toastWarningBorder`
 - `toastWarningIcon`
 - `toastWarningText`
+
+### Transporte dos modos claro e escuro
+
+Os nomes de objetos acima permanecem canônicos. No mapa plano entregue por
+`/themes-colors.css`, os sufixos `-light` e `-dark` identificam o modo de cada
+valor (exemplo: `cardBackground-light`, `cardBackground-dark`). O consumidor
+remove o sufixo ao selecionar o modo; componentes continuam referenciando
+`cardBackground`. Nenhum prefixo por empresa, módulo ou tela é necessário.
+Temas legados sem entradas por modo conservam seu contrato de leitura existente.

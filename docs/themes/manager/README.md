@@ -1,32 +1,33 @@
-# Manager — mapa completo aprovado no localhost
+# Controle Online — paletas aprovadas
 
-`light.json` e `dark.json` contêm os 262 nomes canônicos de `../themes-map.md`.
-Não há tokens legados, cores nos componentes ou preenchimento em tempo de execução.
-Origem visual: consulta somente de leitura do tema MANAGER de produção em 2026-11-02.
-Os tokens ausentes foram definidos nesta proposta; não são valores já cadastrados
-na produção. A proposta preserva o fundo claro #F3F7FB, cards brancos, lateral
-#F1F8FB e o verde da identidade. Na revisão, botões principais, período ativo e seletor
-de empresa usam o mesmo verde claro #DDF3EE do item de navegação selecionado,
-com texto verde escuro para contraste.
-O modo escuro usa superfícies azul-petróleo e destaque verde, com texto claro.
+`light.json` e `dark.json` são referências de aprovação e entradas para publicação
+dos dados. Não são importados pelo aplicativo em execução.
+Os componentes usam os nomes canônicos de `../themes-map.md`; os valores vêm
+exclusivamente da API selecionada pelo domínio.
 
-Ativação: http://localhost:8081/ (sem parâmetro de prévia)
-Claro/escuro são controlados pelo menu do usuário já existente.
-A página, DOMAIN e API_ENTRYPOINT precisam estar em loopback.
-A paleta local aprovada é aplicada sem mesclar cores do tema recebido pela API.
-Domínios publicados e APIs remotas não ativam esta fonte local. O tema aprovado da Lave-Go continua separado.
+## Registros oficiais atualizados em 2026-11-02
 
-Nenhuma alteração de banco, schema, API, indicadores, geometria ou publicação.
-Somente fonte local de tokens para avaliação. A aprovação visual não implica
-que o mapa plano atual da API já suporte dois mapas aninhados de modos;
-uma aplicação futura precisa preservar o contrato de transporte existente.
+| Ambiente | Domínio | API | Tema |
+| --- | --- | --- | --- |
+| Dev | dev.controleonline.com | dd.controleonline.com | 10 |
+| Staging | staging.controleonline.com | s.controleonline.com | 11 |
+| Produção | manager.controleonline.com | api.controleonline.com | 12 |
 
-Validação: igualdade exata com os nomes do mapa; cobertura dos papéis consumidos;
-isolamento da ativação; contraste >=4.5 para textos nas principais superfícies.
-A conferência visual ocorre no app, seletor de empresas, menu da conta e interação
-com os menus. O cadastro de todos os tokens não significa que todas as telas do
-produto já os consumam: esta etapa não refatora os componentes de outros módulos.
+Cada registro contém os 262 tokens aprovados de cada modo em `theme.colors`.
+O transporte plano usa `<token>-light` e `<token>-dark`; componentes continuam
+consumindo `<token>`. Os nomes sem sufixo e os tokens antigos de modo foram
+preservados para compatibilidade com versões anteriores do aplicativo.
+O domínio localhost:8081 do banco dev foi associado ao tema 10. No banco staging,
+localhost:8081 já estava associado ao tema 11. O vínculo localhost de produção
+não foi alterado. Os temas DEFAULT e de outros clientes não foram alterados.
 
-## Publicação da task 1292
+Os 524 valores de cada ambiente foram comparados com o CSS público usando o
+cabeçalho `app-domain`, sem divergências. Não houve migração de banco.
+Backups anteriores:
+- `/tmp/controle-theme-DEV-before-20261102-224838.json`
+- `/tmp/controle-theme-STAGING-before-20261102-224838.json`
+- `/tmp/controle-theme-MASTER-before-20261102-224839.json`
 
-A atribuição publicada está em `../domain-profiles.json`, com domínio e API exatos. A configuração é versionada no app, sem gravação de banco. Dev/staging usam Manager; Lave-Go mantém seu perfil isolado. O domínio Manager de produção não foi incluído. Os limites de ativação exclusivamente local descritos acima correspondem à etapa anterior de aprovação visual.
+A correção da leitura no consumidor está local e ainda depende da publicação
+pelo fluxo oficial. A presença dos dados no banco não significa que esse código
+já está publicado.

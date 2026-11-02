@@ -1,4 +1,3 @@
-import {localDomainTheme} from './localDomainTheme';
 import {resolveManagerTheme} from '../../styles/managerTheme';
 import {Platform} from 'react-native';
 import {app_type} from '@appType';
@@ -65,6 +64,5 @@ export function readPreviewMode() {
 }
 
 export function previewPalette(base, mode) {
-  const local = localDomainTheme(mode);
-  return local ? {...local} : resolveManagerTheme(base, mode);
+  return resolveManagerTheme(base, mode);
 }

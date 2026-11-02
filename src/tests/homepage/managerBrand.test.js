@@ -31,6 +31,12 @@ it('uses the selected company icon and label in the drawer', () => {
   expect(JSON.stringify(tree.toJSON())).toContain('Franquia selecionada');
   expect(JSON.stringify(tree.toJSON())).not.toContain('LAVE-GO - FRANQUIAS');
 });
+it('uses the selected company logo when its icon is an empty API object', () => {
+  mockCurrentCompany = {...mockCurrentCompany, icon: {}};
+  const tree = render();
+  expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 99});
+  expect(tree.root.findByType('DefaultFile').props.company).toBe(mockCurrentCompany);
+});
 it('prefers the logo in the centered home link, with icon as an alternative', () => {
   const tree = render({home: true});
   expect(tree.root.findByType('DefaultFile').props.file).toEqual({id: 99});
