@@ -8,7 +8,7 @@ jest.mock('react-native', () => ({Modal:'Modal',Pressable:'Pressable',ScrollView
 jest.mock('react-native-safe-area-context',()=>({useSafeAreaInsets:()=>({top:0,bottom:24})}));
 jest.mock('../../components/HomeIcon',()=> 'Icon');
 jest.mock('../../components/manager-preview/ManagerBrand',()=> 'Brand');
-jest.mock('@controleonline/ui-manager/src/react/components/CompanyIdentityAvatar',()=> 'Avatar');
+jest.mock('../../components/manager-preview/ManagerCompanyLogo',()=> 'Avatar');
 jest.mock('@store',()=>({useStore:()=>({getters:{companies:mockCompanies,currentCompany:mockCompanies[0]},actions:{setCurrentCompany:mockSelect}})}));
 beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=400;mockSelect.mockClear();mockCompanies=[{id:1,alias:'GYROS'},{id:2,alias:'Empresa com nome muito comprido — unidade centro'},{id:3,name:'Indisponível',enabled:false}];});
 const render=props=>{let tree;act(()=>{tree=renderer.create(<ManagerCompanySelector colors={{}} {...props}/>);});return tree;};
