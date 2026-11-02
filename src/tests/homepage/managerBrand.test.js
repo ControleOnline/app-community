@@ -5,7 +5,7 @@ const {jest} = require('@jest/globals');
 
 let mockMainCompany;
 let mockCurrentCompany;
-jest.mock('react-native', () => ({Image: 'Image', Text: 'Text', View: 'View', StyleSheet: {create: value => value}}));
+jest.mock('react-native', () => ({Image: 'Image', Text: 'Text', View: 'View', Platform: {OS: 'web'}, StyleSheet: {create: value => value}}));
 jest.mock('@store', () => ({useStore: () => ({getters: {
   mainCompany: mockMainCompany,
   currentCompany: mockCurrentCompany,

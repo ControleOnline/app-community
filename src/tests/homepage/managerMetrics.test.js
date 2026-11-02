@@ -128,3 +128,16 @@ it('distinguishes an empty series from a missing API series', async () => {
   expect(tree.root.findAllByType('Text').map(x => x.props.children)).toContain('A API não retornou a série do período.');
   await act(async () => tree.unmount());
 });
+
+
+it('keeps the production sales contract for every period without BI summaries', async () => {
+  let tree; await act(async () => {tree = renderer.create(screen());});
+  for (const label of ['Últimos 7 dias', 'Todo o período']) {
+    await act(async () => choose(tree, label));
+  }
+  const queries = mockOrders.read.mock.calls.map(([arg]) => arg.query);
+  expect(queries).toHaveLength(9);
+  expect(queries.filter(query => query.summary).map(query => query.summary)).toEqual(['sales', 'sales', 'sales']);
+  expect(queries.filter(query => query.summary).every(query => query.orderType === 'sale')).toBe(true);
+  await act(async () => tree.unmount());
+});

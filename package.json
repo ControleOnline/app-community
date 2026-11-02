@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.114",
+  "version": "1.10.115",
   "private": true,
   "scripts": {
     "android": "npm run manager:prepare && node scripts/apply-native-screens-patch.cjs && expo run:android",
@@ -34,7 +34,7 @@
     "test:manager:reads": "node scripts/apply-manager-table-patch.cjs && CO_LIVE_READS=1 jest --config jest.manager-live.config.cjs --runInBand",
     "web:manager-avatar": "node scripts/apply-bottom-navigation-patch.cjs && node scripts/apply-manager-login-patch.cjs && node scripts/apply-manager-table-patch.cjs && node scripts/apply-manager-devices-patch.cjs && node scripts/apply-manager-results-patch.cjs && node scripts/apply-manager-configurator-patch.cjs && node scripts/apply-manager-pdv-patch.cjs && node scripts/apply-manager-products-patch.cjs && node scripts/apply-manager-audit-patch.cjs && EXPO_PUBLIC_SHENLONG_EXPERIMENT=1 EXPO_PUBLIC_MANAGER_PREVIEW=1 expo start --web --port 8083 --max-workers 2",
     "test:people-compat": "node node_modules/jest/bin/jest.js --config jest.people-compat.config.cjs --runInBand --runTestsByPath node_modules/@controleonline/ui-people/src/tests/react/store/mainCompany.test.js node_modules/@controleonline/ui-people/src/tests/react/store/people.customActions.test.js node_modules/@controleonline/ui-people/src/tests/react/utils/currentCompanySelection.test.js",
-    "manager:prepare": "node scripts/apply-bottom-navigation-patch.cjs && node scripts/apply-manager-login-patch.cjs && node scripts/apply-manager-table-patch.cjs && node scripts/apply-manager-devices-patch.cjs && node scripts/apply-manager-results-patch.cjs && node scripts/apply-manager-configurator-patch.cjs && node scripts/apply-manager-pdv-patch.cjs && node scripts/apply-manager-products-patch.cjs && node scripts/apply-manager-audit-patch.cjs && node scripts/apply-admin-bootstrap-patch.cjs && node scripts/apply-single-item-patch.cjs && node scripts/apply-single-item-flow-patch.cjs",
+    "manager:prepare": "node scripts/apply-local-app-domain-patch.cjs && node scripts/apply-object-theme-patch.cjs && node scripts/apply-bottom-navigation-patch.cjs && node scripts/apply-manager-login-patch.cjs && node scripts/apply-manager-table-patch.cjs && node scripts/apply-manager-devices-patch.cjs && node scripts/apply-manager-results-patch.cjs && node scripts/apply-manager-configurator-patch.cjs && node scripts/apply-manager-pdv-patch.cjs && node scripts/apply-manager-products-patch.cjs && node scripts/apply-manager-audit-patch.cjs && node scripts/apply-admin-bootstrap-patch.cjs && node scripts/apply-single-item-patch.cjs && node scripts/apply-single-item-flow-patch.cjs",
     "web:manager": "npm run manager:prepare && EXPO_PUBLIC_SHENLONG_EXPERIMENT=0 EXPO_PUBLIC_MANAGER_LAYOUT=modern expo start --web --port 8081 --max-workers 2",
     "web:legacy": "npm run manager:prepare && EXPO_PUBLIC_SHENLONG_EXPERIMENT=0 EXPO_PUBLIC_MANAGER_LAYOUT=legacy expo start --web --port 8081 --max-workers 2",
     "export:manager": "npm run manager:prepare && EXPO_PUBLIC_SHENLONG_EXPERIMENT=0 EXPO_PUBLIC_MANAGER_LAYOUT=modern expo export --platform web",

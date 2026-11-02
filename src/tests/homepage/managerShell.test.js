@@ -6,6 +6,7 @@ import {DefaultTableThemeContext} from '@controleonline/ui-default/src/react/com
 
 jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:jest.fn()}}));
 let mockWidth = 1440;
+let mockBaseAppType = 'MANAGER';
 let mockFocused = true;
 const mockGo = jest.fn();
 const mockToggle = jest.fn();
@@ -19,7 +20,7 @@ jest.mock('react-native', () => ({
 }));
 jest.mock('react-native-safe-area-context', () => ({SafeAreaProvider: 'SafeAreaProvider', useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}), useSafeAreaFrame: () => ({width: mockWidth, height: 800})}));
 jest.mock('@react-navigation/native', () => ({useIsFocused: () => mockFocused}));
-jest.mock('@appType', () => ({app_type: 'MANAGER', app_type_base: 'MANAGER'}));
+jest.mock('@appType', () => ({app_type: 'MANAGER', get app_type_base(){return mockBaseAppType;}}));
 jest.mock('../../components/manager-preview/ManagerBottomNavigation', () => 'RuntimeToolbar');
 jest.mock('../../components/HomeIcon', () => 'Icon');
 jest.mock('../../components/HomeAvatar', () => 'HomeAvatar');
@@ -40,7 +41,7 @@ beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
   mockExtraMenus = [];
-  mockBottomBar = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
+  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
 afterEach(() => {delete global.window;});
 
@@ -59,7 +60,7 @@ it('keeps company selection in the sidebar and theme switching in the account me
   act(() => {labeled(tree, 'Dispositivos')[0].props.onPress();});
   expect(mockGo).toHaveBeenCalledWith('DevicesIndex', {source: 'manager'});
   expect(labeled(tree, 'Ativar tema escuro')).toHaveLength(0);
-  act(() => labeled(tree, 'Abrir opções do usuário')[1].props.onPress());
+  act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   act(() => labeled(tree, 'Usar tema escuro')[0].props.onPress());
   expect(mockToggle).toHaveBeenCalledTimes(1);
   expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
@@ -94,19 +95,24 @@ it('opens and closes the mobile drawer and closes it after navigation', () => {
   act(() => tree.unmount());
 });
 
-it('opens the same account options from either avatar without navigating prematurely', () => {
+it('keeps a single left-aligned themed account control in the sidebar without navigating prematurely', () => {
   let tree; act(() => {tree = renderer.create(view());});
+  expect(labeled(tree, 'Abrir opções do usuário')).toHaveLength(1);
+  expect(tree.root.findByProps({testID:'manager-topbar'}).findAllByType('HomeAvatar')).toHaveLength(0);
+  const control=labeled(tree, 'Abrir opções do usuário')[0];
+  expect(control.props.style[0]).toMatchObject({alignItems:'center',justifyContent:'flex-start'});
+  expect(control.props.style[1]).toMatchObject({backgroundColor:mockColors.selectBackground,borderColor:mockColors.selectBorder});
   act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   expect(mockGo).not.toHaveBeenCalled();
   expect(labeled(tree, 'Meu perfil')).toHaveLength(1);
   act(() => labeled(tree, 'Meu perfil')[0].props.onPress());
   expect(mockGo).toHaveBeenLastCalledWith('ProfilePage', undefined);
   expect(labeled(tree, 'Meu perfil')).toHaveLength(0);
-  act(() => labeled(tree, 'Abrir opções do usuário')[1].props.onPress());
+  act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   expect(labeled(tree, 'Ajuda do On Manager')).toHaveLength(1);
   act(() => tree.root.findByType('Modal').props.onRequestClose());
   expect(labeled(tree, 'Meu perfil')).toHaveLength(0);
-  expect(tree.root.findAllByType('HomeAvatar')).toHaveLength(2);
+  expect(tree.root.findAllByType('HomeAvatar')).toHaveLength(1);
   act(() => tree.unmount());
 });
 
@@ -142,12 +148,14 @@ it('mounts one inline toolbar only for the focused mobile screen and exposes bot
     setSessionVisible: jest.fn(), setRememberedVisible: jest.fn(async () => true)};
   let tree; act(() => {tree = renderer.create(view('DevicesIndex'));});
   expect(tree.root.findAllByType('RuntimeToolbar')).toHaveLength(1);
+  act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
   act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   act(() => labeled(tree, 'Ocultar nesta sessão')[0].props.onPress());
   expect(mockBottomBar.setSessionVisible).toHaveBeenCalledWith(false);
   mockBottomBar = {...mockBottomBar, visible: false};
   act(() => tree.update(view('DevicesIndex')));
   expect(tree.root.findAllByType('RuntimeToolbar')).toHaveLength(0);
+  act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
   act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   expect(labeled(tree, 'Mostrar nesta sessão')).toHaveLength(1);
   await act(async () => labeled(tree, 'Manter oculta neste aparelho')[0].props.onPress());
@@ -195,4 +203,11 @@ it('keeps the mobile header free of desktop breadcrumbs',()=>{
  mockWidth=400;let tree;act(()=>{tree=renderer.create(view());});
  expect(tree.root.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(0);
  act(()=>tree.unmount());
+});
+
+it.each([320,390,760])('keeps the ADMIN selector in the same mobile topbar at width %i',width=>{
+ mockWidth=width;mockBaseAppType='ADMIN';let tree;act(()=>{tree=renderer.create(view());});
+ const selectors=tree.root.findAllByType('AppTypeSwitcher');expect(selectors).toHaveLength(1);
+ expect(tree.root.findByProps({testID:'manager-topbar'}).findAllByType('AppTypeSwitcher')).toHaveLength(1);
+ expect(selectors[0].props.compact).toBe(true);act(()=>tree.unmount());
 });
