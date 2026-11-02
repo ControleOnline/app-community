@@ -1,19 +1,24 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {formatInteger, normalizeNumber} from '@controleonline/ui-report/src/react/components/operationalInsights/shared';
-import HomeIcon from '../HomeIcon';
+import {Platform, ScrollView, Text, View} from 'react-native';
+import {
+  createOperationalInsightsStyles, formatInteger, normalizeNumber,
+  ReportCardShell, resolveProgressColor,
+} from '@controleonline/ui-report/src/react/components/operationalInsights/shared';
 
-// Shared data formatting; visual roles come exclusively from the domain theme.
-export default function ManagerOrdersTrend({items = [], colors: c, title, subtitle, style}) {
+// Keep the shared report presentation, with an explicit row layout. The installed
+// TrendCard omits flexDirection on its columns container and stacks them on web.
+export default function ManagerOrdersTrend({items = [], ppcColors, accentColor, title, subtitle, style}) {
+  const s = createOperationalInsightsStyles(ppcColors, accentColor);
   const max = items.reduce((value, item) => Math.max(value, normalizeNumber(item.orders)), 0);
-  return <View style={[s.frame, {backgroundColor:c.panelBackground,borderColor:c.panelBorder}, style]}>
-    <View style={s.header}>
-      <View style={[s.icon, {backgroundColor:c.cardIconBackground,borderColor:c.cardIconBorder}]}>
-        <HomeIcon name="bar-chart-2" size={18} color={c.cardIconColor} />
-      </View>
-      <View><Text style={[s.title, {color:c.cardText}]}>{title}</Text>
-        <Text style={[s.subtitle, {color:c.textSecondary}]}>{subtitle}</Text></View>
-    </View>
+  // Home owns the surface; do not inherit the report shell's elevated frame.
+  const frame = {
+    backgroundColor: ppcColors.cardBg, borderColor: ppcColors.borderSoft,
+    borderWidth: 1, borderRadius: 16,
+    shadowOffset: {width: 0, height: 0}, shadowOpacity: 0, shadowRadius: 0,
+    elevation: 0, ...(Platform.OS === 'web' ? {boxShadow: 'none'} : {}),
+  };
+  return <ReportCardShell {...{ppcColors, accentColor, title, subtitle}}
+    style={[style, frame]} iconName="chart-line">
     <ScrollView horizontal showsHorizontalScrollIndicator
       style={{maxHeight: 190}} contentContainerStyle={{minWidth: '100%'}}>
       <View accessibilityLabel="Pedidos concluídos por período" style={{
@@ -25,27 +30,15 @@ export default function ManagerOrdersTrend({items = [], colors: c, title, subtit
           const height = max > 0 ? Math.round(value / max * 118) : 0;
           return <View key={item.key || index} style={[s.trendColumn, {flexShrink: 0}]}
             accessibilityLabel={`${item.label}: ${formatInteger(value)} pedidos`}>
-            <Text style={[s.trendColumnValue,{color:c.cardText}]}>{formatInteger(value)}</Text>
-            <View style={[s.trendColumnTrack, {backgroundColor: c.sectionBackground}]}>
+            <Text style={s.trendColumnValue}>{formatInteger(value)}</Text>
+            <View style={[s.trendColumnTrack, {backgroundColor: ppcColors.panelBg}]}>
               <View style={[s.trendColumnFill, {height, minHeight: 0,
-                backgroundColor: c.cardIconColor}]} />
+                backgroundColor: resolveProgressColor(accentColor, index, items.length)}]} />
             </View>
-            <Text style={[s.trendColumnLabel,{color:c.textSecondary}]}>{item.label}</Text>
+            <Text style={s.trendColumnLabel}>{item.label}</Text>
           </View>;
         })}
       </View>
     </ScrollView>
-  </View>;
+  </ReportCardShell>;
 }
-
-const s = StyleSheet.create({
-  frame:{borderWidth:1,borderRadius:16,padding:14},
-  header:{flexDirection:'row',alignItems:'center',gap:10,marginBottom:14},
-  icon:{width:38,height:38,borderRadius:19,borderWidth:1,alignItems:'center',justifyContent:'center'},
-  title:{fontSize:14,fontWeight:'700'}, subtitle:{fontSize:12,marginTop:4},
-  trendColumn:{width:54,alignItems:'center',justifyContent:'flex-end',gap:6},
-  trendColumnValue:{fontSize:11,lineHeight:13,fontWeight:'900'},
-  trendColumnTrack:{width:'100%',height:118,borderRadius:16,justifyContent:'flex-end',overflow:'hidden'},
-  trendColumnFill:{width:'100%',borderTopLeftRadius:12,borderTopRightRadius:12},
-  trendColumnLabel:{fontSize:10,lineHeight:12,fontWeight:'800',textAlign:'center'},
-});

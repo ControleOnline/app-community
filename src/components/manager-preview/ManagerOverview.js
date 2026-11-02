@@ -94,18 +94,18 @@ export default function ManagerOverview({navigation}) {
   const quick = ['PdvPage', 'DevicesIndex', 'ProductShowcasesPage', 'Inventory', 'FinancialHubPage', 'ConfiguratorPage', 'Integrations', 'MyCompaniesPage']
     .map(find).filter(Boolean);
   const columns = width > 1450 ? 4 : 2;
-  const icon = (name, color = c.cardIconColor, size = 19) => <HomeIcon name={name || 'grid'} size={size} color={color} />;
+  const icon = (name, color = c.buttonBackground, size = 19) => <HomeIcon name={name || 'grid'} size={size} color={color} />;
   const go = item => {experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params);};
   const button = (item, primary = false) => item && <Pressable accessibilityRole="button" onPress={() => go(item)}
-    style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, borderColor: primary ? c.buttonBorder : c.buttonBorderSecondary}]}>
-    {icon(primary ? 'arrow-right' : item.icon, primary ? c.buttonText : c.buttonTextSecondary, 16)}
-    <Text style={{color: primary ? c.buttonText : c.buttonTextSecondary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
+    style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.cardBackground, borderColor: c.cardBorder}]}>
+    {icon(primary ? 'arrow-right' : item.icon, primary ? c.buttonText : c.textPrimary, 16)}
+    <Text style={{color: primary ? c.buttonText : c.textPrimary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
   </Pressable>;
   const cards = [
-    [`Vendas concluídas ${selectedPeriod.suffix}`, live.sales, 'Vendas fechadas · data do pedido', 'credit-card', selectedPeriod.label, live.salesError, canReadOrders, true, history],
-    [`Pedidos ${selectedPeriod.suffix}`, live.count, 'Todos os tipos · data do pedido', 'file-text', selectedPeriod.label, live.periodError, canReadOrders, false, history],
-    ['Em andamento', live.open, 'Pedidos de venda abertos', 'clock', 'Situação atual', live.openError, canReadOrders, false, history],
-    ['Clientes', live.clients, 'Clientes vinculados à empresa', 'users', 'Total cadastrado', live.clientsError, canReadClients, false, clients],
+    [`Vendas concluídas ${selectedPeriod.suffix}`, live.sales, 'Vendas fechadas · data do pedido', 'credit-card', c.textSuccess, selectedPeriod.label, live.salesError, canReadOrders, true, history],
+    [`Pedidos ${selectedPeriod.suffix}`, live.count, 'Todos os tipos · data do pedido', 'file-text', c.buttonBackground, selectedPeriod.label, live.periodError, canReadOrders, false, history],
+    ['Em andamento', live.open, 'Pedidos de venda abertos', 'clock', c.textWarning, 'Situação atual', live.openError, canReadOrders, false, history],
+    ['Clientes', live.clients, 'Clientes vinculados à empresa', 'users', c.buttonBackground, 'Total cadastrado', live.clientsError, canReadClients, false, clients],
   ];
   return <ScrollView style={{backgroundColor: c.pageBackground}} contentContainerStyle={[s.page, {paddingHorizontal: width <= 760 ? 16 : 32}]}>
     <View style={[s.hero, width <= 760 && {flexDirection: 'column'}]}>
@@ -118,60 +118,61 @@ export default function ManagerOverview({navigation}) {
         {periods.map(option => <Pressable key={option.id} accessibilityRole="radio"
           accessibilityLabel={option.label} accessibilityState={{checked: period === option.id}}
           onPress={() => setPeriod(option.id)} style={[s.periodOption, {
-            backgroundColor: period === option.id ? c.buttonBackground : c.buttonBackgroundSecondary,
-            borderColor: period === option.id ? c.buttonBorder : c.buttonBorderSecondary,
+            backgroundColor: period === option.id ? c.buttonBackground : c.cardBackground,
+            borderColor: period === option.id ? c.buttonBackground : c.cardBorder,
           }]}>
-          <Text style={{fontSize: 12, fontWeight: '600', color: period === option.id ? c.buttonText : c.buttonTextSecondary}}>{option.label}</Text>
+          <Text style={{fontSize: 12, fontWeight: '600', color: period === option.id ? c.buttonText : c.textPrimary}}>{option.label}</Text>
         </Pressable>)}
-        <Pressable accessibilityRole="button" accessibilityLabel="Atualizar indicadores" onPress={() => setRefresh(value => value + 1)} style={[s.periodOption, {borderColor: c.buttonBorderSecondary, backgroundColor: c.buttonBackgroundSecondary}]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Atualizar indicadores" onPress={() => setRefresh(value => value + 1)} style={[s.periodOption, {borderColor: c.cardBorder, backgroundColor: c.cardBackground}]}>
           {icon('refresh-cw', c.textPrimary, 16)}
         </Pressable>
       </View>
     </View>
-    <View style={s.metrics}>{cards.map(([label, value, help, glyph, scope, error, allowed, money, destination]) => <View key={label}
+    <View style={s.metrics}>{cards.map(([label, value, help, glyph, tone, scope, error, allowed, money, destination]) => <View key={label}
       style={[s.metricSlot, {width: `${100 / columns}%`}]}>
       <Pressable accessibilityRole={destination ? "button" : undefined} accessibilityLabel={destination ? `Abrir ${label}` : undefined} disabled={!destination} onPress={() => go(destination)} style={[s.metric, width <= 760 && s.metricMobile, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
       <View style={s.between}><Text style={[s.label, {color: c.textSecondary}]}>{label}</Text>
-        <View style={[s.puck, {backgroundColor: c.cardIconBackground}]}>{icon(glyph, c.cardIconColor)}</View></View>
-      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.cardText}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
+        <View style={[s.puck, {backgroundColor: c.cardIconBackground}]}>{icon(glyph, tone || c.buttonBackground)}</View></View>
+      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.textPrimary}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
       <Text style={[s.help, {color: c.textMuted}]}>{help}</Text>
       <Text style={[s.scope, {color: c.textSecondary}]}>{scope}</Text>
       <Text style={[s.help, {color: c.textMuted}]}>{!companyId ? 'Selecione uma empresa' : !allowed ? 'Sem acesso neste perfil' : error || (value === undefined ? 'Carregando…' : 'Dados da API')}</Text>
       </Pressable>
     </View>)}</View>
-    {results && <Pressable accessibilityRole="button" accessibilityLabel="Resultados" onPress={() => go(results)} style={[s.results, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.cardText}]}>Resultados</Text><Text style={[s.sub, {color: c.textSecondary}]}>Resumo dos resultados</Text></View>{icon('arrow-right', c.cardText)}</Pressable>}
+    {results && <Pressable accessibilityRole="button" accessibilityLabel="Resultados" onPress={() => go(results)} style={[s.results, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.textPrimary}]}>Resultados</Text><Text style={[s.sub, {color: c.textSecondary}]}>Resumo dos resultados</Text></View>{icon('arrow-right', c.textPrimary)}</Pressable>}
     <View style={[s.panels, width <= 1060 && {flexDirection: 'column'}]}>
-      <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
-        <Text style={[s.panelTitle, {color: c.cardText}]}>Movimento de pedidos</Text>
+      <View style={[s.panel, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
+        <Text style={[s.panelTitle, {color: c.textPrimary}]}>Movimento de pedidos</Text>
         <Text style={[s.sub, {color: c.textSecondary}]}>Período selecionado: {selectedPeriod.label}.</Text>
         {!companyId || !canReadOrders || live.salesError || !Array.isArray(live.series) || !live.series.length ?
-          <View style={[s.pending, {backgroundColor: c.sectionBackground}]}>
+          <View style={[s.pending, {backgroundColor: c.cardIconBackground}]}>
             {icon('bar-chart-2', c.textMuted, 34)}
             <Text style={[s.sub, {color: c.textMuted, textAlign: 'center'}]}>{!companyId ? 'Selecione uma empresa' : !canReadOrders ? 'Sem acesso neste perfil' : live.salesError || (live.series === undefined ? 'Carregando movimento…' : live.series === null ? 'A API não retornou a série do período.' : 'Nenhuma venda concluída no período.')}</Text>
           </View> : <ManagerOrdersTrend
             title="Pedidos de venda concluídos"
             subtitle={period === 'all' ? 'Por mês · todo o período · data do pedido' : 'Por dia · data do pedido'}
             items={live.series}
-            colors={c}
+            accentColor={c.buttonBackground}
+            ppcColors={{cardBg: c.cardBackground, panelBg: c.cardIconBackground, borderSoft: c.cardBorder, textPrimary: c.textPrimary, textSecondary: c.textSecondary}}
             style={{marginTop: 18}}
           />}
 
       </View>
-      <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
-        <Text style={[s.panelTitle, {color: c.cardText}]}>Acesso rápido</Text>
+      <View style={[s.panel, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
+        <Text style={[s.panelTitle, {color: c.textPrimary}]}>Acesso rápido</Text>
         <Text style={[s.sub, {color: c.textSecondary}]}>Suas ferramentas de gestão e configuração.</Text>
         <View style={s.quick}>{(quick.length ? quick : items.slice(0, 6)).map((item, i) => <Pressable key={item.id || i}
           accessibilityRole="button" onPress={() => go(item)} style={({hovered}) => [s.quickItem,
-            {borderColor: c.listItemBorder, backgroundColor: hovered ? c.listItemActiveBackground : c.listItemBackground}]}>
-          <View style={[s.quickIcon, {backgroundColor:c.cardIconBackground}]}>{icon(item.icon,c.cardIconColor,17)}</View><Text style={{color: c.listItemText, fontWeight: '600', fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.listItemSubtitleText, 14)}
+            {borderColor: c.cardBorder, backgroundColor: hovered ? c.navigationActiveBackground : c.cardIconBackground}]}>
+          {icon(item.icon)}<Text style={{color: c.textPrimary, fontWeight: '600', fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.textMuted, 14)}
         </Pressable>)}</View>
       </View>
     </View>
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>Explore seus módulos</Text>
     <View style={s.modules}>{groups.map((group, i) => <View key={group.id || i} style={[s.module, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
-      <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
+      <Text style={[s.panelTitle, {color: c.textPrimary}]}>{group.title}</Text>
       {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>
-        {icon(item.icon, c.textMuted, 16)}<Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.textMuted, 14)}
+        {icon(item.icon, c.textMuted, 16)}<Text style={{color: c.textPrimary, fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.textMuted, 14)}
       </Pressable>)}
     </View>)}</View>
   </ScrollView>;
@@ -199,7 +200,6 @@ const s = StyleSheet.create({
   results: {borderWidth: 1, borderRadius: 14, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 22},
   panels: {flexDirection: 'row', gap: 18, marginBottom: 26}, panel: {flex: 1, borderWidth: 1, borderRadius: 16, padding: 20},
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
-  quickIcon: {width:32,height:32,borderRadius:9,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 16},
   modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13},

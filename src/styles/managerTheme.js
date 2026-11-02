@@ -24,7 +24,6 @@ const darkMap={
  modalHeaderText:'text-headers-dark',modalText:'text-headers-dark',
  footerBackground:'darkCard',footerBorder:'darkBorder',footerText:'text-menu-dark',
 };
-export const managerObjectThemeTokens = ["cardIconBorder", "buttonBackground", "buttonBackgroundSecondary", "buttonBorder", "buttonBorderSecondary", "buttonText", "buttonTextSecondary", "cardBackground", "cardBorder", "cardIconBackground", "cardIconColor", "cardText", "headerBackground", "headerBorder", "headerIcon", "headerText", "iconActive", "inputPlaceholderText", "linkText", "listItemActiveBackground", "listItemBackground", "listItemBorder", "listItemSelectedBackground", "listItemSubtitleText", "listItemText", "menuActiveBackground", "menuActiveIcon", "menuActiveText", "menuBackground", "menuBorder", "menuIcon", "menuText", "modalBackground", "modalBorder", "modalCloseIcon", "modalHeaderText", "modalOverlay", "navigationActiveBackground", "navigationActiveBorder", "navigationActiveIcon", "navigationActiveText", "navigationBackground", "navigationBorder", "navigationIcon", "navigationText", "pageBackground", "panelBackground", "panelBorder", "sectionBackground", "selectBackground", "selectBorder", "selectIcon", "selectOptionBackground", "selectOptionBorder", "selectOptionSelectedBackground", "selectOptionSelectedText", "selectText", "textMuted", "textPrimary", "textSecondary"];
 const required=['buttonBackground','buttonText','cardBackground','cardBorder','cardIconBackground','headerBackground','headerBorder','navigationActiveBackground','navigationActiveText','navigationBackground','navigationBorder','navigationIcon','navigationText','pageBackground','textMuted','textPrimary','textSecondary','textSuccess','textWarning','tableHeaderBackground','tableRowEvenBackground','tableRowOddBackground'];
 const mapping=mode=>{
  if(!['light','dark'].includes(mode))throw new Error('Modo de tema inválido.');
@@ -41,8 +40,7 @@ export function resolveManagerTheme(theme={},mode='light'){
  }
  return result;
 }
-export function missingManagerThemeTokens(theme={},mode='light',objectTheme=null){
- if(objectTheme) return managerObjectThemeTokens.filter(key=>typeof objectTheme[key]!=='string'||!objectTheme[key].trim()).sort();
+export function missingManagerThemeTokens(theme={},mode='light'){
  const map=mapping(mode),resolved=resolveManagerTheme(theme,mode);
  return [...new Set(required.filter(key=>typeof resolved[key]!=='string'||!resolved[key].trim()).map(key=>map[key]||key))].sort();
 }

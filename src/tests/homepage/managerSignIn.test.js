@@ -10,7 +10,7 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useMan
 it('reuses login and registration with the requested identity copy and a closed small default guide',()=>{
   global.IS_REACT_ACT_ENVIRONMENT=true;
   let tree; act(()=>{tree=renderer.create(<ManagerSignIn navigation={{navigate:jest.fn()}}/>);});
-  expect(tree.root.findByType('ExistingSignIn').props).toMatchObject({introMessage:null,identifierLabel:'Usuário',identifierRequiredMessage:'Usuário é obrigatório',createAccountLabel:'Nova conta'});
+  expect(tree.root.findByType('ExistingSignIn').props).toMatchObject({introMessage:'Eu sou',identifierLabel:'Usuário',identifierRequiredMessage:'Usuário é obrigatório',createAccountLabel:'Nova conta'});
   expect(tree.root.findAllByType('section')).toHaveLength(0);
   if (process.env.SHENLONG_TESTS !== '1') {
     expect(tree.root.findAllByProps({className:'on-guide'})).toHaveLength(0);

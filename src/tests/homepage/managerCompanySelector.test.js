@@ -42,6 +42,6 @@ it('keeps the compact selector accessible and closes on a dismiss request',()=>{
 it('shows a static identity when there is only one company',()=>{
  mockCompanies=mockCompanies.slice(0,1);const tree=render();
  expect(tree.root.findAllByProps({testID:'manager-company-trigger'})).toHaveLength(0);
- expect(tree.root.findByType('Brand').props).toMatchObject({subtitle:false});
+ expect(tree.root.findByType('Brand').props).toMatchObject({subtitle:false,wrapLabel:true});
  act(()=>tree.unmount());
 });
