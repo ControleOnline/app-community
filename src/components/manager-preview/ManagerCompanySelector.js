@@ -3,7 +3,7 @@ import {Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimension
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useStore} from '@store';
 import {isCompanySelectable} from '@controleonline/ui-people/src/react/utils/currentCompanySelection';
-import CompanyIdentityAvatar from '@controleonline/ui-manager/src/react/components/CompanyIdentityAvatar';
+import ManagerCompanyLogo from './ManagerCompanyLogo';
 import HomeIcon from '../HomeIcon';
 import ManagerBrand from './ManagerBrand';
 
@@ -19,26 +19,24 @@ export default function ManagerCompanySelector({colors: c, compact = false}) {
   const company = currentCompany?.id ? currentCompany : mainCompany;
   const label = company?.alias || company?.name || 'Empresa';
   const close = () => setOpen(false);
-  const content = <>
-    <ManagerBrand colors={c} compact={compact} subtitle={false} wrapLabel />
-    {canSwitch && !compact && <HomeIcon name="chevron-down" size={18} color={c.navigationIcon} />}
-  </>;
+  const content = <ManagerBrand colors={c} textColor={c.selectText} compact={compact} subtitle={false}
+    trailing={canSwitch && !compact ? <View style={s.chevron}><HomeIcon name="chevron-down" size={18} color={c.selectIcon} /></View> : null} />;
   return <>
     {canSwitch ? <Pressable testID="manager-company-trigger" accessibilityRole="button"
       accessibilityLabel={`Selecionar empresa. Atual: ${label}`} accessibilityState={{expanded: open}}
-      onPress={() => setOpen(true)} style={[s.trigger, {borderColor: c.cardBorder, backgroundColor: c.pageBackground}, compact && s.compact]}>
+      onPress={() => setOpen(true)} style={[s.trigger, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.compact]}>
       {content}
-    </Pressable> : <View style={[s.trigger, {borderColor: c.cardBorder}, compact && s.compact]} accessibilityLabel={`Empresa atual: ${label}`}>{content}</View>}
+    </Pressable> : <View style={[s.trigger, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.compact]} accessibilityLabel={`Empresa atual: ${label}`}>{content}</View>}
     <Modal visible={open} transparent animationType="fade" onRequestClose={close}>
       <View style={[s.modalRoot, !mobile && s.desktopRoot]}>
         <Pressable accessibilityRole="button" accessibilityLabel="Fechar seleção de empresa" onPress={close}
-          style={[StyleSheet.absoluteFill, {backgroundColor: 'rgba(0,0,0,0.45)'}]} />
-        <View accessibilityViewIsModal style={[s.sheet, {backgroundColor: c.cardBackground, maxHeight: Math.max(0, height - insets.top - 24), paddingBottom: Math.max(16, insets.bottom)},
+          style={[StyleSheet.absoluteFill, {backgroundColor: c.modalOverlay}]} />
+        <View accessibilityViewIsModal style={[s.sheet, {backgroundColor: c.modalBackground, maxHeight: Math.max(0, height - insets.top - 24), paddingBottom: Math.max(16, insets.bottom)},
           !mobile && {width: Math.min(480, width - 32), borderRadius: 16}]}>
-          <View style={[s.heading, {borderBottomColor: c.cardBorder}]}>
-            <Text style={[s.title, {color: c.textPrimary}]}>Selecionar Empresa</Text>
+          <View style={[s.heading, {borderBottomColor: c.modalBorder}]}>
+            <Text style={[s.title, {color: c.modalHeaderText}]}>Selecionar Empresa</Text>
             <Pressable accessibilityRole="button" accessibilityLabel="Fechar seleção de empresa" onPress={close} style={s.close}>
-              <HomeIcon name="x" size={22} color={c.navigationIcon} />
+              <HomeIcon name="x" size={22} color={c.modalCloseIcon} />
             </Pressable>
           </View>
           <ScrollView style={s.list}>
@@ -51,11 +49,14 @@ export default function ManagerCompanySelector({colors: c, compact = false}) {
                   if (!isCompanySelectable(item)) return;
                   people.actions.setCurrentCompany(item);
                   close();
-                }} style={[s.option, {borderBottomColor: c.cardBorder, opacity: disabled ? 0.45 : 1}]}>
-                <CompanyIdentityAvatar home company={item} size={32} backgroundColor={c.cardIconBackground}
-                  borderColor={c.cardBorder} textColor={c.textPrimary} />
-                <Text style={[s.optionName, {color: c.textPrimary}]}>{item.alias || item.name}</Text>
-                {selected && <HomeIcon name="check-circle" size={20} color={c.navigationIcon} />}
+                }} style={({hovered, pressed}) => [s.option, {borderBottomColor:c.selectOptionBorder, opacity:disabled ? 0.45 : 1,
+                  backgroundColor:selected ? c.selectOptionSelectedBackground : c.selectOptionBackground}]}>
+                {({hovered, pressed}) => {
+                  const text = selected ? c.selectOptionSelectedText : c.selectText;
+                  return <><ManagerCompanyLogo company={item} size={32} colors={c} />
+                    <Text style={[s.optionName, {color:text}]}>{item.alias || item.name}</Text>
+                    {selected && <HomeIcon name="check-circle" size={20} color={c.iconActive} />}</>;
+                }}
               </Pressable>;
             })}
           </ScrollView>
@@ -68,6 +69,7 @@ export default function ManagerCompanySelector({colors: c, compact = false}) {
 const s = StyleSheet.create({
   trigger: {minHeight: 64, padding: 10, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8},
   compact: {padding: 6, justifyContent: 'center'},
+  chevron: {width: 18, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   modalRoot: {flex: 1, justifyContent: 'flex-end'}, desktopRoot: {justifyContent: 'center', alignItems: 'center'},
   sheet: {width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, flexShrink: 1},
   heading: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingLeft: 20, paddingRight: 8, paddingVertical: 8, borderBottomWidth: 1},
