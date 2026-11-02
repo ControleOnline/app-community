@@ -100,9 +100,9 @@ export default function ManagerShell({navigation, route, options, children}) {
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => [s.navItem,
-        {backgroundColor: active || hovered || pressed ? c.navigationActiveBackground : 'transparent',
-          borderLeftColor: active ? c.buttonBackground : 'transparent'}, compact && s.center]}>
-      {icon(item.icon, 18, active ? c.buttonBackground : c.navigationIcon)}
+        {backgroundColor: active ? c.navigationActiveBackground : hovered || pressed ? c.navigationActiveBackground : 'transparent',
+          borderLeftColor: active ? c.navigationActiveBorder : 'transparent'}, compact && s.center]}>
+      {icon(item.icon, 18, active ? c.navigationActiveIcon : c.navigationIcon)}
       {!compact && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
     </Pressable>;
   };
@@ -121,35 +121,31 @@ export default function ManagerShell({navigation, route, options, children}) {
       </View>)}
       {!groups.length && !compact && <Text style={[s.navText, {color: c.textMuted}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
     </ScrollView>
-    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.cardBorder}]}>{avatar(34)}
-      {!compact && <View style={{flex: 1}}><Text numberOfLines={1} style={[s.navText, {color: c.textPrimary}]}>{String(name)}</Text>
+    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.center]}>{avatar(34)}
+      {!compact && <View style={{flexShrink: 1, minWidth: 0}}><Text numberOfLines={1} style={[s.navText, {color: c.selectText}]}>{String(name)}</Text>
         <Text style={{fontSize: 11, color: c.textMuted}}>Minha conta</Text></View>}
     </Pressable>
   </View>;
-  return <View style={[s.shell, {backgroundColor: c.pageBackground}]}>
+  return <View  style={[s.shell, {backgroundColor: c.pageBackground}]}>
     {!mobile && sidebar}
     <View collapsable={false} style={s.main}>
       <View style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
       <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
         <View style={[s.headerSide, s.headerLeft]}>
           <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
-            onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.cardBorder}]}>{icon('menu')}</Pressable>
-        {!mobile && <View testID="manager-breadcrumb" style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.textMuted, fontSize: 12}}>
-          {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.textPrimary, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
+            onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.headerBorder}]}>{icon('menu', 18, c.headerIcon)}</Pressable>
+        {!mobile && <View testID="manager-breadcrumb" style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.headerText, fontSize: 12}}>
+          {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
         </Text></View>}
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
           onPress={() => go({name: 'HomePage'})} style={s.homeButton}>
-          <ManagerBrand colors={c} home />
+          <ManagerBrand colors={c} home homeSize={40} homeWidth={80} />
         </Pressable>
-        <View style={[s.headerSide, s.headerRight]}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'header'}} onPress={() => openAccount('header')} style={s.accountButton}>{avatar(38)}</Pressable>
+        <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls]}>
+          {app_type_base === 'ADMIN' && <AppTypeSwitcher colors={c} compact={mobile} />}
         </View>
       </View>
-      {app_type_base === 'ADMIN' && <View style={[s.headerDetails, mobile && s.mobileDetails]}>
-
-        {app_type_base === 'ADMIN' && <AppTypeSwitcher />}
-      </View>}
       </View>
       <ManagerScreenNavigation navigation={navigation} route={route} options={options} colors={c} />
       {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
@@ -171,7 +167,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       onTheme={accountAction(toggleMode)}
       onLogout={auth.actions?.logOut ? accountAction(() => auth.actions.logOut()) : undefined} />}
     {mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay]}>
-      <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, {backgroundColor: 'rgba(0,0,0,0.5)'}]} />
+      <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, {backgroundColor: c.modalOverlay}]} />
       {sidebar}
     </View>}
   </View>;
@@ -187,16 +183,16 @@ const s = StyleSheet.create({
   caption: {fontSize: 10, fontWeight: '700', letterSpacing: 1.3, textTransform: 'uppercase', margin: 12},
   navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
   navText: {fontSize: 12, fontWeight: '600', flexShrink: 1}, center: {justifyContent: 'center', paddingHorizontal: 0},
-  account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 10},
+  account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10},
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
   mobileTop: {paddingHorizontal: 12, minHeight: 64},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
-  accountButton: {width: 44, height: 44, alignItems: 'center', justifyContent: 'center'},
+  headerControls: {flexDirection:'row',alignItems:'center',justifyContent:'flex-end',gap:16},
   headerDetails: {paddingHorizontal: 28, paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16},
   mobileDetails: {paddingHorizontal: 12, justifyContent: 'flex-end'},
   breadcrumb: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
-  homeButton: {width: 44, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
+  homeButton: {width: 88, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });
