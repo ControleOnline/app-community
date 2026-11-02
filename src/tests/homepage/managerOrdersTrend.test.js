@@ -14,7 +14,7 @@ it('keeps the full history in one scrollable row with a common scale and no visi
   const items = Array.from({length: 14}, (_, i) => ({key: String(i), label: `Mês ${i}`, orders: i}));
   let tree;
   act(() => {tree = renderer.create(<ManagerOrdersTrend items={items} colors={{sectionBackground:'track-token',cardIconColor:'bar-token'}} />);});
-  const row = tree.root.findByProps({accessibilityLabel: 'Pedidos por período'});
+  const row = tree.root.findByProps({accessibilityLabel: 'Pedidos concluídos por período'});
   expect(row.props.style.flexDirection).toBe('row');
   expect(row.props.children).toHaveLength(14);
   expect(tree.root.findByType('ScrollView').props.horizontal).toBe(true);

@@ -1,14 +1,17 @@
 {
-  "version": "1.10.108",
-  "rc": 3,
-  "branch": "rc/1.10.108-rc.3",
-  "baseMaster": "215c19c807e0156ee7b21c8a8556bb844faa77dd",
+  "version": "1.10.112",
+  "rc": 2,
+  "branch": "rc/1.10.112-rc.2",
+  "baseMaster": "df6a677d1c61e97ff2652b3003bd3d24f1c76171",
   "tasks": [
-    1275,
-    1283
+    1308
   ],
+  "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "215c19c807e0156ee7b21c8a8556bb844faa77dd"
+    "ControleOnline/app-community": "c8246a645d9ec40bfa15743cde90476cb30f2b6a"
   },
-  "frozen": true
+  "packages": {
+    "@controleonline/ui-crm": "1.0.50"
+  },
+  "note": "1.0.50 has /ai on npm; 1.0.51 delayed"
 }
