@@ -1,40 +1,27 @@
-# Lave-Go — tema aprovado no ambiente local
+# Lave-Go — paletas aprovadas
 
-`light.json` e `dark.json` são dados das paletas aprovadas, usando exclusivamente
-os nomes de objetos de `../themes-map.md`. Não são cores padrão ou fallbacks.
-A ativação é automática no localhost/loopback com `DOMAIN=https://app.lave-go.com`.
-Não depende de parâmetro na URL; claro/escuro seguem a preferência do menu do usuário.
-A seleção de franquia não escolhe a paleta.
-Sem essa ativação, o carregamento normal do domínio continua sendo utilizado.
-Nenhum arquivo desta revisão grava na API ou no banco.
+`light.json` e `dark.json` são referências da aprovação visual e entrada para
+publicação dos dados, nunca a fonte de cores do aplicativo em execução.
+Os componentes consomem os nomes canônicos de `../themes-map.md`.
 
-Os componentes usam os tokens diretamente, sem branches da Lave-Go, aliases de
-cores ou substituição de token ausente. As cores locais não são mescladas com a
-paleta de outro domínio. O seletor compartilhado de tipo de app recebe `colors`;
-a adaptação provisória da dependência é reaplicável por `manager:prepare` e falha
-sem sobrescrever versões incompatíveis. O CSS corretivo foi removido.
+## Fonte oficial
 
-Papéis principais:
-- KPI: `cardBackground`, `cardBorder`, `cardText`, `textSecondary`, `textMuted`.
-- Painéis: `panelBackground`, `panelBorder`; interior do gráfico: `sectionBackground`.
-- Ícones dos cards/acessos: `cardIconBackground`, `cardIconBorder`, `cardIconColor`.
-- Acessos: `listItemBackground`, `listItemActiveBackground`, `listItemBorder`, `listItemText`.
-- Empresa e app: `selectBackground`, `selectBorder`, `selectText`, `selectIcon`.
-- Conta: tokens `menu*`; seleção de empresa: tokens `modal*` e `listItem*`.
-- Cabeçalho e lateral: tokens `header*` e `navigation*`.
+Banco da API `apinew.lave-go.com`, registro `theme.id=2` (`LAVE-GO`), coluna
+JSON `colors`, vinculado ao domínio `app.lave-go.com`. O mesmo registro atende
+Admin, Shop e POS da Lave-Go, conforme autorizado pelo responsável.
 
-Geometria: removida a borda superior exclusiva dos KPIs; arredondamento original
-de 16 px restaurado. O mapa atual não define cor independente para essa faixa.
-Dimensões, tipografia e posicionamento são responsabilidade do layout, não das
-paletas JSON. Não foram criados tokens nem colunas de banco para esses detalhes.
+A API existente serializa esse mapa plano em `/themes-colors.css`. Cada token
+canônico tem duas entradas de transporte, `<token>-light` e `<token>-dark`.
+O aplicativo seleciona o modo e entrega aos componentes o nome canônico sem
+sufixo. Os sufixos identificam modos, não novos papéis visuais.
+As entradas sem sufixo preservam a paleta clara para clientes antigos; os nomes
+legados do escuro permanecem disponíveis. O aplicativo mantém a leitura legada
+para temas que ainda não têm entradas por modo.
 
-Limite desta etapa: os arquivos são fixtures de revisão local, não um novo formato
-persistido de `Theme.colors`. O resolvedor legado dos demais domínios foi mantido;
-a adequação de seus tokens/modos continua pendente de revisão nesses ambientes.
-Antes de aplicar no banco, é necessário definir/validar o transporte dos dois
-modos pela API (que atualmente serializa um mapa plano) e os vínculos do tema.
-Não enviar os dois arquivos como um objeto aninhado para a API atual.
+Em 2026-11-02, as duas paletas foram gravadas e os 122 tokens de cada modo foram
+comparados com o CSS público da API, sem divergências. Não houve migração.
+Backup anterior: `/tmp/lavego-theme-2-before-20261102-223429.json`.
 
-## Publicação da task 1292
-
-A atribuição publicada está em `../domain-profiles.json`, com domínio e API exatos. A configuração é versionada no app, sem gravação de banco. Dev/staging usam Manager; Lave-Go mantém seu perfil isolado. O domínio Manager de produção não foi incluído. Os limites de ativação exclusivamente local descritos acima correspondem à etapa anterior de aprovação visual.
+A alteração do consumidor está local e ainda depende do fluxo oficial de
+publicação. A troca de API/domínio não seleciona uma paleta embutida no app.
+Os demais bancos não foram modificados nesta operação.
