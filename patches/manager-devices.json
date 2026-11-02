@@ -1,12 +1,12 @@
 {
   "package": "@controleonline/ui-common",
-  "version": "1.2.111",
+  "version": "1.2.113",
   "normalizeNewlines": true,
   "files": [
     {
       "file": "src/react/pages/Devices.js",
-      "before": "d9f53f1cfc438a852798b259f6eab81e539cb6c673114ca682ba82ae1c1a793f",
-      "after": "d9f53f1cfc438a852798b259f6eab81e539cb6c673114ca682ba82ae1c1a793f",
+      "before": "31047eb3464458d8f808212ce4932cbd43d0ab91baa55fea69d0ad79fb313d6b",
+      "after": "31047eb3464458d8f808212ce4932cbd43d0ab91baa55fea69d0ad79fb313d6b",
       "payload": "manager-devices-0.after.js"
     },
     {

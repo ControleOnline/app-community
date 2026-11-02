@@ -1,6 +1,6 @@
 {
   "package": "@controleonline/ui-products",
-  "version": "1.0.42",
+  "version": "1.0.41",
   "files": [
     {
       "file": "src/react/components/products/ProductItem.js",
