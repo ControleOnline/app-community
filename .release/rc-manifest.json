@@ -1,14 +1,24 @@
 {
-  "version": "1.10.108",
-  "rc": 3,
-  "branch": "rc/1.10.108-rc.3",
-  "baseMaster": "215c19c807e0156ee7b21c8a8556bb844faa77dd",
+  "version": "1.10.109",
+  "rc": 1,
+  "branch": "rc/1.10.109-rc.1",
+  "baseMaster": "23d662842175b1e12a98a23d5198274d525d88fd",
   "tasks": [
-    1275,
-    1283
+    1292
   ],
+  "taskRepository": "ControleOnline/app-community",
+  "frozen": true,
+  "contentCommit": "993607930846ddd336d1961599eb27c51d5c617f",
   "repositories": {
-    "ControleOnline/app-community": "215c19c807e0156ee7b21c8a8556bb844faa77dd"
+    "ControleOnline/app-community": "993607930846ddd336d1961599eb27c51d5c617f",
+    "ControleOnline/api-platform-orders": "8131fc065fd11c8fa9d1764d9f63835d0ae697e5"
   },
-  "frozen": true
+  "packages": {
+    "controleonline/orders": "1.0.7"
+  },
+  "validation": {
+    "database": "No schema or production data changes; skip database migrations.",
+    "scope": "Only task 1292 delta from current master; independent dev work excluded.",
+    "checks": "39 focused app tests; 5 package tests/29 assertions; API container lint and 2 aggregate tests/16 assertions; app export passed. Full API suite has unrelated failures, recorded in issue."
+  }
 }
