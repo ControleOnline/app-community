@@ -1,4 +1,3 @@
-import {orderMovementEndpoint, resolveOrderMovement, orderValueMetric, resolvePaidOrderValue} from './orderMovement';
 import React, {useEffect, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
@@ -22,8 +21,6 @@ export default function ManagerOverview({navigation}) {
   const {user} = useStore('auth').getters;
   const firstName = getAvatarDisplayName(user).split(' ')[0] || 'Usuário';
   const focused = useIsFocused();
-  const valueMetric = orderValueMetric();
-  const paidServices = valueMetric === 'paidOrders';
   const companyId = currentCompany?.id;
   const [period, setPeriod] = useState('today');
   const periods = [
@@ -54,25 +51,21 @@ export default function ManagerOverview({navigation}) {
     const range = period === 'today' ? ranges.current : period === 'week' ? ranges.comparison : {};
     const query = buildOperationalInsightsFilters({companyId, after: range.after, before: range.before});
     if (canReadOrders) {
-      // The opt-in value metric uses order prices; sales keeps the existing calculation.
-      const {orderType: valueOrderType, ...valueQuery} = query;
-      readCollection(api, paidServices ? orderMovementEndpoint() : 'orders', {
-        ...(paidServices ? valueQuery : query), itemsPerPage: 1, page: 1, summary: valueMetric,
-      }).then(result => {
-          const value = paidServices ? resolvePaidOrderValue(result.summary)
-            : resolveHistorySalesTotals(result.summary)?.revenue;
-          publish({sales: value ?? null,
-            salesError: value == null ? 'Resumo do valor não retornado integralmente pela API.' : ''});
-        }).catch(() => publish({salesError: 'Não foi possível carregar o valor do período.'}));
+      // Reuse the ERP client and server-side summary without replacing history state.
+      // Never calculate revenue from a paginated list or from payment status.
+      readCollection(api, 'orders', {...query, itemsPerPage: 1, page: 1, summary: 'sales'})
+        .then(result => {
+          const totals = resolveHistorySalesTotals(result.summary);
+          const summary = result.summary?.sales?.sales || result.summary?.sales;
+          const series = period === 'all' ? summary?.monthly : summary?.daily;
+          publish({series: Array.isArray(series) ? series : null, sales: totals?.revenue ?? null,
+            salesError: totals ? '' : 'Resumo de vendas não retornado pela API.'});
+        }).catch(() => publish({salesError: 'Não foi possível carregar as vendas.'}));
       // Match the existing homepage: orders include every order type.
       const {orderType, ...allOrdersQuery} = query;
-      readCollection(api, orderMovementEndpoint(), {...allOrdersQuery, itemsPerPage: 1, page: 1, summary: 'movement'})
-        .then(result => {
-          const movement = resolveOrderMovement(result.summary, period, result.totalItems);
-          publish({count: result.totalItems, series:movement?.series ?? null, undatedOrders:movement?.undatedOrders,
-            movementError:movement ? '' : 'A API não retornou o movimento completo dos pedidos.'});
-        })
-        .catch(() => publish({periodError: 'Não foi possível carregar os pedidos.', movementError:'Não foi possível carregar o movimento dos pedidos.'}));
+      readCollection(api, 'orders', {...allOrdersQuery, itemsPerPage: 1, page: 1})
+        .then(result => publish({count: result.totalItems}))
+        .catch(() => publish({periodError: 'Não foi possível carregar os pedidos.'}));
       readCollection(api, 'orders', {provider: query.provider, orderType: 'sale', 'status.realStatus': 'open', itemsPerPage: 1, page: 1})
         .then(result => publish({open: result.totalItems}))
         .catch(() => publish({openError: 'Não foi possível carregar os pedidos abertos.'}));
@@ -84,7 +77,7 @@ export default function ManagerOverview({navigation}) {
         .catch(() => publish({clientsError: 'Não foi possível carregar os clientes.'}));
     }
     return () => {cancelled = true;};
-  }, [focused, companyId, period, refresh, canReadOrders, canReadClients, valueMetric]);
+  }, [focused, companyId, period, refresh, canReadOrders, canReadClients]);
   useEffect(() => {
     if (!focused || metrics.key !== metricKey) return;
     const ordersReady = !canReadOrders || ((live.sales !== undefined || live.salesError) && (live.count !== undefined || live.periodError) && (live.open !== undefined || live.openError));
@@ -109,7 +102,7 @@ export default function ManagerOverview({navigation}) {
     <Text style={{color: primary ? c.buttonText : c.buttonTextSecondary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
   </Pressable>;
   const cards = [
-    [`${paidServices ? 'Valor dos serviços pagos' : 'Vendas concluídas'} ${selectedPeriod.suffix}`, live.sales, paidServices ? 'Pedidos pagos · data do pedido' : 'Vendas fechadas · data do pedido', 'credit-card', selectedPeriod.label, live.salesError, canReadOrders, true, history],
+    [`Vendas concluídas ${selectedPeriod.suffix}`, live.sales, 'Vendas fechadas · data do pedido', 'credit-card', selectedPeriod.label, live.salesError, canReadOrders, true, history],
     [`Pedidos ${selectedPeriod.suffix}`, live.count, 'Todos os tipos · data do pedido', 'file-text', selectedPeriod.label, live.periodError, canReadOrders, false, history],
     ['Em andamento', live.open, 'Pedidos de venda abertos', 'clock', 'Situação atual', live.openError, canReadOrders, false, history],
     ['Clientes', live.clients, 'Clientes vinculados à empresa', 'users', 'Total cadastrado', live.clientsError, canReadClients, false, clients],
@@ -151,19 +144,18 @@ export default function ManagerOverview({navigation}) {
       <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Movimento de pedidos</Text>
         <Text style={[s.sub, {color: c.textSecondary}]}>Período selecionado: {selectedPeriod.label}.</Text>
-        {!companyId || !canReadOrders || live.movementError || !Array.isArray(live.series) || !live.series.length ?
+        {!companyId || !canReadOrders || live.salesError || !Array.isArray(live.series) || !live.series.length ?
           <View style={[s.pending, {backgroundColor: c.sectionBackground}]}>
             {icon('bar-chart-2', c.textMuted, 34)}
-            <Text style={[s.sub, {color: c.textMuted, textAlign: 'center'}]}>{!companyId ? 'Selecione uma empresa' : !canReadOrders ? 'Sem acesso neste perfil' : live.movementError || (live.series === undefined ? 'Carregando movimento…' : live.series === null ? 'A API não retornou a série do período.' : 'Nenhum pedido no período.')}</Text>
+            <Text style={[s.sub, {color: c.textMuted, textAlign: 'center'}]}>{!companyId ? 'Selecione uma empresa' : !canReadOrders ? 'Sem acesso neste perfil' : live.salesError || (live.series === undefined ? 'Carregando movimento…' : live.series === null ? 'A API não retornou a série do período.' : 'Nenhuma venda concluída no período.')}</Text>
           </View> : <ManagerOrdersTrend
-            title="Pedidos no período"
+            title="Pedidos de venda concluídos"
             subtitle={period === 'all' ? 'Por mês · todo o período · data do pedido' : 'Por dia · data do pedido'}
             items={live.series}
             colors={c}
             style={{marginTop: 18}}
           />}
 
-        {live.undatedOrders > 0 && <Text style={[s.sub,{color:c.textMuted}]}>{`${live.undatedOrders} pedido(s) sem data, incluídos no total e fora do gráfico.`}</Text>}
       </View>
       <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Acesso rápido</Text>

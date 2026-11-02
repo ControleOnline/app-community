@@ -1,0 +1,54 @@
+# Publish Web products without the full Deploy (Android) concurrency lock.
+name: Web Manager Hotfix Publish
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: web-manager-hotfix
+  cancel-in-progress: true
+jobs:
+  web:
+    name: "Web ${{ matrix.ftp_product }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ftp_product: manager
+            app_domain: https://manager.controleonline.com
+          - ftp_product: admin
+            app_domain: https://admin.controleonline.com
+    steps:
+      - uses: actions/checkout@v5
+      - name: FTP credentials
+        run: |
+          set -e
+          PRODUCT="${{ matrix.ftp_product }}"
+          case "$PRODUCT" in
+            manager)
+              echo "FTP_HOST=${{ secrets.FTPHOST }}" >> "$GITHUB_ENV"
+              echo "FTP_USER=${{ secrets.FTPUSER }}" >> "$GITHUB_ENV"
+              echo "FTP_PASS=${{ secrets.FTPPASS }}" >> "$GITHUB_ENV"
+              ;;
+            admin)
+              echo "FTP_HOST=${{ secrets.ADMIN_HOST }}" >> "$GITHUB_ENV"
+              echo "FTP_USER=${{ secrets.ADMIN_USER }}" >> "$GITHUB_ENV"
+              echo "FTP_PASS=${{ secrets.ADMIN_PASS }}" >> "$GITHUB_ENV"
+              ;;
+          esac
+      - uses: ./.github/actions/web-export-deploy
+        with:
+          app_type: ""
+          api_entrypoint: https://api.controleonline.com
+          socket: wss://api.controleonline.com
+          domain: ${{ matrix.app_domain }}
+          remote_dir: "public_html/"
+        env:
+          NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+          NEW_RELIC_APPLICATION_ID: ${{ secrets.NEW_RELIC_APPLICATION_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_TRUST_KEY: ${{ secrets.NEW_RELIC_TRUST_KEY }}
+          NEW_RELIC_BEACON: ${{ secrets.NEW_RELIC_BEACON }}
+          NEW_RELIC_ERROR_BEACON: ${{ secrets.NEW_RELIC_ERROR_BEACON }}

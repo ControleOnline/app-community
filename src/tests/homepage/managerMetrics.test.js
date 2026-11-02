@@ -3,8 +3,6 @@ import renderer, {act} from 'react-test-renderer';
 import ManagerOverview from '../../components/manager-preview/ManagerOverview';
 let mockCompany = {id: 9, alias: 'GYROS'};
 let mockHistory;
-let mockValueMetric = 'sales';
-jest.mock('../../components/manager-preview/orderMovement', () => ({...jest.requireActual('../../components/manager-preview/orderMovement'), orderValueMetric: () => mockValueMetric}));
 const mockProducts = {getPurchasingSuggestion: jest.fn(async () => [{product_id: 1}])};
 const mockPeople = {read: jest.fn(async () => ({totalItems: 648}))};
 const mockStoreRead = jest.fn();
@@ -32,7 +30,6 @@ const screen = () => <ManagerOverview navigation={navigation} />;
 const choose = (tree, label) => tree.root.findAllByType('Pressable').find(node => node.props.accessibilityLabel === label).props.onPress();
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
-  mockValueMetric = 'sales';
   mockCompany = {id: 9, alias: 'GYROS'};
   mockOrders.read.mockClear(); mockProducts.getPurchasingSuggestion.mockClear();
   mockHistory = async ({query}) => ({totalItems: query['status.realStatus'] === 'open' ? 4 : query.orderType === 'sale' ? 1079 : 1199,
@@ -111,9 +108,9 @@ it('uses the existing destinations for clients, orders, sales and results', asyn
 it('renders the complete API series for the selected period, including all time', async () => {
   const daily = [{key: '2026-10-14', label: '14/10', orders: 3}];
   const monthly = Array.from({length: 14}, (_, i) => ({key: String(i), label: String(i), orders: i + 1}));
-  mockHistory = async ({query}) => query.summary === 'movement'
-    ? {totalItems: query['orderDate[after]'] ? 3 : 105, summary:{movement:{totals:{orders:query['orderDate[after]'] ? 3 : 105,undatedOrders:0},daily,monthly}}}
-    : {totalItems:7,summary:{sales:{totals:{revenue:0,orders:0,averageTicket:0},daily:[],monthly:[]}}};
+  mockHistory = async () => ({totalItems: 1199, summary: {sales: {sales: {
+    totals: {revenue: 3210, orders: 123, averageTicket: 26.09}, daily, monthly,
+  }}}});
   let tree; await act(async () => {tree = renderer.create(screen());});
   expect(tree.root.findByType('TrendCard').props.items).toEqual(daily);
   await act(async () => choose(tree, 'Todo o período'));
@@ -124,26 +121,23 @@ it('renders the complete API series for the selected period, including all time'
 });
 
 it('distinguishes an empty series from a missing API series', async () => {
-  mockHistory = async () => ({totalItems: 0, summary: {sales: {totals: {revenue: 0, orders: 0, averageTicket: 0}},movement:{totals:{orders:0,undatedOrders:0},daily:[]}}});
+  mockHistory = async () => ({totalItems: 0, summary: {sales: {totals: {revenue: 0, orders: 0, averageTicket: 0}, daily: []}}});
   let tree; await act(async () => {tree = renderer.create(screen());});
-  expect(tree.root.findAllByType('Text').map(x => x.props.children)).toContain('Nenhum pedido no período.');
+  expect(tree.root.findAllByType('Text').map(x => x.props.children)).toContain('Nenhuma venda concluída no período.');
   await act(async () => choose(tree, 'Todo o período'));
-  expect(tree.root.findAllByType('Text').map(x => x.props.children)).toContain('A API não retornou o movimento completo dos pedidos.');
+  expect(tree.root.findAllByType('Text').map(x => x.props.children)).toContain('A API não retornou a série do período.');
   await act(async () => tree.unmount());
 });
 
 
-it('uses paid order value without the sale filter, and preserves the normal sales path', async () => {
-  mockValueMetric = 'paidOrders';
-  mockHistory = async ({query}) => ({totalItems:370,summary:{paidOrders:{basis:'order-price',status:'paid',realStatus:'open',totals:{orders:370,amount:16095,unpricedOrders:0}}}});
+it('keeps the production sales contract for every period without BI summaries', async () => {
   let tree; await act(async () => {tree = renderer.create(screen());});
-  expect(mockOrders.read.mock.calls[0][0].query).toMatchObject({summary:'paidOrders',provider:'/people/9'});
-  expect(mockOrders.read.mock.calls[0][0].query.orderType).toBeUndefined();
-  let texts=tree.root.findAllByType('Text').map(x=>x.props.children);
-  expect(texts).toContain('Valor dos serviços pagos hoje');
-  expect(texts).toContain('Pedidos pagos · data do pedido');
-  expect(texts.join(' ')).toMatch(/16.095,00/);
-  await act(async () => choose(tree,'Todo o período'));
-  expect(mockOrders.read.mock.calls[3][0].query['orderDate[after]']).toBeUndefined();
+  for (const label of ['Últimos 7 dias', 'Todo o período']) {
+    await act(async () => choose(tree, label));
+  }
+  const queries = mockOrders.read.mock.calls.map(([arg]) => arg.query);
+  expect(queries).toHaveLength(9);
+  expect(queries.filter(query => query.summary).map(query => query.summary)).toEqual(['sales', 'sales', 'sales']);
+  expect(queries.filter(query => query.summary).every(query => query.orderType === 'sale')).toBe(true);
   await act(async () => tree.unmount());
 });
