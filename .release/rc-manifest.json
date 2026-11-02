@@ -1,14 +1,14 @@
 {
   "version": "1.10.111",
-  "rc": 2,
-  "branch": "rc/1.10.111-rc.2",
-  "baseMaster": "851a0c498e5665b5c3e9913d04880cd1bb248c8e",
+  "rc": 3,
+  "branch": "rc/1.10.111-rc.3",
+  "baseMaster": "b0c709cce7255ef04ddc3018871e237707a160a2",
   "tasks": [
     1300
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "5d8818738597b2bc9d40153a0faf4e225c2f9e40"
+    "ControleOnline/app-community": "10b96d4e4d157bafe2ae0190cdbc1d0711561b9d"
   },
-  "note": "cancel-in-progress true so Web deploy is not blocked by stale Android jobs"
+  "note": "web-only publish workflow bypass Android concurrency"
 }
