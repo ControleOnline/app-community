@@ -17,22 +17,26 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
   } : anchor === 'sidebar' ? {left: insets.left + 12, bottom}
     : {right: insets.right + 20, top};
   const option = (label, icon, action) => <Pressable key={label} accessibilityRole="menuitem" accessibilityLabel={label}
-    onPress={action} style={({hovered, pressed}) => [s.option, {backgroundColor: hovered || pressed ? c.navigationActiveBackground : 'transparent'}]}>
-    <HomeIcon name={icon} size={18} color={c.textSecondary} /><Text style={{color: c.textPrimary, fontSize: 13}}>{label}</Text>
+    onPress={action} style={({hovered, pressed}) => [s.option, {backgroundColor: hovered || pressed ? c.menuActiveBackground : 'transparent'}]}>
+    {({hovered, pressed}) => {
+      const highlighted = hovered || pressed;
+      return <><HomeIcon name={icon} size={18} color={highlighted ? c.menuActiveIcon : c.menuIcon} />
+        <Text style={{color:highlighted ? c.menuActiveText : c.menuText, fontSize:13}}>{label}</Text></>;
+    }}
   </Pressable>;
   return <View accessibilityRole="menu" accessibilityLabel="Opções do usuário" accessibilityViewIsModal
-    style={[s.panel, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}, position,
+    style={[s.panel, {backgroundColor: c.menuBackground, borderColor: c.menuBorder}, position,
       {maxHeight: Math.max(0, frame.height - top - bottom)}]}>
     <ScrollView style={s.options}>
-      <Text numberOfLines={1} style={[s.name, {color: c.textPrimary}]}>{name}</Text>
+      <Text numberOfLines={1} style={[s.name, {color: c.menuText}]}>{name}</Text>
       {canOpenProfile && option('Meu perfil', 'user', onProfile)}
       {onHelp && option('Ajuda do On Manager', 'help-circle', onHelp)}
       {option(mode === 'light' ? 'Usar tema escuro' : 'Usar tema claro', mode === 'light' ? 'moon' : 'sun', onTheme)}
-      {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.cardBorder}]}>
+      {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.menuBorder}]}>
         <Text style={[s.barTitle, {color: c.textSecondary}]}>Barra de atalhos</Text>
         {option(bottomBar.visible ? 'Ocultar nesta sessão' : 'Mostrar nesta sessão', 'layout', onBarSession)}
         {option(bottomBar.rememberedVisible ? 'Manter oculta neste aparelho' : 'Manter visível neste aparelho', 'save', onBarRemember)}
-        {!!bottomBar.error && <Text accessibilityRole="alert" style={{color: c.textPrimary, padding: 12}}>{bottomBar.error}</Text>}
+        {!!bottomBar.error && <Text accessibilityRole="alert" style={{color: c.menuText, padding: 12}}>{bottomBar.error}</Text>}
       </View>}
       {onLogout && option('Sair da conta', 'log-out', onLogout)}
     </ScrollView>
@@ -45,7 +49,7 @@ export default function ManagerAccountMenu(props) {
     <SafeAreaProvider style={s.layer}>
       <View style={s.layer}>
         <Pressable accessibilityRole="button" accessibilityLabel="Fechar opções do usuário" onPress={props.onClose}
-          style={[StyleSheet.absoluteFill, {backgroundColor: 'rgba(0,0,0,0.18)'}]} />
+          style={[StyleSheet.absoluteFill, {backgroundColor: props.colors.overlayBackground}]} />
         <AccountPanel {...props} />
       </View>
     </SafeAreaProvider>
