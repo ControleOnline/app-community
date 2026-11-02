@@ -1,14 +1,16 @@
 {
-  "version": "1.10.111",
-  "rc": 3,
-  "branch": "rc/1.10.111-rc.3",
-  "baseMaster": "b0c709cce7255ef04ddc3018871e237707a160a2",
+  "version": "1.10.112",
+  "rc": 1,
+  "branch": "rc/1.10.112-rc.1",
+  "baseMaster": "e2472f215a4d9a82f2fba04cd870a657bab3f1c5",
   "tasks": [
-    1300
+    1308
   ],
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "10b96d4e4d157bafe2ae0190cdbc1d0711561b9d"
+    "ControleOnline/app-community": "39818bde9d16f0fd45d0c344409fbee4e8c9da7b"
   },
-  "note": "web-only publish workflow bypass Android concurrency"
+  "packages": {
+    "@controleonline/ui-crm": "1.0.51"
+  }
 }
