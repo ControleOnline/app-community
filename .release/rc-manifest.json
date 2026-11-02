@@ -9,7 +9,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "PENDING"
+    "ControleOnline/app-community": "6d1bc59c29f00a8b0be753e5e517780ba425ea5e"
   },
   "validation": {
     "scope": "Only task 1296 delta: ConfiguratorPage overlay reads configurator menus (fixed list = fallback on request error) + tests. Requires API RC rc/1.10.111-rc.1 (common 1.0.8 migration).",
