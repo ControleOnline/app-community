@@ -1,8 +1,8 @@
 {
   "package": "@controleonline/ui-manager",
-  "version": "1.0.23",
+  "version": "1.0.25",
   "file": "src/react/components/CompanyFilter.js",
-  "before": "c30130af29a0d2fadd120cb6c260ec93836d2ebe2de5e48c0288add776969c07",
-  "after": "c30130af29a0d2fadd120cb6c260ec93836d2ebe2de5e48c0288add776969c07",
+  "before": "56edfe85947c2a408527bbae1e0840385968fb72bfeb41da5cc85304fff5acf4",
+  "after": "56edfe85947c2a408527bbae1e0840385968fb72bfeb41da5cc85304fff5acf4",
   "replacements": []
 }
