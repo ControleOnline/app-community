@@ -16,7 +16,7 @@ export default function ManagerOrdersTrend({items = [], colors: c, title, subtit
     </View>
     <ScrollView horizontal showsHorizontalScrollIndicator
       style={{maxHeight: 190}} contentContainerStyle={{minWidth: '100%'}}>
-      <View accessibilityLabel="Pedidos por período" style={{
+      <View accessibilityLabel="Pedidos concluídos por período" style={{
         flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around',
         gap: 8, padding: 8, minWidth: '100%', minHeight: 170,
       }}>

@@ -3,20 +3,17 @@
     {
       "domain": "dev.controleonline.com",
       "api": "dd.controleonline.com",
-      "theme": "manager",
-      "valueMetric": "sales"
+      "theme": "manager"
     },
     {
       "domain": "staging.controleonline.com",
       "api": "s.controleonline.com",
-      "theme": "manager",
-      "valueMetric": "sales"
+      "theme": "manager"
     },
     {
       "domain": "app.lave-go.com",
       "api": "apinew.lave-go.com",
-      "theme": "lave-go",
-      "valueMetric": "paidOrders"
+      "theme": "lave-go"
     }
   ]
 }
