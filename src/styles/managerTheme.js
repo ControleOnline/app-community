@@ -30,7 +30,17 @@ const mapping=mode=>{
  if(!['light','dark'].includes(mode))throw new Error('Modo de tema inválido.');
  return {...tableMap(mode),...(mode==='dark'?darkMap:{})};
 };
+// Mode suffixes are transport keys; visual objects still consume canonical tokens.
+export function apiModeTheme(theme={},mode='light'){
+ if(!['light','dark'].includes(mode))throw new Error('Modo de tema inválido.');
+ const suffix=`-${mode}`;
+ const entries=Object.entries(theme).filter(([key])=>key.endsWith(suffix)&&/^([a-z]+[A-Z][a-zA-Z0-9]*|surface)-(light|dark)$/.test(key));
+ if(!entries.length)return null;
+ return Object.fromEntries(entries.map(([key,value])=>[key.slice(0,-suffix.length),value]));
+}
 export function resolveManagerTheme(theme={},mode='light'){
+ const official=apiModeTheme(theme,mode);
+ if(official)return {...theme,...official};
  const result={...theme};
  for(const [target,source] of Object.entries(mapping(mode)))result[target]=theme[source];
  // Older domain maps name their light row colors listItemEvenRow/listItemOddRow.

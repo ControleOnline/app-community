@@ -1,9 +1,5 @@
 import {env} from '@env';
 import profiles from '../../../docs/themes/domain-profiles.json';
-import light from '../../../docs/themes/lave-go/light.json';
-import dark from '../../../docs/themes/lave-go/dark.json';
-import managerLight from '../../../docs/themes/manager/light.json';
-import managerDark from '../../../docs/themes/manager/dark.json';
 
 // Explicit domain profiles own palettes; they are never missing-token fallbacks.
 // Switching the configured domain disables this local data source.
@@ -34,17 +30,5 @@ export function domainProfile(config = env, location = typeof window === 'undefi
   } catch { return null; }
 }
 
-export function localDomainTheme(mode) {
-  const profile = domainProfile();
-  if (profile) {
-    if (!['light', 'dark'].includes(mode)) throw new Error('Modo de tema inválido.');
-    return profile.theme === 'manager' ? (mode === 'dark' ? managerDark : managerLight) : (mode === 'dark' ? dark : light);
-  }
-  if (localManagerThemeEnabled()) {
-    if (!['light', 'dark'].includes(mode)) throw new Error('Modo de tema inválido.');
-    return mode === 'dark' ? managerDark : managerLight;
-  }
-  if (!localDomainThemeEnabled()) return null;
-  if (!['light', 'dark'].includes(mode)) throw new Error('Modo de tema inválido.');
-  return mode === 'dark' ? dark : light;
-}
+// Retained for compatibility with older preview callers; runtime colors come from the API.
+export function localDomainTheme() { return null; }

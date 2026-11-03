@@ -3,7 +3,7 @@ import path from 'node:path';
 import light from '../../../docs/themes/manager/light.json';
 import dark from '../../../docs/themes/manager/dark.json';
 import {localManagerThemeEnabled, localDomainTheme, domainProfile} from '../../components/manager-preview/localDomainTheme';
-import {missingManagerThemeTokens} from '../../styles/managerTheme';
+import {apiModeTheme, missingManagerThemeTokens, resolveManagerTheme} from '../../styles/managerTheme';
 const config={DOMAIN:'http://localhost:8081',API_ENTRYPOINT:'http://localhost:8000'};
 jest.mock('@env',()=>({env:{DOMAIN:'http://localhost:8081',API_ENTRYPOINT:'http://localhost:8000'}}));
 afterEach(()=>{delete global.window;});
@@ -15,7 +15,7 @@ it.each([['light',light],['dark',dark]])('%s supplies every canonical token with
  for(const [key,value] of Object.entries(palette))
    expect(value).toMatch(key==='buttonDisabledOpacity'?/^0\.\d+$/:/^#[\da-f]{6}([\da-f]{2})?$/i);
  global.window={location:{hostname:'localhost',search:'?managerThemePreview=1'}};
- expect(localDomainTheme(mode)).toBe(palette);
+ expect(localDomainTheme(mode)).toBeNull();
 });
 it('applies on normal localhost only with a local domain AND a local API',()=>{
  const location={hostname:'localhost',search:'?managerThemePreview=1'};
@@ -26,8 +26,8 @@ it('applies on normal localhost only with a local domain AND a local API',()=>{
  expect(localManagerThemeEnabled(location,{...config,DOMAIN:'https://app.lave-go.com'})).toBe(false);
  expect(localManagerThemeEnabled(location,{...config,DOMAIN:'invalid'})).toBe(false);
  global.window={location:{hostname:'localhost',search:''}};
- expect(localDomainTheme('light')).toBe(light);
- expect(localDomainTheme('dark')).toBe(dark);
+ expect(localDomainTheme('light')).toBeNull();
+ expect(localDomainTheme('dark')).toBeNull();
  global.window={location:{hostname:'staging.controleonline.com',search:''}};
  expect(localDomainTheme('light')).toBeNull();
 });
@@ -50,4 +50,10 @@ it('activates published profiles only for the assigned domain AND API',()=>{
    expect(domainProfile(config,{hostname:'other.test'})).toBeNull();
  }
  expect(domainProfile({DOMAIN:'https://manager.controleonline.com',API_ENTRYPOINT:'https://api.controleonline.com'},{hostname:'manager.controleonline.com'})).toBeNull();
+});
+
+it.each([['light',light],['dark',dark]])('reads all approved Manager %s tokens from the API transport',(mode,palette)=>{
+ const transport=Object.fromEntries(Object.entries(palette).map(([key,value])=>[`${key}-${mode}`,value]));
+ expect(apiModeTheme(transport,mode)).toEqual(palette);
+ expect(resolveManagerTheme(transport,mode)).toMatchObject(palette);
 });
