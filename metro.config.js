@@ -3,6 +3,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 const packageConfig = require('./package.json');
 
 const projectRoot = __dirname;
+require('./scripts/apply-integrations-catalog-patch.cjs');
 require('./scripts/apply-admin-bootstrap-patch.cjs');
 require('./scripts/apply-single-item-patch.cjs');
 require('./scripts/apply-manager-header-patch.cjs');
