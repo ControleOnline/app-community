@@ -1,14 +1,13 @@
 {
-  "version": "1.10.119",
+  "version": "1.10.120",
   "rc": 1,
-  "branch": "rc/1.10.119-rc.1",
-  "baseMaster": "063180a607cdc3604b581a5dfa71815aaf57e4c0",
+  "branch": "rc/1.10.120-rc.1",
+  "baseMaster": "d48cd0da7a42db4f41ab86ecec45a47ba6987be1",
   "tasks": [
     1327
   ],
   "frozen": true,
-  "note": "align manager-devices patch to ui-common 1.2.114",
   "repositories": {
-    "ControleOnline/app-community": "cf5117faa012df4a496284d562c29ea824340f7f"
+    "ControleOnline/app-community": "6bb145d40614d61b6db75f28922a76240c4781e5"
   }
 }
