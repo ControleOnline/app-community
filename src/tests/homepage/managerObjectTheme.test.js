@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import light from '../../../docs/themes/lave-go/light.json';
 import dark from '../../../docs/themes/lave-go/dark.json';
-import {localDomainThemeEnabled} from '../../components/manager-preview/localDomainTheme';
+import {localDomainTheme, localDomainThemeEnabled} from '../../components/manager-preview/localDomainTheme';
 import {previewPalette, readPreviewMode} from '../../components/manager-preview/model';
 import {managerObjectThemeTokens, missingManagerThemeTokens, resolveManagerTheme} from '../../styles/managerTheme';
 
@@ -30,14 +30,16 @@ it.each([['light',light],['dark',dark]])('%s contains only canonical object toke
  const changed={...fixture}; delete changed.cardIconBackground;
  expect(missingManagerThemeTokens({},mode,changed)).toContain('cardIconBackground');
  global.window={location:location('localhost',`?lavegoThemePreview=${mode}`)};
- expect(previewPalette({pageBackground:'another-domain',darkCard:'legacy'},mode)).toEqual(fixture);
- expect(previewPalette({},mode).cardIconBackground).toBe(fixture.cardIconBackground);
+ const transported=Object.fromEntries(Object.entries(fixture).map(([key,value])=>[`${key}-${mode}`,value]));
+ const resolved=previewPalette({...transported,pageBackground:'old-color'},mode);
+ for(const [key,value] of Object.entries(fixture))expect(resolved[key]).toBe(value);
+ expect(localDomainTheme(mode)).toBeNull();
 });
 it('selects the approved local theme without a query and never leaks it into published domains',()=>{
  const source={pageBackground:'other-page',cardBackground:'other-card','bg-dark':'other-night'};
  global.window={location:location('localhost','')};
- expect(previewPalette(source,'light')).toEqual(light);
- global.window={location:location()}; expect(previewPalette(source,'light')).toEqual(light);
+ expect(previewPalette(source,'light')).toEqual(resolveManagerTheme(source,'light'));
+ global.window={location:location()}; expect(previewPalette(source,'light')).toEqual(resolveManagerTheme(source,'light'));
  global.window={location:location('staging.controleonline.com')};
  expect(previewPalette(source,'dark')).toEqual(resolveManagerTheme(source,'dark'));
  expect(source.cardBackground).toBe('other-card');
@@ -60,4 +62,14 @@ it('uses the saved menu preference rather than the retired preview query',()=>{
  global.window.location.search='?lavegoThemePreview=dark';
  global.localStorage={getItem:()=> 'light'};
  expect(readPreviewMode()).toBe('light');
+});
+
+it('switches between both API modes without modifying the source or losing transport keys',()=>{
+ const source={...Object.fromEntries(Object.entries(light).map(([k,v])=>[`${k}-light`,v])),...Object.fromEntries(Object.entries(dark).map(([k,v])=>[`${k}-dark`,v]))};
+ const before=JSON.stringify(source);
+ const night=previewPalette(source,'dark');
+ const day=previewPalette(night,'light');
+ for(const [key,value] of Object.entries(light))expect(day[key]).toBe(value);
+ for(const [key,value] of Object.entries(dark))expect(night[key]).toBe(value);
+ expect(JSON.stringify(source)).toBe(before);
 });

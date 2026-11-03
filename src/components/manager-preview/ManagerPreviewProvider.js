@@ -4,7 +4,7 @@ import {managerPreviewEnabled, previewModeKey, previewPalette, readPreviewMode} 
 import {missingManagerThemeTokens} from '../../styles/managerTheme';
 import {useAvatarRuntime} from '@experimental-avatar';
 import useExperienceRuntime from './useExperienceRuntime';
-import {localDomainTheme} from './localDomainTheme';
+import {apiModeTheme} from '../../styles/managerTheme';
 import ManagerCatalogImageCache from './ManagerCatalogImageCache';
 import {app_type} from '@appType';
 import {isPosSingleItemMode} from '@controleonline/ui-common/src/react/config/deviceConfigBootstrap';
@@ -55,7 +55,7 @@ export default function ManagerPreviewProvider({children}) {
     try { localStorage.setItem(previewModeKey, next); } catch { /* In-memory preference remains usable. */ }
     setMode(next);
   };
-  return <PreviewContext.Provider value={{bottomBar, themeIssues: missingManagerThemeTokens(base.current, mode, localDomainTheme(mode)), ...avatar, experience, mode, toggleMode, colors: active ? previewPalette(base.current, mode) : incoming}}>
+  return <PreviewContext.Provider value={{bottomBar, themeIssues: missingManagerThemeTokens(base.current, mode, apiModeTheme(base.current, mode)), ...avatar, experience, mode, toggleMode, colors: active ? previewPalette(base.current, mode) : incoming}}>
     <ManagerCatalogImageCache>{children}</ManagerCatalogImageCache>
   </PreviewContext.Provider>;
 }
