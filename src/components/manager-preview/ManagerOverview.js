@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useStore} from '@store';
@@ -19,19 +19,44 @@ export default function ManagerOverview({navigation}) {
   const people = useStore('people');
   const {currentCompany} = people.getters;
   const {user} = useStore('auth').getters;
-  const firstName = getAvatarDisplayName(user).split(' ')[0] || 'Usuário';
+  const translateStore = useStore('translate');
+  const translateMessages = translateStore?.getters?.messages || {};
+  const pendingTranslateMessages = translateStore?.getters?.pendingMessages || {};
+  const t = useMemo(() => global.t?.t, [translateMessages, pendingTranslateMessages]);
+  const firstName =
+    getAvatarDisplayName(user).split(' ')[0] ||
+    t?.('configs', 'label', 'user') ||
+    t?.('menu', 'menu', 'user');
   const focused = useIsFocused();
   const companyId = currentCompany?.id;
   const [period, setPeriod] = useState('today');
-  const periods = [
-    {id: 'today', label: 'Hoje', suffix: 'hoje'},
-    {id: 'week', label: 'Últimos 7 dias', suffix: 'nos últimos 7 dias'},
-    {id: 'all', label: 'Todo o período', suffix: 'em todo o período'},
-  ];
-  const selectedPeriod = periods.find(option => option.id === period);
+  const periods = useMemo(
+    () => [
+      {
+        id: 'today',
+        label: t?.('configs', 'period', 'today') || t?.('configs', 'label', 'today'),
+        suffix: t?.('configs', 'period_suffix', 'today'),
+      },
+      {
+        id: 'week',
+        label: t?.('configs', 'period', 'last_7_days') || t?.('configs', 'label', 'last_7_days'),
+        suffix: t?.('configs', 'period_suffix', 'last_7_days'),
+      },
+      {
+        id: 'all',
+        label: t?.('configs', 'period', 'all_time') || t?.('configs', 'label', 'all_time'),
+        suffix: t?.('configs', 'period_suffix', 'all_time'),
+      },
+    ],
+    [t, translateMessages, pendingTranslateMessages],
+  );
+  const selectedPeriod = periods.find(option => option.id === period) || periods[0];
   const {menus} = useStore('theme').getters;
   // Every destination comes from the real runtime menu, never a demo capability.
-  const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
+  const groups = useMemo(
+    () => managerMenu(menus, navigation.getState().routeNames, t),
+    [menus, navigation, t, translateMessages, pendingTranslateMessages],
+  );
   const items = groups.flatMap(group => group.items);
   const canReadOrders = items.some(item => item.name === 'OrderHistoryPage');
   const canReadClients = items.some(item => item.name === 'ClientsIndex');
@@ -59,22 +84,22 @@ export default function ManagerOverview({navigation}) {
           const summary = result.summary?.sales?.sales || result.summary?.sales;
           const series = period === 'all' ? summary?.monthly : summary?.daily;
           publish({series: Array.isArray(series) ? series : null, sales: totals?.revenue ?? null,
-            salesError: totals ? '' : 'Resumo de vendas não retornado pela API.'});
-        }).catch(() => publish({salesError: 'Não foi possível carregar as vendas.'}));
+            salesError: totals ? '' : t?.('configs', 'error', 'sales_summary_missing')});
+        }).catch(() => publish({salesError: t?.('configs', 'error', 'load_sales')}));
       // Match the existing homepage: orders include every order type.
       const {orderType, ...allOrdersQuery} = query;
       readCollection(api, 'orders', {...allOrdersQuery, itemsPerPage: 1, page: 1})
         .then(result => publish({count: result.totalItems}))
-        .catch(() => publish({periodError: 'Não foi possível carregar os pedidos.'}));
+        .catch(() => publish({periodError: t?.('configs', 'error', 'load_orders')}));
       readCollection(api, 'orders', {provider: query.provider, orderType: 'sale', 'status.realStatus': 'open', itemsPerPage: 1, page: 1})
         .then(result => publish({open: result.totalItems}))
-        .catch(() => publish({openError: 'Não foi possível carregar os pedidos abertos.'}));
+        .catch(() => publish({openError: t?.('configs', 'error', 'load_open_orders')}));
     }
     if (canReadClients) {
       // Reuse the legacy homepage's client relation without replacing the people list.
       readCollection(api, 'people', {'link.company': `/people/${companyId}`, 'link.linkType': 'client', itemsPerPage: 1, page: 1})
         .then(result => publish({clients: result.totalItems}))
-        .catch(() => publish({clientsError: 'Não foi possível carregar os clientes.'}));
+        .catch(() => publish({clientsError: t?.('configs', 'error', 'load_clients')}));
     }
     return () => {cancelled = true;};
   }, [focused, companyId, period, refresh, canReadOrders, canReadClients]);
@@ -102,10 +127,50 @@ export default function ManagerOverview({navigation}) {
     <Text style={{color: primary ? c.buttonText : c.buttonTextSecondary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
   </Pressable>;
   const cards = [
-    [`Vendas concluídas ${selectedPeriod.suffix}`, live.sales, 'Vendas fechadas · data do pedido', 'credit-card', selectedPeriod.label, live.salesError, canReadOrders, true, history],
-    [`Pedidos ${selectedPeriod.suffix}`, live.count, 'Todos os tipos · data do pedido', 'file-text', selectedPeriod.label, live.periodError, canReadOrders, false, history],
-    ['Em andamento', live.open, 'Pedidos de venda abertos', 'clock', 'Situação atual', live.openError, canReadOrders, false, history],
-    ['Clientes', live.clients, 'Clientes vinculados à empresa', 'users', 'Total cadastrado', live.clientsError, canReadClients, false, clients],
+    [
+      [t?.('configs', 'metric', 'closed_sales'), selectedPeriod.suffix].filter(Boolean).join(' '),
+      live.sales,
+      t?.('configs', 'metric_hint', 'closed_sales_by_order_date'),
+      'credit-card',
+      selectedPeriod.label,
+      live.salesError,
+      canReadOrders,
+      true,
+      history,
+    ],
+    [
+      [t?.('configs', 'metric', 'orders'), selectedPeriod.suffix].filter(Boolean).join(' '),
+      live.count,
+      t?.('configs', 'metric_hint', 'all_types_by_order_date'),
+      'file-text',
+      selectedPeriod.label,
+      live.periodError,
+      canReadOrders,
+      false,
+      history,
+    ],
+    [
+      t?.('configs', 'metric', 'in_progress'),
+      live.open,
+      t?.('configs', 'metric_hint', 'open_sale_orders'),
+      'clock',
+      t?.('configs', 'metric_footer', 'current_status'),
+      live.openError,
+      canReadOrders,
+      false,
+      history,
+    ],
+    [
+      t?.('configs', 'metric', 'clients') || t?.('menu', 'menu', 'clients'),
+      live.clients,
+      t?.('configs', 'metric_hint', 'clients_linked_to_company'),
+      'users',
+      t?.('configs', 'metric_footer', 'total_registered'),
+      live.clientsError,
+      canReadClients,
+      false,
+      clients,
+    ],
   ];
   return <ScrollView style={{backgroundColor: c.pageBackground}} contentContainerStyle={[s.page, {paddingHorizontal: width <= 760 ? 16 : 32}]}>
     <View style={[s.hero, width <= 760 && {flexDirection: 'column'}]}>
@@ -113,8 +178,8 @@ export default function ManagerOverview({navigation}) {
       <View style={s.actions}>{button(main, true)}{configs !== main && button(configs)}</View>
     </View>
     <View style={[s.periodBar, width <= 760 && s.periodBarMobile]}>
-      <Text style={[s.periodLabel, {color: c.textSecondary}]}>Período</Text>
-      <View accessibilityRole="radiogroup" accessibilityLabel="Período dos indicadores" style={s.periodOptions}>
+      <Text style={[s.periodLabel, {color: c.textSecondary}]}>{t?.('configs', 'label', 'period')}</Text>
+      <View accessibilityRole="radiogroup" accessibilityLabel={t?.('configs', 'a11y', 'metrics_period')} style={s.periodOptions}>
         {periods.map(option => <Pressable key={option.id} accessibilityRole="radio"
           accessibilityLabel={option.label} accessibilityState={{checked: period === option.id}}
           onPress={() => setPeriod(option.id)} style={[s.periodOption, {
@@ -123,7 +188,7 @@ export default function ManagerOverview({navigation}) {
           }]}>
           <Text style={{fontSize: 12, fontWeight: '600', color: period === option.id ? c.buttonText : c.buttonTextSecondary}}>{option.label}</Text>
         </Pressable>)}
-        <Pressable accessibilityRole="button" accessibilityLabel="Atualizar indicadores" onPress={() => setRefresh(value => value + 1)} style={[s.periodOption, {borderColor: c.buttonBorderSecondary, backgroundColor: c.buttonBackgroundSecondary}]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'a11y', 'refresh_metrics')} onPress={() => setRefresh(value => value + 1)} style={[s.periodOption, {borderColor: c.buttonBorderSecondary, backgroundColor: c.buttonBackgroundSecondary}]}>
           {icon('refresh-cw', c.textPrimary, 16)}
         </Pressable>
       </View>
@@ -136,10 +201,10 @@ export default function ManagerOverview({navigation}) {
       <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.cardText}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
       <Text style={[s.help, {color: c.textMuted}]}>{help}</Text>
       <Text style={[s.scope, {color: c.textSecondary}]}>{scope}</Text>
-      <Text style={[s.help, {color: c.textMuted}]}>{!companyId ? 'Selecione uma empresa' : !allowed ? 'Sem acesso neste perfil' : error || (value === undefined ? 'Carregando…' : 'Dados da API')}</Text>
+      <Text style={[s.help, {color: c.textMuted}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !allowed ? t?.('configs', 'message', 'no_access_profile') : error || (value === undefined ? t?.('configs', 'message', 'loading') : t?.('configs', 'message', 'api_data'))}</Text>
       </Pressable>
     </View>)}</View>
-    {results && <Pressable accessibilityRole="button" accessibilityLabel="Resultados" onPress={() => go(results)} style={[s.results, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.cardText}]}>Resultados</Text><Text style={[s.sub, {color: c.textSecondary}]}>Resumo dos resultados</Text></View>{icon('arrow-right', c.cardText)}</Pressable>}
+    {results && <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'button_title', 'results') || results?.title} onPress={() => go(results)} style={[s.results, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.cardText}]}>{t?.('configs', 'button_title', 'results') || results?.title}</Text><Text style={[s.sub, {color: c.textSecondary}]}>{t?.('configs', 'section_title', 'resultsDescription')}</Text></View>{icon('arrow-right', c.cardText)}</Pressable>}
     <View style={[s.panels, width <= 1060 && {flexDirection: 'column'}]}>
       <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Movimento de pedidos</Text>
@@ -147,10 +212,10 @@ export default function ManagerOverview({navigation}) {
         {!companyId || !canReadOrders || live.salesError || !Array.isArray(live.series) || !live.series.length ?
           <View style={[s.pending, {backgroundColor: c.sectionBackground}]}>
             {icon('bar-chart-2', c.textMuted, 34)}
-            <Text style={[s.sub, {color: c.textMuted, textAlign: 'center'}]}>{!companyId ? 'Selecione uma empresa' : !canReadOrders ? 'Sem acesso neste perfil' : live.salesError || (live.series === undefined ? 'Carregando movimento…' : live.series === null ? 'A API não retornou a série do período.' : 'Nenhuma venda concluída no período.')}</Text>
+            <Text style={[s.sub, {color: c.textMuted, textAlign: 'center'}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !canReadOrders ? t?.('configs', 'message', 'no_access_profile') : live.salesError || (live.series === undefined ? t?.('configs', 'message', 'loading_movement') : live.series === null ? t?.('configs', 'message', 'series_unavailable') : t?.('configs', 'message', 'no_sales_in_period'))}</Text>
           </View> : <ManagerOrdersTrend
-            title="Pedidos de venda concluídos"
-            subtitle={period === 'all' ? 'Por mês · todo o período · data do pedido' : 'Por dia · data do pedido'}
+            title={t?.('configs', 'chart', 'completed_sale_orders')}
+            subtitle={period === 'all' ? t?.('configs', 'chart', 'by_month_all_period') : t?.('configs', 'chart', 'by_day_order_date')}
             items={live.series}
             colors={c}
             style={{marginTop: 18}}
@@ -167,7 +232,7 @@ export default function ManagerOverview({navigation}) {
         </Pressable>)}</View>
       </View>
     </View>
-    <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>Explore seus módulos</Text>
+    <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
     <View style={s.modules}>{groups.map((group, i) => <View key={group.id || i} style={[s.module, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
       <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
       {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>

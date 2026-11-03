@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {useStore} from '@store';
 import DefaultFile from '@controleonline/ui-default/src/react/components/files/DefaultFile';
+import {resolveCompanyMedia} from './companyMedia';
 
 function CompanyName({label, color}) {
   const [fontSize, setFontSize] = useState(17);
@@ -20,11 +21,9 @@ export default function ManagerBrand({colors: c, textColor = c.textPrimary, home
   const {currentCompany, mainCompany} = useStore('people').getters;
   const selectedCompany = currentCompany?.id ? currentCompany : mainCompany;
   // Company selector (drawer) shows the ICON media; the centered home link shows the LOGO media.
-  const pickFile = company => home
-    ? company?.logo || company?.icon
-    : company?.icon || company?.logo;
-  const owner = pickFile(selectedCompany) ? selectedCompany : mainCompany;
-  const file = pickFile(owner);
+  const selectedFile = resolveCompanyMedia(selectedCompany, {home});
+  const owner = selectedFile ? selectedCompany : mainCompany;
+  const file = selectedFile || resolveCompanyMedia(mainCompany, {home});
   const identity = JSON.stringify([selectedCompany?.id, owner?.id, file]);
   const [failed, setFailed] = useState(null);
   const [loaded, setLoaded] = useState(null);

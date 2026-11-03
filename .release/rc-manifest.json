@@ -1,16 +1,37 @@
 {
-  "version": "1.10.125",
-  "rc": 1,
-  "branch": "rc/1.10.125-rc.1",
-  "baseMaster": "6660779d46f4e6a23382ce55d6bb31334c58b994",
-  "tasks": [
-    1335
-  ],
+  "branch": "rc/1.10.130-rc.1",
+  "version": "1.10.126",
   "frozen": true,
+  "base": "master",
+  "baseSha": "07c007d",
+  "tasks": [
+    {
+      "id": 1340,
+      "repo": "app-community",
+      "summary": "Manager shell logo selector, sidebar toggle, header back"
+    },
+    {
+      "id": 1351,
+      "repo": "app-community",
+      "summary": "Single-line DefaultTable footer + remove gray title strip"
+    },
+    {
+      "id": 1353,
+      "repo": "app-community",
+      "summary": "ui-default overlay pins 1.0.284"
+    },
+    {
+      "id": 1354,
+      "repo": "app-community",
+      "summary": "remaining ui-default overlay pins"
+    }
+  ],
   "packages": {
-    "@controleonline/ui-crm": "1.0.62"
+    "@controleonline/ui-default": "1.0.284",
+    "@controleonline/ui-layout": "1.0.22",
+    "@controleonline/ui-manager": "1.0.26",
+    "@controleonline/ui-common": "1.2.116"
   },
-  "repositories": {
-    "ControleOnline/app-community": "b88b33974a3b60c40beb67086988f2e1993c82b3"
-  }
+  "createdAt": "2026-11-03T21:19:04Z",
+  "notes": "Human authorized production publish after staging visual validation of single-line footer (financial-hub)."
 }
