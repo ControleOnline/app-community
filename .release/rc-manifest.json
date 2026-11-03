@@ -1,16 +1,14 @@
 {
-  "version": "1.10.118",
+  "version": "1.10.119",
   "rc": 1,
-  "branch": "rc/1.10.118-rc.1",
-  "baseMaster": "9434c29230d771207d2a6177125192de8087686a",
+  "branch": "rc/1.10.119-rc.1",
+  "baseMaster": "063180a607cdc3604b581a5dfa71815aaf57e4c0",
   "tasks": [
     1327
   ],
   "frozen": true,
-  "packages": {
-    "@controleonline/ui-crm": "1.0.59"
-  },
+  "note": "align manager-devices patch to ui-common 1.2.114",
   "repositories": {
-    "ControleOnline/app-community": "734c3689aed78a1a11d539c3671856dc23ed514d"
+    "ControleOnline/app-community": "cf5117faa012df4a496284d562c29ea824340f7f"
   }
 }
