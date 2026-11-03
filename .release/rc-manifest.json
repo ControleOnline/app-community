@@ -1,17 +1,16 @@
 {
-  "version": "1.10.116",
+  "version": "1.10.118",
   "rc": 1,
-  "branch": "rc/1.10.116-rc.1",
-  "baseMaster": "ed2219aa8923ce1afd41f8fc878ccb44703f10cf",
+  "branch": "rc/1.10.118-rc.1",
+  "baseMaster": "9434c29230d771207d2a6177125192de8087686a",
   "tasks": [
-    1322
+    1327
   ],
   "frozen": true,
-  "repositories": {
-    "ControleOnline/app-community": "71ca49bc3dca94268ac0315567dc57b31ddf5c05"
-  },
   "packages": {
-    "@controleonline/ui-common": "1.2.114",
-    "@controleonline/ui-crm": "1.0.58"
+    "@controleonline/ui-crm": "1.0.59"
+  },
+  "repositories": {
+    "ControleOnline/app-community": "734c3689aed78a1a11d539c3671856dc23ed514d"
   }
 }
