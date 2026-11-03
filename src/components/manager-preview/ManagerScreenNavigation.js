@@ -37,14 +37,9 @@ export default function ManagerScreenNavigation({navigation, route, options = {}
   const title = resolveManagementPageTitle(route, {...options, headerTitle: extractedTitle || options.headerTitle});
   // Composite order headers may include status/actions; they are not disposable titles.
   const operationalHeader = customTitle && extractedTitle === null ? customTitle : null;
-  if (!customLeft && !actions && !title && !operationalHeader) return null;
+  // Title alone is redundant with the shell header/breadcrumb — drop the gray strip.
+  if (!customLeft && !actions && !operationalHeader) return null;
   return <View testID="management-screen-navigation" style={[s.container, {borderBottomColor: c.headerBorder, backgroundColor: c.pageBackground}]}>
-    <View style={s.row}>
-      <View style={s.side}>
-      </View>
-      <View style={s.title}>{title ? <Text accessibilityRole="header" style={[s.titleText, {color: c.textPrimary}]}>{title}</Text> : null}</View>
-      <View style={s.side} />
-    </View>
     {(customLeft || operationalHeader || actions) ? <View style={s.details}>
       {customLeft && <View style={s.operational}>{customLeft}</View>}
       {operationalHeader && <View style={s.operational}>{operationalHeader}</View>}
