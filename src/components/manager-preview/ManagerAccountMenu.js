@@ -24,21 +24,21 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
         <Text style={{color:highlighted ? c.menuActiveText : c.menuText, fontSize:13}}>{label}</Text></>;
     }}
   </Pressable>;
-  return <View accessibilityRole="menu" accessibilityLabel="Opções do usuário" accessibilityViewIsModal
+  return <View accessibilityRole="menu" accessibilityLabel={global.t?.t('configs', 'a11y', 'user_options')} accessibilityViewIsModal
     style={[s.panel, {backgroundColor: c.menuBackground, borderColor: c.menuBorder}, position,
       {maxHeight: Math.max(0, frame.height - top - bottom)}]}>
     <ScrollView style={s.options}>
       <Text numberOfLines={1} style={[s.name, {color: c.menuText}]}>{name}</Text>
-      {canOpenProfile && option('Meu perfil', 'user', onProfile)}
-      {onHelp && option('Ajuda do On Manager', 'help-circle', onHelp)}
-      {option(mode === 'light' ? 'Usar tema escuro' : 'Usar tema claro', mode === 'light' ? 'moon' : 'sun', onTheme)}
+      {canOpenProfile && option(global.t?.t('configs', 'menu', 'my_profile') || global.t?.t('menu', 'menu', 'my_profile'), 'user', onProfile)}
+      {onHelp && option(global.t?.t('configs', 'menu', 'manager_help') || global.t?.t('menu', 'menu', 'manager_help'), 'help-circle', onHelp)}
+      {option(mode === 'light' ? (global.t?.t('configs', 'menu', 'use_dark_theme') || global.t?.t('menu', 'menu', 'use_dark_theme')) : (global.t?.t('configs', 'menu', 'use_light_theme') || global.t?.t('menu', 'menu', 'use_light_theme')), mode === 'light' ? 'moon' : 'sun', onTheme)}
       {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.menuBorder}]}>
-        <Text style={[s.barTitle, {color: c.textSecondary}]}>Barra de atalhos</Text>
+        <Text style={[s.barTitle, {color: c.textSecondary}]}>{global.t?.t('configs', 'section_title', 'shortcut_bar')}</Text>
         {option(bottomBar.visible ? 'Ocultar nesta sessão' : 'Mostrar nesta sessão', 'layout', onBarSession)}
         {option(bottomBar.rememberedVisible ? 'Manter oculta neste aparelho' : 'Manter visível neste aparelho', 'save', onBarRemember)}
         {!!bottomBar.error && <Text accessibilityRole="alert" style={{color: c.menuText, padding: 12}}>{bottomBar.error}</Text>}
       </View>}
-      {onLogout && option('Sair da conta', 'log-out', onLogout)}
+      {onLogout && option(global.t?.t('configs', 'menu', 'logout') || global.t?.t('menu', 'menu', 'logout'), 'log-out', onLogout)}
     </ScrollView>
   </View>;
 }
