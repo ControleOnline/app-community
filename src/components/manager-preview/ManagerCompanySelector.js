@@ -21,7 +21,10 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
   const close = () => setOpen(false);
   const isLogo = mode === 'logo';
   const content = isLogo
-    ? <ManagerBrand colors={c} home homeSize={40} homeWidth={80} textColor={c.headerText || c.selectText} compact subtitle={false} />
+    ? <View style={s.logoStack}>
+        <ManagerBrand colors={c} home homeSize={40} homeWidth={80} textColor={c.headerText || c.selectText} compact subtitle={false} />
+        <Text numberOfLines={1} style={[s.logoAlias, {color: c.headerText || c.textMuted || c.selectText}]}>{label}</Text>
+      </View>
     : <ManagerBrand colors={c} textColor={c.selectText} compact={compact} subtitle={false}
         trailing={canSwitch && !compact ? <View style={s.chevron}><HomeIcon name="chevron-down" size={18} color={c.selectIcon} /></View> : null} />;
   const triggerStyle = isLogo
@@ -74,7 +77,9 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
 
 const s = StyleSheet.create({
   trigger: {minHeight: 64, padding: 10, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8},
-  logoTrigger: {minHeight: 44, minWidth: 88, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4},
+  logoTrigger: {minHeight: 56, minWidth: 96, maxWidth: 160, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4},
+  logoStack: {alignItems: 'center', justifyContent: 'center', gap: 2, maxWidth: 152},
+  logoAlias: {fontSize: 10, fontWeight: '500', lineHeight: 12, opacity: 0.72, textAlign: 'center', maxWidth: 152},
   compact: {padding: 6, justifyContent: 'center'},
   chevron: {width: 18, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   modalRoot: {flex: 1, justifyContent: 'flex-end'}, desktopRoot: {justifyContent: 'center', alignItems: 'center'},

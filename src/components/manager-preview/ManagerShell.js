@@ -190,6 +190,6 @@ const s = StyleSheet.create({
   mobileDetails: {paddingHorizontal: 12, justifyContent: 'flex-end'},
   breadcrumb: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
-  homeButton: {width: 88, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
+  homeButton: {minWidth: 96, maxWidth: 168, minHeight: 56, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });
