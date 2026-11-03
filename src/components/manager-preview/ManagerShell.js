@@ -109,9 +109,7 @@ export default function ManagerShell({navigation, route, options, children}) {
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
     width: compact ? 76 : 254}, mobile && s.drawer]}>
     {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={s.close}>{icon('x')}</Pressable>}
-    <View style={[s.brand, compact && s.compactBrand]}>
-      <ManagerCompanySelector colors={c} compact={compact} />
-    </View>
+    <View style={[s.brand, compact && s.compactBrand]} />
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
       {!compact && <Text style={[s.caption, {color: c.textMuted}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
@@ -138,10 +136,9 @@ export default function ManagerShell({navigation, route, options, children}) {
           {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
         </Text></View>}
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
-          onPress={() => go({name: 'HomePage'})} style={s.homeButton}>
-          <ManagerBrand colors={c} home homeSize={40} homeWidth={80} />
-        </Pressable>
+        <View style={s.homeButton} testID="manager-header-company">
+          <ManagerCompanySelector colors={c} compact mode="logo" />
+        </View>
         <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls]}>
           {app_type_base === 'ADMIN' && <AppTypeSwitcher colors={c} compact={mobile} />}
         </View>
