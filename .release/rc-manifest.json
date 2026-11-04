@@ -1,33 +1,21 @@
 {
-  "branch": "rc/1.10.134-rc.1",
   "version": "1.10.134",
-  "frozen": true,
-  "base": "master",
-  "baseSha": "d1b18c4",
+  "rc": 1,
+  "branch": "rc/1.10.134-rc.1",
+  "baseMaster": "d1b18c4099a5d634dbd2c9be823a0a2ce3f098e7",
   "tasks": [
-    {
-      "id": 1340,
-      "summary": "Manager shell logo selector, sidebar, header back"
-    },
-    {
-      "id": 1351,
-      "summary": "Single-line footer + remove gray title"
-    },
-    {
-      "id": 1356,
-      "summary": "Sticky ID/actions body cells"
-    },
-    {
-      "id": 1357,
-      "summary": "No mainCompany logo fallback"
-    }
+    1340,
+    1351,
+    1356,
+    1357
   ],
-  "packages": {
-    "@controleonline/ui-default": "1.0.285",
-    "@controleonline/ui-layout": "1.0.23",
-    "@controleonline/ui-manager": "1.0.26",
-    "@controleonline/ui-common": "1.2.116"
+  "taskRepository": "ControleOnline/app-community",
+  "frozen": true,
+  "repositories": {
+    "ControleOnline/app-community": "269e472a32e9f4848187f52a07f235b1f2a97d5e"
   },
-  "createdAt": "2026-11-04T11:59:59Z",
-  "notes": "Human authorized production publish of Manager UI delta validated on staging."
+  "validation": {
+    "scope": "Manager UI production: footer single-line, sticky cols, no mainCompany logo fallback, shell logo selector. Human authorized.",
+    "checks": "staging visual validation"
+  }
 }
