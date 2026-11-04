@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-layout",
-      "version": "1.0.22",
+      "version": "1.0.23",
       "file": "src/react/App.js",
       "before": "0000000000000000000000000000000000000000000000000000000000000000",
       "after": "17436f95bee5437d8dd13264fa6f209ebc1bb64389c1f832381ceb6b5d5e961e",
