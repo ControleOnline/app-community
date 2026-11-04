@@ -9,7 +9,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "PENDING"
+    "ControleOnline/app-community": "c12077ff654ea0ac94b8e2dbb80d53709598b8a4"
   },
   "validation": {
     "scope": "Task 1292 delta still missing from master (official API theme modes, published UI package build compat) rebased onto master 1.10.125 (ui-common 1.2.116). Patch version conflicts resolved keeping master's newer pins. Task 1296 is already in master.",
