@@ -12,7 +12,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "269e472a32e9f4848187f52a07f235b1f2a97d5e"
+    "ControleOnline/app-community": "5deb24f0f33f4df4d2386963c2cf55c15b691f54"
   },
   "validation": {
     "scope": "Manager UI production: footer single-line, sticky cols, no mainCompany logo fallback, shell logo selector. Human authorized.",
