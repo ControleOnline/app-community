@@ -1,16 +1,18 @@
 {
-  "version": "1.10.125",
+  "version": "1.10.133",
   "rc": 1,
-  "branch": "rc/1.10.125-rc.1",
-  "baseMaster": "6660779d46f4e6a23382ce55d6bb31334c58b994",
+  "branch": "rc/1.10.133-rc.1",
+  "baseMaster": "07c007dc662f0065f6b2a656717566ceab9fd6d6",
   "tasks": [
-    1335
+    1292
   ],
+  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
-  "packages": {
-    "@controleonline/ui-crm": "1.0.62"
-  },
   "repositories": {
-    "ControleOnline/app-community": "b88b33974a3b60c40beb67086988f2e1993c82b3"
+    "ControleOnline/app-community": "c12077ff654ea0ac94b8e2dbb80d53709598b8a4"
+  },
+  "validation": {
+    "scope": "Task 1292 delta still missing from master (official API theme modes, published UI package build compat) rebased onto master 1.10.125 (ui-common 1.2.116). Patch version conflicts resolved keeping master's newer pins. Task 1296 is already in master.",
+    "checks": "see PR"
   }
 }
