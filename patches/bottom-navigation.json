@@ -25,14 +25,6 @@
       "after": "b5a64c77da0456210f6f483ceaccd62d8a64fc08e7da56da2cf35f7219d60c74"
     },
     {
-      "package": "@controleonline/ui-layout",
-      "version": "1.0.21",
-      "file": "src/react/layouts/DefaultLayout.js",
-      "before": "a6a316df59831373819861024e8b3640cece3389809b0503fc426f1a490ba30d",
-      "payload": "bottom-navigation-3.after.js",
-      "after": "88ded1e14d8349ab6a1e18fdbd8b416864374c26a6cccd85b616d3ccb0c45cb8"
-    },
-    {
       "package": "@controleonline/ui-common",
       "version": "1.2.116",
       "file": "src/react/hooks/useBottomNavigationPreference.js",

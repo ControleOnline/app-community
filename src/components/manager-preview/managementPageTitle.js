@@ -1,17 +1,13 @@
-const titles = {
-  ClientsIndex: 'Clientes', ProvidersIndex: 'Fornecedores', FranchiseesIndex: 'Franquias',
-  EmployeesIndex: 'Colaboradores', MyCompaniesPage: 'Minhas empresas',
-  DevicesIndex: 'Dispositivos', ConfiguratorPage: 'Configurações', IncomeStatement: 'Resultados',
-  PdvPage: 'PDV', LinkedOrderSettlementPage: 'Mesas e comandas',
-};
+import {managerRouteTitle} from './model';
 
+/**
+ * Header titles must come from the translation store (same path as managerMenu).
+ * Natural-language Portuguese is never hardcoded here.
+ */
 export const resolveManagementPageTitle = (route, options = {}) => {
-  if (titles[route.name]) return titles[route.name];
-  if (route.name === 'OrderHistoryPage') {
-    const type = route.params?.orderTypeFilter || route.params?.orderType;
-    if (type === 'sale') return 'Pedidos de venda';
-    if (type === 'purchase') return 'Pedidos de compra';
-  }
+  const t = global.t?.t;
+  const fromRoute = managerRouteTitle(route?.name, route?.params || {}, t);
+  if (fromRoute) return fromRoute;
   // Product contexts and record/finance titles belong to their existing page.
   return typeof options.headerTitle === 'string' ? options.headerTitle : options.title;
 };

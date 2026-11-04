@@ -20,12 +20,42 @@ const employeeLinkColumns = [
   {name:'id',label:'ID',editable:false,sortable:false,isIdentity:true},
   {name:'people',label:'Colaborador',editable:false,sortable:false,format:person=>person?.name || person?.alias || '—'},
 ];
-const routes={ProductsPage:['Produtos','Novo produto'],ClientsIndex:['Clientes','Novo cliente'],ProvidersIndex:['Fornecedores','Novo fornecedor'],FranchiseesIndex:['Franquias','Nova franquia'],EmployeesIndex:['Colaboradores','Novo colaborador'],MyCompaniesPage:['Minhas empresas','Nova empresa']};
+import {managerRouteTitle} from './model';
+
+const routeListKeys = {
+  ProductsPage: 'products',
+  ClientsIndex: 'clients',
+  ProvidersIndex: 'providers',
+  FranchiseesIndex: 'franchisees',
+  EmployeesIndex: 'employees',
+  MyCompaniesPage: 'my_companies',
+};
+const routeAddKeys = {
+  ProductsPage: 'new_product',
+  ClientsIndex: 'new_client',
+  ProvidersIndex: 'new_provider',
+  FranchiseesIndex: 'new_franchisee',
+  EmployeesIndex: 'new_employee',
+  MyCompaniesPage: 'new_company',
+};
+const resolveRouteProfile = name => {
+  if (!routeListKeys[name]) return null;
+  const tr = global.t?.t;
+  const list =
+    managerRouteTitle(name, {}, tr) ||
+    tr?.('menu', 'menu', routeListKeys[name]) ||
+    tr?.('configs', 'title', routeListKeys[name]);
+  const add =
+    tr?.('configs', 'button_title', routeAddKeys[name]) ||
+    tr?.('menu', 'menu', routeAddKeys[name]);
+  return [list, add];
+};
+
 export default function ManagerDefaultTable(props) {
   const ownsTitle=useManagementPageTitle();
   const route=useRoute(), {width}=useWindowDimensions();
   const preview=useManagerPreview();
-  const profile=routes[route.name];
+  const profile=resolveRouteProfile(route.name);
   const tableStore=useStore(props.storeName || 'people'), peopleStore=useStore('people');
   const enabled=!!(route.name!=='ProductsPage' && managerPreviewEnabled && preview && profile && ['people','people_link','products'].includes(props.storeName));
   const columns=tableStore?.getters?.columns?.length ? tableStore.getters.columns : (props.columns?.length ? props.columns : (enabled && route.name === 'EmployeesIndex' && props.storeName === 'people_link' ? employeeLinkColumns : []));
@@ -62,7 +92,7 @@ export default function ManagerDefaultTable(props) {
     <DefaultTableThemeContext.Provider value={tableColors}>
     <DefaultTable {...props} columns={columns} paginationMode="pages" compactBreakpoint={760}
       initialViewMode={mobile?'cards':'table'} visibleColumnsPreferenceKey={`on-manager:${route.name}`}
-      pageSize={mobile?10:20} searchPlaceholder={props.searchPlaceholder || `Buscar ${profile[0].toLowerCase()}`}
+      pageSize={mobile?10:20} searchPlaceholder={props.searchPlaceholder || [global.t?.t('configs', 'placeholder', 'search'), profile?.[0]].filter(Boolean).join(' ')}
       requestParams={{...props.requestParams,...(route.name==='EmployeesIndex'?employeeListFields:{}),itemsPerPage:mobile?10:20}}
       cardListProps={{...props.cardListProps,key:`on-manager:${route.name}:list`}}
       showToolbarActions showToolbarControls

@@ -1,18 +1,33 @@
 {
-  "version": "1.10.133",
-  "rc": 1,
-  "branch": "rc/1.10.133-rc.1",
-  "baseMaster": "07c007dc662f0065f6b2a656717566ceab9fd6d6",
-  "tasks": [
-    1292
-  ],
-  "taskRepository": "ControleOnline/app-community",
+  "branch": "rc/1.10.134-rc.1",
+  "version": "1.10.134",
   "frozen": true,
-  "repositories": {
-    "ControleOnline/app-community": "c12077ff654ea0ac94b8e2dbb80d53709598b8a4"
+  "base": "master",
+  "baseSha": "d1b18c4",
+  "tasks": [
+    {
+      "id": 1340,
+      "summary": "Manager shell logo selector, sidebar, header back"
+    },
+    {
+      "id": 1351,
+      "summary": "Single-line footer + remove gray title"
+    },
+    {
+      "id": 1356,
+      "summary": "Sticky ID/actions body cells"
+    },
+    {
+      "id": 1357,
+      "summary": "No mainCompany logo fallback"
+    }
+  ],
+  "packages": {
+    "@controleonline/ui-default": "1.0.285",
+    "@controleonline/ui-layout": "1.0.23",
+    "@controleonline/ui-manager": "1.0.26",
+    "@controleonline/ui-common": "1.2.116"
   },
-  "validation": {
-    "scope": "Task 1292 delta still missing from master (official API theme modes, published UI package build compat) rebased onto master 1.10.125 (ui-common 1.2.116). Patch version conflicts resolved keeping master's newer pins. Task 1296 is already in master.",
-    "checks": "see PR"
-  }
+  "createdAt": "2026-11-04T11:59:59Z",
+  "notes": "Human authorized production publish of Manager UI delta validated on staging."
 }

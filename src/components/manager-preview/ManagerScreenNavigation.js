@@ -37,19 +37,9 @@ export default function ManagerScreenNavigation({navigation, route, options = {}
   const title = resolveManagementPageTitle(route, {...options, headerTitle: extractedTitle || options.headerTitle});
   // Composite order headers may include status/actions; they are not disposable titles.
   const operationalHeader = customTitle && extractedTitle === null ? customTitle : null;
-  if (!allowBack && !customLeft && !actions && !title && !operationalHeader) return null;
+  // Title alone is redundant with the shell header/breadcrumb — drop the gray strip.
+  if (!customLeft && !actions && !operationalHeader) return null;
   return <View testID="management-screen-navigation" style={[s.container, {borderBottomColor: c.headerBorder, backgroundColor: c.pageBackground}]}>
-    <View style={s.row}>
-      <View style={s.side}>
-        {!customLeft && allowBack && <Pressable accessibilityRole="button" accessibilityLabel="Voltar"
-          onPress={() => goBackFromManagement(navigation, route, options.headerBackFallback)}
-          style={[s.back, {borderColor: c.cardBorder, backgroundColor: c.cardBackground}]}>
-          <Text style={{color: c.textPrimary}}>← Voltar</Text>
-        </Pressable>}
-      </View>
-      <View style={s.title}>{title ? <Text accessibilityRole="header" style={[s.titleText, {color: c.textPrimary}]}>{title}</Text> : null}</View>
-      <View style={s.side} />
-    </View>
     {(customLeft || operationalHeader || actions) ? <View style={s.details}>
       {customLeft && <View style={s.operational}>{customLeft}</View>}
       {operationalHeader && <View style={s.operational}>{operationalHeader}</View>}
@@ -61,7 +51,7 @@ export default function ManagerScreenNavigation({navigation, route, options = {}
 const s = StyleSheet.create({
   container: {paddingHorizontal: 12, paddingVertical: 6, borderBottomWidth: 1, gap: 6},
   row: {flexDirection: 'row', alignItems: 'center', minHeight: 44},
-  side: {width: 88, flexShrink: 0},
+  side: {width: 12, flexShrink: 0},
   back: {minHeight: 44, paddingHorizontal: 10, justifyContent: 'center', alignSelf: 'flex-start', borderWidth: 1, borderRadius: 10},
   title: {flex: 1, minWidth: 0, paddingHorizontal: 4},
   titleText: {fontSize: 16, fontWeight: '600', textAlign: 'center'},
