@@ -24,29 +24,82 @@ export const managerPreviewEnabled = shouldPreview({
 });
 
 
-const previewRouteTitles = {MyCompaniesPage:'Minhas empresas',EmployeesIndex:'Colaboradores', PdvPage:'PDV', LinkedOrderSettlementPage:'Mesas e comandas', OrderHistoryPage:'Pedidos', ProductsPage:'Produtos', ClientsIndex:'Clientes', ProvidersIndex:'Fornecedores', FranchiseesIndex:'Franquias', DevicesIndex:'Dispositivos', ConfiguratorPage:'Configurações', IncomeStatement:'Resultados', FinancialHubPage:'Financeiro', ProductShowcasesPage:'Vitrines'};
+/** Machine keys only — never Portuguese display strings. Values resolve via translate. */
+const routeTranslationKeys = {
+  MyCompaniesPage: 'my_companies',
+  EmployeesIndex: 'employees',
+  PdvPage: 'pdv',
+  LinkedOrderSettlementPage: 'tables_and_orders',
+  OrderHistoryPage: 'orders',
+  ProductsPage: 'products',
+  ClientsIndex: 'clients',
+  ProvidersIndex: 'providers',
+  FranchiseesIndex: 'franchisees',
+  DevicesIndex: 'devices',
+  ConfiguratorPage: 'settings',
+  IncomeStatement: 'results',
+  FinancialHubPage: 'financial',
+  ProductShowcasesPage: 'showcases',
+};
 
-export function managerRouteTitle(name, params = {}) {
+/**
+ * Resolve a route title exclusively from the translation store (menu → configs).
+ * No hardcoded natural-language fallbacks.
+ */
+export function managerRouteTitle(name, params = {}, translate) {
+  const t = translate || global.t?.t;
   if (name === 'OrderHistoryPage') {
     const kind = params.orderTypeFilter || params.orderType;
-    if (kind === 'sale') return 'Pedidos de venda';
-    if (kind === 'purchase') return 'Pedidos de compra';
+    if (kind === 'sale') {
+      return (
+        t?.('menu', 'menu', 'sale_orders') ||
+        t?.('configs', 'title', 'sale_orders') ||
+        t?.('menu', 'menu', 'orders_sale')
+      );
+    }
+    if (kind === 'purchase') {
+      return (
+        t?.('menu', 'menu', 'purchase_orders') ||
+        t?.('configs', 'title', 'purchase_orders') ||
+        t?.('menu', 'menu', 'orders_purchase')
+      );
+    }
   }
-  return previewRouteTitles[name];
+  const key = routeTranslationKeys[name] || name;
+  return (
+    t?.('menu', 'menu', key) ||
+    t?.('configs', 'title', key) ||
+    t?.('menu', 'menu', name)
+  );
 }
 
 export function managerMenu(menus, availableRoutes, translate, menuType = 'home') {
   const registered = new Set(availableRoutes);
-  return filterRuntimeMenuModulesByType(menus, menuType).map(group => ({
-    ...group,
-    title: translate?.('menu', 'menu', group.label) || group.label,
-    items: group.menus.map(item => ({
-      ...item,
-      name: resolveMenuRouteName(item.route),
-      params: resolveMenuRouteParams(item.routeParams),
-      title: managerRouteTitle(resolveMenuRouteName(item.route), resolveMenuRouteParams(item.routeParams)) || resolveRuntimeMenuLabel(item, translate),
-    })).filter(item => registered.has(item.name)),
-  })).filter(group => group.items.length);
+  const t = translate || global.t?.t;
+  return filterRuntimeMenuModulesByType(menus, menuType).map(group => {
+    const groupKey = group.menuKey || group.label;
+    return {
+      ...group,
+      title:
+        t?.('menu', 'menu', groupKey) ||
+        t?.('menu', 'menu', group.label) ||
+        resolveRuntimeMenuLabel({menuKey: groupKey, label: group.label}, t),
+      items: group.menus
+        .map(item => {
+          const name = resolveMenuRouteName(item.route);
+          const params = resolveMenuRouteParams(item.routeParams);
+          return {
+            ...item,
+            name,
+            params,
+            title:
+              resolveRuntimeMenuLabel(item, t) ||
+              managerRouteTitle(name, params, t),
+          };
+        })
+        .filter(item => registered.has(item.name)),
+    };
+  }).filter(group => group.items.length);
 }
 
 export function selectedManagerMenuItem(items, route) {

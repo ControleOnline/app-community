@@ -21,7 +21,7 @@ import ManagerBottomNavigation from './ManagerBottomNavigation';
 import useJourneyReadiness from './useJourneyReadiness';
 import ManagerBrand from './ManagerBrand';
 import {ManagementPageTitleContext} from './ManagementPageTitleContext';
-import ManagerScreenNavigation from './ManagerScreenNavigation';
+import ManagerScreenNavigation, {goBackFromManagement} from './ManagerScreenNavigation';
 
 export default function ManagerShell({navigation, route, options, children}) {
   const {width} = useWindowDimensions();
@@ -109,8 +109,17 @@ export default function ManagerShell({navigation, route, options, children}) {
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
     width: compact ? 76 : 254}, mobile && s.drawer]}>
     {mobile && <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={s.close}>{icon('x')}</Pressable>}
-    <View style={[s.brand, compact && s.compactBrand]}>
-      <ManagerCompanySelector colors={c} compact={compact} />
+    <View style={[s.brand, compact && s.compactBrand, s.sidebarToggleRow]}>
+      {!mobile && (
+        <Pressable
+          testID="manager-sidebar-toggle"
+          accessibilityRole="button"
+          accessibilityLabel={compact ? 'Expandir menu' : 'Recolher menu'}
+          onPress={() => setCollapsed(!collapsed)}
+          style={[s.sidebarToggle, {borderColor: c.navigationBorder}]}>
+          {icon(compact ? 'chevrons-right' : 'chevrons-left', 18, c.navigationIcon)}
+        </Pressable>
+      )}
     </View>
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
       {!compact && <Text style={[s.caption, {color: c.textMuted}]}>INÍCIO</Text>}
@@ -128,20 +137,38 @@ export default function ManagerShell({navigation, route, options, children}) {
   </View>;
   return <View  style={[s.shell, {backgroundColor: c.pageBackground}]}>
     {!mobile && sidebar}
+    {mobile && !open && (
+      <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder}]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Abrir menu"
+          onPress={() => setOpen(true)}
+          style={s.sidebarToggle}>
+          {icon('menu', 18, c.navigationIcon)}
+        </Pressable>
+      </View>
+    )}
     <View collapsable={false} style={s.main}>
       <View style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
       <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
         <View style={[s.headerSide, s.headerLeft]}>
-          <Pressable accessibilityRole="button" accessibilityLabel={mobile ? 'Abrir menu' : 'Alternar menu compacto'}
-            onPress={() => mobile ? setOpen(true) : setCollapsed(!collapsed)} style={[s.iconButton, {borderColor: c.headerBorder}]}>{icon('menu', 18, c.headerIcon)}</Pressable>
-        {!mobile && <View testID="manager-breadcrumb" style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.headerText, fontSize: 12}}>
-          {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
-        </Text></View>}
+          {navigation.canGoBack?.() ? (
+            <Pressable
+              testID="manager-header-back"
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
+              onPress={() => goBackFromManagement(navigation, route, options?.headerBackFallback)}
+              style={s.headerIconOnly}>
+              {icon('arrow-left', 18, c.headerIcon)}
+            </Pressable>
+          ) : null}
+          {!mobile && <View testID="manager-breadcrumb" style={s.breadcrumb}><Text numberOfLines={1} style={{color: c.headerText, fontSize: 12}}>
+            {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
+          </Text></View>}
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Ir para o início"
-          onPress={() => go({name: 'HomePage'})} style={s.homeButton}>
-          <ManagerBrand colors={c} home homeSize={40} homeWidth={80} />
-        </Pressable>
+        <View style={s.homeButton} testID="manager-header-company">
+          <ManagerCompanySelector colors={c} compact mode="logo" />
+        </View>
         <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls]}>
           {app_type_base === 'ADMIN' && <AppTypeSwitcher colors={c} compact={mobile} />}
         </View>
@@ -193,6 +220,10 @@ const s = StyleSheet.create({
   mobileDetails: {paddingHorizontal: 12, justifyContent: 'flex-end'},
   breadcrumb: {flex: 1, minWidth: 0},
   iconButton: {width: 38, height: 38, flexShrink: 0, borderWidth: 1, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
-  homeButton: {width: 88, height: 44, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
+  headerIconOnly: {width: 36, height: 36, flexShrink: 0, alignItems: 'center', justifyContent: 'center', opacity: 0.75},
+  sidebarToggleRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'},
+  sidebarToggle: {width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 0},
+  mobileRail: {width: 48, borderRightWidth: 1, alignItems: 'center', paddingTop: 12, flexShrink: 0},
+  homeButton: {minWidth: 96, maxWidth: 168, minHeight: 56, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });

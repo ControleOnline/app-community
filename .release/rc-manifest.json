@@ -1,18 +1,21 @@
 {
-  "version": "1.10.133",
+  "version": "1.10.134",
   "rc": 1,
-  "branch": "rc/1.10.133-rc.1",
-  "baseMaster": "07c007dc662f0065f6b2a656717566ceab9fd6d6",
+  "branch": "rc/1.10.134-rc.1",
+  "baseMaster": "d1b18c4099a5d634dbd2c9be823a0a2ce3f098e7",
   "tasks": [
-    1292
+    1340,
+    1351,
+    1356,
+    1357
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "c12077ff654ea0ac94b8e2dbb80d53709598b8a4"
+    "ControleOnline/app-community": "470282cd3cd7b17cbb95546f63beaa0d0ed21694"
   },
   "validation": {
-    "scope": "Task 1292 delta still missing from master (official API theme modes, published UI package build compat) rebased onto master 1.10.125 (ui-common 1.2.116). Patch version conflicts resolved keeping master's newer pins. Task 1296 is already in master.",
-    "checks": "see PR"
+    "scope": "Manager UI production delta. Human authorized.",
+    "checks": "staging visual"
   }
 }

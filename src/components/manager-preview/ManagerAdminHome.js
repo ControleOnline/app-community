@@ -14,10 +14,10 @@ export default function ManagerAdminHome({navigation}) {
   const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
   const toolbar = managerMenu(menus, navigation.getState().routeNames, global.t?.t, 'toolbar')
     .flatMap(group => group.items).filter(item => !groups.some(group => group.items.some(other => other.name === item.name)));
-  if (toolbar.length) groups.push({id: 'toolbar', title: 'Mais acessos', items: toolbar});
+  if (toolbar.length) groups.push({id: 'toolbar', title: global.t?.t('configs', 'section_title', 'more_access') || global.t?.t('menu', 'menu', 'more_access'), items: toolbar});
   return <ScrollView style={{backgroundColor: c.pageBackground}} contentContainerStyle={[s.page, {padding: width <= 760 ? 16 : 32}]}>
-    <Text accessibilityRole="header" style={[s.heading, {color: c.textPrimary}]}>Olá, {getAvatarDisplayName(user).split(' ')[0] || 'Usuário'}</Text>
-    <Text style={[s.subtitle, {color: c.textSecondary}]}>Administração</Text>
+    <Text accessibilityRole="header" style={[s.heading, {color: c.textPrimary}]}>Olá, {getAvatarDisplayName(user).split(' ')[0] || global.t?.t('configs', 'label', 'user')}</Text>
+    <Text style={[s.subtitle, {color: c.textSecondary}]}>{global.t?.t('configs', 'section_title', 'administration') || global.t?.t('menu', 'menu', 'administration')}</Text>
     {groups.map((group, index) => <View key={group.id || index} style={s.group}>
       <Text accessibilityRole="header" style={[s.groupTitle, {color: c.textPrimary}]}>{group.title}</Text>
       <View style={s.items}>{group.items.filter(item => item.name !== 'HomePage').map((item, i) => <Pressable key={item.id || i}
@@ -29,7 +29,7 @@ export default function ManagerAdminHome({navigation}) {
         <HomeIcon name="chevron-right" size={16} color={c.textMuted} />
       </Pressable>)}</View>
     </View>)}
-    {!groups.length && <Text style={{color: c.textSecondary}}>Aguardando os menus disponíveis para seu perfil.</Text>}
+    {!groups.length && <Text style={{color: c.textSecondary}}>{global.t?.t('configs', 'message', 'waiting_menus')}</Text>}
   </ScrollView>;
 }
 
