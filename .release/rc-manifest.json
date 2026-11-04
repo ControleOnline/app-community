@@ -12,7 +12,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "0000000000000000000000000000000000000000"
+    "ControleOnline/app-community": "470282cd3cd7b17cbb95546f63beaa0d0ed21694"
   },
   "validation": {
     "scope": "Manager UI production delta. Human authorized.",
