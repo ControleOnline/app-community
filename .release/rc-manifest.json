@@ -1,21 +1,18 @@
 {
   "version": "1.10.134",
-  "rc": 1,
-  "branch": "rc/1.10.134-rc.1",
-  "baseMaster": "d1b18c4099a5d634dbd2c9be823a0a2ce3f098e7",
+  "rc": 2,
+  "branch": "rc/1.10.134-rc.2",
+  "baseMaster": "11025ace1dc23edc8daa73865f62b303835c5d91",
   "tasks": [
-    1340,
-    1351,
-    1356,
-    1357
+    1361
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "470282cd3cd7b17cbb95546f63beaa0d0ed21694"
+    "ControleOnline/app-community": "9cf6eec28d594d01d0a2cd75ff5d16042d2906e1"
   },
   "validation": {
-    "scope": "Manager UI production delta. Human authorized.",
-    "checks": "staging visual"
+    "scope": "New workflow file android-deploy-lavego-shop.yml (workflow_dispatch only). Human authorized.",
+    "checks": "diff review against android-deploy-lavego-shop-v2.yml"
   }
 }
