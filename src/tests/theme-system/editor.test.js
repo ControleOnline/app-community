@@ -1,0 +1,73 @@
+import React from 'react';
+import renderer,{act} from 'react-test-renderer';
+import ThemeColorEditor from '../../components/theme-editor/ThemeColorEditor';
+import {previewTheme,clearThemePreview} from '../../styles/themeRuntime';
+import {saveThemeChanges} from '../../components/theme-editor/themeService';
+import {themeFieldLabel} from '../../styles/themeEditorModel';
+import {screenThemeKey} from '../../styles/screenThemeKeys';
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',themeId:1}),previewTheme:jest.fn(),clearThemePreview:jest.fn(),setThemeMode:jest.fn()}));
+jest.mock('../../components/theme-editor/themeService',()=>({editorContext:()=> 'context',loadDomainTheme:jest.fn().mockResolvedValue({id:1}),saveThemeChanges:jest.fn()}));
+let mockWidth=1440;
+jest.mock('react-native',()=>({...jest.requireActual('react-native'),useWindowDimensions:()=>({width:mockWidth,height:852})}));
+const theme={id:1,theme:'Local',colors:{cardBackground:'#ffffff',googleLoading:'#abcdef'}};
+const findField=(tree,mode)=>tree.root.findAllByType('TextInput').find(node=>node.props.accessibilityLabel===`cardBackground — ${mode}`);
+const press=(tree,label)=>tree.root.findAllByType('Pressable').find(node=>node.findAllByType('Text').some(text=>text.children.join('')===label));
+test('editing a shared color initializes both modes, previews locally and cancels without saving',async()=>{
+  let tree;await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']}/>);});
+  expect(saveThemeChanges).not.toHaveBeenCalled();
+  await act(async()=>findField(tree,'claro').props.onChangeText('#112233'));
+  expect(findField(tree,'escuro').props.value).toBe('#ffffff');
+  expect(previewTheme.mock.calls.at(-1)[0]).toMatchObject({'cardBackground-light':'#112233','cardBackground-dark':'#ffffff',googleLoading:'#abcdef'});
+  await act(async()=>press(tree,'Cancelar').props.onPress());
+  expect(findField(tree,'claro').props.value).toBe('#ffffff');expect(saveThemeChanges).not.toHaveBeenCalled();
+  expect(clearThemePreview).toHaveBeenCalled();await act(async()=>tree.unmount());
+});
+test('only the explicit save persists changes; a denied save keeps the draft and error visible',async()=>{
+  saveThemeChanges.mockClear();saveThemeChanges.mockRejectedValueOnce(new Error('Sem permissão'));
+  let tree;await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']}/>);});
+  await act(async()=>findField(tree,'escuro').props.onChangeText('#000000'));
+  await act(async()=>press(tree,'Salvar cores').props.onPress());
+  expect(saveThemeChanges).toHaveBeenCalledTimes(1);expect(findField(tree,'escuro').props.value).toBe('#000000');
+  expect(tree.root.findAllByProps({accessibilityRole:'alert'})[0].children.join('')).toContain('Sem permissão');
+  await act(async()=>tree.unmount());
+});
+
+test('mobile modes use a single column and touch-sized fields while preserving explicit save and cancel',async()=>{
+ mockWidth=393;saveThemeChanges.mockClear();let tree;
+ await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']}/>);});
+ const field=findField(tree,'claro');expect(field.props.style.flat().filter(Boolean)).toContainEqual({minHeight:44,fontSize:16});
+ const modes=tree.root.findAllByType('View').find(n=>Array.isArray(n.props.style)&&n.props.style.some(s=>s?.flexDirection==='column'));
+ expect(modes).toBeDefined();expect(saveThemeChanges).not.toHaveBeenCalled();
+ await act(async()=>field.props.onChangeText('#334455'));await act(async()=>press(tree,'Cancelar').props.onPress());
+ expect(findField(tree,'claro').props.value).toBe('#ffffff');expect(saveThemeChanges).not.toHaveBeenCalled();await act(async()=>tree.unmount());mockWidth=1440;
+});
+test('variation editing shows inherited values but saves only the explicit variation and can return to the default',async()=>{
+ saveThemeChanges.mockClear();saveThemeChanges.mockResolvedValueOnce({id:1});let tree;
+ const theme={id:1,theme:'Local',colors:{'cardBackground-light':'#112233','cardBackground-dark':'#445566'}};
+ await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['indicatorCardBackground']}/>);});
+ const field=()=>tree.root.findAllByType('TextInput').find(node=>node.props.accessibilityLabel===`${themeFieldLabel('indicatorCardBackground')} — claro`);
+ expect(field().props.value).toBe('#112233');
+ await act(async()=>field().props.onChangeText('#abcdef'));
+ expect(previewTheme.mock.calls.at(-1)[0]).toEqual({...theme.colors,'indicatorCardBackground-light':'#abcdef'});
+ await act(async()=>press(tree,'Salvar cores').props.onPress());
+ expect(saveThemeChanges.mock.calls[0][1]).toEqual({'indicatorCardBackground-light':'#abcdef'});
+ await act(async()=>field().props.onChangeText('#abcdef'));
+ const reset=tree.root.findAllByType('Pressable').find(n=>n.props.accessibilityLabel==='Usar padrão indicatorCardBackground claro');
+ await act(async()=>reset.props.onPress());expect(field().props.value).toBe('#112233');
+ await act(async()=>press(tree,'Cancelar').props.onPress());await act(async()=>tree.unmount());
+});
+test('local editing saves only the scoped color and scope changes preserve pending drafts',async()=>{
+ saveThemeChanges.mockClear();saveThemeChanges.mockResolvedValueOnce({id:1});let tree;
+ const screen={id:'FinancialHubPage',label:'Centro financeiro'};
+ const theme={id:1,theme:'Local',colors:{'cardBackground-light':'#112233','cardBackground-dark':'#445566'}};
+ const props={theme,selectedTokens:['cardBackground'],concise:true};
+ await act(async()=>{tree=renderer.create(<ThemeColorEditor {...props} screen={screen}/>);});
+ expect(findField(tree,'claro').props.value).toBe('#112233');
+ await act(async()=>findField(tree,'claro').props.onChangeText('#abcdef'));
+ const key=screenThemeKey(screen.id,'cardBackground','light');
+ expect(previewTheme.mock.calls.at(-1)[0]).toEqual({...theme.colors,[key]:'#abcdef'});
+ await act(async()=>tree.update(<ThemeColorEditor {...props} screen={null}/>));expect(findField(tree,'claro').props.value).toBe('#112233');
+ await act(async()=>tree.update(<ThemeColorEditor {...props} screen={screen}/>));expect(findField(tree,'claro').props.value).toBe('#abcdef');
+ await act(async()=>press(tree,'Salvar cores').props.onPress());expect(saveThemeChanges.mock.calls[0][1]).toEqual({[key]:'#abcdef'});
+ await act(async()=>tree.unmount());
+});
