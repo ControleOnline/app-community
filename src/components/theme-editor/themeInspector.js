@@ -1,0 +1,70 @@
+const validBindings=value=>Array.isArray(value)?value.filter(item=>typeof item?.token==='string'&&typeof item?.property==='string'):[];
+const uniqueBindings=bindings=>[...new Map(bindings.map(item=>[`${item.property}:${item.token}`,item])).values()];
+export function inspectThemeElement(element) {
+  if(!element || element.closest?.('[data-co-theme-tools="true"]'))return null;
+  const node=element.closest?.('[data-co-theme]');
+  const stateNode=element.closest?.('[data-co-theme-states]');
+  if(!node && !stateNode)return null;
+  try {
+    const scope=element.closest?.('[data-co-theme-screen]');
+    const screenId=scope?.getAttribute?.('data-co-theme-screen');
+    const screen=screenId && screenId.length<=200?{id:screenId,label:scope.getAttribute('data-co-theme-screen-label') || 'Tela atual'}:null;
+    const scoped=hit=>hit?{...hit,...(screen?{screen}:{})}:hit;
+    const menu=element.closest?.('[role="menu"][data-co-theme]');
+    const menuBindings=validBindings(menu?JSON.parse(menu.getAttribute('data-co-theme')):[]);
+    const container=menu && menu!==node && menuBindings.length?scoped({node:menu,bindings:menuBindings,states:{normal:menuBindings}}):null;
+    const bindings=validBindings(node?JSON.parse(node.getAttribute('data-co-theme')):[]);
+    // Keep a nested icon/text's own references along with its Pressable interaction states.
+    if(stateNode){
+      const declared=JSON.parse(stateNode.getAttribute('data-co-theme-states'));
+      // Stateful children are already recorded for each state. Do not mix their
+      // currently rendered Hover text into the Normal state (or vice versa).
+      const stateKeys=new Set(['normal','hover'].flatMap(state=>validBindings(declared?.[state]).map(item=>`${item.property}:${item.token}`)));
+      const own=node && node!==stateNode?bindings.filter(item=>!stateKeys.has(`${item.property}:${item.token}`)):[];
+      const states={};
+      for(const state of ['normal','hover'])if(Array.isArray(declared?.[state]))states[state]=uniqueBindings([...validBindings(declared[state]),...own]);
+      if(Object.values(states).some(value=>value.length))return scoped({node:stateNode,bindings:states.normal || [],states,...(container?{container}:{})});
+    }
+    return bindings.length?scoped({node,bindings,states:{normal:bindings},...(container?{container}:{})}):null;
+  } catch{return null;}
+}
+export function attachThemeInspector(document,onHover,onSelect) {
+  let touch=null,moved=false;
+  const tools=event=>event.target.closest?.('[data-co-theme-tools="true"]');
+  const block=event=>{event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();};
+  const select=event=>{block(event);onSelect(inspectThemeElement(event.target));};
+  const move=event=>{
+    if(touch && Math.hypot(event.clientX-touch.x,event.clientY-touch.y)>10)moved=true;
+    onHover(inspectThemeElement(event.target));
+  };
+  const click=event=>{
+    if(tools(event))return;
+    if(moved){block(event);return;}
+    select(event);
+  };
+  const key=event=>{if(event.key==='Escape')onSelect(null,true);};
+  const down=event=>{
+    if(tools(event))return;
+    if(event.pointerType==='touch'){
+      touch={x:event.clientX,y:event.clientY};moved=false;
+      // Allow the browser's default pan while preventing component press handlers.
+      event.stopPropagation();event.stopImmediatePropagation?.();return;
+    }
+    block(event);
+  };
+  const touchUp=event=>{
+    if(!touch || event.pointerType!=='touch' || tools(event))return;
+    touch=null;
+    if(moved){event.stopPropagation();return;}
+    // The compatibility click can arrive after selection unmounts the inspector.
+    const suppress=click=>{if(tools(click))return;block(click);clearTimeout(timer);document.removeEventListener('click',suppress,true);};
+    const timer=setTimeout(()=>document.removeEventListener('click',suppress,true),600);
+    document.addEventListener('click',suppress,true);
+    select(event);
+  };
+  const cancelTouch=()=>{touch=null;moved=true;};
+  const blockTouch=event=>{if(!tools(event)){event.stopPropagation();event.stopImmediatePropagation?.();}};
+  const listeners={pointermove:move,pointerdown:down,pointerup:touchUp,pointercancel:cancelTouch,mousedown:down,touchstart:blockTouch,touchend:blockTouch,click,keydown:key};
+  for(const [name,handler] of Object.entries(listeners))document.addEventListener(name,handler,true);
+  return()=>{for(const [name,handler] of Object.entries(listeners))document.removeEventListener(name,handler,true);onHover(null);};
+}

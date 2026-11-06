@@ -1,4 +1,4 @@
-import './src/styles/colorPreprocessor';
+import './src/styles/themeProvenance';
 import './src/web/registerVectorIconFonts';
 import '@controleonline/ui-common/src/react/localStorage';
 
