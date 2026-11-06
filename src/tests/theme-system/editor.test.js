@@ -52,7 +52,7 @@ test('variation editing shows inherited values but saves only the explicit varia
  await act(async()=>press(tree,'Salvar cores').props.onPress());
  expect(saveThemeChanges.mock.calls[0][1]).toEqual({'indicatorCardBackground-light':'#abcdef'});
  await act(async()=>field().props.onChangeText('#abcdef'));
- const reset=tree.root.findAllByType('Pressable').find(n=>n.props.accessibilityLabel==='Usar padrão indicatorCardBackground light');
+ const reset=tree.root.findAllByType('Pressable').find(n=>n.props.accessibilityLabel==='Usar padrão indicatorCardBackground claro');
  await act(async()=>reset.props.onPress());expect(field().props.value).toBe('#112233');
  await act(async()=>press(tree,'Cancelar').props.onPress());await act(async()=>tree.unmount());
 });
