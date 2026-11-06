@@ -73,7 +73,7 @@ function OperationalPage({navigation,route,Component}) {
         {singleItem ? <View style={{flexDirection:'row',gap:8,paddingHorizontal:12,paddingVertical:8}}>
           {(canViewHistory ? ['orders','catalog'] : ['catalog']).map(view=><Pressable key={view} accessibilityRole="tab" accessibilityState={{selected:active===view}}
             accessibilityLabel={view==='orders' ? 'Pedidos do PDV' : 'Catálogo do PDV'} onPress={()=>go(view)}
-            style={{minHeight:44,paddingHorizontal:16,borderRadius:10,borderWidth:1,borderColor:colors.cardBorder || colors.border,
+            style={{minHeight:44,paddingHorizontal:16,borderRadius:10,borderWidth:1,borderColor:colors.cardBorder,
               backgroundColor:active===view ? colors.buttonBackground : colors.cardBackground,justifyContent:'center'}}>
             <Text style={{color:active===view ? colors.buttonText : colors.textPrimary}}>{view==='orders' ? 'Pedidos' : 'Catálogo'}</Text>
           </Pressable>)}
