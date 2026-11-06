@@ -1,0 +1,10 @@
+import {useSyncExternalStore} from 'react';
+const listeners=new Set();
+const notify=()=>listeners.forEach(listener=>listener());
+const company={id:99,theme:{id:99},name:'Empresa de teste'};
+const stores={auth:{getters:{isLogged:true,user:{id:999,name:'Administrador de teste'}},actions:{logIn(){}}},people:{getters:{currentCompany:company,mainCompany:company},actions:{}},qa:{getters:{saves:0,toast:''},actions:{}}};
+const actions={setColors:colors=>{stores.theme={getters:{colors},actions};notify();}};
+stores.theme={getters:{colors:{}},actions};
+export const recordSave=()=>{stores.qa={getters:{...stores.qa.getters,saves:stores.qa.getters.saves+1},actions:{}};notify();};
+export const recordToast=toast=>{stores.qa={getters:{...stores.qa.getters,toast},actions:{}};notify();};
+export const useStore=name=>useSyncExternalStore(listener=>{listeners.add(listener);return()=>listeners.delete(listener);},()=>stores[name],()=>stores[name]);

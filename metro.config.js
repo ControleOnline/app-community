@@ -3,6 +3,8 @@ const { getDefaultConfig } = require('expo/metro-config');
 const packageConfig = require('./package.json');
 
 const projectRoot = __dirname;
+require('./scripts/generate-theme-contract.cjs');
+require('./scripts/apply-theme-system-patch.cjs');
 require('./scripts/apply-integrations-catalog-patch.cjs');
 require('./scripts/apply-admin-bootstrap-patch.cjs');
 require('./scripts/apply-single-item-patch.cjs');
@@ -64,11 +66,25 @@ if (managerWebPreview || managerNativePreview) {
 
 const resolveBeforeAvatar = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const original=require('./scripts/lib/theme-original-modules.cjs')[moduleName];
+  if(original)return {type:'sourceFile',filePath:path.resolve(projectRoot,moduleRoot,...original)};
+  const dependencyOrigin=/[\\/]node_modules[\\/]@controleonline[\\/]|[\\/]modules[\\/]controleonline[\\/]/.test(context.originModulePath);
+  const matches=(name,file)=> moduleName===`@controleonline/${name}/${file.replace(/\.js$/,'')}` || moduleName===`@controleonline/${name}/${file}`
+    || (dependencyOrigin && moduleName.startsWith('.') && path.resolve(path.dirname(context.originModulePath),moduleName).replace(/\.js$/,'').endsWith(`/${name}/${file.replace(/\.js$/,'')}`));
+  const bridge=(file)=>({type:'sourceFile',filePath:path.join(projectRoot,'src',file)});
+  if(matches('ui-layout','src/styles/colors.js'))return bridge('styles/ThemeColors.js');
+  if(matches('ui-layout','src/styles/branding.js'))return bridge('styles/branding.js');
+  if(matches('ui-common','src/react/components/DefaultProvider.web.configuration.js'))return bridge('styles/ThemeProviderConfiguration.web.js');
+  if(matches('ui-common','src/react/components/DefaultProvider.native.configuration.js'))return bridge('styles/ThemeProviderConfiguration.native.js');
+  if(moduleName==='@controleonline/ui-common/src/utils/storedSessionToken')return bridge('session/scopedStoredSessionToken.js');
+  if(matches('ui-login','src/store/modules/auth/mutations.js'))return bridge('session/scopedAuthMutations.js');
+  if(matches('ui-login','src/store/modules/auth/actions.js'))return bridge('session/scopedAuthActions.js');
+  if(moduleName==='@controleonline/ui-common/src/api/fetch' && !(managerWebPreview && platform==='web'))return bridge('session/ScopedApiFetch.js');
   // Legacy host path still present in some published UI packages during migration to ui-layout.
   if (moduleName === '@controleonline/../../src/styles/colors')
-    return {type: 'sourceFile', filePath: path.join(appNodeModules, '@controleonline/ui-layout/src/styles/colors.js')};
+    return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/styles/ThemeColors.js')};
   if (moduleName === '@controleonline/../../src/styles/branding')
-    return {type: 'sourceFile', filePath: path.join(appNodeModules, '@controleonline/ui-layout/src/styles/branding.js')};
+    return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/styles/branding.js')};
   if (moduleName === '@controleonline/ui-common/src/react/components/AppTypeSwitcher')
     return {type: 'sourceFile', filePath: path.join(projectRoot, 'src/components/AuthenticatedAppTypeSwitcher.js')};
   if (moduleName === '@experimental-avatar') return {type: 'sourceFile', filePath: avatarModule.entry};

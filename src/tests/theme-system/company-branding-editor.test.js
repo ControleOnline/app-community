@@ -1,0 +1,32 @@
+import React from 'react';
+import renderer,{act} from 'react-test-renderer';
+import CompanyBrandingEditor from '../../components/theme-editor/CompanyBrandingEditor';
+import {loadCompanyBranding,saveCompanyBranding} from '../../components/theme-editor/companyBrandingService';
+import {publishCompanyBranding,clearCompanyBranding} from '../../components/theme-editor/companyBrandingRuntime';
+let mockCompany={id:5,alias:'GYROS',logo:'/original.png'},mockAvailable=true;
+jest.mock('@store',()=>({useStore:()=>({getters:{currentCompany:mockCompany}})}));
+jest.mock('../../components/theme-editor/ThemeToolsProvider',()=>({useThemeTools:()=>({available:mockAvailable})}));
+jest.mock('../../components/theme-editor/themeService',()=>({editorContext:()=> 'local-session'}));
+jest.mock('../../components/theme-editor/companyBrandingService',()=>({loadCompanyBranding:jest.fn(),saveCompanyBranding:jest.fn()}));
+jest.mock('../../components/theme-editor/companyBrandingRuntime',()=>({publishCompanyBranding:jest.fn(),clearCompanyBranding:jest.fn()}));
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({raw:{'headerBackground-light':'#fff','headerBackground-dark':'#123456'}})}));
+jest.mock('@controleonline/ui-default/src/react/components/files/DefaultFile',()=> 'DefaultFile');
+const press=(tree,label)=>tree.root.findAllByType('Pressable').find(node=>node.findAllByType('Text').some(text=>text.children.join('')===label));
+beforeEach(()=>{mockAvailable=true;mockCompany={id:5,alias:'GYROS',logo:'/original.png'};jest.clearAllMocks();loadCompanyBranding.mockResolvedValue({branding:{logoLight:'',logoDark:''}});});
+test('previews image edits, cancel restores the original and nothing is saved implicitly',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<CompanyBrandingEditor/>);});
+ await act(async()=>press(tree,'Logos da empresa para claro e escuro').props.onPress());
+ const field=()=>tree.root.findByProps({accessibilityLabel:'Endereço do logo para modo claro'});
+ await act(async()=>field().props.onChangeText('/light.svg'));
+ expect(publishCompanyBranding).toHaveBeenLastCalledWith(mockCompany,{logoLight:'/light.svg',logoDark:''},expect.any(Object));
+ expect(saveCompanyBranding).not.toHaveBeenCalled();
+ await act(async()=>press(tree,'Cancelar prévia').props.onPress());expect(field().props.value).toBe('');expect(clearCompanyBranding).toHaveBeenCalled();
+ await act(async()=>tree.unmount());
+});
+test('requires the existing admin permission and separates selected-company identity',async()=>{
+ mockAvailable=false;let tree;await act(async()=>{tree=renderer.create(<CompanyBrandingEditor/>);});expect(tree.toJSON()).toBeNull();
+ mockAvailable=true;await act(async()=>tree.update(<CompanyBrandingEditor/>));
+ await act(async()=>press(tree,'Logos da empresa para claro e escuro').props.onPress());expect(loadCompanyBranding).toHaveBeenCalledWith(mockCompany);
+ mockCompany={id:9,alias:'Outra empresa'};await act(async()=>tree.update(<CompanyBrandingEditor/>));expect(loadCompanyBranding).toHaveBeenLastCalledWith(mockCompany);
+ expect(clearCompanyBranding).toHaveBeenCalled();expect(saveCompanyBranding).not.toHaveBeenCalled();await act(async()=>tree.unmount());
+});

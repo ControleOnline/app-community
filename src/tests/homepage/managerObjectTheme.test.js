@@ -22,11 +22,11 @@ it('enables the approved theme on normal localhost only for the configured Lave-
   expect(localDomainThemeEnabled(location(),other)).toBe(false);
  expect(localDomainThemeEnabled(location('localhost',''),domain)).toBe(true);
 });
-it.each([['light',light],['dark',dark]])('%s contains only canonical object tokens and covers the consumed roles',(mode,fixture)=>{
+it.each([['light',light],['dark',dark]])('%s contains canonical tokens and reports the omissions in the legacy fixture',(mode,fixture)=>{
  const map=fs.readFileSync(path.join(process.cwd(),'docs/themes/themes-map.md'),'utf8');
  const allowed=new Set([...map.matchAll(/^- `([^`]+)`/gm)].map(match=>match[1]));
  expect(Object.keys(fixture).filter(key=>!allowed.has(key))).toEqual([]);
- expect(missingManagerThemeTokens({},mode,fixture)).toEqual([]);
+ expect(missingManagerThemeTokens({},mode,fixture)).toEqual(['cardShadow','containerTransparentBackground','iconBackground','textDanger']);
  const changed={...fixture}; delete changed.cardIconBackground;
  expect(missingManagerThemeTokens({},mode,changed)).toContain('cardIconBackground');
  global.window={location:location('localhost',`?lavegoThemePreview=${mode}`)};

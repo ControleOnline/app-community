@@ -8,6 +8,7 @@ import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
 import ManagerOrdersTrend from './ManagerOrdersTrend';
+import ManagerStartup from './ManagerStartup';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
 import {readCollection} from '../../experience/collections';
@@ -123,7 +124,7 @@ export default function ManagerOverview({navigation}) {
   const go = item => {experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params);};
   const button = (item, primary = false) => item && <Pressable accessibilityRole="button" onPress={() => go(item)}
     style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, borderColor: primary ? c.buttonBorder : c.buttonBorderSecondary}]}>
-    {icon(primary ? 'arrow-right' : item.icon, primary ? c.buttonText : c.buttonTextSecondary, 16)}
+    {icon(primary ? 'arrow-right' : item.icon, primary ? c.buttonIcon : c.buttonIconSecondary, 16)}
     <Text style={{color: primary ? c.buttonText : c.buttonTextSecondary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
   </Pressable>;
   const cards = [
@@ -137,6 +138,7 @@ export default function ManagerOverview({navigation}) {
       canReadOrders,
       true,
       history,
+      'closed-sales',
     ],
     [
       [t?.('configs', 'metric', 'orders'), selectedPeriod.suffix].filter(Boolean).join(' '),
@@ -148,6 +150,7 @@ export default function ManagerOverview({navigation}) {
       canReadOrders,
       false,
       history,
+      'period-orders',
     ],
     [
       t?.('configs', 'metric', 'in_progress'),
@@ -159,6 +162,7 @@ export default function ManagerOverview({navigation}) {
       canReadOrders,
       false,
       history,
+      'open-orders',
     ],
     [
       t?.('configs', 'metric', 'clients') || t?.('menu', 'menu', 'clients'),
@@ -170,8 +174,29 @@ export default function ManagerOverview({navigation}) {
       canReadClients,
       false,
       clients,
+      'clients',
     ],
   ];
+  // Labels may arrive after the company/theme. Queue through the existing translator
+  // before hiding the incomplete presentation; keep all data hooks above this gate.
+  const essentialTexts = [
+    ...periods.map(option => option.label), t?.('configs','label','period'),
+    t?.('configs','metric','closed_sales'), t?.('configs','metric','orders'),
+    t?.('configs','metric','in_progress'), cards[3][0],
+  ];
+  const textsReady=essentialTexts.every(value=>typeof value==='string' && value.trim());
+  const [translationAttempt,setTranslationAttempt]=useState(0);
+  const [translationsSettled,setTranslationsSettled]=useState(false);
+  useEffect(()=>{
+    if(textsReady)return;
+    let current=true;setTranslationsSettled(false);
+    Promise.resolve().then(()=>global.t?.scheduleQueuedTranslateResolution?.()).catch(()=>{}).finally(()=>{if(current)setTranslationsSettled(true);});
+    return()=>{current=false;};
+  },[textsReady,companyId,translationAttempt]);
+  if(!companyId || !items.length)return null; // Shell owns context recovery and empty-access messaging.
+  if(!textsReady)return <ManagerStartup accessibilityLabel="Preparando a Home" busy={!translationsSettled}
+    message={translationsSettled?'Alguns textos da Home ainda não estão disponíveis.':'Preparando os textos da Home…'}
+    onRetry={translationsSettled?()=>setTranslationAttempt(value=>value+1):undefined}/>;
   return <ScrollView style={{backgroundColor: c.pageBackground}} contentContainerStyle={[s.page, {paddingHorizontal: width <= 760 ? 16 : 32}]}>
     <View style={[s.hero, width <= 760 && {flexDirection: 'column'}]}>
       <View style={{flex: 1}}><Text accessibilityRole="header" style={[s.title, {color: c.textPrimary}]}>Olá, {firstName}</Text></View>
@@ -193,20 +218,20 @@ export default function ManagerOverview({navigation}) {
         </Pressable>
       </View>
     </View>
-    <View style={s.metrics}>{cards.map(([label, value, help, glyph, scope, error, allowed, money, destination]) => <View key={label}
+    <View style={s.metrics}>{cards.map(([label, value, help, glyph, scope, error, allowed, money, destination, id]) => <View key={id} testID={`manager-metric-${id}`}
       style={[s.metricSlot, {width: `${100 / columns}%`}]}>
-      <Pressable accessibilityRole={destination ? "button" : undefined} accessibilityLabel={destination ? `Abrir ${label}` : undefined} disabled={!destination} onPress={() => go(destination)} style={[s.metric, width <= 760 && s.metricMobile, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
-      <View style={s.between}><Text style={[s.label, {color: c.textSecondary}]}>{label}</Text>
-        <View style={[s.puck, {backgroundColor: c.cardIconBackground}]}>{icon(glyph, c.cardIconColor)}</View></View>
-      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.cardText}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
-      <Text style={[s.help, {color: c.textMuted}]}>{help}</Text>
-      <Text style={[s.scope, {color: c.textSecondary}]}>{scope}</Text>
-      <Text style={[s.help, {color: c.textMuted}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !allowed ? t?.('configs', 'message', 'no_access_profile') : error || (value === undefined ? t?.('configs', 'message', 'loading') : t?.('configs', 'message', 'api_data'))}</Text>
+      <Pressable accessibilityRole={destination ? "button" : undefined} accessibilityLabel={destination ? `Abrir ${label}` : undefined} disabled={!destination} onPress={() => go(destination)} style={[s.metric, width <= 760 && s.metricMobile, {backgroundColor: c.indicatorCardBackground, borderColor: c.indicatorCardBorder}]}>
+      <View style={s.between}><Text style={[s.label, {color: c.indicatorCardSecondaryText}]}>{label}</Text>
+        <View style={[s.puck, {backgroundColor: c.indicatorCardIconBackground}]}>{icon(glyph, c.indicatorCardIconColor)}</View></View>
+      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.indicatorCardText}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
+      <Text style={[s.help, {color: c.indicatorCardMutedText}]}>{help}</Text>
+      <Text style={[s.scope, {color: c.indicatorCardSecondaryText}]}>{scope}</Text>
+      <Text style={[s.help, {color: c.indicatorCardMutedText}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !allowed ? t?.('configs', 'message', 'no_access_profile') : error || (value === undefined ? t?.('configs', 'message', 'loading') : t?.('configs', 'message', 'api_data'))}</Text>
       </Pressable>
     </View>)}</View>
-    {results && <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'button_title', 'results') || results?.title} onPress={() => go(results)} style={[s.results, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.cardText}]}>{t?.('configs', 'button_title', 'results') || results?.title}</Text><Text style={[s.sub, {color: c.textSecondary}]}>{t?.('configs', 'section_title', 'resultsDescription')}</Text></View>{icon('arrow-right', c.cardText)}</Pressable>}
+    {results && <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'button_title', 'results') || results?.title} onPress={() => go(results)} style={[s.results, {backgroundColor: c.indicatorCardBackground, borderColor: c.indicatorCardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.indicatorCardText}]}>{t?.('configs', 'button_title', 'results') || results?.title}</Text><Text style={[s.sub, {color: c.indicatorCardSecondaryText}]}>{t?.('configs', 'section_title', 'resultsDescription')}</Text></View>{icon('arrow-right', c.indicatorCardText)}</Pressable>}
     <View style={[s.panels, width <= 1060 && {flexDirection: 'column'}]}>
-      <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
+      <View testID="manager-orders-movement" style={[s.panel, width <= 1060 && s.stackedPanel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Movimento de pedidos</Text>
         <Text style={[s.sub, {color: c.textSecondary}]}>Período selecionado: {selectedPeriod.label}.</Text>
         {!companyId || !canReadOrders || live.salesError || !Array.isArray(live.series) || !live.series.length ?
@@ -222,13 +247,13 @@ export default function ManagerOverview({navigation}) {
           />}
 
       </View>
-      <View style={[s.panel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
+      <View testID="manager-quick-access" style={[s.panel, width <= 1060 && s.stackedPanel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Acesso rápido</Text>
         <Text style={[s.sub, {color: c.textSecondary}]}>Suas ferramentas de gestão e configuração.</Text>
         <View style={s.quick}>{(quick.length ? quick : items.slice(0, 6)).map((item, i) => <Pressable key={item.id || i}
           accessibilityRole="button" onPress={() => go(item)} style={({hovered}) => [s.quickItem,
             {borderColor: c.listItemBorder, backgroundColor: hovered ? c.listItemActiveBackground : c.listItemBackground}]}>
-          <View style={[s.quickIcon, {backgroundColor:c.cardIconBackground}]}>{icon(item.icon,c.cardIconColor,17)}</View><Text style={{color: c.listItemText, fontWeight: '600', fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.listItemSubtitleText, 14)}
+          <View style={[s.quickIcon, {backgroundColor:c.iconBackground}]}>{icon(item.icon,c.listItemIcon,17)}</View><Text style={{color: c.listItemText, fontWeight: '600', fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.listItemIcon, 14)}
         </Pressable>)}</View>
       </View>
     </View>
@@ -263,6 +288,7 @@ const s = StyleSheet.create({
   value: {fontSize: 23, fontWeight: '700', marginTop: 15}, help: {fontSize: 11, marginTop: 7},
   results: {borderWidth: 1, borderRadius: 14, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 22},
   panels: {flexDirection: 'row', gap: 18, marginBottom: 26}, panel: {flex: 1, borderWidth: 1, borderRadius: 16, padding: 20},
+  stackedPanel: {flexGrow:0,flexShrink:0,flexBasis:'auto'},
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
   quickIcon: {width:32,height:32,borderRadius:9,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 16},

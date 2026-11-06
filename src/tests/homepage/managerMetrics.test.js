@@ -1,6 +1,7 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import ManagerOverview from '../../components/manager-preview/ManagerOverview';
+import {overviewTranslation} from './fixtures/overviewTranslations';
 let mockCompany = {id: 9, alias: 'GYROS'};
 let mockHistory;
 const mockProducts = {getPurchasingSuggestion: jest.fn(async () => [{product_id: 1}])};
@@ -30,11 +31,14 @@ const screen = () => <ManagerOverview navigation={navigation} />;
 const choose = (tree, label) => tree.root.findAllByType('Pressable').find(node => node.props.accessibilityLabel === label).props.onPress();
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
+  global.t={t:overviewTranslation};
   mockCompany = {id: 9, alias: 'GYROS'};
   mockOrders.read.mockClear(); mockProducts.getPurchasingSuggestion.mockClear();
   mockHistory = async ({query}) => ({totalItems: query['status.realStatus'] === 'open' ? 4 : query.orderType === 'sale' ? 1079 : 1199,
     summary: {sales: {totals: {revenue: 3210, orders: 123, averageTicket: 26.09}}}});
 });
+
+afterEach(()=>{delete global.t;});
 
 it('uses company-scoped API totals without querying the removed stock card', async () => {
   let tree; await act(async () => {tree = renderer.create(screen());});
