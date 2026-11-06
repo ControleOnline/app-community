@@ -278,10 +278,6 @@ jobs:
             app_domain: https://manager.controleonline.com
             track: internal
             release_status: completed
-          - display_name: Menu
-            app_domain: https://menu.controleonline.com
-            track: internal
-            release_status: completed
           - display_name: PDV
             app_domain: https://pos.controleonline.com
             track: internal
