@@ -46,14 +46,14 @@ it('shows a static identity when there is only one company',()=>{
  act(()=>tree.unmount());
 });
 
-it('keeps the borderless logo at its original size with the name and arrow in the same row',()=>{
+it('stacks the logo above the company name and arrow',()=>{
  const tree=render({mode:'header'});
  expect(tree.root.findAllByProps({testID:'manager-company-name-border'})).toHaveLength(0);
- expect(tree.root.findByType('Brand').parent.props.style).toMatchObject({flexDirection:'row',gap:12});
+ expect(tree.root.findByType('Brand').parent.props.style).toMatchObject({flexDirection:'column',gap:4});
  expect(tree.root.findByType('CompanyName').props).toMatchObject({label:'GYROS',dense:true,small:true,complete:true});
  const arrow=tree.root.findByProps({testID:'manager-company-chevron'});
- expect(arrow.parent).toBe(tree.root.findByType('Brand').parent);
- expect(arrow.parent.props.style.alignItems).toBe('center');
+ // Name + chevron share a row under the logo
+ expect(arrow.parent.props.style).toMatchObject({flexDirection:'row',alignItems:'center'});
  expect(tree.root.findByType('Brand').props).toMatchObject({homeSize:40,homeWidth:47});
  expect(arrow.parent.findAllByType('CompanyName')).toHaveLength(1);
  act(()=>trigger(tree).props.onPress());

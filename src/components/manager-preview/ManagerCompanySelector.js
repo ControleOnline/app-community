@@ -24,14 +24,16 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
   const dense = mode === 'header';
   const iconOnly = compact && !dense;
   const content = isLogo
-    ? <View style={{...s.logoStack,...(mobile && width<=360?{gap:4}:{})}} onLayout={event=>setHeaderWidth(Math.round(event.nativeEvent.layout.width))}>
+    ? <View style={{...s.logoStack,...(mobile && width<=360?{gap:2}:{})}} onLayout={event=>setHeaderWidth(Math.round(event.nativeEvent.layout.width))}>
         <ManagerBrand colors={c} home homeSize={40} homeWidth={mobile?Math.min(64,Math.max(32,Math.round(headerWidth*.28))):80} textColor={c.headerText} compact subtitle={false} />
-        <View style={s.logoCaption}>
-          <CompanyName key={`${label}-${mobile}`} label={label} color={c.selectText} dense small={mobile} complete />
+        <View style={s.logoCaptionRow}>
+          <View style={s.logoCaption}>
+            <CompanyName key={`${label}-${mobile}`} label={label} color={c.selectText} dense small={mobile} complete />
+          </View>
+          {canSwitch && <View testID="manager-company-chevron" style={s.logoChevron}>
+            <HomeIcon name="chevron-down" size={12} color={c.selectIcon} />
+          </View>}
         </View>
-        {canSwitch && <View testID="manager-company-chevron" style={s.logoChevron}>
-          <HomeIcon name="chevron-down" size={12} color={c.selectIcon} />
-        </View>}
       </View>
     : <ManagerBrand colors={c} textColor={c.selectText} compact={iconOnly} dense={dense} small={dense && mobile} subtitle={false}
         trailing={canSwitch && !iconOnly ? <View style={[s.chevron,dense && {width:12}]}><HomeIcon name="chevron-down" size={dense?12:18} color={c.selectIcon} /></View> : null} />;
@@ -86,7 +88,8 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
 const s = StyleSheet.create({
   trigger: {minHeight: 64, padding: 10, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8},
   logoTrigger: {minHeight: 44, minWidth: 0, width: '100%', maxWidth: 240, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4},
-  logoStack: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, width: '100%', minWidth: 0},
+  logoStack: {flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, width: '100%', minWidth: 0},
+  logoCaptionRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, maxWidth: '100%', minWidth: 0},
   logoCaption: {flexShrink: 1, minWidth: 0, alignItems: 'center'},
   logoChevron: {flexShrink: 0, width: 12, height: 12, alignItems: 'center', justifyContent: 'center'},
   compact: {padding: 6, justifyContent: 'center'},

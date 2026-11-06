@@ -1,18 +1,18 @@
 {
-  "version": "1.10.134",
-  "rc": 4,
-  "branch": "rc/1.10.134-rc.4",
-  "baseMaster": "68a68bd4a891a115297e97424000e8b20f01efea",
+  "version": "1.10.135",
+  "rc": 2,
+  "branch": "rc/1.10.135-rc.2",
+  "baseMaster": "05476ede506c584c4686ae72a6871107653e2395",
   "tasks": [
-    1370
+    1379
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "8c40e31f01de35d1e1288105ad61c00d576aa2bf"
+    "ControleOnline/app-community": "03a1e408bd7aaede9f6664dadd23da17c4043115"
   },
   "validation": {
-    "scope": "deploy.yml: remove Menu block from Android matrix.",
+    "scope": "android-deploy-lavego-shop.yml: Play track internal -> production.",
     "checks": "diff review"
   }
 }
