@@ -1,18 +1,18 @@
 {
   "version": "1.10.134",
-  "rc": 3,
-  "branch": "rc/1.10.134-rc.3",
-  "baseMaster": "e65040b5e9fd1f4bccb3a1db3e488e4ce1258535",
+  "rc": 4,
+  "branch": "rc/1.10.134-rc.4",
+  "baseMaster": "68a68bd4a891a115297e97424000e8b20f01efea",
   "tasks": [
-    1365
+    1370
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "dcc0c5e43e8dec3ed2edf13909cb16d323ae54fb"
+    "ControleOnline/app-community": "8c40e31f01de35d1e1288105ad61c00d576aa2bf"
   },
   "validation": {
-    "scope": "deploy.yml: remove publish_play false from Menu matrix block.",
+    "scope": "deploy.yml: remove Menu block from Android matrix.",
     "checks": "diff review"
   }
 }
