@@ -8,10 +8,10 @@ export const themeFieldValue = (colors,token,mode) => {
   if(Object.hasOwn(colors,`${token}-light`) || Object.hasOwn(colors,`${token}-dark`))return colors[themeColorKey(token,mode)] ?? '';
   return colors[token] ?? '';
 };
-export const themeFieldLabel = token => {
-  if(contract.variants?.[token])return `${token} · ${contract.variants[token].label}`;
+export const themeFieldLabel = (token,translate=value=>value) => {
+  if(contract.variants?.[token])return `${token} · ${translate(contract.variants[token].label)}`;
   const variant=token.includes('Secondary')?'Secundário':token.startsWith('button')?'Primário':'';
-  return variant ? `${token} · ${variant}` : token;
+  return variant ? `${token} · ${translate(variant)}` : token;
 };
 export const validThemeValue = (token,value) => {
   if(value==='')return true;
