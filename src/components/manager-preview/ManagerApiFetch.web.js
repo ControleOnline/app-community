@@ -1,4 +1,4 @@
-import originalFetch from '../../../node_modules/@controleonline/ui-common/src/api/fetch';
+import originalFetch from '../../session/ScopedApiFetch';
 import {env} from '@env';
 import {managerPreviewEnabled} from './model';
 import resolvePreviewApiUrl from '../../../scripts/lib/manager-api-url.cjs';

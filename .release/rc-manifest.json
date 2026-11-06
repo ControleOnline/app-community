@@ -1,17 +1,18 @@
 {
-  "version": "1.10.116",
-  "rc": 1,
-  "branch": "rc/1.10.116-rc.1",
-  "baseMaster": "ed2219aa8923ce1afd41f8fc878ccb44703f10cf",
+  "version": "1.10.134",
+  "rc": 4,
+  "branch": "rc/1.10.134-rc.4",
+  "baseMaster": "68a68bd4a891a115297e97424000e8b20f01efea",
   "tasks": [
-    1322
+    1370
   ],
+  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "71ca49bc3dca94268ac0315567dc57b31ddf5c05"
+    "ControleOnline/app-community": "8c40e31f01de35d1e1288105ad61c00d576aa2bf"
   },
-  "packages": {
-    "@controleonline/ui-common": "1.2.114",
-    "@controleonline/ui-crm": "1.0.58"
+  "validation": {
+    "scope": "deploy.yml: remove Menu block from Android matrix.",
+    "checks": "diff review"
   }
 }

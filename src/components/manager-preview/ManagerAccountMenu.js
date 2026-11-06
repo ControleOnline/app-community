@@ -2,8 +2,9 @@ import React from 'react';
 import {Modal, Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets} from 'react-native-safe-area-context';
 import HomeIcon from '../HomeIcon';
+import ScreenThemeBoundary from '../theme-editor/ScreenThemeBoundary';
 
-function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, onProfile, onHelp, onTheme, onLogout, bottomBar, onBarSession, onBarRemember}) {
+function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, onProfile, onHelp, onTheme, onThemeEditor, onLogout, bottomBar, onBarSession, onBarRemember}) {
   // A native Modal has its own window; activity insets may exclude its system bars.
   const insets = useSafeAreaInsets();
   const frame = useSafeAreaFrame();
@@ -17,7 +18,7 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
   } : anchor === 'sidebar' ? {left: insets.left + 12, bottom}
     : {right: insets.right + 20, top};
   const option = (label, icon, action) => <Pressable key={label} accessibilityRole="menuitem" accessibilityLabel={label}
-    onPress={action} style={({hovered, pressed}) => [s.option, {backgroundColor: hovered || pressed ? c.menuActiveBackground : 'transparent'}]}>
+    onPress={action} style={({hovered, pressed}) => [s.option, {backgroundColor: hovered || pressed ? c.menuActiveBackground : c.containerTransparentBackground}]}>
     {({hovered, pressed}) => {
       const highlighted = hovered || pressed;
       return <><HomeIcon name={icon} size={18} color={highlighted ? c.menuActiveIcon : c.menuIcon} />
@@ -32,6 +33,7 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
       {canOpenProfile && option(global.t?.t('configs', 'menu', 'my_profile') || global.t?.t('menu', 'menu', 'my_profile'), 'user', onProfile)}
       {onHelp && option(global.t?.t('configs', 'menu', 'manager_help') || global.t?.t('menu', 'menu', 'manager_help'), 'help-circle', onHelp)}
       {option(mode === 'light' ? (global.t?.t('configs', 'menu', 'use_dark_theme') || global.t?.t('menu', 'menu', 'use_dark_theme')) : (global.t?.t('configs', 'menu', 'use_light_theme') || global.t?.t('menu', 'menu', 'use_light_theme')), mode === 'light' ? 'moon' : 'sun', onTheme)}
+      {onThemeEditor && option('Configurar temas', 'sliders', onThemeEditor)}
       {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.menuBorder}]}>
         <Text style={[s.barTitle, {color: c.textSecondary}]}>{global.t?.t('configs', 'section_title', 'shortcut_bar')}</Text>
         {option(bottomBar.visible ? 'Ocultar nesta sessão' : 'Mostrar nesta sessão', 'layout', onBarSession)}
@@ -47,11 +49,13 @@ export default function ManagerAccountMenu(props) {
   if (!props.anchor) return null;
   return <Modal transparent visible animationType="fade" onRequestClose={props.onClose}>
     <SafeAreaProvider style={s.layer}>
-      <View style={s.layer}>
+      <ScreenThemeBoundary screen={props.screen}>
+      <View style={s.layer} dataSet={{coThemeEditorHost:'true'}}>
         <Pressable accessibilityRole="button" accessibilityLabel="Fechar opções do usuário" onPress={props.onClose}
           style={[StyleSheet.absoluteFill, {backgroundColor: props.colors.overlayBackground}]} />
         <AccountPanel {...props} />
       </View>
+      </ScreenThemeBoundary>
     </SafeAreaProvider>
   </Modal>;
 }

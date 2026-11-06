@@ -7,7 +7,7 @@ const mockSelect = jest.fn();
 jest.mock('react-native', () => ({Modal:'Modal',Pressable:'Pressable',ScrollView:'ScrollView',Text:'Text',View:'View',StyleSheet:{create:x=>x,absoluteFill:{}},useWindowDimensions:()=>({width:mockWidth,height:875})}));
 jest.mock('react-native-safe-area-context',()=>({useSafeAreaInsets:()=>({top:0,bottom:24})}));
 jest.mock('../../components/HomeIcon',()=> 'Icon');
-jest.mock('../../components/manager-preview/ManagerBrand',()=> 'Brand');
+jest.mock('../../components/manager-preview/ManagerBrand',()=> ({__esModule:true,default:'Brand',CompanyName:'CompanyName'}));
 jest.mock('../../components/manager-preview/ManagerCompanyLogo',()=> 'Avatar');
 jest.mock('@store',()=>({useStore:()=>({getters:{companies:mockCompanies,currentCompany:mockCompanies[0]},actions:{setCurrentCompany:mockSelect}})}));
 beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=400;mockSelect.mockClear();mockCompanies=[{id:1,alias:'GYROS'},{id:2,alias:'Empresa com nome muito comprido — unidade centro'},{id:3,name:'Indisponível',enabled:false}];});
@@ -43,5 +43,27 @@ it('shows a static identity when there is only one company',()=>{
  mockCompanies=mockCompanies.slice(0,1);const tree=render();
  expect(tree.root.findAllByProps({testID:'manager-company-trigger'})).toHaveLength(0);
  expect(tree.root.findByType('Brand').props).toMatchObject({subtitle:false});
+ act(()=>tree.unmount());
+});
+
+it('keeps the borderless logo at its original size with the name and arrow in the same row',()=>{
+ const tree=render({mode:'header'});
+ expect(tree.root.findAllByProps({testID:'manager-company-name-border'})).toHaveLength(0);
+ expect(tree.root.findByType('Brand').parent.props.style).toMatchObject({flexDirection:'row',gap:12});
+ expect(tree.root.findByType('CompanyName').props).toMatchObject({label:'GYROS',dense:true,small:true,complete:true});
+ const arrow=tree.root.findByProps({testID:'manager-company-chevron'});
+ expect(arrow.parent).toBe(tree.root.findByType('Brand').parent);
+ expect(arrow.parent.props.style.alignItems).toBe('center');
+ expect(tree.root.findByType('Brand').props).toMatchObject({homeSize:40,homeWidth:47});
+ expect(arrow.parent.findAllByType('CompanyName')).toHaveLength(1);
+ act(()=>trigger(tree).props.onPress());
+ expect(tree.root.findByType('Modal').props.visible).toBe(true);
+ act(()=>tree.unmount());
+});
+it('keeps the desktop logo legible and hides the arrow for a single company',()=>{
+ mockWidth=1200;mockCompanies=mockCompanies.slice(0,1);
+ const tree=render({mode:'header'});
+ expect(tree.root.findByType('Brand').props.homeSize).toBe(40);
+ expect(tree.root.findAllByProps({testID:'manager-company-chevron'})).toHaveLength(0);
  act(()=>tree.unmount());
 });

@@ -13,6 +13,7 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!@controleonline/)'],
   moduleNameMapper: {
+    ...Object.fromEntries(Object.entries(require('./scripts/lib/theme-original-modules.cjs')).map(([name,parts])=>['^'+name+'$',moduleRoot+'/'+parts.join('/')])),
     '^@expo/vector-icons$': require.resolve('@expo/vector-icons', {paths: [path.dirname(require.resolve('expo/package.json'))]}),
     '^@controleonline/(ui-orders|ui-products|ui-default)/(.*)$': `${moduleRoot}/$1/$2`,
     '^@controleonline/../../src/(.*)$': '<rootDir>/src/$1',
