@@ -1,0 +1,32 @@
+import React from 'react';
+import renderer, {act} from 'react-test-renderer';
+import ManagerPreviewProvider, {useManagerPreview} from '../../components/manager-preview/ManagerPreviewProvider';
+let mockLogged = true;
+let mockUser = 'admin-1';
+jest.mock('@store',()=>({useStore:name=>({getters:name==='auth'?{isLogged:mockLogged,user:{id:mockUser}}:name==='theme'?{colors:{}}:name==='people'?{currentCompany:{id:5}}:{item:{}}})}));
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({status:'loading',mode:'light'}),setThemeMode:jest.fn()}));
+jest.mock('../../components/manager-preview/model',()=>({managerPreviewEnabled:true,previewPalette:()=>({})}));
+jest.mock('@experimental-avatar',()=>({useAvatarRuntime:()=>({})}));
+jest.mock('../../components/manager-preview/useExperienceRuntime',()=>()=>({}));
+jest.mock('../../components/manager-preview/ManagerCatalogImageCache',()=>({children})=>children);
+jest.mock('@controleonline/ui-common/src/react/hooks/useBottomNavigationPreference',()=>()=>({}));
+jest.mock('@appType',()=>({app_type:'MANAGER'}));
+jest.mock('@controleonline/ui-common/src/react/config/deviceConfigBootstrap',()=>({isPosSingleItemMode:()=>false}));
+function Probe(){return <menu-state value={useManagerPreview().mobileMenu}/>;}
+it('retains the rail between screens and resets it when the login changes',()=>{
+ global.IS_REACT_ACT_ENVIRONMENT=true;mockLogged=true;mockUser='admin-1';let tree;
+ const view=key=><ManagerPreviewProvider><Probe key={key}/></ManagerPreviewProvider>;
+ act(()=>{tree=renderer.create(view('home'));});
+ const menu=()=>tree.root.findByType('menu-state').props.value;
+ expect(menu()).toMatchObject({visible:false,hint:true});
+ act(()=>menu().toggle());
+ act(()=>tree.update(view('clients')));
+ expect(menu()).toMatchObject({visible:true,hint:false});
+ act(()=>menu().dismissHint());expect(menu().visible).toBe(true);
+ mockLogged=false;act(()=>tree.update(view('logout')));
+ mockLogged=true;act(()=>tree.update(view('login')));
+ expect(menu()).toMatchObject({visible:false,hint:true});
+ act(()=>menu().toggle());mockUser='admin-2';act(()=>tree.update(view('other-user')));
+ expect(menu()).toMatchObject({visible:false,hint:true});
+ act(()=>tree.unmount());
+});

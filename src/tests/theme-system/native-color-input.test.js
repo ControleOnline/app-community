@@ -1,0 +1,21 @@
+import React from 'react';
+import renderer,{act} from 'react-test-renderer';
+import NativeColorInput from '../../components/theme-editor/NativeColorInput.web';
+test('the native picker owns its value while open, coalesces input events and flushes the final color on blur',async()=>{
+ const frames=new Map();let id=0;global.requestAnimationFrame=fn=>{frames.set(++id,fn);return id;};global.cancelAnimationFrame=key=>frames.delete(key);
+ const change=jest.fn();let tree;
+ await act(async()=>{tree=renderer.create(<NativeColorInput value="#ffffff" onColor={change} label="Cor"/>);});
+ const input=()=>tree.root.findByType('input');
+ expect(input().props.value).toBeUndefined();expect(input().props.defaultValue).toBe('#ffffff');
+ await act(async()=>{input().props.onFocus();input().props.onInput({currentTarget:{value:'#123456'}});input().props.onInput({currentTarget:{value:'#abcdef'}});});
+ await act(async()=>tree.update(<NativeColorInput value="#000000" onColor={change} label="Cor"/>));
+ expect(input().props.defaultValue).toBe('#ffffff');
+ expect(frames.size).toBe(1);expect(change).not.toHaveBeenCalled();
+ await act(async()=>{const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn());});
+ expect(change).toHaveBeenCalledTimes(1);expect(change).toHaveBeenLastCalledWith('#abcdef');
+ await act(async()=>{input().props.onInput({currentTarget:{value:'#654321'}});input().props.onBlur();});
+ expect(change).toHaveBeenLastCalledWith('#654321');expect(frames.size).toBe(0);
+ const stopPropagation=jest.fn();input().props.onKeyDown({key:'Escape',stopPropagation});expect(stopPropagation).toHaveBeenCalled();
+ await act(async()=>input().props.onInput({currentTarget:{value:'#000000'}}));
+ expect(frames.size).toBe(1);await act(async()=>tree.unmount());expect(frames.size).toBe(0);delete global.requestAnimationFrame;delete global.cancelAnimationFrame;
+});

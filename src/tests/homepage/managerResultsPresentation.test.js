@@ -46,3 +46,11 @@ it('hides only its page title when the shared layout owns it',()=>{
  expect(presentation.styles.pageTitle.display).toBe('none');
  act(()=>tree.unmount());
 });
+it('isolates monthly summary colors from indicator and default surfaces without changing the report layout',()=>{
+ const c=resolveManagerTheme({...theme.colors,'indicatorCardBackground-light':'#123456','summaryCardBackground-light':'#654321','summaryCardText-light':'#abcdef','summaryCardSecondaryText-light':'#fedcba'},'light');
+ const styles=managerResultsStyles(c);
+ expect(styles.monthCard.backgroundColor).toBe('#654321');expect(styles.metricBox.backgroundColor).toBe('#654321');
+ expect(styles.monthTitle.color).toBe('#abcdef');expect(styles.metricLabel.color).toBe('#fedcba');
+ expect(styles.filterCard.backgroundColor).toBe(c.cardBackground);expect(styles.filterCard.backgroundColor).not.toBe('#123456');
+ expect(styles.monthCard.borderRadius).toBe(14);expect(styles.metricBox.marginBottom).toBe(14);
+});

@@ -22,6 +22,19 @@ Regras:
 - se o mesmo papel visual aparecer em vários modulos, o token deve continuar sendo o mesmo
 - se o papel visual for diferente, parar a execução e perguntar.
 
+Variações por finalidade:
+- variações continuam neste contrato e em `theme.colors`, sem vínculo novo no banco
+- uma variação sem valor próprio herda o token base no mesmo modo; nenhum valor é gravado automaticamente
+- editar uma variação afeta todos os componentes que usam essa finalidade, e não o padrão compartilhado
+- os metadados `base`, `variant`, `label` e `usage` abaixo definem a herança e o alcance exibido pelo editor
+
+Escopo por tela no navegador:
+- o inspetor oferece “Só nesta tela” e “Em todas as telas” para os mesmos tokens canônicos
+- “Só nesta tela” usa a identidade estável do tipo de app, nome da rota e store; não usa URL, idioma, ID de registro, filtros ou paginação
+- as personalizações são chaves de transporte `screen_<identidade codificada>__<token>-light/dark` no mesmo `theme.colors`; não são novos tokens globais
+- valor local vazio herda o global no mesmo modo; editar o global preserva cores locais explícitas
+- as definições por tela não mudam permissões nem vínculos; apenas a interface local atualizada interpreta esse escopo
+
 ### MAPA DE OBJETOS
 
 Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
@@ -102,6 +115,19 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `cardSelectedText`
 - `cardShadow`
 - `cardText`
+- `indicatorCardBackground` <!-- base: cardBackground; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardBorder` <!-- base: cardBorder; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardText` <!-- base: cardText; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardSecondaryText` <!-- base: textSecondary; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardMutedText` <!-- base: textMuted; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardIconBackground` <!-- base: cardIconBackground; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `indicatorCardIconColor` <!-- base: cardIconColor; variant: indicator; label: Cards de indicadores; usage: Indicadores e faixa de resultados da Home -->
+- `summaryCardBackground` <!-- base: cardBackground; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
+- `summaryCardBorder` <!-- base: cardBorder; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
+- `summaryCardText` <!-- base: textPrimary; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
+- `summaryCardSecondaryText` <!-- base: textMuted; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
+- `summaryCardSuccessText` <!-- base: textSuccess; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
+- `summaryCardDangerText` <!-- base: textDanger; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
 
 ### checkbox
 
@@ -371,3 +397,13 @@ valor (exemplo: `cardBackground-light`, `cardBackground-dark`). O consumidor
 remove o sufixo ao selecionar o modo; componentes continuam referenciando
 `cardBackground`. Nenhum prefixo por empresa, módulo ou tela é necessário.
 Temas legados sem entradas por modo conservam seu contrato de leitura existente.
+
+
+### Contrato consumido pelo aplicativo
+
+- `scripts/generate-theme-contract.cjs` deriva os grupos e nomes deste Markdown.
+- `src/styles/themeContract.generated.js` é um resultado automático; não deve ser editado manualmente.
+- Claro e escuro usam as variantes `-light` e `-dark`; primário e secundário descrevem o papel do objeto, não o modo.
+- Rótulos de apresentação já existentes, incluindo Tokens Base e Google loading, permanecem no editor. Não são novos nomes canônicos de cor.
+- O preview Google loading utiliza o papel oficial `loadingSpinner`. Valores legados existentes no banco são preservados.
+- O editor, a validação e o inspetor consomem o mesmo contrato. Os valores permanecem no tema do banco.

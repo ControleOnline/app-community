@@ -5,12 +5,13 @@ import {useStore} from '@store';
 import {isCompanySelectable} from '@controleonline/ui-people/src/react/utils/currentCompanySelection';
 import ManagerCompanyLogo from './ManagerCompanyLogo';
 import HomeIcon from '../HomeIcon';
-import ManagerBrand from './ManagerBrand';
+import ManagerBrand, {CompanyName} from './ManagerBrand';
 
 export default function ManagerCompanySelector({colors: c, compact = false, mode = 'sidebar'}) {
   const people = useStore('people');
   const {currentCompany, mainCompany, companies: availableCompanies} = people.getters;
   const companies = Array.isArray(availableCompanies) ? availableCompanies : [];
+  const [headerWidth,setHeaderWidth]=useState(168);
   const [open, setOpen] = useState(false);
   const {width, height} = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -19,17 +20,24 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
   const company = currentCompany?.id ? currentCompany : mainCompany;
   const label = company?.alias || company?.name || 'Empresa';
   const close = () => setOpen(false);
-  const isLogo = mode === 'logo';
+  const isLogo = mode === 'logo' || mode === 'header';
+  const dense = mode === 'header';
+  const iconOnly = compact && !dense;
   const content = isLogo
-    ? <View style={s.logoStack}>
-        <ManagerBrand colors={c} home homeSize={40} homeWidth={80} textColor={c.headerText || c.selectText} compact subtitle={false} />
-        <Text numberOfLines={1} style={[s.logoAlias, {color: c.headerText || c.textMuted || c.selectText}]}>{label}</Text>
+    ? <View style={{...s.logoStack,...(mobile && width<=360?{gap:4}:{})}} onLayout={event=>setHeaderWidth(Math.round(event.nativeEvent.layout.width))}>
+        <ManagerBrand colors={c} home homeSize={40} homeWidth={mobile?Math.min(64,Math.max(32,Math.round(headerWidth*.28))):80} textColor={c.headerText} compact subtitle={false} />
+        <View style={s.logoCaption}>
+          <CompanyName key={`${label}-${mobile}`} label={label} color={c.selectText} dense small={mobile} complete />
+        </View>
+        {canSwitch && <View testID="manager-company-chevron" style={s.logoChevron}>
+          <HomeIcon name="chevron-down" size={12} color={c.selectIcon} />
+        </View>}
       </View>
-    : <ManagerBrand colors={c} textColor={c.selectText} compact={compact} subtitle={false}
-        trailing={canSwitch && !compact ? <View style={s.chevron}><HomeIcon name="chevron-down" size={18} color={c.selectIcon} /></View> : null} />;
+    : <ManagerBrand colors={c} textColor={c.selectText} compact={iconOnly} dense={dense} small={dense && mobile} subtitle={false}
+        trailing={canSwitch && !iconOnly ? <View style={[s.chevron,dense && {width:12}]}><HomeIcon name="chevron-down" size={dense?12:18} color={c.selectIcon} /></View> : null} />;
   const triggerStyle = isLogo
     ? [s.logoTrigger]
-    : [s.trigger, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.compact];
+    : [s.trigger, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, iconOnly && s.compact, dense && s.dense, dense && mobile && {minHeight:32}];
   return <>
     {canSwitch ? <Pressable testID="manager-company-trigger" accessibilityRole="button"
       accessibilityLabel={`Selecionar empresa. Atual: ${label}`} accessibilityState={{expanded: open}}
@@ -77,10 +85,12 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
 
 const s = StyleSheet.create({
   trigger: {minHeight: 64, padding: 10, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8},
-  logoTrigger: {minHeight: 56, minWidth: 96, maxWidth: 160, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4},
-  logoStack: {alignItems: 'center', justifyContent: 'center', gap: 2, maxWidth: 152},
-  logoAlias: {fontSize: 10, fontWeight: '500', lineHeight: 12, opacity: 0.72, textAlign: 'center', maxWidth: 152},
+  logoTrigger: {minHeight: 44, minWidth: 0, width: '100%', maxWidth: 240, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4},
+  logoStack: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, width: '100%', minWidth: 0},
+  logoCaption: {flexShrink: 1, minWidth: 0, alignItems: 'center'},
+  logoChevron: {flexShrink: 0, width: 12, height: 12, alignItems: 'center', justifyContent: 'center'},
   compact: {padding: 6, justifyContent: 'center'},
+  dense: {minHeight:34,paddingHorizontal:6,paddingVertical:4,borderRadius:8,width:'100%',minWidth:0},
   chevron: {width: 18, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
   modalRoot: {flex: 1, justifyContent: 'flex-end'}, desktopRoot: {justifyContent: 'center', alignItems: 'center'},
   sheet: {width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, flexShrink: 1},

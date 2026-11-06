@@ -11,22 +11,29 @@ import {DefaultTableThemeContext} from '../../../node_modules/@controleonline/ui
 import {managerTableTheme} from './managerTableTheme';
 import {getAvatarDisplayName} from '@controleonline/ui-common/src/react/utils/userAvatar';
 import ManagerCompanySelector from './ManagerCompanySelector';
+import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
+import {useThemeTools} from '../theme-editor/ThemeToolsProvider';
+import {refreshDomainTheme} from '../../styles/themeRuntime';
 import ManagerBottomNavigation from './ManagerBottomNavigation';
 import useJourneyReadiness from './useJourneyReadiness';
 import ManagerBrand from './ManagerBrand';
 import {ManagementPageTitleContext} from './ManagementPageTitleContext';
 import ManagerScreenNavigation, {goBackFromManagement} from './ManagerScreenNavigation';
+import ScreenThemeBoundary from '../theme-editor/ScreenThemeBoundary';
+import {identifyThemeScreen} from '../../styles/screenThemeKeys';
+import {resolveManagementPageTitle} from './managementPageTitle';
 
 export default function ManagerShell({navigation, route, options, children}) {
   const {width} = useWindowDimensions();
   const focused = useIsFocused();
-  const {colors: c, themeIssues = [], mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar} = useManagerPreview();
+  const {colors: c, themeIssues = [], themeStatus, themeError, mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar, mobileMenu} = useManagerPreview();
+  const themeTools=useThemeTools();
   useJourneyReadiness({experience, route: route.name, focused});
   const tableTheme = useMemo(() => managerTableTheme(c), [c]);
   const themeStore = useStore('theme');
@@ -59,6 +66,19 @@ export default function ManagerShell({navigation, route, options, children}) {
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
+  const [mobileHeaderHeight, setMobileHeaderHeight] = useState(64);
+  const [localRail, setLocalRail] = useState(false);
+  const [localHint, setLocalHint] = useState(true);
+  const longMenuPress = useRef(false);
+  const railVisible = mobileMenu ? mobileMenu.visible : localRail;
+  const menuHint = mobileMenu ? mobileMenu.hint : localHint;
+  const dismissMenuHint = () => mobileMenu ? mobileMenu.dismissHint() : setLocalHint(false);
+  const toggleMobileRail = () => {
+    longMenuPress.current = true;
+    setOpen(false);
+    if (mobileMenu) mobileMenu.toggle();
+    else {setLocalRail(value => !value); setLocalHint(false);}
+  };
   const compact = !mobile && (width <= 1060 || collapsed);
   const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
   const toolbar = managerMenu(menus, navigation.getState().routeNames, global.t?.t, 'toolbar')
@@ -66,6 +86,7 @@ export default function ManagerShell({navigation, route, options, children}) {
   if (toolbar.length) groups.push({id: 'toolbar', title: 'Mais acessos', items: toolbar});
   const items = groups.flatMap(group => group.items);
   const selected = selectedManagerMenuItem(items, route);
+  const themeScreen=identifyThemeScreen(route,app_type,selected?.title || resolveManagementPageTitle(route,options));
   const section = groups.find(group => group.items.includes(selected));
   const name = getAvatarDisplayName(user) || 'Minha conta';
   useEffect(() => {
@@ -93,17 +114,17 @@ export default function ManagerShell({navigation, route, options, children}) {
     navigation.navigate(item.name, params);
   };
   const icon = (value, size = 18, color = c.navigationIcon) => <HomeIcon name={value || 'grid'} size={size} color={color} />;
-  const navItem = (item, key) => {
+  const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
-      accessibilityState={{selected: active}} title={compact ? item.title : undefined}
+      accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => [s.navItem,
-        {backgroundColor: active ? c.navigationActiveBackground : hovered || pressed ? c.navigationActiveBackground : 'transparent',
-          borderLeftColor: active ? c.navigationActiveBorder : 'transparent'}, compact && s.center]}>
+        {backgroundColor: active ? c.navigationActiveBackground : hovered || pressed ? c.navigationActiveBackground : c.containerTransparentBackground,
+          borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground}, iconsOnly && s.center]}>
       {icon(item.icon, 18, active ? c.navigationActiveIcon : c.navigationIcon)}
-      {!compact && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
+      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
     </Pressable>;
   };
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
@@ -135,30 +156,48 @@ export default function ManagerShell({navigation, route, options, children}) {
         <Text style={{fontSize: 11, color: c.textMuted}}>Minha conta</Text></View>}
     </Pressable>
   </View>;
-  return <View  style={[s.shell, {backgroundColor: c.pageBackground}]}>
+  // Keep module instances mounted during appearance refreshes: forms and local
+  // module state must survive a company/theme loading presentation.
+  const preparingTheme=themeStatus==='idle' || themeStatus==='loading';
+  const failedTheme=themeStatus==='error';
+  const missingCompany=themeStatus==='ready' && !currentCompany?.id;
+  const preparing=preparingTheme || failedTheme || missingCompany;
+  const startup=preparingTheme
+    ? <ManagerStartup accessibilityLabel="Preparando aparência do sistema" message="Carregando a aparência do sistema…"/>
+    : failedTheme
+      ? <ManagerStartup accessibilityLabel="Falha ao carregar aparência" message="Não foi possível carregar a aparência do sistema." busy={false} error={themeError} onRetry={refreshDomainTheme}/>
+      : missingCompany
+        ? <ManagerStartup accessibilityLabel="Preparando empresa" message={recovering?'Carregando empresa e acessos…':'A empresa ainda não está disponível.'} busy={recovering} error={recoveryError} onRetry={retryContext}/>
+        : null;
+  return <ScreenThemeBoundary screen={themeScreen}>
+    {startup}
+    <View testID="manager-shell-presentation" style={[s.shell, {backgroundColor: c.pageBackground}, preparing && {display:'none'}]}>
     {!mobile && sidebar}
-    {mobile && !open && (
-      <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder}]}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Abrir menu"
-          onPress={() => setOpen(true)}
-          style={s.sidebarToggle}>
-          {icon('menu', 18, c.navigationIcon)}
-        </Pressable>
-      </View>
-    )}
     <View collapsable={false} style={s.main}>
-      <View style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
+      <View testID="manager-header" onLayout={event => {if (mobile) setMobileHeaderHeight(Math.round(event.nativeEvent.layout.height));}}
+        style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
       <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
-        <View style={[s.headerSide, s.headerLeft]}>
+        <View style={[s.headerSide, s.headerLeft,mobile && {flexGrow:0,flexShrink:0,flexBasis:'auto',gap:4}]}>
+          {mobile && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
+            accessibilityLabel="Abrir menu" accessibilityHint="Segure para mostrar ou ocultar os atalhos laterais"
+            title="Toque para abrir o menu. Segure para mostrar ou ocultar os atalhos."
+            delayLongPress={500}
+            onPressIn={() => {longMenuPress.current = false;}}
+            onLongPress={toggleMobileRail}
+            onPress={() => {
+              if (longMenuPress.current) return;
+              dismissMenuHint(); setOpen(true);
+            }}
+            style={[s.mobileMenuButton, {borderColor: c.headerBorder}]}>
+            {icon('menu', 18, c.headerIcon)}
+          </Pressable>}
           {navigation.canGoBack?.() ? (
             <Pressable
               testID="manager-header-back"
               accessibilityRole="button"
               accessibilityLabel="Voltar"
               onPress={() => goBackFromManagement(navigation, route, options?.headerBackFallback)}
-              style={s.headerIconOnly}>
+              style={[s.headerIconOnly,mobile && {width:28}]}>
               {icon('arrow-left', 18, c.headerIcon)}
             </Pressable>
           ) : null}
@@ -166,25 +205,36 @@ export default function ManagerShell({navigation, route, options, children}) {
             {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
           </Text></View>}
         </View>
-        <View style={s.homeButton} testID="manager-header-company">
-          <ManagerCompanySelector colors={c} compact mode="logo" />
+        <View style={[s.homeButton,mobile && s.mobileCompany]} testID="manager-header-company">
+          <ManagerCompanySelector colors={c} mode="header" />
         </View>
-        <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls]}>
+        <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls,mobile && {flexGrow:0,flexShrink:0,flexBasis:'auto'}]}>
           {app_type_base === 'ADMIN' && <AppTypeSwitcher colors={c} compact={mobile} />}
         </View>
       </View>
       </View>
+      {mobile && menuHint && <Text style={{fontSize:10, color:c.headerText, paddingHorizontal:12, paddingBottom:4}}>
+        Segure ☰ para mostrar ou ocultar os atalhos.
+      </Text>}
       <ManagerScreenNavigation navigation={navigation} route={route} options={options} colors={c} />
       {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
         <Text style={{color:c.textPrimary}}>{recoveryError || (!currentCompany?.id ? 'A empresa ainda não foi carregada.' : 'Nenhum menu foi carregado para este contexto.')}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:44,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
       </View>}
-      <View style={s.content}><DefaultTableThemeContext.Provider value={tableTheme}><ManagementPageTitleContext.Provider value={route.name !== 'HomePage' && !(route.name === 'DisplayDetails' && options?.headerShown === false)}>{children}</ManagementPageTitleContext.Provider></DefaultTableThemeContext.Provider></View>
+      <View style={s.mobileBody}>
+        {mobile && railVisible && <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor:c.navigationBackground, borderRightColor:c.navigationBorder}]}>
+          <ScrollView style={s.menu} contentContainerStyle={{paddingHorizontal:2,paddingVertical:4}}>
+            {navItem({name:'HomePage',title:'Início',icon:'grid'},'rail-home',true)}
+            {items.filter(item=>item.name!=='HomePage').map((item,index)=>navItem(item,`rail-${item.id || item.name}-${index}`,true))}
+          </ScrollView>
+        </View>}
+        <View style={s.content}><DefaultTableThemeContext.Provider value={tableTheme}><ManagementPageTitleContext.Provider value={route.name !== 'HomePage' && !(route.name === 'DisplayDetails' && options?.headerShown === false)}>{children}</ManagementPageTitleContext.Provider></DefaultTableThemeContext.Provider></View>
+      </View>
       {mobile && focused && bottomBar?.visible && <ManagerBottomNavigation navigation={navigation} route={route} colors={c} />}
     </View>
     {focused && !open && !accountAnchor && <ManagerGuide navigation={navigation} route={route} items={items} />}
-    {focused && <ManagerAccountMenu anchor={accountAnchor} mobile={mobile} colors={c} name={name} mode={mode}
+    {focused && <ManagerAccountMenu screen={themeScreen} anchor={accountAnchor} mobile={mobile} colors={c} name={name} mode={mode}
       canOpenProfile={canOpenProfile} onClose={closeAccount}
       bottomBar={mobile ? bottomBar : undefined}
       onBarSession={accountAction(() => bottomBar.setSessionVisible(!bottomBar.visible))}
@@ -192,12 +242,13 @@ export default function ManagerShell({navigation, route, options, children}) {
       onProfile={accountAction(() => go({name: 'ProfilePage'}))}
       onHelp={avatarEnabled ? accountAction(() => setGuideOpen(true)) : undefined}
       onTheme={accountAction(toggleMode)}
+      onThemeEditor={themeTools.available ? accountAction(themeTools.openEditor) : undefined}
       onLogout={auth.actions?.logOut ? accountAction(() => auth.actions.logOut()) : undefined} />}
-    {mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay]}>
+    {mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay, {top: mobileHeaderHeight}]}>
       <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, {backgroundColor: c.modalOverlay}]} />
       {sidebar}
     </View>}
-  </View>;
+  </View></ScreenThemeBoundary>;
 }
 
 const s = StyleSheet.create({
@@ -213,7 +264,7 @@ const s = StyleSheet.create({
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10},
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
-  mobileTop: {paddingHorizontal: 12, minHeight: 64},
+  mobileTop: {paddingHorizontal:8,minHeight:64,gap:6,justifyContent:'space-between'},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
   headerControls: {flexDirection:'row',alignItems:'center',justifyContent:'flex-end',gap:16},
   headerDetails: {paddingHorizontal: 28, paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16},
@@ -223,7 +274,10 @@ const s = StyleSheet.create({
   headerIconOnly: {width: 36, height: 36, flexShrink: 0, alignItems: 'center', justifyContent: 'center', opacity: 0.75},
   sidebarToggleRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'},
   sidebarToggle: {width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 0},
-  mobileRail: {width: 48, borderRightWidth: 1, alignItems: 'center', paddingTop: 12, flexShrink: 0},
-  homeButton: {minWidth: 96, maxWidth: 168, minHeight: 56, flexShrink: 0, alignItems: 'center', justifyContent: 'center'},
+  mobileRail: {width: 48, borderRightWidth: 1, flexShrink: 0, minHeight:0},
+  mobileBody: {flex:1,minHeight:0,flexDirection:'row'},
+  mobileMenuButton: {width:36,height:36,flexShrink:0,borderWidth:1,borderRadius:10,alignItems:'center',justifyContent:'center'},
+  homeButton: {width:240,maxWidth:240,minWidth:0,minHeight:34,flexShrink:1,alignItems:'stretch',justifyContent:'center'},
+  mobileCompany: {flex:1,width:undefined,minWidth:0,maxWidth:240},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });
