@@ -1,19 +1,19 @@
 {
-  "version": "1.10.135",
-  "rc": 3,
-  "branch": "rc/1.10.135-rc.3",
-  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
+  "version": "1.10.136",
+  "rc": 1,
+  "branch": "rc/1.10.136-rc.1",
+  "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
-    1387
+    1390
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
-    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
+    "ControleOnline/app-community": "95ef27146bbf4a04508ebe7e6621b70685b3d55c",
+    "ControleOnline/ui-default": "665e3ef295837ffcd0f61cb4ea2148b6285b0121"
   },
   "validation": {
-    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
-    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
+    "scope": "ui-default 1.0.286: remove contagem e linha Ordenar (movido para Mais opcoes), toolbar compacta, rows da DefaultTable a 50%.",
+    "checks": "jest compactToolbar + suite table (69 pass; grouping ja falhava por import quebrado)"
   }
 }
