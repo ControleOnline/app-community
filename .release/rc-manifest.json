@@ -4,7 +4,6 @@
   "branch": "rc/1.10.139-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
-    128,
     131,
     1390,
     1392,
@@ -21,7 +20,7 @@
     "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging.",
+    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging. Task #128 (Caixa, ja homologada e em Deploy) segue com o codigo presente, fora da lista para respeitar o limite de 5 tasks.",
     "checks": "node --test cashRegisterSummary (6 pass), cashRegisterDrilldown (3 pass), phpunit CashRegisterSummaryServiceTest (5 pass)"
   }
 }
