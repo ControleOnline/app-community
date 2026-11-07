@@ -3,21 +3,14 @@
   "rc": 1,
   "branch": "rc/1.10.143-rc.1",
   "baseMaster": "4a7b22e58d3e3dbc3472ba3fea36f8ce1c0136b8",
-  "tasks": [
-    1416,
-    1417,
-    1418,
-    1419,
-    1420,
-    1421
-  ],
+  "tasks": [1417, 1418, 1419, 1420, 1421],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4211a82cd21f0eecd0673817ad254aba767804fd"
+    "ControleOnline/app-community": "5a91daeaabf337f9744d550881d6e6b00bc1206d"
   },
   "validation": {
-    "scope": "Theme/home batch: showLeftMenu, homeModulesLayout list|buttons, category module colors, scrollbar tokens web, paid orders series, logo-only brand (ui-manager/ui-layout).",
+    "scope": "Theme/home: showLeftMenu, modules list|buttons + category colors, scrollbar web, paid orders series. Logo-only (#1416) on ui-manager/ui-layout.",
     "checks": "groupPaidOrdersSeries unit tests; human production approval 2026-11-07"
   }
 }
