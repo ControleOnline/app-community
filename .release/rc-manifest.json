@@ -14,7 +14,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "10fc52e29f7b49f904ff021c8c5417f0bbacd253"
+    "ControleOnline/app-community": "4211a82cd21f0eecd0673817ad254aba767804fd"
   },
   "validation": {
     "scope": "Theme/home batch: showLeftMenu, homeModulesLayout list|buttons, category module colors, scrollbar tokens web, paid orders series, logo-only brand (ui-manager/ui-layout).",
