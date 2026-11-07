@@ -1,7 +1,7 @@
 {
   "version": "1.10.139",
-  "rc": 1,
-  "branch": "rc/1.10.139-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.139-rc.2",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     131,
@@ -16,11 +16,11 @@
     "ControleOnline/app-community": "823592caf173f5b4aa7602e14efa9d4809c89ef0",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
     "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
-    "ControleOnline/ui-customers": "94f9f0dd532c079b399a1d5a2c66af69d8996fed",
+    "ControleOnline/ui-customers": "0831bd4a62a6c704ed521c4d6d5ca591e9b48e62",
     "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging. Task #128 (Caixa, ja homologada e em Deploy) segue com o codigo presente, fora da lista para respeitar o limite de 5 tasks.",
+    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging. Task #128 (Caixa, ja homologada e em Deploy) segue com o codigo presente, fora da lista para respeitar o limite de 5 tasks. rc.2 (#1392): ui-customers 1.0.90 - upload de anexo envia o people dono do documento quando a empresa atual nao esta disponivel (API /files/upload retornava 500 sem people).",
     "checks": "node --test cashRegisterSummary (6 pass), cashRegisterDrilldown (3 pass), phpunit CashRegisterSummaryServiceTest (5 pass)"
   }
 }
