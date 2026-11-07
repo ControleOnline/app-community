@@ -1,21 +1,21 @@
 {
-  "version": "1.10.140",
+  "version": "1.10.141",
   "rc": 1,
-  "branch": "rc/1.10.140-rc.1",
-  "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
+  "branch": "rc/1.10.141-rc.1",
+  "baseMaster": "7728d59cc2fc70df3059087fd22db693e6c68c4e",
   "tasks": [
-    128,
-    131
+    1390,
+    1396,
+    1403
   ],
-  "taskRepository": "ControleOnline/ui-common",
+  "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "9e63b137713b26825d0899980d6e59ba4fc39753",
-    "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
-    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
+    "ControleOnline/app-community": "ff59101efae09f126d14669960b61bafddf63f79",
+    "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c"
   },
   "validation": {
-    "scope": "Tela Caixa consolidada por forma de pagamento com filtros de periodo e drill-down para FinancialHubPage (tasks #128 e #131), homologadas em staging.",
-    "checks": "node --test cashRegisterSummary (6), cashRegisterDrilldown (3); phpunit CashRegisterSummaryServiceTest (5); validado em staging"
+    "scope": "ui-default 1.0.288: toolbar compacta (sem contagem, Ordenar em Mais opcoes, linha unica), rows 50%, layout recolhido abaixo de 1000px.",
+    "checks": "jest suite table 72 pass (grouping ja falhava por import quebrado); manager:prepare validado; homologado em staging via rc/1.10.138-rc.2"
   }
 }

@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.285",
+      "version": "1.0.288",
       "file": "src/react/components/inputs/DefaultInput.js",
       "before": "c71e03aabd9492564bf6bf15dd8ede3d5710fe6bb0868184c138b8a2b13205e4",
       "after": "c71e03aabd9492564bf6bf15dd8ede3d5710fe6bb0868184c138b8a2b13205e4",
