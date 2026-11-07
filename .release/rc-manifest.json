@@ -1,18 +1,19 @@
 {
   "version": "1.10.135",
-  "rc": 2,
-  "branch": "rc/1.10.135-rc.2",
-  "baseMaster": "05476ede506c584c4686ae72a6871107653e2395",
+  "rc": 3,
+  "branch": "rc/1.10.135-rc.3",
+  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
   "tasks": [
-    1379
+    1387
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "03a1e408bd7aaede9f6664dadd23da17c4043115"
+    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
+    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
   },
   "validation": {
-    "scope": "android-deploy-lavego-shop.yml: Play track internal -> production.",
-    "checks": "diff review"
+    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
+    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
   }
 }
