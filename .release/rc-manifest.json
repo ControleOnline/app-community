@@ -1,22 +1,22 @@
 {
   "version": "1.10.137",
-  "rc": 1,
-  "branch": "rc/1.10.137-rc.1",
+  "rc": 4,
+  "branch": "rc/1.10.136-rc.4",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     1390,
     1396,
-    128
+    1403
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
     "ControleOnline/app-community": "f7f09433f6c17ea2f6cad73e8a67d491d8561bbb",
-    "ControleOnline/ui-default": "10192f3b9b00d7d45574eca361d9111f5ec6dcc8",
+    "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
     "ControleOnline/ui-common": "6bb419444fabf184d89c7738795617cb7b527246"
   },
   "validation": {
-    "scope": "ui-common 1.2.119: tela Caixa (CashRegisterSummary) consolidada por forma de pagamento (task #128), sobre o staging atual (tasks 1390, 1396).",
+    "scope": "ui-common 1.2.119: tela Caixa (CashRegisterSummary) consolidada por forma de pagamento (task #128), sobre o staging atual (tasks 1390, 1396). rc.4 (#1403): ui-default 1.0.288 - toolbar recolhida (layout mobile) abaixo de 1000px.",
     "checks": "node --test cashRegisterSummary (3 pass); phpunit CashRegisterSummaryServiceTest (5 pass)"
   }
 }
