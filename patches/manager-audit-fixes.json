@@ -42,7 +42,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.285",
+      "version": "1.0.287",
       "file": "src/react/components/table/useDefaultTableStoreSync.js",
       "before": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
       "after": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
