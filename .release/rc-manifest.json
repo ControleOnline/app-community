@@ -1,22 +1,24 @@
 {
-  "version": "1.10.137",
+  "version": "1.10.138",
   "rc": 1,
-  "branch": "rc/1.10.137-rc.1",
+  "branch": "rc/1.10.138-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     1390,
     1396,
-    128
+    128,
+    1392
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f7f09433f6c17ea2f6cad73e8a67d491d8561bbb",
+    "ControleOnline/app-community": "971f92eedcd61c7b864d90317f2d136226bd4135",
     "ControleOnline/ui-default": "10192f3b9b00d7d45574eca361d9111f5ec6dcc8",
-    "ControleOnline/ui-common": "6bb419444fabf184d89c7738795617cb7b527246"
+    "ControleOnline/ui-common": "6bb419444fabf184d89c7738795617cb7b527246",
+    "ControleOnline/ui-customers": "94f9f0dd532c079b399a1d5a2c66af69d8996fed"
   },
   "validation": {
-    "scope": "ui-common 1.2.119: tela Caixa (CashRegisterSummary) consolidada por forma de pagamento (task #128), sobre o staging atual (tasks 1390, 1396).",
-    "checks": "node --test cashRegisterSummary (3 pass); phpunit CashRegisterSummaryServiceTest (5 pass)"
+    "scope": "ui-customers 1.0.89 (task #1392): anexos de documento passam a ser vinculados ao documento (relationResource=\"documents\"); API people 1.0.13 corrige a FK document_file.file_id -> files. Sobre o staging atual (tasks 1390, 1396, 128).",
+    "checks": "node --test documentsTabContract (3 pass); upload /files/upload validado em staging (201); FK reproduzida no banco de staging"
   }
 }
