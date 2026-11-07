@@ -1,10 +1,11 @@
 {
-  "version": "1.10.138",
-  "rc": 2,
-  "branch": "rc/1.10.138-rc.2",
+  "version": "1.10.139",
+  "rc": 1,
+  "branch": "rc/1.10.139-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     128,
+    131,
     1390,
     1392,
     1396,
@@ -13,13 +14,14 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "971f92eedcd61c7b864d90317f2d136226bd4135",
+    "ControleOnline/app-community": "823592caf173f5b4aa7602e14efa9d4809c89ef0",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
-    "ControleOnline/ui-common": "6bb419444fabf184d89c7738795617cb7b527246",
-    "ControleOnline/ui-customers": "94f9f0dd532c079b399a1d5a2c66af69d8996fed"
+    "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
+    "ControleOnline/ui-customers": "94f9f0dd532c079b399a1d5a2c66af69d8996fed",
+    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "ui-customers 1.0.89 (task #1392): anexos de documento passam a ser vinculados ao documento (relationResource=\"documents\"); API people 1.0.13 corrige a FK document_file.file_id -> files. Sobre o staging atual (tasks 1390, 1396, 128). rc.2 (#1403): ui-default 1.0.288 - toolbar recolhida (layout mobile) abaixo de 1000px.",
-    "checks": "node --test documentsTabContract (3 pass); upload /files/upload validado em staging (201); FK reproduzida no banco de staging"
+    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging.",
+    "checks": "node --test cashRegisterSummary (6 pass), cashRegisterDrilldown (3 pass), phpunit CashRegisterSummaryServiceTest (5 pass)"
   }
 }
