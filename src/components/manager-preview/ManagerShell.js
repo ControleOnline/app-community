@@ -38,6 +38,10 @@ export default function ManagerShell({navigation, route, options, children}) {
   const tableTheme = useMemo(() => managerTableTheme(c), [c]);
   const themeStore = useStore('theme');
   const {menus} = themeStore.getters;
+  const themeColors = themeStore.getters?.colors || {};
+  const showLeftMenuRaw = themeColors.showLeftMenu ?? themeColors.enableSidebar ?? true;
+  const showLeftMenu = !(showLeftMenuRaw === false || showLeftMenuRaw === 'false' || showLeftMenuRaw === 0 || showLeftMenuRaw === '0');
+
   const auth = useStore('auth');
   const {user} = auth.getters;
   const peopleStore = useStore('people');
@@ -172,13 +176,13 @@ export default function ManagerShell({navigation, route, options, children}) {
   return <ScreenThemeBoundary screen={themeScreen}>
     {startup}
     <View testID="manager-shell-presentation" style={[s.shell, {backgroundColor: c.pageBackground}, preparing && {display:'none'}]}>
-    {!mobile && sidebar}
+    {!mobile && showLeftMenu && sidebar}
     <View collapsable={false} style={s.main}>
       <View testID="manager-header" onLayout={event => {if (mobile) setMobileHeaderHeight(Math.round(event.nativeEvent.layout.height));}}
         style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
       <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
         <View style={[s.headerSide, s.headerLeft,mobile && {flexGrow:0,flexShrink:0,flexBasis:'auto',gap:4}]}>
-          {mobile && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
+          {mobile && showLeftMenu && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
             accessibilityLabel="Abrir menu" accessibilityHint="Segure para mostrar ou ocultar os atalhos laterais"
             title="Toque para abrir o menu. Segure para mostrar ou ocultar os atalhos."
             delayLongPress={500}
@@ -244,7 +248,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       onTheme={accountAction(toggleMode)}
       onThemeEditor={themeTools.available ? accountAction(themeTools.openEditor) : undefined}
       onLogout={auth.actions?.logOut ? accountAction(() => auth.actions.logOut()) : undefined} />}
-    {mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay, {top: mobileHeaderHeight}]}>
+    {mobile && showLeftMenu && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay, {top: mobileHeaderHeight}]}>
       <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, {backgroundColor: c.modalOverlay}]} />
       {sidebar}
     </View>}
