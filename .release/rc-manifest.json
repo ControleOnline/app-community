@@ -1,19 +1,16 @@
 {
-  "version": "1.10.142",
+  "version": "1.10.143",
   "rc": 1,
-  "branch": "rc/1.10.142-rc.1",
-  "baseMaster": "7f35750f97567feb6604debad851c0dde1e6dfd2",
-  "tasks": [
-    1392
-  ],
+  "branch": "rc/1.10.143-rc.1",
+  "baseMaster": "origin/master",
+  "tasks": [1416, 1417, 1418, 1419, 1420, 1421],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a2d0df553ff5fb001a793cb01589e6c4e8f027ca",
-    "ControleOnline/ui-customers": "0831bd4a62a6c704ed521c4d6d5ca591e9b48e62"
+    "ControleOnline/app-community": "3baa3286f3cba232a700af7153d169dd2a67e739"
   },
   "validation": {
-    "scope": "ui-customers 1.0.90: anexos de documento vinculados ao documento e upload com people do dono; API people 1.0.13 corrige FK document_file.file_id -> files.",
-    "checks": "documentsTabContract (3 pass); homologado em staging via rc/1.10.139-rc.2 (ui-customers 1.0.90)"
+    "scope": "Theme/home batch: showLeftMenu, homeModulesLayout list|buttons, category module colors, scrollbar tokens web, paid orders series, logo-only brand (ui-manager/ui-layout).",
+    "checks": "groupPaidOrdersSeries unit tests; human production approval 2026-11-07"
   }
 }
