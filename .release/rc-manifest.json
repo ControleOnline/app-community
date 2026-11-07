@@ -3,11 +3,18 @@
   "rc": 1,
   "branch": "rc/1.10.143-rc.1",
   "baseMaster": "origin/master",
-  "tasks": [1416, 1417, 1418, 1419, 1420, 1421],
+  "tasks": [
+    1416,
+    1417,
+    1418,
+    1419,
+    1420,
+    1421
+  ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "3baa3286f3cba232a700af7153d169dd2a67e739"
+    "ControleOnline/app-community": "bd048566dd3803399d77126ab3338df98b9a413d"
   },
   "validation": {
     "scope": "Theme/home batch: showLeftMenu, homeModulesLayout list|buttons, category module colors, scrollbar tokens web, paid orders series, logo-only brand (ui-manager/ui-layout).",
