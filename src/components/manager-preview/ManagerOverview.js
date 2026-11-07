@@ -8,6 +8,7 @@ import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
 import ManagerOrdersTrend from './ManagerOrdersTrend';
+import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
@@ -80,11 +81,35 @@ export default function ManagerOverview({navigation}) {
       // Reuse the ERP client and server-side summary without replacing history state.
       // Never calculate revenue from a paginated list or from payment status.
       readCollection(api, 'orders', {...query, itemsPerPage: 1, page: 1, summary: 'sales'})
-        .then(result => {
+        .then(async result => {
           const totals = resolveHistorySalesTotals(result.summary);
           const summary = result.summary?.sales?.sales || result.summary?.sales;
-          const series = period === 'all' ? summary?.monthly : summary?.daily;
-          publish({series: Array.isArray(series) ? series : null, sales: totals?.revenue ?? null,
+          const rawSeries = period === 'all' ? summary?.monthly : summary?.daily;
+          let series = mapSummarySeries(rawSeries);
+          if (!series || !series.length) {
+            // Fallback: paid orders grouped by day (or month when the window is long).
+            try {
+              const window = buildDateRangeWindow(period === 'today' ? 'today' : period === 'week' ? 'last_7_days' : 'all');
+              const paidPage = await readCollection(api, 'orders', {
+                ...query,
+                orderType: 'sale',
+                itemsPerPage: 200,
+                page: 1,
+                'order[id]': 'DESC',
+              });
+              const from = window?.from ? new Date(window.from) : null;
+              const to = window?.to ? new Date(window.to) : null;
+              series = groupPaidOrdersSeries(paidPage?.items || paidPage?.member || [], {
+                from,
+                to,
+                // All-time and long ranges group by month; short ranges by day.
+                longPeriodDays: period === 'all' ? 0 : 60,
+              });
+            } catch (_) {
+              series = series || null;
+            }
+          }
+          publish({series: series && series.length ? series : (Array.isArray(rawSeries) ? [] : null), sales: totals?.revenue ?? null,
             salesError: totals ? '' : t?.('configs', 'error', 'sales_summary_missing')});
         }).catch(() => publish({salesError: t?.('configs', 'error', 'load_sales')}));
       // Match the existing homepage: orders include every order type.
@@ -257,13 +282,41 @@ export default function ManagerOverview({navigation}) {
         </Pressable>)}</View>
       </View>
     </View>
-    <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
-    <View style={s.modules}>{groups.map((group, i) => <View key={group.id || i} style={[s.module, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
-      <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-      {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>
-        {icon(item.icon, c.textMuted, 16)}<Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.textMuted, 14)}
-      </Pressable>)}
-    </View>)}</View>
+        <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
+    {homeModulesLayout === 'buttons' ? (
+      <View style={s.moduleButtons}>
+        {items.map((item, i) => {
+          const bg = item.color || item.categoryColor || c.cardBackground;
+          return (
+            <Pressable
+              key={item.id || i}
+              accessibilityRole="button"
+              onPress={() => go(item)}
+              style={[s.moduleButton, {backgroundColor: bg, borderColor: c.cardBorder}]}
+            >
+              {icon(item.icon, c.cardText, 28)}
+              <Text style={{color: c.cardText, fontSize: 12, fontWeight: '700', marginTop: 8, textAlign: 'center'}}>{item.title}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    ) : (
+      <View style={s.modules}>{groups.map((group, i) => {
+        const bg = group.color || group.categoryColor || c.cardBackground;
+        return (
+          <View key={group.id || i} style={[s.module, {backgroundColor: bg, borderColor: c.cardBorder}]}>
+            <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
+            {group.items.map((item, j) => (
+              <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>
+                {icon(item.icon, c.textMuted, 16)}
+                <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', c.textMuted, 14)}
+              </Pressable>
+            ))}
+          </View>
+        );
+      })}</View>
+    )}
   </ScrollView>;
 }
 
