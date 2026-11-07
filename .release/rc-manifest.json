@@ -1,19 +1,21 @@
 {
-  "version": "1.10.135",
-  "rc": 3,
-  "branch": "rc/1.10.135-rc.3",
-  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
+  "version": "1.10.140",
+  "rc": 1,
+  "branch": "rc/1.10.140-rc.1",
+  "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
-    1387
+    128,
+    131
   ],
-  "taskRepository": "ControleOnline/app-community",
+  "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
-    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
+    "ControleOnline/app-community": "9e63b137713b26825d0899980d6e59ba4fc39753",
+    "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
+    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
-    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
+    "scope": "Tela Caixa consolidada por forma de pagamento com filtros de periodo e drill-down para FinancialHubPage (tasks #128 e #131), homologadas em staging.",
+    "checks": "node --test cashRegisterSummary (6), cashRegisterDrilldown (3); phpunit CashRegisterSummaryServiceTest (5); validado em staging"
   }
 }
