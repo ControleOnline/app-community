@@ -1,7 +1,7 @@
 {
   "version": "1.10.136",
-  "rc": 1,
-  "branch": "rc/1.10.136-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.136-rc.2",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     1390
@@ -9,11 +9,11 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "95ef27146bbf4a04508ebe7e6621b70685b3d55c",
+    "ControleOnline/app-community": "bc37c7c0e236fab4e1d5d24ad2aef5c212282e76",
     "ControleOnline/ui-default": "665e3ef295837ffcd0f61cb4ea2148b6285b0121"
   },
   "validation": {
-    "scope": "ui-default 1.0.286: remove contagem e linha Ordenar (movido para Mais opcoes), toolbar compacta, rows da DefaultTable a 50%.",
+    "scope": "ui-default 1.0.286: remove contagem e linha Ordenar (movido para Mais opcoes), toolbar compacta, rows da DefaultTable a 50%. rc.2: overlays de patches apontam para ui-default 1.0.286 (deploy do rc.1 falhou na checagem de versao).",
     "checks": "jest compactToolbar + suite table (69 pass; grouping ja falhava por import quebrado)"
   }
 }
