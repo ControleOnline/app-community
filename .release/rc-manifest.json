@@ -1,26 +1,23 @@
 {
-  "version": "1.10.139",
-  "rc": 2,
-  "branch": "rc/1.10.139-rc.2",
+  "version": "1.10.144",
+  "rc": 1,
+  "branch": "rc/1.10.144-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     131,
-    1390,
-    1392,
-    1396,
-    1403
+    1411
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "823592caf173f5b4aa7602e14efa9d4809c89ef0",
+    "ControleOnline/app-community": "e146a6db7dc4ff9f919991f5db6bdb0e66ccea7b",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
     "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
-    "ControleOnline/ui-customers": "0831bd4a62a6c704ed521c4d6d5ca591e9b48e62",
+    "ControleOnline/ui-customers": "7b5e762a4866be61d4668077242d99d2aa44edb8",
     "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "task #131: clique no tipo de pagamento da tela Caixa abre FinancialHubPage filtrada por tipo e periodo (ui-common 1.2.120, ui-financial 1.1.44); mantem demais tasks do staging. Task #128 (Caixa, ja homologada e em Deploy) segue com o codigo presente, fora da lista para respeitar o limite de 5 tasks. rc.2 (#1392): ui-customers 1.0.90 - upload de anexo envia o people dono do documento quando a empresa atual nao esta disponivel (API /files/upload retornava 500 sem people).",
-    "checks": "node --test cashRegisterSummary (6 pass), cashRegisterDrilldown (3 pass), phpunit CashRegisterSummaryServiceTest (5 pass)"
+    "scope": "ui-customers 1.0.91 (task #1411): Ver/Abrir/Compartilhar/Imprimir de anexos de documento buscam o arquivo privado com API-TOKEN (blob/arquivo em cache) em vez de abrir a URL sem autenticacao. Sobre o staging atual; tasks 1390, 1392, 1396, 1403 ja estao em master (1.10.142).",
+    "checks": "node --test documentsTabHelpers + documentsTabContract (13 pass); download /files/{id}/download retorna 200 com API-TOKEN e 403 sem"
   }
 }
