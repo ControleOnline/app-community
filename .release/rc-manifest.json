@@ -2,7 +2,7 @@
   "version": "1.10.143",
   "rc": 1,
   "branch": "rc/1.10.143-rc.1",
-  "baseMaster": "origin/master",
+  "baseMaster": "4a7b22e58d3e3dbc3472ba3fea36f8ce1c0136b8",
   "tasks": [
     1416,
     1417,
@@ -14,7 +14,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "bd048566dd3803399d77126ab3338df98b9a413d"
+    "ControleOnline/app-community": "10fc52e29f7b49f904ff021c8c5417f0bbacd253"
   },
   "validation": {
     "scope": "Theme/home batch: showLeftMenu, homeModulesLayout list|buttons, category module colors, scrollbar tokens web, paid orders series, logo-only brand (ui-manager/ui-layout).",
