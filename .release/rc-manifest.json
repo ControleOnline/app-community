@@ -1,20 +1,22 @@
 {
-  "version": "1.10.136",
-  "rc": 3,
-  "branch": "rc/1.10.136-rc.3",
+  "version": "1.10.137",
+  "rc": 1,
+  "branch": "rc/1.10.137-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     1390,
-    1396
+    1396,
+    128
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "bc37c7c0e236fab4e1d5d24ad2aef5c212282e76",
-    "ControleOnline/ui-default": "10192f3b9b00d7d45574eca361d9111f5ec6dcc8"
+    "ControleOnline/app-community": "f7f09433f6c17ea2f6cad73e8a67d491d8561bbb",
+    "ControleOnline/ui-default": "10192f3b9b00d7d45574eca361d9111f5ec6dcc8",
+    "ControleOnline/ui-common": "6bb419444fabf184d89c7738795617cb7b527246"
   },
   "validation": {
-    "scope": "ui-default 1.0.286: remove contagem e linha Ordenar (movido para Mais opcoes), toolbar compacta, rows da DefaultTable a 50%. rc.2: overlays de patches apontam para ui-default 1.0.286 (deploy do rc.1 falhou na checagem de versao). rc.3 (#1396): ui-default 1.0.287 - toolbar em linha unica; Filtros/Tabela/Cards no Mais opcoes no mobile.",
-    "checks": "jest compactToolbar + suite table (69 pass; grouping ja falhava por import quebrado)"
+    "scope": "ui-common 1.2.119: tela Caixa (CashRegisterSummary) consolidada por forma de pagamento (task #128), sobre o staging atual (tasks 1390, 1396).",
+    "checks": "node --test cashRegisterSummary (3 pass); phpunit CashRegisterSummaryServiceTest (5 pass)"
   }
 }
