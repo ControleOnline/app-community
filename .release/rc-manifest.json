@@ -1,23 +1,24 @@
 {
-  "version": "1.10.144",
+  "version": "1.10.145",
   "rc": 1,
-  "branch": "rc/1.10.144-rc.1",
+  "branch": "rc/1.10.145-rc.1",
   "baseMaster": "f1259a338e4150c89654213b9d33e72b646beb18",
   "tasks": [
     131,
+    133,
     1411
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e146a6db7dc4ff9f919991f5db6bdb0e66ccea7b",
+    "ControleOnline/app-community": "555730531ac6d773a9f876b24847cf28e74e8344",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
-    "ControleOnline/ui-common": "7998dc134d7be0e72c864ff0cb6408fd109c561c",
+    "ControleOnline/ui-common": "f66e2112a9e5298fd232ba20526d0d7729b9e836",
     "ControleOnline/ui-customers": "7b5e762a4866be61d4668077242d99d2aa44edb8",
     "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   },
   "validation": {
-    "scope": "ui-customers 1.0.91 (task #1411): Ver/Abrir/Compartilhar/Imprimir de anexos de documento buscam o arquivo privado com API-TOKEN (blob/arquivo em cache) em vez de abrir a URL sem autenticacao. Sobre o staging atual; tasks 1390, 1392, 1396, 1403 ja estao em master (1.10.142).",
-    "checks": "node --test documentsTabHelpers + documentsTabContract (13 pass); download /files/{id}/download retorna 200 com API-TOKEN e 403 sem"
+    "scope": "task #133: bloco Por dispositivo na tela Caixa (ui-common 1.2.121); mantem demais tasks do staging.",
+    "checks": "node --test cashRegisterSummary (8 pass); phpunit CashRegisterSummaryServiceTest (7 pass)"
   }
 }
