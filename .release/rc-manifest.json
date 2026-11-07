@@ -1,16 +1,19 @@
 {
-  "version": "1.10.143",
+  "version": "1.10.147",
   "rc": 1,
-  "branch": "rc/1.10.143-rc.1",
-  "baseMaster": "4a7b22e58d3e3dbc3472ba3fea36f8ce1c0136b8",
-  "tasks": [1417, 1418, 1419, 1420, 1421],
+  "branch": "rc/1.10.147-rc.1",
+  "baseMaster": "9fbdfd8f9a8550235905477768d076c8f6fba175",
+  "tasks": [
+    1411
+  ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "5a91daeaabf337f9744d550881d6e6b00bc1206d"
+    "ControleOnline/app-community": "a532d141c90954f532095bfc8006c40bb1213e34",
+    "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1"
   },
   "validation": {
-    "scope": "Theme/home: showLeftMenu, modules list|buttons + category colors, scrollbar web, paid orders series. Logo-only (#1416) on ui-manager/ui-layout.",
-    "checks": "groupPaidOrdersSeries unit tests; human production approval 2026-11-07"
+    "scope": "ui-customers 1.0.92 (task #1411): Ver/Abrir/Compartilhar/Imprimir de anexos privados com API-TOKEN (somente origem confiavel); blob so renderiza imagem/pdf.",
+    "checks": "documentsTabHelpers + documentsTabContract (14 pass); homologado pelo usuario em staging (ui-customers 1.0.91, rc 1.10.145-rc.1); Security: recusado em 1.0.91, correcoes em 1.0.92"
   }
 }
