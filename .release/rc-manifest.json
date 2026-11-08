@@ -1,18 +1,20 @@
 {
-  "version": "1.10.149",
+  "version": "1.10.151",
   "rc": 1,
-  "branch": "rc/1.10.149-rc.1",
-  "baseMaster": "60d040a49d8b386514d5d0458846ffd5b7fca3a2",
+  "branch": "rc/1.10.151-rc.1",
+  "baseMaster": "d74b81936b01d9512f60ce475e3d2638ecc6cb2e",
   "tasks": [
-    1433
+    133,
+    134,
+    1437
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "ce90601718d500d2d0bf1c2cfd2b8135e03f1df0"
-  },
-  "validation": {
-    "scope": "ManagerOverview declara homeModulesLayout (tema, fallback list); corrige ReferenceError na home.",
-    "checks": "parse esbuild ok; unica ocorrencia da variavel no repo; sem teste de runtime"
+    "ControleOnline/app-community": "331e1ab54fb03ea80af60babbdc87b145691dc36",
+    "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
+    "ControleOnline/ui-common": "ea23be69dac91969dd05e1c0b901a223fb3fc28a",
+    "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1",
+    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
   }
 }
