@@ -1,4 +1,5 @@
 import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {CONTROL_HEIGHT} from './controlHeight';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useStore, getAllStores} from '@store';
@@ -224,7 +225,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
         <Text style={{color:c.textPrimary}}>{recoveryError || (!currentCompany?.id ? 'A empresa ainda não foi carregada.' : 'Nenhum menu foi carregado para este contexto.')}</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:44,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:CONTROL_HEIGHT,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
       </View>}
       <View style={s.mobileBody}>
         {mobile && railVisible && <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor:c.navigationBackground, borderRightColor:c.navigationBorder}]}>
@@ -263,7 +264,7 @@ const s = StyleSheet.create({
   brand: {flexShrink: 0, padding: 12}, compactBrand: {paddingHorizontal: 8},
   close: {alignSelf: 'flex-end', marginRight: 12, padding: 8}, menu: {flex: 1, minHeight: 0}, group: {marginTop: 22},
   caption: {fontSize: 10, fontWeight: '700', letterSpacing: 1.3, textTransform: 'uppercase', margin: 12},
-  navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
+  navItem: {minHeight: CONTROL_HEIGHT, paddingVertical: 4, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
   navText: {fontSize: 12, fontWeight: '600', flexShrink: 1}, center: {justifyContent: 'center', paddingHorizontal: 0},
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10},
   main: {flex: 1, minWidth: 0},

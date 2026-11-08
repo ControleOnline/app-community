@@ -10,6 +10,7 @@ import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pag
 import ManagerOrdersTrend from './ManagerOrdersTrend';
 import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
+import {CONTROL_HEIGHT} from './controlHeight';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
 import {readCollection} from '../../experience/collections';
@@ -328,12 +329,12 @@ const s = StyleSheet.create({
   hero: {flexDirection: 'row', gap: 16, alignItems: 'flex-start', marginBottom: 24},
   title: {fontSize: 24, lineHeight: 32, fontWeight: '700'},
   sub: {fontSize: 12, lineHeight: 19, marginTop: 8}, actions: {flexDirection: 'row', flexWrap: 'wrap', gap: 8},
-  button: {minHeight: 44, paddingHorizontal: 14, borderWidth: 1, borderRadius: 10, flexDirection: 'row', gap: 8, alignItems: 'center'},
+  button: {minHeight: CONTROL_HEIGHT, paddingHorizontal: 14, borderWidth: 1, borderRadius: 10, flexDirection: 'row', gap: 8, alignItems: 'center'},
   periodBar: {flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16},
   periodBarMobile: {flexDirection: 'column', alignItems: 'stretch', gap: 8},
   periodLabel: {fontSize: 12, fontWeight: '600', flexShrink: 0},
   periodOptions: {flexDirection: 'row', flexWrap: 'wrap', gap: 8},
-  periodOption: {minHeight: 44, paddingHorizontal: 12, borderWidth: 1, borderRadius: 10, justifyContent: 'center'},
+  periodOption: {minHeight: CONTROL_HEIGHT, paddingHorizontal: 12, borderWidth: 1, borderRadius: 10, justifyContent: 'center'},
   scope: {fontSize: 10, fontWeight: '600', marginTop: 10},
   metrics: {flexDirection: 'row', flexWrap: 'wrap', rowGap: 14, marginHorizontal: -7, marginBottom: 22},
   metricSlot: {paddingHorizontal: 7},
@@ -346,8 +347,8 @@ const s = StyleSheet.create({
   panels: {flexDirection: 'row', gap: 18, marginBottom: 26}, panel: {flex: 1, borderWidth: 1, borderRadius: 16, padding: 20},
   stackedPanel: {flexGrow:0,flexShrink:0,flexBasis:'auto'},
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
-  quickIcon: {width:32,height:32,borderRadius:9,alignItems:'center',justifyContent:'center'},
-  quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 16},
+  quickIcon: {width:24,height:24,borderRadius:7,alignItems:'center',justifyContent:'center'},
+  quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 10, minHeight: CONTROL_HEIGHT, paddingHorizontal: 12, paddingVertical: 3},
   modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13},
 });
