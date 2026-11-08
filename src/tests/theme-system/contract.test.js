@@ -25,7 +25,7 @@ test('preserves explicit shared values and selects primary/secondary modes indep
   expect(resolveManagerTheme(colors,'dark')).toMatchObject({iconBackground:'rgba(1,2,3,.5)',buttonBackground:'#000000',buttonBackgroundSecondary:'#bbbbbb'});
   expect(themeFieldValue({cardBackground:'#ffffff'},'cardBackground','dark')).toBe('#ffffff');
 });
-test('inverts only the Lave-Go shortcut bar in light mode and respects saved shortcut colors',()=>{
+test('reads shortcut colors from the theme and never from the domain name',()=>{
   const previousDomain=env.DOMAIN;
   env.DOMAIN='https://app.lave-go.com';
   const colors={'navigationBackground-light':'#020202','navigationActiveBackground-light':'#facc0c',
@@ -33,9 +33,7 @@ test('inverts only the Lave-Go shortcut bar in light mode and respects saved sho
   try {
     expect(resolveManagerTheme(colors,'light')).toMatchObject({
       navigationBackground:'#020202',navigationActiveBackground:'#facc0c',
-      shortcutBarBackground:'#FACC0C',shortcutBarActiveBackground:'#000000',
-      shortcutBarIcon:'#000000',shortcutBarText:'#000000',
-      shortcutBarActiveIcon:'#FACC0C',shortcutBarActiveText:'#FACC0C',
+      shortcutBarBackground:'#020202',shortcutBarActiveBackground:'#facc0c',
     });
     expect(resolveManagerTheme(colors,'dark').shortcutBarBackground).toBe('#29261e');
     expect(resolveManagerTheme({...colors,'shortcutBarBackground-light':'#abcdef'},'light')

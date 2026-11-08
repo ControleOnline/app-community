@@ -1,17 +1,6 @@
 import contract from './themeContract.generated';
 import {legacyThemeFieldSource} from './themeEditorModel';
-import {env} from '@env';
-import {resolveAppDomain} from '@controleonline/ui-common/src/utils/appDomain';
 const canonical = new Set(contract.names);
-export const laveGoShortcutSource = 'Padrão local da barra de atalhos da Lave-Go';
-const laveGoShortcutLight = {
- shortcutBarBackground:'#FACC0C',
- shortcutBarIcon:'#000000',
- shortcutBarText:'#000000',
- shortcutBarActiveBackground:'#000000',
- shortcutBarActiveIcon:'#FACC0C',
- shortcutBarActiveText:'#FACC0C',
-};
 const tableMap=mode=>({tableHeaderBackground:`bg-headers-${mode}`,tableRowEvenBackground:`bg-even-${mode}`,tableRowOddBackground:`bg-odd-${mode}`});
 const darkMap={
  appBackground:'bg-dark',containerBackground:'bg-dark',pageBackground:'bg-dark',screenBackground:'bg-dark',
@@ -82,8 +71,6 @@ export function resolveManagerThemeDetails(input={},mode='light'){
  }
  // Optional purpose variants inherit only the resolved base of the same mode.
  // This is a read-time relationship, never a migration or a persisted copy.
- const shortcutDefaults = mode==='light' && resolveAppDomain(env.DOMAIN).toLowerCase()==='app.lave-go.com'
-  ? laveGoShortcutLight : {};
  for(const [token,{base}] of Object.entries(contract.variants || {})){
   const key=`${token}-${mode}`;
   // Variations also work on legacy palettes, without changing their resolution model.
@@ -92,8 +79,7 @@ export function resolveManagerThemeDetails(input={},mode='light'){
    else{delete values[token];delete sources[token];}
   }
   if(values[token]===undefined || values[token]===null || String(values[token]).trim()===''){
-   const defaultColor=shortcutDefaults[token];
-   values[token]=defaultColor ?? values[base];sources[token]=defaultColor ? laveGoShortcutSource : sources[base];
+   values[token]=values[base];sources[token]=sources[base];
   }
  }
  return {values,sources};
