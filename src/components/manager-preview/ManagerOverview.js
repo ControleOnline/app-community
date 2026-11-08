@@ -4,6 +4,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
+import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -17,7 +18,8 @@ import {getAvatarDisplayName} from '@controleonline/ui-common/src/react/utils/us
 
 export default function ManagerOverview({navigation}) {
   const {width} = useWindowDimensions();
-  const {colors: c, experience} = useManagerPreview();
+  const {colors: c, experience, moduleIcons, moduleAccent, moduleAccentPalette} = useManagerPreview();
+  const showModuleIcons = moduleIcons?.value === true;
   const people = useStore('people');
   const {currentCompany} = people.getters;
   const {user} = useStore('auth').getters;
@@ -53,10 +55,7 @@ export default function ManagerOverview({navigation}) {
     [t, translateMessages, pendingTranslateMessages],
   );
   const selectedPeriod = periods.find(option => option.id === period) || periods[0];
-  const themeGetters = useStore('theme').getters;
-  const {menus} = themeGetters;
-  // Theme-driven layout; the theme setting may not exist yet, so default to the list view.
-  const homeModulesLayout = themeGetters?.homeModulesLayout === 'buttons' ? 'buttons' : 'list';
+  const {menus} = useStore('theme').getters;
   // Every destination comes from the real runtime menu, never a demo capability.
   const groups = useMemo(
     () => managerMenu(menus, navigation.getState().routeNames, t),
@@ -89,27 +88,27 @@ export default function ManagerOverview({navigation}) {
           const summary = result.summary?.sales?.sales || result.summary?.sales;
           const rawSeries = period === 'all' ? summary?.monthly : summary?.daily;
           let series = mapSummarySeries(rawSeries);
-          if (!series || !series.length) {
-            // Fallback: paid orders grouped by day (or month when the window is long).
+          const pageSize = 200;
+          // Only use the fallback when one page can cover the entire period.
+          if ((!series || !series.length) && !cancelled && result.totalItems > 0 && result.totalItems <= pageSize) {
             try {
-              const window = buildDateRangeWindow(period === 'today' ? 'today' : period === 'week' ? 'last_7_days' : 'all');
-              const paidPage = await readCollection(api, 'orders', {
+              const paidPage = await api.fetch('orders', {params: {
                 ...query,
-                orderType: 'sale',
-                itemsPerPage: 200,
+                itemsPerPage: pageSize,
                 page: 1,
                 'order[id]': 'DESC',
-              });
-              const from = window?.from ? new Date(window.from) : null;
-              const to = window?.to ? new Date(window.to) : null;
-              series = groupPaidOrdersSeries(paidPage?.items || paidPage?.member || [], {
-                from,
-                to,
-                // All-time and long ranges group by month; short ranges by day.
-                longPeriodDays: period === 'all' ? 0 : 60,
-              });
+              }});
+              const orders = paidPage?.member ?? paidPage?.['hydra:member'] ?? paidPage?.items;
+              const total = paidPage?.totalItems ?? paidPage?.['hydra:totalItems'] ?? result.totalItems;
+              if (Array.isArray(orders) && orders.length >= Number(total)) {
+                series = groupPaidOrdersSeries(orders, {
+                  from: range.after,
+                  to: range.before,
+                  longPeriodDays: period === 'all' ? 0 : 60,
+                });
+              }
             } catch (_) {
-              series = series || null;
+              // Keep the API series state if the fallback cannot be loaded.
             }
           }
           publish({series: series && series.length ? series : (Array.isArray(rawSeries) ? [] : null), sales: totals?.revenue ?? null,
@@ -285,41 +284,40 @@ export default function ManagerOverview({navigation}) {
         </Pressable>)}</View>
       </View>
     </View>
-        <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
-    {homeModulesLayout === 'buttons' ? (
-      <View style={s.moduleButtons}>
-        {items.map((item, i) => {
-          const bg = item.color || item.categoryColor || c.cardBackground;
-          return (
-            <Pressable
-              key={item.id || i}
-              accessibilityRole="button"
-              onPress={() => go(item)}
-              style={[s.moduleButton, {backgroundColor: bg, borderColor: c.cardBorder}]}
-            >
-              {icon(item.icon, c.cardText, 28)}
-              <Text style={{color: c.cardText, fontSize: 12, fontWeight: '700', marginTop: 8, textAlign: 'center'}}>{item.title}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    ) : (
-      <View style={s.modules}>{groups.map((group, i) => {
-        const bg = group.color || group.categoryColor || c.cardBackground;
-        return (
-          <View key={group.id || i} style={[s.module, {backgroundColor: bg, borderColor: c.cardBorder}]}>
-            <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-            {group.items.map((item, j) => (
-              <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>
-                {icon(item.icon, c.textMuted, 16)}
+    <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
+    <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
+      {groups.map((group, i) => {
+        const accent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
+        const accentBackground = moduleAccentBackground(accent);
+        return <View key={group.id || i}
+          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
+          <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
+          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons && s.moduleGrid}>
+            {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button"
+              accessibilityLabel={item.title} onPress={() => go(item)}
+              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
+                borderColor: c.listItemBorder,
+                backgroundColor: hovered || pressed
+                  ? moduleAccentBackground(accent, true) ?? c.listItemActiveBackground
+                  : accentBackground ?? c.listItemBackground,
+              }] : s.moduleItem}>
+              {showModuleIcons ? <>
+                <View style={[s.moduleTileIcon, !accent && {backgroundColor: c.iconBackground}]}>
+                  {icon(item.icon, accent ?? c.listItemIcon, 22)}
+                </View>
+                <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
+              </> : <>
+                {accent ? <View style={[s.moduleListIcon, {backgroundColor: accentBackground}]}>
+                  {icon(item.icon, accent, 16)}
+                </View> : icon(item.icon, c.textMuted, 16)}
                 <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
                 {icon('chevron-right', c.textMuted, 14)}
-              </Pressable>
-            ))}
+              </>}
+            </Pressable>)}
           </View>
-        );
-      })}</View>
-    )}
+        </View>;
+      })}
+    </View>
   </ScrollView>;
 }
 
@@ -349,5 +347,13 @@ const s = StyleSheet.create({
   quickIcon: {width:32,height:32,borderRadius:9,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 16},
   modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
+  moduleCards: {alignItems: 'flex-start'},
+  iconModule: {minWidth: 0, flexShrink: 1},
+  moduleGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
+  moduleTile: {width: 104, maxWidth: '100%', minHeight: 96, padding: 8, gap: 6,
+    alignItems: 'center', borderWidth: 1, borderRadius: 10},
+  moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
+  moduleListIcon: {width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center'},
+  moduleTileLabel: {fontSize: 12, textAlign: 'center', width: '100%'},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13},
 });

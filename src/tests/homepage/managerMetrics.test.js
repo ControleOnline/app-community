@@ -145,3 +145,27 @@ it('keeps the production sales contract for every period without BI summaries', 
   expect(queries.filter(query => query.summary).every(query => query.orderType === 'sale')).toBe(true);
   await act(async () => tree.unmount());
 });
+
+it('builds the chart from a complete order page when the summary omits the series', async () => {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  const member = ['paid', 'unpaid'].map(realStatus => ({
+    status: {realStatus},
+    paymentDate: date.toISOString(),
+  }));
+  mockHistory = async ({query}) => query.itemsPerPage === 200
+    ? {totalItems: 2, member}
+    : {totalItems: 2, summary: {sales: {totals: {revenue: 10, orders: 1, averageTicket: 10}}}};
+  let tree;
+  await act(async () => {tree = renderer.create(screen());});
+  try {
+    expect(tree.root.findByType('TrendCard').props.items).toEqual([
+      {key: date.toISOString().slice(0, 10), label: date.toISOString().slice(5, 10), orders: 1},
+    ]);
+    expect(mockOrders.read).toHaveBeenCalledWith({query: expect.objectContaining({
+      itemsPerPage: 200, provider: '/people/9', orderType: 'sale',
+    })});
+  } finally {
+    await act(async () => tree.unmount());
+  }
+});

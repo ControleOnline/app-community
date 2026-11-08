@@ -5,8 +5,9 @@
     {
       "file": "src/react/pages/ConfiguratorPage.js",
       "before": "451c784cc90e1fbaefa11ccbb8e81ffc310a38a17ea49e968bf550dc6bbba35e",
-      "after": "d5dd2810bf63da5d5f8fbe182718f2933b31f522a19b65632d2ccae3ef4b09f8",
-      "payload": "manager-configurator.after.js"
+      "after": "7e0bf599a64af02196e9411174f5c2259cf3306f80e25e825c8fd9d425a84780",
+      "payload": "manager-configurator.after.js",
+      "previousAfter": "d5dd2810bf63da5d5f8fbe182718f2933b31f522a19b65632d2ccae3ef4b09f8"
     }
   ]
 }

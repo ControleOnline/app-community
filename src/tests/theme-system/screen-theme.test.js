@@ -46,6 +46,14 @@ test('optional purpose inheritance follows screen overrides without overwriting 
  expect(resolveScreenThemeDetails(colors,'light',finance.id).values.indicatorCardBackground).toBe('#abcdef');
  expect(resolveScreenThemeDetails({...colors,'indicatorCardBackground-light':'#123456'},'light',finance.id).values.indicatorCardBackground).toBe('#123456');
 });
+test('a local shortcut background preview leaves the sidebar and other screens unchanged',()=>{
+ const colors={'navigationBackground-light':'#101010',
+  [screenThemeKey(home.id,'shortcutBarBackground','light')]:'#ffee00'};
+ expect(resolveScreenThemeDetails(colors,'light',home.id).values).toMatchObject({
+  shortcutBarBackground:'#ffee00',navigationBackground:'#101010',
+ });
+ expect(resolveScreenThemeDetails(colors,'light',finance.id).values.shortcutBarBackground).toBe('#101010');
+});
 test('scoped serialization retains keys and validates their actual canonical token types',()=>{
  const key=screenThemeKey(finance.id,'cardBackground','light'),opacity=screenThemeKey(finance.id,'buttonDisabledOpacity','light');
  expect(serializeThemeColors({[key]:'#abcdef',[opacity]:'0.5'})).toEqual({[key]:'#abcdef',[opacity]:'0.5'});
