@@ -7,7 +7,9 @@ jest.mock('@appType',()=>({app_type:'ADMIN'}));
 jest.mock('../../components/HomeIcon',()=> 'Icon');
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({colors:{}})}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='theme'?{menus:mockMenus}:{user:{name:'Leandro'}}})}));
-beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockMenus=[{label:'Administração',menus:[{route:'UsersPage',label:'Usuários',menuType:'home',routeParams:{scope:8}},{route:'NotRegistered',label:'Unavailable',menuType:'home'}]}];});
+const originalTranslations=global.t;
+beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;global.t={t:(_context,_type,key)=>key==='waiting_menus'?'Aguardando os menus':undefined};mockMenus=[{label:'Administração',menus:[{route:'UsersPage',label:'Usuários',menuType:'home',routeParams:{scope:8}},{route:'NotRegistered',label:'Unavailable',menuType:'home'}]}];});
+afterEach(()=>{global.t=originalTranslations;});
 it('uses only registered runtime menu destinations and preserves their parameters',()=>{
  const n={navigate:jest.fn(),getState:()=>({routeNames:['UsersPage']})};let tree;
  act(()=>{tree=renderer.create(<AdminHome navigation={n}/>);});

@@ -13,9 +13,11 @@ const mockToggle = jest.fn();
 const mockGuide = jest.fn();
 const mockLogout = jest.fn();
 let mockBottomBar;
+let mockSidebar;
+let mockModuleAccent;
 const mockColors = previewPalette({}, 'light');
 jest.mock('react-native', () => ({
-  Platform: {OS: 'web'}, Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
+  processColor:require('../theme-system/nativeMock.cjs').processColor, Platform: {OS: 'web'}, Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
   StyleSheet: {create: x => x, absoluteFill: {}}, useWindowDimensions: () => ({width: mockWidth}),
 }));
 jest.mock('react-native-safe-area-context', () => ({SafeAreaProvider: 'SafeAreaProvider', useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}), useSafeAreaFrame: () => ({width: mockWidth, height: 800})}));
@@ -27,21 +29,21 @@ jest.mock('../../components/HomeAvatar', () => 'HomeAvatar');
 jest.mock('../../components/manager-preview/ManagerCompanySelector', () => 'ManagerCompanySelector');
 jest.mock('@controleonline/ui-common/src/react/components/AppTypeSwitcher', () => 'AppTypeSwitcher');
 jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
-  useManagerPreview: () => ({bottomBar: mockBottomBar, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
+  useManagerPreview: () => ({bottomBar: mockBottomBar, sidebar: mockSidebar, moduleAccent: mockModuleAccent, moduleAccentPalette: {primary: '#147568'}, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
 }));
 let mockExtraMenus = [];
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'theme'
-  ? {menus: [{id: 'settings', label: 'Configurações', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
+  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
   : {user: {name: 'Usuário local'}}, actions: {logOut: mockLogout}})}));
 const navigation = {navigate: mockGo, getState: () => ({routeNames: ['HomePage', 'DevicesIndex', 'ProfilePage']})};
-const view = route => <ManagerShell navigation={navigation} route={{name: route || 'HomePage'}}><content /></ManagerShell>;
+const view = (route, params) => <ManagerShell navigation={navigation} route={{name: route || 'HomePage', params}}><content /></ManagerShell>;
 const TableThemeProbe=()=> <table-theme colors={React.useContext(DefaultTableThemeContext)}/>;
 const labeled = (tree, label) => tree.root.findAllByType('Pressable').filter(x => x.props.accessibilityLabel === label);
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
   mockExtraMenus = [];
-  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
+  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
 afterEach(() => {delete global.window;});
 
@@ -93,6 +95,26 @@ it('opens and closes the mobile drawer and closes it after navigation', () => {
   act(() => labeled(tree, 'Dispositivos')[0].props.onPress());
   expect(labeled(tree, 'Dispositivos')).toHaveLength(0);
   act(() => tree.unmount());
+});
+
+it('keeps the mobile menu gestures without a visible instruction', () => {
+  mockWidth = 390;
+  let tree;
+  act(() => {tree = renderer.create(view());});
+  try {
+    const menu = tree.root.findByProps({testID:'manager-mobile-menu-toggle'});
+    expect(tree.root.findAllByType('Text').some(node => node.props.children ===
+      'Segure ☰ para mostrar ou ocultar os atalhos.')).toBe(false);
+    act(() => {
+      menu.props.onPressIn();
+      menu.props.onLongPress();
+      menu.props.onPress();
+    });
+    expect(tree.root.findAllByProps({testID:'manager-mobile-rail'})).toHaveLength(1);
+    expect(tree.root.findAllByProps({accessibilityViewIsModal:true})).toHaveLength(0);
+  } finally {
+    act(() => tree.unmount());
+  }
 });
 
 it('keeps a single left-aligned themed account control in the sidebar without navigating prematurely', () => {
@@ -210,4 +232,56 @@ it.each([320,390,760])('keeps the ADMIN selector in the same mobile topbar at wi
  const selectors=tree.root.findAllByType('AppTypeSwitcher');expect(selectors).toHaveLength(1);
  expect(tree.root.findByProps({testID:'manager-topbar'}).findAllByType('AppTypeSwitcher')).toHaveLength(1);
  expect(selectors[0].props.compact).toBe(true);act(()=>tree.unmount());
+});
+
+it.each([1440,393])('keeps account recovery accessible with the sidebar hidden at %ipx', width => {
+  mockWidth=width;
+  const setVisible=jest.fn();
+  mockSidebar={ready:true,visible:false,setRememberedVisible:setVisible};
+  let tree;act(()=>{tree=renderer.create(view());});
+  expect(tree.root.findAllByProps({testID:'manager-sidebar'})).toHaveLength(0);
+  expect(labeled(tree,'Abrir menu')).toHaveLength(0);
+  act(()=>labeled(tree,'Abrir opções do usuário')[0].props.onPress());
+  act(()=>labeled(tree,'Mostrar menu lateral')[0].props.onPress());
+  expect(setVisible).toHaveBeenCalledWith(true);
+  act(()=>tree.unmount());
+});
+
+it.each([
+  ['MANAGER', 36, 0, 50],
+  ['ADMIN', 36, 104, 118],
+])('anchors the mobile company to the header center in %s', (appType, left, right, inset) => {
+  mockWidth = 393;
+  mockBaseAppType = appType;
+  let tree; act(() => {tree = renderer.create(view());});
+  const slot = tree.root.findByProps({testID:'manager-header-company'});
+  expect(slot.props.style[1]).toMatchObject({position:'absolute'});
+  expect(slot.props.style[2].left).toBe(slot.props.style[2].right);
+  const sides = tree.root.findByProps({testID:'manager-topbar'}).children.filter(child => child.props.onLayout);
+  act(() => {
+    sides[0].props.onLayout({nativeEvent:{layout:{width:left}}});
+    sides[1].props.onLayout({nativeEvent:{layout:{width:right}}});
+  });
+  expect(slot.props.style[2]).toEqual({left:inset,right:inset});
+  act(() => tree.unmount());
+});
+
+it('uses category colors on sidebar items before and after navigation', () => {
+  mockModuleAccent = {value:true};
+  let tree; act(() => {tree = renderer.create(view());});
+  const devices = labeled(tree, 'Dispositivos')[0];
+  const inactive = labeled(tree, 'Início')[0];
+  expect(devices.props.style({})[1].backgroundColor).toBe('rgba(20, 117, 104, 0.14)');
+  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('rgba(20, 117, 104, 0.24)');
+  expect(devices.findByType('Icon').props.color).toBe('#147568');
+  expect(inactive.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
+  act(() => tree.update(view('DevicesIndex', {source:'manager'})));
+  expect(devices.props.style({})[1]).toMatchObject({
+    backgroundColor:'rgba(20, 117, 104, 0.24)',borderLeftColor:'#147568',
+  });
+  mockModuleAccent = {value:false};
+  act(() => tree.update(view('DevicesIndex', {source:'manager'})));
+  expect(devices.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
+  expect(devices.props.style({})[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
+  act(() => tree.unmount());
 });

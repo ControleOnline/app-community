@@ -25,10 +25,8 @@ export function isPaidOrder(order) {
       order?.status?.status ||
       order?.status ||
       '',
-  ).toLowerCase();
-  return ['paid', 'pago', 'settled', 'liquidado', 'closed', 'fechado', 'completed', 'concluido', 'concluído'].some(
-    (token) => status.includes(token),
-  );
+  ).trim().toLowerCase();
+  return ['paid', 'pago', 'settled', 'liquidado', 'closed', 'fechado', 'completed', 'concluido', 'concluído'].includes(status);
 }
 
 export function groupPaidOrdersSeries(orders, { from, to, longPeriodDays = 60 } = {}) {

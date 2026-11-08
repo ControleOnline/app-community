@@ -8,6 +8,7 @@ describe('groupPaidOrdersSeries', () => {
   it('detects paid statuses', () => {
     expect(isPaidOrder({status: {realStatus: 'paid'}})).toBe(true);
     expect(isPaidOrder({status: {status: 'open'}})).toBe(false);
+    expect(isPaidOrder({status: {status: 'unpaid'}})).toBe(false);
   });
 
   it('groups by day for short windows', () => {

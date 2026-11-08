@@ -14,6 +14,16 @@ const visibleViewport = () => {
   const viewport = window.visualViewport;
   return { height: viewport?.height || window.innerHeight, inset: viewport ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) : 0 };
 };
+
+const shortcutBarInset = () => {
+  let inset = 0;
+  for (const bar of document.querySelectorAll?.('[data-testid="bottom-navigation"]') || []) {
+    const {top, width, height} = bar.getBoundingClientRect();
+    if (width && height && top > 0) inset = Math.max(inset, window.innerHeight - top);
+  }
+  return inset;
+};
+
 export default function FloatingThemePanel({ onClose }) {const c = useThemeEditorPalette();
   const runtime = useThemeRuntime();
   const mobile = useWindowDimensions().width <= 760;
@@ -27,24 +37,28 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const [editScope, setEditScope] = useState('screen');
   const [origins, setOrigins] = useState(false);
   const [viewport, setViewport] = useState(visibleViewport);
+  const [dockInset, setDockInset] = useState(0);
   const [position, setPosition] = useState({ x: null, y: 16 });
   const panel = useRef(null);
   const [portalHost] = useState(() => document.createElement ? document.createElement('div') : document.body);
   const stopDrag = useRef(null);
   const context = editorContext();
   useEffect(() => {
-    if (portalHost === document.body) return;
     // Keep the same portal root (and draft) inside an open account modal's focus
     // boundary. Moving the DOM host avoids remounting the editor on menu changes.
     const place = () => {
-      const target = document.querySelector('[data-co-theme-editor-host="true"]') || document.body;
-      if (portalHost.parentNode !== target) target.appendChild(portalHost);
+      if (portalHost !== document.body) {
+        const target = document.querySelector('[data-co-theme-editor-host="true"]') || document.body;
+        if (portalHost.parentNode !== target) target.appendChild(portalHost);
+      }
+      if (mobile) setDockInset(shortcutBarInset());
     };
     place();
+    if (typeof MutationObserver === 'undefined') return;
     const observer = new MutationObserver(place);
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => {observer.disconnect();portalHost.remove();};
-  }, [portalHost]);
+    return () => {observer.disconnect();if (portalHost !== document.body) portalHost.remove();};
+  }, [mobile, portalHost]);
   useEffect(() => {
     let alive = true;setTheme(null);setError('');setSelection(null);setInspecting(false);
     loadDomainTheme().then((value) => {if (alive) setTheme(value);}).catch((e) => {if (alive) setError(e.message || t("Não foi possível abrir o tema."));});
@@ -63,13 +77,14 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   useEffect(() => {
     const resize = () => {
       setViewport(visibleViewport());
+      if (mobile) setDockInset(shortcutBarInset());
       const rectangle = panel.current?.getBoundingClientRect();if (!rectangle) return;
       setPosition((current) => ({ x: current.x === null ? null : Math.min(current.x, Math.max(0, window.innerWidth - rectangle.width)), y: Math.min(current.y, Math.max(0, window.innerHeight - rectangle.height)) }));
     };
     const escape = (event) => {if (event.key === 'Escape' && !inspecting && !event.defaultPrevented) onClose();};
     window.addEventListener('resize', resize);window.visualViewport?.addEventListener('resize', resize);window.visualViewport?.addEventListener('scroll', resize);document.addEventListener('keydown', escape);
     return () => {window.removeEventListener('resize', resize);window.visualViewport?.removeEventListener('resize', resize);window.visualViewport?.removeEventListener('scroll', resize);document.removeEventListener('keydown', escape);stopDrag.current?.();};
-  }, [inspecting, onClose]);
+  }, [inspecting, mobile, onClose]);
   const actual = resolveScreenThemeDetails(runtime.preview || runtime.raw, runtime.mode, selection?.screen?.id);
   const values = actual.values;
   const bindings = useMemo(() => selection?.states?.[interaction] || selection?.bindings || [], [selection, interaction]);
@@ -85,10 +100,13 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   };
   const button = (label, action, selected = false) => <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected }} onPress={action} style={{ minHeight: mobile ? 44 : 34, justifyContent: 'center', padding: 9, borderWidth: 1, borderColor: selected ? c.buttonBorder : c.modalBorder, borderRadius: 7, backgroundColor: selected ? c.buttonBackground : c.buttonBackgroundSecondary }}><Text style={{ fontSize: 12, color: selected ? c.buttonText : c.buttonTextSecondary }}>{label}</Text></Pressable>;
   const compactInspection = mobile && inspecting;
+  const mobileBottom = 12 + Math.ceil(Math.max(viewport.inset, dockInset));
+  const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .78),
+    viewport.height + viewport.inset - mobileBottom - 12));
   return createPortal(<>
     {hover && inspecting && <div aria-hidden style={{ pointerEvents: 'none', position: 'fixed', left: hover.left, top: hover.top, width: hover.width, height: hover.height, border: `2px solid ${c.modalBorder}`, background: c.selectOptionSelectedBackground, zIndex: 2147482999 }} />}
     <div ref={panel} data-co-theme-tools="true" role="dialog" aria-modal="false" aria-label={t("Configurador flutuante de temas")}
-    style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: 12 + viewport.inset, width: 'calc(100vw - 24px)', maxHeight: Math.max(160, Math.floor(viewport.height * .78)) } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
+    style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
       <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <strong>{t("Configurador de temas · ADMIN")}</strong>
         <button onClick={onClose} aria-label={t("Fechar painel e cancelar prévia")} style={{ border: 0, background: c.containerTransparentBackground, color: c.modalText, minHeight: mobile ? 44 : 32, minWidth: mobile ? 44 : 32, padding: 8, cursor: 'pointer' }}>✕</button>
@@ -100,11 +118,14 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
       {/* Keep the editor mounted while inspecting so touch selection never discards the draft. */}
       <div style={{ display: compactInspection ? 'none' : 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
         <View style={{ padding: 10, gap: 8 }}>
-          <Text style={{ fontSize: 12, color: c.textSecondary }}>{theme ? t("{{v0}} · tema #{{v1}} do domínio atual", { v0: theme.theme, v1: theme.id }) : t("Carregando tema do domínio…")}</Text>
+          <Text style={{ fontSize: 12, color: c.textSecondary }}>{theme ? t("{{v0}} · tema #{{v1}} do domínio atual", { v0: theme.theme, v1: theme.id }) : error ? t("Tema do domínio indisponível") : t("Carregando tema do domínio…")}</Text>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {button(inspecting ? t("Parar inspeção") : selection ? t("Voltar à inspeção") : t("⌖ Inspecionar elemento"), () => setInspecting((value) => !value))}
             {!!selection && button(t("Todas as variáveis"), () => setSelection(null))}
-            {!!selection?.container && button(t("Fundo e borda do menu"), () => {setSelection(selection.container);setInteraction('normal');})}
+            {!!selection?.container && button(
+              t(selection.container.kind === 'shortcut-bar' ? "Fundo e borda da barra de atalhos" : "Fundo e borda do menu"),
+              () => {setSelection(selection.container);setInteraction('normal');},
+            )}
             {!!error && button(t("Recarregar"), () => setReload((value) => value + 1))}
           </View>
           {inspecting && !mobile && <Text style={{ fontSize: 12, color: c.textLink }}>{t("Passe sobre a tela e clique no elemento. Esc encerra a inspeção.")}</Text>}

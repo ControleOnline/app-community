@@ -1,20 +1,28 @@
 import React from 'react';
 import renderer,{act} from 'react-test-renderer';
 import ManagerOverview from '../../components/manager-preview/ManagerOverview';
-let mockWidth=393,mockTexts=true;
+let mockWidth=393,mockTexts=true,mockModuleIcons=false,mockModuleAccent=false;
 const mockFetch=jest.fn(async()=>({totalItems:0,summary:{sales:{totals:{revenue:0,orders:0,averageTicket:0},daily:[]}}}));
-jest.mock('react-native',()=>({Platform:{OS:'web'},View:'View',Text:'Text',ScrollView:'ScrollView',Pressable:'Pressable',StyleSheet:{create:x=>x},useWindowDimensions:()=>({width:mockWidth})}));
+jest.mock('react-native',()=>({processColor:require('../theme-system/nativeMock.cjs').processColor,Platform:{OS:'web'},View:'View',Text:'Text',ScrollView:'ScrollView',Pressable:'Pressable',StyleSheet:{create:x=>x},useWindowDimensions:()=>({width:mockWidth})}));
 jest.mock('@react-navigation/native',()=>({useIsFocused:()=>true}));
 jest.mock('@appType',()=>({app_type:'MANAGER'}));
 jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:(...args)=>mockFetch(...args)}}));
 jest.mock('../../components/HomeIcon',()=> 'Icon');
 jest.mock('../../components/manager-preview/ManagerStartup',()=> 'ManagerStartup');
 jest.mock('../../components/manager-preview/ManagerOrdersTrend',()=> 'Trend');
-jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({colors:{cardText:'#123456'}})}));
-jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[{id:1,label:'Menu',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',menuType:'home'},{id:2,route:'ClientsIndex',label:'Clientes',menuType:'home'}]}]}:{messages:{}}})}));
+jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({
+  colors:{cardText:'#123456',listItemText:'#654321',textMuted:'#345678',listItemIcon:'#876543',listItemBackground:'#F1F1F1'},
+  moduleIcons:{value:mockModuleIcons},
+  moduleAccent:{value:mockModuleAccent},
+  moduleAccentPalette:{primary:'#147568'},
+})}));
+jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[
+  {id:1,label:'Menu',color:'$primary',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
+  {id:2,label:'Comercial',menus:[{id:2,route:'ClientsIndex',label:'Clientes',menuType:'home'}]},
+]}:{messages:{}}})}));
 const navigation={getState:()=>({routeNames:['OrderHistoryPage','ClientsIndex']}),navigate:jest.fn()};
 const view=()=> <ManagerOverview navigation={navigation}/>;
-beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
+beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockModuleIcons=false;mockModuleAccent=false;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
 afterEach(()=>delete global.t);
 it('keeps four semantic card identities across text and period changes',async()=>{
  let tree;await act(async()=>{tree=renderer.create(view());});
@@ -55,3 +63,57 @@ it('offers the existing translation retry after a failed resolution without faki
  await act(async()=>state().props.onRetry());expect(global.t.scheduleQueuedTranslateResolution).toHaveBeenCalledTimes(2);
  await act(async()=>tree.unmount());
 });
+
+it('switches Explore Modules to icons and back with the same groups and route parameters', async () => {
+  let tree; await act(async () => {tree=renderer.create(view());});
+  const modules = () => tree.root.findByProps({testID:'manager-explore-modules'});
+  const shortcuts = () => modules().findAllByType('Pressable');
+  const labels = shortcuts().map(node => node.props.accessibilityLabel);
+  expect(labels).toHaveLength(2);
+  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(0);
+
+  mockModuleIcons=true;
+  await act(async () => tree.update(view()));
+  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(2);
+  expect(shortcuts().map(node => node.props.accessibilityLabel)).toEqual(labels);
+  expect(shortcuts()[0].findAllByType('Icon')).toHaveLength(1);
+  expect(shortcuts()[0].findByType('Text').props.style[1].color).toBe('#654321');
+  await act(async () => shortcuts()[0].props.onPress());
+  expect(navigation.navigate).toHaveBeenLastCalledWith('OrderHistoryPage',{orderTypeFilter:'sale'});
+
+  mockModuleIcons=false;
+  await act(async () => tree.update(view()));
+  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(0);
+  expect(shortcuts()[0].findAllByType('Icon')).toHaveLength(2);
+  await act(async () => tree.unmount());
+});
+
+it.each([[false, '#345678'], [true, '#876543']])(
+  'uses the category accent for Home icons and their backgrounds (grid: %s)',
+  async (grid, themeColor) => {
+    mockModuleIcons = grid;
+    let tree;
+    await act(async () => {tree = renderer.create(view());});
+    const shortcuts = () => tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable');
+    const iconColors = () => shortcuts().map(item => item.findAllByType('Icon')[0].props.color);
+    const backgrounds = () => shortcuts().map(item => {
+      const style = grid ? item.props.style({}) : item.findAllByType('Icon')[0].parent.props.style;
+      return Array.isArray(style) ? Object.assign({}, ...style).backgroundColor : style?.backgroundColor;
+    });
+    const themeBackground = grid ? '#F1F1F1' : undefined;
+    try {
+      expect(iconColors()).toEqual([themeColor, themeColor]);
+      expect(backgrounds()).toEqual([themeBackground, themeBackground]);
+      mockModuleAccent = true;
+      await act(async () => tree.update(view()));
+      expect(iconColors()).toEqual(['#147568', themeColor]);
+      expect(backgrounds()).toEqual(['rgba(20, 117, 104, 0.14)', themeBackground]);
+      mockModuleAccent = false;
+      await act(async () => tree.update(view()));
+      expect(iconColors()).toEqual([themeColor, themeColor]);
+      expect(backgrounds()).toEqual([themeBackground, themeBackground]);
+    } finally {
+      await act(async () => tree.unmount());
+    }
+  },
+);

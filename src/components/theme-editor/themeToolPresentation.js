@@ -10,7 +10,11 @@ export function themeEditorText(message,values={}) {
  const translated=translator?.t?.('configs','theme_editor',source);
  const fallback=translator?.formatMessage?.(source);
  const text=translated && translated!==source && translated!==fallback?translated:source;
- return text.replace(/\{\{(\w+)\}\}/g,(match,key)=>Object.hasOwn(values,key)?String(values[key] ?? ''):match);
+ return text.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+  // The translation formatter can capitalize the numbered placeholders.
+  const valueKey = /^V\d+$/.test(key) ? key.toLowerCase() : key;
+  return Object.hasOwn(values, valueKey) ? String(values[valueKey] ?? '') : match;
+ });
 }
 export function useThemeEditorPalette() {
  // Subscribe to the existing translation store; its updates rerender tool labels.

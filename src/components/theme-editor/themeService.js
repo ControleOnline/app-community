@@ -5,27 +5,51 @@ import {scopeFor,sessionVersion} from '../../session/sessionScope';
 import {registerActiveTheme,refreshDomainTheme} from '../../styles/themeRuntime';
 
 const idOf = value => String(value?.id || value?.['@id'] || value || '').split('/').pop();
-const itemsOf = result => result?.['hydra:member'] || result?.member || result?.response?.data || result?.data || result || [];
 let pending = null;
 let pendingKey = '';
 export const editorContext = () => `${scopeFor(env)}|${sessionVersion()}`;
-export function loadDomainTheme() {
-  const key=editorContext();
-  if(pending && key===pendingKey)return pending;
-  pendingKey=key;
-  pending=(async()=>{
-    const domain=resolveAppDomain(env.DOMAIN);
-    const response=await api.fetch('people_domains',{params:{domain,itemsPerPage:50}});
-    const list=itemsOf(response);
-    const entry=Array.isArray(list)?list.find(item=>item.domain===domain):null;
-    const id=idOf(entry?.theme);
-    if(!id)throw new Error('O domínio atual não possui um tema acessível para edição.');
-    const theme=await api.fetch(`themes/${id}`);
-    if(key!==editorContext())throw new Error('O contexto mudou. Abra o editor novamente.');
-    registerActiveTheme(id,scopeFor(env));
-    return {...theme,id:theme.id || id,colors:theme.colors || {}};
-  })().finally(()=>{if(pendingKey===key)pending=null;});
-  return pending;
+export async function loadDomainBinding() {
+  const key = editorContext();
+  const domain = resolveAppDomain(env.DOMAIN);
+  let binding;
+  try {
+    const result = await api.fetch('theme-management/domain', {params: {domain}});
+    binding = result?.domain || null;
+  } catch (error) {
+    if ((error?.status ?? error?.code) !== 404 || !domain || key !== editorContext()) throw error;
+    // Older APIs expose the link through the authenticated domain collection.
+    const result = await api.fetch('people_domains', {params: {domain, itemsPerPage:50}});
+    const rows = result?.['hydra:member'] || result?.member || result?.response?.data || result?.data || result;
+    const matches = Array.isArray(rows) ? rows.filter(item => item?.domain === domain) : [];
+    const view = result?.['hydra:view'] || result?.view;
+    const entry = matches.length === 1 && !view?.['hydra:next'] && !view?.next ? matches[0] : null;
+    const themeId = idOf(entry?.theme);
+    binding = entry ? {domain, themeId: /^\d+$/.test(themeId) ? themeId : null, canApply:false} : null;
+  }
+  if (key !== editorContext()) throw new Error('O contexto mudou. Abra o editor novamente.');
+  return binding;
+}
+export async function loadDomainTheme(binding) {
+  const context = editorContext();
+  const entry = binding || await loadDomainBinding();
+  const id = idOf(entry?.themeId);
+  if (!id) throw new Error('O domínio atual não possui um tema acessível para edição.');
+  if (context !== editorContext()) throw new Error('O contexto mudou. Abra o editor novamente.');
+  const key = JSON.stringify([context, id]);
+  if (pending && key === pendingKey) return pending;
+
+  pendingKey = key;
+  const request = api.fetch(`themes/${id}`).then(theme => {
+    if (context !== editorContext() || pending !== request) {
+      throw new Error('O contexto ou o tema mudou. Abra o editor novamente.');
+    }
+    registerActiveTheme(id, scopeFor(env));
+    return {...theme, id: theme.id || id, colors: theme.colors || {}};
+  }).finally(() => {
+    if (pending === request) pending = null;
+  });
+  pending = request;
+  return request;
 }
 export async function saveThemeChanges(theme,changes,context) {
   if(context!==editorContext())throw new Error('A sessão ou o domínio mudou. Abra o editor novamente.');

@@ -1,54 +1,40 @@
-/**
- * Apply theme scrollbar tokens as web CSS (webkit + standard scrollbar).
- * Tokens come from the domain theme (scrollbar-thumb-*, scrollbar-track-*, …).
- */
+const styleId = 'co-global-scrollbar-styles';
+const outsideScreen = ':not([data-co-scrollbars], [data-co-scrollbars] *)';
 
-let styleNode = null;
+export function applyThemeScrollbarStyles() {
+  if (typeof document === 'undefined' || !document.head || document.getElementById(styleId)) return;
 
-function readCssVar(name, fallback) {
-  if (typeof document === 'undefined') return fallback;
-  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return value || fallback;
-}
-
-export function applyThemeScrollbarStyles({ mode = 'light' } = {}) {
-  if (typeof document === 'undefined') return;
-  const suffix = mode === 'dark' ? 'dark' : 'light';
-  const thumb = readCssVar(`--scrollbar-thumb-${suffix}`, readCssVar('--co-theme-scrollbar-thumb-' + suffix, '#AAAAAA'));
-  const track = readCssVar(`--scrollbar-track-${suffix}`, readCssVar('--co-theme-scrollbar-track-' + suffix, '#353434'));
-  const hover = readCssVar(
-    `--scrollbar-thumb-hover-${suffix}`,
-    readCssVar('--co-theme-scrollbar-thumb-hover-' + suffix, thumb),
-  );
-  const width = readCssVar('--scrollbar-width', readCssVar('--co-theme-scrollbar-width', '10px'));
-  const radius = readCssVar('--scrollbar-radius', readCssVar('--co-theme-scrollbar-radius', '8px'));
-
-  const css = `
-html, body, * {
-  scrollbar-width: thin;
-  scrollbar-color: ${thumb} ${track};
-}
-*::-webkit-scrollbar {
-  width: ${width};
-  height: ${width};
-}
-*::-webkit-scrollbar-track {
-  background: ${track};
-  border-radius: ${radius};
-}
-*::-webkit-scrollbar-thumb {
-  background: ${thumb};
-  border-radius: ${radius};
-}
-*::-webkit-scrollbar-thumb:hover {
-  background: ${hover};
+  // ScreenThemeBoundary owns scrollbars inside a themed screen.
+  const style = document.createElement('style');
+  style.id = styleId;
+  style.textContent = `
+@media not all and (forced-colors: active) {
+  ${outsideScreen} {
+    scrollbar-width: thin;
+    scrollbar-color: var(--co-theme-scrollbarThumb, #aaa) var(--co-theme-scrollbarTrack, #353434);
+  }
+  ${outsideScreen}::-webkit-scrollbar {
+    width: var(--co-theme-scrollbar-width, 10px);
+    height: var(--co-theme-scrollbar-width, 10px);
+  }
+  ${outsideScreen}::-webkit-scrollbar-track {
+    background: var(--co-theme-scrollbarTrack, #353434);
+    border-radius: var(--co-theme-scrollbar-radius, 8px);
+  }
+  ${outsideScreen}::-webkit-scrollbar-thumb {
+    background: var(--co-theme-scrollbarThumb, #aaa);
+    border-radius: var(--co-theme-scrollbar-radius, 8px);
+  }
+  @supports selector(::-webkit-scrollbar-thumb) {
+    ${outsideScreen} {
+      scrollbar-color: auto;
+      scrollbar-width: auto;
+    }
+    ${outsideScreen}::-webkit-scrollbar-thumb:hover {
+      background: var(--co-theme-scrollbarThumbHover, var(--co-theme-scrollbarThumb, #aaa));
+    }
+  }
 }
 `;
-
-  if (!styleNode) {
-    styleNode = document.createElement('style');
-    styleNode.setAttribute('data-co-theme-scrollbar', '1');
-    document.head.appendChild(styleNode);
-  }
-  styleNode.textContent = css;
+  document.head.appendChild(style);
 }
