@@ -15,7 +15,7 @@ it('keeps a centered single-line name, shrinks overflowing text and preserves th
  const text=()=>tree.root.findByType('Text');
  expect(Object.assign({},...tree.root.findByType('DefaultFile').props.style.flat(Infinity).filter(Boolean))).toMatchObject({width:22,height:22});
  expect(text().props.accessibilityLabel).toBe(mockCompany.alias);expect(text().props.numberOfLines).toBe(1);
- expect(text().props.style[1]).toMatchObject({fontSize:12,textAlign:'center'});
+ expect(Object.assign({},...text().props.style.filter(Boolean))).toMatchObject({fontSize:12,textAlign:'center'});
  measure.scrollWidth=300;
  act(()=>text().props.onLayout({nativeEvent:{layout:{height:16,width:90}}}));
  expect(text().props.style[1].fontSize).toBe(9);expect(text().children.join('')).toBe(mockCompany.alias);
@@ -63,13 +63,13 @@ it('switches the selected-company logo with the theme mode and preserves the ori
  expect(mockCompany.logo).toEqual({id:8});act(()=>tree.unmount());
 });
 
-it('shows a complete header label without a line clamp or tiny text, even when it needs extra wrapping',()=>{
+it('fits the complete header label on one line when the available width is narrow',()=>{
  const label='MT - RONDONÓPOLIS — uma unidade com nome muito comprido';
- let tree;const measure={clientWidth:65,scrollWidth:65,scrollHeight:90};
+ let tree;const measure={clientWidth:145,scrollWidth:145};
  act(()=>{tree=renderer.create(<CompanyName label={label} dense small complete/>,{createNodeMock:element=>element.type==='Text'?measure:null});});
  const text=tree.root.findByType('Text');
- expect(text.props.numberOfLines).toBeUndefined();expect(text.props.adjustsFontSizeToFit).toBe(false);
- expect(text.props.style[1]).toMatchObject({fontSize:10,overflowWrap:'anywhere'});
+ expect(text.props.numberOfLines).toBe(1);expect(text.props.adjustsFontSizeToFit).toBe(false);
+ expect(Object.assign({},...text.props.style.filter(Boolean))).toMatchObject({textAlign:'center'});
  expect(text.children.join('')).toBe(label);expect(text.props.accessibilityLabel).toBe(label);
  act(()=>tree.unmount());
 });
