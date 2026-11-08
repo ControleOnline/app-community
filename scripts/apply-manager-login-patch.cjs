@@ -9,10 +9,11 @@ for (const moduleRoot of roots) {
   const target = path.join(moduleRoot, patch.file);
   if (!fs.existsSync(target)) continue;
   let source = fs.readFileSync(target,'utf8');
-  for (const [before, after] of patch.replacements) {
+  for (const [before, after, previous] of patch.replacements) {
     if (source.includes(after)) continue;
-    if (source.split(before).length !== 2) throw new Error(`ui-login changed: cannot safely apply local identifier adapter at ${target}`);
-    source = source.replace(before,after);
+    const from = previous && source.includes(previous) ? previous : before;
+    if (source.split(from).length !== 2) throw new Error(`ui-login changed: cannot safely apply local identifier adapter at ${target}`);
+    source = source.replace(from,after);
   }
   fs.writeFileSync(target,source);
 }

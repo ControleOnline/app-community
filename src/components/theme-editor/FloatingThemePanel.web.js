@@ -89,6 +89,24 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const values = actual.values;
   const bindings = useMemo(() => selection?.states?.[interaction] || selection?.bindings || [], [selection, interaction]);
   const selectedTokens = useMemo(() => [...new Set(bindings.map((item) => item.token))], [bindings]);
+  const selectScrollbar = () => {
+    // Native scrollbar parts are CSS pseudo-elements and cannot be selected as DOM nodes.
+    setSelection((current) => ({
+      kind: 'scrollbar',
+      screen: current?.screen,
+      states: {
+        normal: [
+          {property: 'scrollbar thumb', token: 'scrollbarThumb'},
+          {property: 'scrollbar track', token: 'scrollbarTrack'},
+        ],
+        hover: [{property: 'scrollbar thumb :hover', token: 'scrollbarThumbHover'}],
+      },
+    }));
+    setInspecting(false);
+    setInteraction('normal');
+    if (!selection?.screen) setEditScope('global');
+    setError('');
+  };
   const drag = (event) => {
     if (mobile || event.target.closest?.('button,input')) return;
     const start = { x: event.clientX, y: event.clientY };
@@ -108,11 +126,12 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     <div ref={panel} data-co-theme-tools="true" role="dialog" aria-modal="false" aria-label={t("Configurador flutuante de temas")}
     style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
       <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <strong>{t("Configurador de temas · ADMIN")}</strong>
+        <strong>{t("Configurador de temas")}</strong>
         <button onClick={onClose} aria-label={t("Fechar painel e cancelar prévia")} style={{ border: 0, background: c.containerTransparentBackground, color: c.modalText, minHeight: mobile ? 44 : 32, minWidth: mobile ? 44 : 32, padding: 8, cursor: 'pointer' }}>✕</button>
       </div>
       {compactInspection && <View style={{ padding: 10, gap: 6 }}>
         <Text style={{ fontSize: 12, color: c.textLink }}>{t("Toque no elemento para editar suas cores. Arraste a página para rolar.")}</Text>
+        {button(t("Barra de rolagem"), selectScrollbar)}
         {button(t("Cancelar inspeção"), () => setInspecting(false))}
       </View>}
       {/* Keep the editor mounted while inspecting so touch selection never discards the draft. */}
@@ -121,6 +140,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
           <Text style={{ fontSize: 12, color: c.textSecondary }}>{theme ? t("{{v0}} · tema #{{v1}} do domínio atual", { v0: theme.theme, v1: theme.id }) : error ? t("Tema do domínio indisponível") : t("Carregando tema do domínio…")}</Text>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {button(inspecting ? t("Parar inspeção") : selection ? t("Voltar à inspeção") : t("⌖ Inspecionar elemento"), () => setInspecting((value) => !value))}
+            {button(t("Barra de rolagem"), selectScrollbar, selection?.kind === 'scrollbar')}
             {!!selection && button(t("Todas as variáveis"), () => setSelection(null))}
             {!!selection?.container && button(
               t(selection.container.kind === 'shortcut-bar' ? "Fundo e borda da barra de atalhos" : "Fundo e borda do menu"),

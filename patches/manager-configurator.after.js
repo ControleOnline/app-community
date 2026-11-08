@@ -99,15 +99,15 @@ const getConfigActions = () => [
 
 // Shortcuts are dynamic: each one is a `configurator` menu (menus-people), filtered by the
 // API per profile and enabled flag. The fixed list above is only a fallback used when the
-// menu request fails. Theme tools can supply their own authorized shortcut.
+// menu request fails; an empty response means nothing is allowed and hides every card.
 export const CONFIGURATOR_MENU_TYPE = 'configurator';
 
-export const filterConfigActions = (actions, state, showThemeShortcut = false) =>
-  actions.filter(item =>
-    state?.status === 'error' ||
-    (state?.status === 'ready' && state.routes.has(item.route)) ||
-    (showThemeShortcut && item.route === 'ThemeManagerPage'),
-  );
+export const filterConfigActions = (actions, state) =>
+  state?.status === 'error'
+    ? actions
+    : state?.status === 'ready'
+      ? actions.filter(item => state.routes.has(item.route))
+      : [];
 
 export const useConfiguratorMenu = companyId => {
   const [state, setState] = useState({ status: 'loading', routes: new Set() });
@@ -167,7 +167,7 @@ function ActionCard({ styles, colors, label, description, icon, onPress }) {
   );
 }
 
-export default function ConfiguratorPage({ navigation, presentation = null, showThemeShortcut = false }) {
+export default function ConfiguratorPage({ navigation, presentation = null }) {
   const peopleStore = useStore('people');
   const themeStore = useStore('theme');
   const { currentCompany } = peopleStore.getters;
@@ -190,7 +190,7 @@ export default function ConfiguratorPage({ navigation, presentation = null, show
     () => presentation?.styles || createStyles(configuratorColors),
     [presentation?.styles, configuratorColors],
   );
-  const configActions = filterConfigActions(getConfigActions(), menuState, showThemeShortcut).map(item => ({
+  const configActions = filterConfigActions(getConfigActions(), menuState).map(item => ({
     ...item,
     ...(presentation?.actionText?.[item.route] || {}),
   }));
