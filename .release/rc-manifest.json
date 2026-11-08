@@ -1,26 +1,28 @@
 {
-  "version": "1.10.153",
+  "version": "1.10.154",
   "rc": 1,
-  "branch": "rc/1.10.153-rc.1",
+  "branch": "rc/1.10.154-rc.1",
   "baseMaster": "d74b81936b01d9512f60ce475e3d2638ecc6cb2e",
   "tasks": [
     133,
     134,
-    1437,
     1442,
-    1444
+    1444,
+    1447
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "96d1af8bee4a73c4a460475371bdc67b7b324af4",
+    "ControleOnline/app-community": "5e9f36b798aa9628b620a24bbd919d5506f65143",
     "ControleOnline/ui-default": "1ca2828eb269e35e4e304e9c7a405233dffc498a",
     "ControleOnline/ui-common": "ea23be69dac91969dd05e1c0b901a223fb3fc28a",
-    "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1",
-    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
+    "ControleOnline/ui-customers": "47afa285f21ade188dedbdd1565565ceb99d2e5b",
+    "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90",
+    "ControleOnline/ui-crm": "034a1f09019c1464db0287bdf1d3fd8821376e16",
+    "ControleOnline/ui-products": "024e64eb2bac77c97c064e332bb7880415e0953b"
   },
   "validation": {
-    "scope": "1.10.152 (#1442): altura 32px nos botoes da home, acesso rapido e menu lateral. 1.10.153 (#1444): ui-default 1.0.289 - badge ID 32px, row compacta 40px.",
+    "scope": "1.10.152 (#1442): altura 32px nos botoes da home, acesso rapido e menu lateral. 1.10.153 (#1444): ui-default 1.0.289 - badge ID 32px, row compacta 40px. 1.10.154 (#1447): abas de 40px em ui-customers 1.0.93, ui-crm 1.0.63, ui-products 1.0.43 (ui-contracts nao publicou). 1437 removida do manifesto: ja esta em master.",
     "checks": "jest controlHeight.contract (1 pass); parse esbuild ok; sem validacao visual; compactRowHeight.contract (1 pass); sem validacao visual"
   }
 }
