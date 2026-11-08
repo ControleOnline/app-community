@@ -1,19 +1,18 @@
 {
-  "version": "1.10.147",
+  "version": "1.10.148",
   "rc": 1,
-  "branch": "rc/1.10.147-rc.1",
-  "baseMaster": "9fbdfd8f9a8550235905477768d076c8f6fba175",
+  "branch": "rc/1.10.148-rc.1",
+  "baseMaster": "d4b39fa69b5051d83d254e491d7ef5317feca110",
   "tasks": [
-    1411
+    1431
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a532d141c90954f532095bfc8006c40bb1213e34",
-    "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1"
+    "ControleOnline/app-community": "199c234b4d6a13f059f0b869d0dd9f273d91c0ec"
   },
   "validation": {
-    "scope": "ui-customers 1.0.92 (task #1411): Ver/Abrir/Compartilhar/Imprimir de anexos privados com API-TOKEN (somente origem confiavel); blob so renderiza imagem/pdf.",
-    "checks": "documentsTabHelpers + documentsTabContract (14 pass); homologado pelo usuario em staging (ui-customers 1.0.91, rc 1.10.145-rc.1); Security: recusado em 1.0.91, correcoes em 1.0.92"
+    "scope": "package.json fixa @controleonline/ui-default 1.0.288, versao exigida pelos patches ui-default-read-ownership/refresh (build do master falhava em apply-manager-table-patch).",
+    "checks": "varredura de todos os patches vs pins do package.json: unica divergencia era ui-default; staging ja estava alinhado; ui-default 1.0.288 publicado no npm"
   }
 }
