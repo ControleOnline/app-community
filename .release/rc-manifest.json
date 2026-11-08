@@ -1,7 +1,7 @@
 {
   "version": "1.10.151",
-  "rc": 1,
-  "branch": "rc/1.10.151-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.151-rc.2",
   "baseMaster": "d74b81936b01d9512f60ce475e3d2638ecc6cb2e",
   "tasks": [
     133,
@@ -11,7 +11,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "331e1ab54fb03ea80af60babbdc87b145691dc36",
+    "ControleOnline/app-community": "6a0c3b614613bc777467b1c0c900254b755d07b1",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
     "ControleOnline/ui-common": "ea23be69dac91969dd05e1c0b901a223fb3fc28a",
     "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1",
