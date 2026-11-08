@@ -2,8 +2,7 @@ import contract from './themeContract.generated';
 import {resolveManagerThemeDetails} from './managerTheme';
 import {parseScreenThemeKey} from './screenThemeKeys';
 
-export function resolveScreenThemeDetails(raw={},mode='light',screen){
-  const base=resolveManagerThemeDetails(raw,mode);
+export function resolveScreenThemeDetails(raw={},mode='light',screen,base=resolveManagerThemeDetails(raw,mode)){
   if(!screen)return base;
   const values={...base.values},sources={...base.sources},overrides=new Set();
   for(const [key,value] of Object.entries(raw)){
@@ -20,8 +19,14 @@ export function resolveScreenThemeDetails(raw={},mode='light',screen){
   }
   return {values,sources};
 }
-export function screenThemeCss(raw,mode,screen){
-  const base=resolveManagerThemeDetails(raw,mode).values;
-  const local=resolveScreenThemeDetails(raw,mode,screen).values;
-  return Object.fromEntries(Object.entries(local).filter(([token,value])=>value!=null && value!==base[token]).map(([token,value])=>[`--co-theme-${token}`,String(value)]));
+export function screenThemePresentation(raw, mode, screen) {
+  const base = resolveManagerThemeDetails(raw, mode);
+  const {values} = resolveScreenThemeDetails(raw, mode, screen, base);
+  const css = Object.fromEntries(Object.entries(values).filter(([token,value])=>value!=null && value!==base.values[token])
+    .map(([token,value])=>[`--co-theme-${token}`,String(value)]));
+  const scrollbars = values.scrollbarThumb && values.scrollbarTrack
+    ? (values.scrollbarThumbHover ? 'hover' : 'normal') : undefined;
+  return {css, scrollbars};
 }
+
+export const screenThemeCss = (raw, mode, screen) => screenThemePresentation(raw, mode, screen).css;

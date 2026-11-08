@@ -36,6 +36,31 @@
     [
       "                style={styles.logoContainer}>",
       "                style={[styles.logoContainer, introMessage === null && {marginBottom: 0}]}>"
+    ],
+    [
+      "import {createStyles, resolveSignInTheme} from './index.styles';",
+      "import {createStyles, resolveSignInTheme} from './index.styles';\nimport {resolveLoginFieldColors} from '@controleonline/../../src/styles/loginFieldColors';"
+    ],
+    [
+      "  const styles = useMemo(() => createStyles(theme), [theme]);",
+      "  const styles = useMemo(() => createStyles(theme), [theme]);\n  const loginFields = resolveLoginFieldColors(theme);",
+      "  const styles = useMemo(() => createStyles(theme), [theme]);\n  const loginFields = resolveLoginFieldColors(theme, APP_ENV.DOMAIN);"
+    ],
+    [
+      "                styles.inputContainer,\n                errors.username && styles.inputError,",
+      "                styles.inputContainer,\n                {backgroundColor: loginFields.backgroundColor},\n                errors.username && styles.inputError,"
+    ],
+    [
+      "                placeholderTextColor={theme.inputPlaceholderText}\n                style={styles.input}\n                value={username}",
+      "                placeholderTextColor={loginFields.placeholderColor}\n                style={[styles.input, {color: loginFields.textColor}]}\n                value={username}"
+    ],
+    [
+      "                styles.inputContainer,\n                errors.password && styles.inputError,",
+      "                styles.inputContainer,\n                {backgroundColor: loginFields.backgroundColor},\n                errors.password && styles.inputError,"
+    ],
+    [
+      "                placeholderTextColor={theme.inputPlaceholderText}\n                style={styles.input}\n                value={password}",
+      "                placeholderTextColor={loginFields.placeholderColor}\n                style={[styles.input, {color: loginFields.textColor}]}\n                value={password}"
     ]
   ]
 }

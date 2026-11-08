@@ -1,6 +1,7 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import RuntimeBar from '@controleonline/ui-common/src/react/components/RuntimeBottomNavigationBar';
+import ManagerBottomNavigation from '../../components/manager-preview/ManagerBottomNavigation';
 const mockFetch = jest.fn();
 let mockCompany;
 let mockRuntimeMenus;
@@ -41,6 +42,27 @@ it('renders only the configured role-aware toolbar, including a profile-only POS
   expect(bar.props.appearance).toBe('soft'); expect(bar.props.placement).toBe('inline');
   expect(bar.props.activeRouteName).toBe('PdvPage');
   act(() => tree.unmount());
+});
+
+it('passes the dedicated Manager dock colors to the rendered shortcut bar', async () => {
+  mockFetch.mockResolvedValue(response(['ProfilePage']));
+  const navigation={getState:()=>({routeNames:['ProfilePage']})};
+  const colors={navigationBackground:'var(--co-theme-navigationBackground)',
+    navigationBorder:'var(--co-theme-navigationBorder)',
+    shortcutBarBackground:'var(--co-theme-shortcutBarBackground)',
+    shortcutBarBorder:'var(--co-theme-shortcutBarBorder)'};
+  let tree;
+  await act(async () => {tree=renderer.create(<ManagerBottomNavigation navigation={navigation}
+    route={{name:'ProfilePage'}} colors={colors}/>);});
+  try {
+    expect(tree.root.findByType('Bar').props.colors).toMatchObject({
+      navigationBackground:'var(--co-theme-shortcutBarBackground)',
+      navigationBorder:'var(--co-theme-shortcutBarBorder)',
+    });
+    expect(colors.navigationBackground).toBe('var(--co-theme-navigationBackground)');
+  } finally {
+    act(() => tree.unmount());
+  }
 });
 
 it('uses only safe Home/Profile fallback on API failure, never the business preset', async () => {

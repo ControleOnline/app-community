@@ -90,6 +90,7 @@ export function managerMenu(menus, availableRoutes, translate, menuType = 'home'
           const params = resolveMenuRouteParams(item.routeParams);
           return {
             ...item,
+            categoryColor: group.color,
             name,
             params,
             title:
@@ -102,12 +103,15 @@ export function managerMenu(menus, availableRoutes, translate, menuType = 'home'
   }).filter(group => group.items.length);
 }
 
+export const matchesManagerMenuParams = (item, route) => Object.entries(item.params || {})
+  .every(([key, value]) => JSON.stringify(route.params?.[key]) === JSON.stringify(value));
+
 export function selectedManagerMenuItem(items, route) {
   const candidates = items.filter(item => item.name === route.name);
   if (candidates.length === 1) return candidates[0];
   // A shared route can represent distinct domain flows (sales and purchases).
   return candidates.sort((a, b) => Object.keys(b.params || {}).length - Object.keys(a.params || {}).length)
-    .find(item => Object.entries(item.params || {}).every(([key, value]) => JSON.stringify(route.params?.[key]) === JSON.stringify(value)));
+    .find(item => matchesManagerMenuParams(item, route));
 }
 
 export const previewModeKey = 'controleonline.manager-preview.mode';

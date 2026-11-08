@@ -12,7 +12,7 @@ const data={domain:{id:7,domain:'localhost:8081',themeId:11,canApply:true},canDe
 const text=tree=>tree.root.findAllByType('Text').map(n=>n.children.join('')).join('\n');
 const button=(tree,label)=>tree.root.findAllByType('Pressable').find(n=>n.props.accessibilityLabel===label || n.findAllByType('Text').some(t=>t.children.join('')===label));
 async function open(){let tree;await act(async()=>{tree=renderer.create(<ThemeCatalog/>);});await act(async()=>button(tree,'Gerenciar temas e vínculos').props.onPress());return tree;}
-beforeEach(()=>{mockAvailable=true;jest.clearAllMocks();loadThemeCatalog.mockResolvedValue(data);});
+beforeEach(()=>{mockAvailable=true;jest.clearAllMocks();loadThemeCatalog.mockResolvedValue(data);loadCatalogTheme.mockResolvedValue({...data.items[1],colors:{}});});
 test('shows current theme and links without any write, blocking deletion in use',async()=>{
  const tree=await open();expect(text(tree)).toContain('Tema: ATUAL #11');expect(text(tree)).toContain('Em uso em localhost:8081');expect(text(tree)).toContain('Empresa #3');
  expect(text(tree)).not.toContain('Domínio: localhost:8081');
@@ -81,4 +81,20 @@ test('company search uses only visible link details and changing scope collapses
  await act(async()=>button(tree,'Gestão global').props.onPress());
  expect(button(tree,'Ver vínculos de ATUAL').props.accessibilityState.expanded).toBe(false);
  expect(text(tree)).not.toContain('Domínio: localhost:8081');await act(async()=>tree.unmount());
+});
+
+test('offers a read-only preview before confirmation, with permission from the domain',async()=>{
+ mockAvailable=false;
+ loadCatalogTheme.mockResolvedValue({...data.items[1],colors:{'cardBackground-light':'#abcdef','cardBackground-dark':'#123456'}});
+ let tree;await act(async()=>{tree=renderer.create(<ThemeCatalog mode="apply"/>);});
+ await act(async()=>button(tree,'Trocar tema').props.onPress());
+ await act(async()=>button(tree,'Prévia de GYROS').props.onPress());
+ expect(text(tree)).toContain('GYROS #5');
+ expect(tree.root.findByProps({testID:'theme-swap-preview'}).findAllByType('View').some(view=>view.props.style?.backgroundColor==='#abcdef')).toBe(true);
+ await act(async()=>button(tree,'Escuro').props.onPress());
+ expect(tree.root.findByProps({testID:'theme-swap-preview'}).findAllByType('View').some(view=>view.props.style?.backgroundColor==='#123456')).toBe(true);
+ expect(applyDomainTheme).not.toHaveBeenCalled();
+ await act(async()=>button(tree,'Confirmar aplicação').props.onPress());
+ expect(applyDomainTheme).toHaveBeenCalledWith(data.domain,data.items[1],'local-session',expect.any(Function));
+ await act(async()=>tree.unmount());
 });

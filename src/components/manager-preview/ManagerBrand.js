@@ -8,25 +8,35 @@ import {useThemeRuntime} from '../../styles/themeRuntime';
 import {useCompanyBranding} from '../theme-editor/companyBrandingRuntime';
 
 export function CompanyName({label, color, dense = false, small = false, lines = 1, complete = false}) {
-  const [fontSize, setFontSize] = useState(dense ? (small ? 11 : 12) : 17);
-  const text=useRef(null);
-  const fitName=()=>{
-    const node=text.current;
-    if(dense && Platform?.OS==='web' && node?.clientWidth>0 && (node.scrollWidth>node.clientWidth+1 || ((complete || lines>1) && node.scrollHeight>Math.round(fontSize*1.18)*(complete?2:1.5)+1)) && fontSize>(complete?10:9)){
-      setFontSize(size=>Math.max(complete?10:9,size-1));
+  const [fontSize, setFontSize] = useState(dense ? (small || complete ? 11 : 12) : 17);
+  const text = useRef(null);
+  const fitName = () => {
+    const node = text.current;
+    if (!dense || Platform?.OS !== 'web' || !node?.clientWidth) return;
+    if (node.scrollWidth > node.clientWidth + 1) {
+      // A single-line header caption can use the full width below the logo.
+      const minimum = complete ? 1 : 9;
+      if (fontSize > minimum) {
+        setFontSize(complete ? Math.max(minimum, Math.floor(fontSize * node.clientWidth / node.scrollWidth * 10) / 10)
+          : Math.max(minimum, fontSize - 1));
+      }
+    } else if (!complete && lines > 1 && node.scrollHeight > Math.round(fontSize * 1.18) * 1.5 + 1 && fontSize > 9) {
+      setFontSize(size => Math.max(9, size - 1));
     }
   };
-  useLayoutEffect(()=>{fitName();},[dense,fontSize,label,lines,complete]);
-  // Header names wrap to their full height; never replace their ending with an ellipsis.
+  useLayoutEffect(() => {fitName();}, [dense, fontSize, label, lines, complete]);
   return (
     <Text ref={text} accessibilityLabel={label}
-      title={dense && Platform?.OS==='web'?label:undefined}
-      numberOfLines={dense && !complete?lines:undefined} adjustsFontSizeToFit={dense && !complete} minimumFontScale={dense?0.75:undefined}
-      onLayout={event=>{
-        if(dense){fitName();return;}
-        if(event.nativeEvent.layout.height>42 && fontSize>12)setFontSize(size=>Math.max(12,size-1));
+      title={dense && Platform?.OS === 'web' ? label : undefined}
+      numberOfLines={dense ? lines : undefined}
+      adjustsFontSizeToFit={dense && (!complete || Platform?.OS !== 'web')}
+      minimumFontScale={dense ? (complete ? 0.1 : 0.75) : undefined}
+      onLayout={event => {
+        if (dense) {fitName(); return;}
+        if (event.nativeEvent.layout.height > 42 && fontSize > 12) setFontSize(size => Math.max(12, size - 1));
       }}
-      style={[s.title, {color,fontSize,lineHeight:Math.round(fontSize*1.18),...(dense?{textAlign:'center',...(complete?{maxWidth:'100%',minWidth:0,flexShrink:1,...(Platform?.OS==='web'?{overflowWrap:'anywhere'}:{})}:lines===1?{width:'100%'}:{})}:{})}]}>
+      style={[s.title, {color, fontSize, lineHeight: Math.round(fontSize * 1.18)},
+        dense && s.denseTitle, complete ? s.completeTitle : dense && lines === 1 && s.fullTitle]}>
       {label}
     </Text>
   );
@@ -125,5 +135,8 @@ const s = StyleSheet.create({
   homeLogo: {width: 28, height: 28, flexShrink: 0},
   remote: {position: 'absolute', top: 0, left: 0},
   title: {fontWeight: '600'},
+  denseTitle: {textAlign: 'center'},
+  completeTitle: {flexShrink: 1, minWidth: 0},
+  fullTitle: {width: '100%'},
   subtitle: {fontSize: 9, letterSpacing: 1.5, marginTop: 4},
 });

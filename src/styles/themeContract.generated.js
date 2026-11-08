@@ -17,7 +17,10 @@ module.exports = {
         "sectionBorder",
         "sheetBackground",
         "sheetBorder",
-        "surface"
+        "surface",
+        "scrollbarThumb",
+        "scrollbarTrack",
+        "scrollbarThumbHover"
       ]
     },
     {
@@ -190,7 +193,10 @@ module.exports = {
         "inputFocusBorder",
         "inputIcon",
         "inputPlaceholderText",
-        "inputText"
+        "inputText",
+        "loginInputBackground",
+        "loginInputText",
+        "loginInputPlaceholderText"
       ]
     },
     {
@@ -324,7 +330,14 @@ module.exports = {
         "navigationDisabledText",
         "navigationIcon",
         "navigationShadow",
-        "navigationText"
+        "navigationText",
+        "shortcutBarBackground",
+        "shortcutBarBorder",
+        "shortcutBarIcon",
+        "shortcutBarText",
+        "shortcutBarActiveBackground",
+        "shortcutBarActiveIcon",
+        "shortcutBarActiveText"
       ]
     },
     {
@@ -417,6 +430,9 @@ module.exports = {
     "sheetBackground",
     "sheetBorder",
     "surface",
+    "scrollbarThumb",
+    "scrollbarTrack",
+    "scrollbarThumbHover",
     "navbarBackground",
     "navbarBorder",
     "tabBarBackground",
@@ -535,6 +551,9 @@ module.exports = {
     "inputIcon",
     "inputPlaceholderText",
     "inputText",
+    "loginInputBackground",
+    "loginInputText",
+    "loginInputPlaceholderText",
     "linkDisabledText",
     "linkHoverText",
     "linkText",
@@ -629,6 +648,13 @@ module.exports = {
     "navigationIcon",
     "navigationShadow",
     "navigationText",
+    "shortcutBarBackground",
+    "shortcutBarBorder",
+    "shortcutBarIcon",
+    "shortcutBarText",
+    "shortcutBarActiveBackground",
+    "shortcutBarActiveIcon",
+    "shortcutBarActiveText",
     "overlayBackground",
     "overlayBorder",
     "overlayShadow",
@@ -757,7 +783,54 @@ module.exports = {
       "variant": "summary",
       "label": "Cards de resumo financeiro",
       "usage": "Cards mensais e caixas de métricas do relatório de resultados"
+    },
+    "shortcutBarBackground": {
+      "base": "navigationBackground",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Fundo da barra de atalhos inferior do Manager"
+    },
+    "shortcutBarBorder": {
+      "base": "navigationBorder",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Borda da barra de atalhos inferior do Manager"
+    },
+    "shortcutBarIcon": {
+      "base": "navigationIcon",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Ícone do atalho no estado normal"
+    },
+    "shortcutBarText": {
+      "base": "navigationText",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Texto do atalho no estado normal"
+    },
+    "shortcutBarActiveBackground": {
+      "base": "navigationActiveBackground",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Fundo do atalho selecionado"
+    },
+    "shortcutBarActiveIcon": {
+      "base": "navigationActiveIcon",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Ícone do atalho selecionado"
+    },
+    "shortcutBarActiveText": {
+      "base": "navigationActiveText",
+      "variant": "shortcutBar",
+      "label": "Barra de atalhos",
+      "usage": "Texto do atalho selecionado"
     }
+  },
+  "legacyKeys": {
+    "scrollbarThumb": "scrollbar-thumb",
+    "scrollbarTrack": "scrollbar-track",
+    "scrollbarThumbHover": "scrollbar-thumb-hover"
   },
   "managerTokens": [
     "buttonBackground",
@@ -830,6 +903,13 @@ module.exports = {
     "selectOptionSelectedBackground",
     "selectOptionSelectedText",
     "selectText",
+    "shortcutBarActiveBackground",
+    "shortcutBarActiveIcon",
+    "shortcutBarActiveText",
+    "shortcutBarBackground",
+    "shortcutBarBorder",
+    "shortcutBarIcon",
+    "shortcutBarText",
     "summaryCardBackground",
     "summaryCardBorder",
     "summaryCardDangerText",

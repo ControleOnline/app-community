@@ -14,6 +14,29 @@ jest.mock('../../components/theme-editor/ThemeColorEditor',()=>{
 const button=(tree,label)=>tree.root.findAllByType('Pressable').find(n=>n.findAllByType('Text').some(t=>t.children.join('')===label));
 beforeEach(()=>{mockWidth=393;mockMounts=0;attachThemeInspector.mockClear();global.window={innerWidth:393,innerHeight:852,addEventListener:jest.fn(),removeEventListener:jest.fn()};global.document={body:{},addEventListener:jest.fn(),removeEventListener:jest.fn()};});
 afterEach(()=>{delete global.window;delete global.document;});
+test('keeps the shortcut bar uncovered during mobile inspection and editing',async()=>{
+ let bar={getBoundingClientRect:()=>({top:758,width:393,height:56})};
+ let notify;
+ global.document.querySelectorAll=()=>bar?[bar]:[];
+ global.MutationObserver=jest.fn(callback=>{notify=callback;return {observe:jest.fn(),disconnect:jest.fn()};});
+ let tree;
+ try{
+  await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+  const panel=()=>tree.root.findByProps({role:'dialog'});
+  expect(panel().props.style.bottom).toBe(106);
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  expect(panel().props.style.bottom).toBe(106);
+  const bindings=[{property:'backgroundColor',token:'navigationBackground'}];
+  await act(async()=>attachThemeInspector.mock.calls.at(-1)[2]({bindings}));
+  expect(panel().props.style.bottom).toBe(106);
+  expect(tree.root.findByType('draft-editor').props.selectedTokens).toEqual(['navigationBackground']);
+  bar=null;await act(async()=>notify());
+  expect(panel().props.style.bottom).toBe(12);
+ }finally{
+  if(tree)await act(async()=>tree.unmount());
+  delete global.MutationObserver;
+ }
+});
 test('mobile inspection collapses the panel without unmounting the draft, then offers actual Normal/Hover fields',async()=>{
  let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
  const editor=()=>tree.root.findByType('draft-editor');
@@ -78,4 +101,17 @@ test('an inspected screen defaults to local editing and explicitly switches to g
  await act(async()=>button(tree,'Só nesta tela').props.onPress());expect(editor().props.screen).toEqual(screen);
  expect(editor().props.draft).toBe('unsaved local color');expect(mockMounts).toBe(1);
  await act(async()=>tree.unmount());
+});
+
+test('selects native scrollbar colors without depending on a scrollbar DOM element',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try {
+  const editor=()=>tree.root.findByType('draft-editor');
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  expect(button(tree,'Barra de rolagem')).toBeDefined();
+  await act(async()=>button(tree,'Barra de rolagem').props.onPress());
+  expect(editor().props.selectedTokens).toEqual(['scrollbarThumb','scrollbarTrack']);
+  await act(async()=>button(tree,'Hover').props.onPress());
+  expect(editor().props.selectedTokens).toEqual(['scrollbarThumbHover']);
+ }finally{await act(async()=>tree.unmount());}
 });

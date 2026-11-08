@@ -55,6 +55,13 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `sheetBackground`
 - `sheetBorder`
 - `surface`
+- `scrollbarThumb` <!-- legacy: scrollbar-thumb -->
+- `scrollbarTrack` <!-- legacy: scrollbar-track -->
+- `scrollbarThumbHover` <!-- legacy: scrollbar-thumb-hover -->
+
+As barras de rolagem web usam indicador e fundo do mesmo modo quando ambos têm valor.
+A cor de hover é opcional e depende do suporte ao indicador do navegador.
+As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica definida.
 
 ### barra
 
@@ -206,6 +213,9 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `inputIcon`
 - `inputPlaceholderText`
 - `inputText`
+- `loginInputBackground`
+- `loginInputText`
+- `loginInputPlaceholderText`
 
 ### link
 
@@ -324,6 +334,13 @@ Usar os mesmos nomes em qualquer objeto quando o papel visual for o mesmo.
 - `navigationIcon`
 - `navigationShadow`
 - `navigationText`
+- `shortcutBarBackground` <!-- base: navigationBackground; variant: shortcutBar; label: Barra de atalhos; usage: Fundo da barra de atalhos inferior do Manager -->
+- `shortcutBarBorder` <!-- base: navigationBorder; variant: shortcutBar; label: Barra de atalhos; usage: Borda da barra de atalhos inferior do Manager -->
+- `shortcutBarIcon` <!-- base: navigationIcon; variant: shortcutBar; label: Barra de atalhos; usage: Ícone do atalho no estado normal -->
+- `shortcutBarText` <!-- base: navigationText; variant: shortcutBar; label: Barra de atalhos; usage: Texto do atalho no estado normal -->
+- `shortcutBarActiveBackground` <!-- base: navigationActiveBackground; variant: shortcutBar; label: Barra de atalhos; usage: Fundo do atalho selecionado -->
+- `shortcutBarActiveIcon` <!-- base: navigationActiveIcon; variant: shortcutBar; label: Barra de atalhos; usage: Ícone do atalho selecionado -->
+- `shortcutBarActiveText` <!-- base: navigationActiveText; variant: shortcutBar; label: Barra de atalhos; usage: Texto do atalho selecionado -->
 
 ### overlay
 

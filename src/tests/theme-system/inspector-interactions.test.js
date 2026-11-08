@@ -28,7 +28,7 @@ test('menu render children expose different text and icon tokens for Normal and 
  const label={getAttribute:()=>JSON.stringify([{property:'color',token:'menuActiveText'}])};
  const menuBindings=[binding('menuBackground'),{property:'borderColor',token:'menuBorder'}];
  const menu={getAttribute:()=>JSON.stringify(menuBindings)};
- const target={closest:selector=>selector.includes('tools')?null:selector.includes('role=')?menu:selector.includes('states')?parent:label};
+ const target={closest:selector=>selector.includes('role=')?menu:selector.includes('states')?parent:selector==='[data-co-theme]'?label:null};
  const hit=inspectThemeElement(target);
  expect(hit.states.normal).not.toContainEqual({property:'color',token:'menuActiveText'});
  expect(hit.states.normal).toContainEqual({property:'color',token:'menuText'});

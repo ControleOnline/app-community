@@ -7,8 +7,8 @@ jest.mock('react-native-vector-icons/Feather',()=> 'Icon');
 const mockFetch=jest.fn();
 jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:(...a)=>mockFetch(...a)}}));
 const menuResponse=routeList=>({response:{success:true,data:{modules:{cfg:{id:'cfg',label:'Configuracoes',menus:routeList.map((route,i)=>({id:i,menuKey:'k'+i,label:route,route,menuType:'configurator',sortOrder:i}))}}}}});
-const renderPage=async()=>{global.IS_REACT_ACT_ENVIRONMENT=true;const navigate=jest.fn();let tree;
- await act(async()=>{tree=renderer.create(<Configurator navigation={{navigate}}/>);});return {tree,navigate};};
+const renderPage=async(props={})=>{global.IS_REACT_ACT_ENVIRONMENT=true;const navigate=jest.fn();let tree;
+ await act(async()=>{tree=renderer.create(<Configurator navigation={{navigate}} {...props}/>);});return {tree,navigate};};
 beforeEach(()=>mockFetch.mockReset());
 jest.mock('@store',()=>({useStore:name=>({getters:name==='theme'?{colors:{background:'#eeeeee'}}:{currentCompany:{id:3,theme:{colors:{background:'#ff0000'}}}}})}));
 const routes=['GeneralSettings','GenericLogPage','ConnectionsPage','IntegrationsPage','ProductShowcasesPage','CronJobsPage','TranslationsReviewPage','ThemeManagerPage'];
@@ -28,6 +28,12 @@ it('hides a shortcut that the menu does not return (e.g. Integrações disabled)
 it('shows no shortcut when the profile is allowed none (empty response is not a fallback)',async()=>{
  mockFetch.mockResolvedValue({response:{success:true,data:{modules:{}}}});
  const {tree}=await renderPage();expect(tree.root.findAllByType('TouchableOpacity')).toHaveLength(0);
+});
+it('uses only API shortcuts even when the floating editor is available',async()=>{
+ mockFetch.mockResolvedValue(menuResponse(['ConnectionsPage']));
+ const {tree}=await renderPage({showThemeShortcut:true});
+ expect(tree.root.findAllByType('TouchableOpacity').map(card=>card.props.accessibilityLabel)).toEqual(['Conexões']);
+ await act(async()=>tree.unmount());
 });
 it('shows no shortcut while the menu is still loading',()=>{
  mockFetch.mockReturnValue(new Promise(()=>{}));global.IS_REACT_ACT_ENVIRONMENT=true;let tree;

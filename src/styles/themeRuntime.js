@@ -63,7 +63,7 @@ export function useDomainThemePublisher({actions}) {
     const values=Object.fromEntries(Object.entries(selected).filter(([key,value])=>value!==undefined
       && !(/-(light|dark)$/.test(key)&&names.has(key.replace(/-(light|dark)$/,'')))));
     applyThemeCssVariables({themeColors:values});
-    try { applyThemeScrollbarStyles({ mode: values.mode || values.themeMode || 'light' }); } catch (_) {}
+    applyThemeScrollbarStyles(values);
     const web=typeof document!=='undefined';
     const colors=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,web?`var(--co-theme-${key})`:value]));
     const previous=published.current;

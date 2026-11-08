@@ -1,6 +1,6 @@
 import contract from './themeContract.generated';
+import {legacyThemeFieldSource} from './themeEditorModel';
 const canonical = new Set(contract.names);
-// Token-to-token contract only. Every color value is supplied by Themes.
 const tableMap=mode=>({tableHeaderBackground:`bg-headers-${mode}`,tableRowEvenBackground:`bg-even-${mode}`,tableRowOddBackground:`bg-odd-${mode}`});
 const darkMap={
  appBackground:'bg-dark',containerBackground:'bg-dark',pageBackground:'bg-dark',screenBackground:'bg-dark',
@@ -45,7 +45,10 @@ export function resolveManagerThemeDetails(input={},mode='light'){
  const theme=Object.fromEntries(Object.entries(input).filter(([key])=>!key.startsWith('screen_') && !key.startsWith('q-screen_')));
  if(!['light','dark'].includes(mode))throw new Error('Modo de tema inválido.');
  const values={...theme},sources=Object.fromEntries(Object.keys(theme).map(key=>[key,key]));
- const modern=Object.keys(theme).some(key=>/-(light|dark)$/.test(key) && canonical.has(key.replace(/-(light|dark)$/, '')) && !contract.variants?.[key.replace(/-(light|dark)$/, '')]);
+ const modern = Object.keys(theme).some(key => {
+  const token = key.replace(/-(light|dark)$/, '');
+  return token !== key && canonical.has(token) && !contract.variants?.[token] && !contract.legacyKeys[token];
+ });
  if(modern){
   for(const key of Object.keys(values)){
    const variant=/-(light|dark)$/.test(key);
@@ -59,6 +62,12 @@ export function resolveManagerThemeDetails(input={},mode='light'){
     const source=theme[first]?first:second;values[target]=theme[source];sources[target]=source;
    }
   }
+ }
+ // Compatibility aliases are independent of the legacy or modern palette model.
+ for (const token of Object.keys(contract.legacyKeys)) {
+  const source = legacyThemeFieldSource(theme, token, mode);
+  if (source) {values[token] = theme[source]; sources[token] = source;}
+  else {delete values[token]; delete sources[token];}
  }
  // Optional purpose variants inherit only the resolved base of the same mode.
  // This is a read-time relationship, never a migration or a persisted copy.

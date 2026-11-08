@@ -4,7 +4,7 @@ import {SafeAreaProvider, useSafeAreaFrame, useSafeAreaInsets} from 'react-nativ
 import HomeIcon from '../HomeIcon';
 import ScreenThemeBoundary from '../theme-editor/ScreenThemeBoundary';
 
-function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, onProfile, onHelp, onTheme, onThemeEditor, onLogout, bottomBar, onBarSession, onBarRemember}) {
+function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, onProfile, onHelp, onTheme, onThemeEditor, onLogout, sidebarPreference, bottomBar, onBarSession, onBarRemember}) {
   // A native Modal has its own window; activity insets may exclude its system bars.
   const insets = useSafeAreaInsets();
   const frame = useSafeAreaFrame();
@@ -33,6 +33,9 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
       {canOpenProfile && option(global.t?.t('configs', 'menu', 'my_profile') || global.t?.t('menu', 'menu', 'my_profile'), 'user', onProfile)}
       {onHelp && option(global.t?.t('configs', 'menu', 'manager_help') || global.t?.t('menu', 'menu', 'manager_help'), 'help-circle', onHelp)}
       {option(mode === 'light' ? (global.t?.t('configs', 'menu', 'use_dark_theme') || global.t?.t('menu', 'menu', 'use_dark_theme')) : (global.t?.t('configs', 'menu', 'use_light_theme') || global.t?.t('menu', 'menu', 'use_light_theme')), mode === 'light' ? 'moon' : 'sun', onTheme)}
+      {sidebarPreference?.ready && option(sidebarPreference.visible ? 'Ocultar menu lateral' : 'Mostrar menu lateral', 'layout',
+        () => sidebarPreference.setRememberedVisible(!sidebarPreference.visible))}
+      {!!sidebarPreference?.error && <Text accessibilityRole="alert" style={{color: c.menuText}}>{sidebarPreference.error}</Text>}
       {onThemeEditor && option('Configurar temas', 'sliders', onThemeEditor)}
       {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.menuBorder}]}>
         <Text style={[s.barTitle, {color: c.textSecondary}]}>{global.t?.t('configs', 'section_title', 'shortcut_bar')}</Text>

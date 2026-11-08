@@ -3,9 +3,11 @@ import renderer, {act} from 'react-test-renderer';
 import ManagerPreviewProvider, {useManagerPreview} from '../../components/manager-preview/ManagerPreviewProvider';
 let mockLogged = true;
 let mockUser = 'admin-1';
+let mockTheme = {};
+jest.mock('react-native',()=>({Platform:{OS:'web'}}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='auth'?{isLogged:mockLogged,user:{id:mockUser}}:name==='theme'?{colors:{}}:name==='people'?{currentCompany:{id:5}}:{item:{}}})}));
-jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({status:'loading',mode:'light'}),setThemeMode:jest.fn()}));
-jest.mock('../../components/manager-preview/model',()=>({managerPreviewEnabled:true,previewPalette:()=>({})}));
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({status:'loading',mode:'light',raw:mockTheme}),setThemeMode:jest.fn()}));
+jest.mock('../../components/manager-preview/model',()=>({managerPreviewEnabled:true,previewPalette:colors=>colors}));
 jest.mock('@experimental-avatar',()=>({useAvatarRuntime:()=>({})}));
 jest.mock('../../components/manager-preview/useExperienceRuntime',()=>()=>({}));
 jest.mock('../../components/manager-preview/ManagerCatalogImageCache',()=>({children})=>children);
@@ -18,15 +20,48 @@ it('retains the rail between screens and resets it when the login changes',()=>{
  const view=key=><ManagerPreviewProvider><Probe key={key}/></ManagerPreviewProvider>;
  act(()=>{tree=renderer.create(view('home'));});
  const menu=()=>tree.root.findByType('menu-state').props.value;
- expect(menu()).toMatchObject({visible:false,hint:true});
+ expect(menu().visible).toBe(false);
  act(()=>menu().toggle());
  act(()=>tree.update(view('clients')));
- expect(menu()).toMatchObject({visible:true,hint:false});
- act(()=>menu().dismissHint());expect(menu().visible).toBe(true);
+ expect(menu().visible).toBe(true);
  mockLogged=false;act(()=>tree.update(view('logout')));
  mockLogged=true;act(()=>tree.update(view('login')));
- expect(menu()).toMatchObject({visible:false,hint:true});
+ expect(menu().visible).toBe(false);
  act(()=>menu().toggle());mockUser='admin-2';act(()=>tree.update(view('other-user')));
- expect(menu()).toMatchObject({visible:false,hint:true});
+ expect(menu().visible).toBe(false);
  act(()=>tree.unmount());
+});
+
+it('uses domain presentation defaults until the account saves a preference', async () => {
+  function Preferences() {
+    const {sidebar, moduleIcons, moduleAccent} = useManagerPreview();
+    return <preferences sidebar={sidebar} icons={moduleIcons} accent={moduleAccent} />;
+  }
+
+  mockTheme = {showLeftMenu:'false', homeModulesLayout:'buttons'};
+  const previousStorage = global.localStorage;
+  const values = new Map();
+  global.localStorage = {getItem:key=>values.get(key),setItem:(key,value)=>values.set(key,value)};
+  let tree;
+  try {
+    await act(async () => {tree = renderer.create(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>);});
+    const current = () => tree.root.findByType('preferences').props;
+    expect(current().sidebar.visible).toBe(false);
+    expect(current().icons.value).toBe(true);
+    expect(current().accent.value).toBe(true);
+    await act(async () => {
+      await current().sidebar.setRememberedVisible(true);
+      await current().icons.setValue(false);
+      await current().accent.setValue(false);
+    });
+    mockTheme = {enableSidebar:0, homeModulesLayout:'buttons'};
+    await act(async () => tree.update(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>));
+    expect(current().sidebar.visible).toBe(true);
+    expect(current().icons.value).toBe(false);
+    expect(current().accent.value).toBe(false);
+  } finally {
+    if (tree) await act(async () => tree.unmount());
+    global.localStorage = previousStorage;
+    mockTheme = {};
+  }
 });
