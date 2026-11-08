@@ -3,9 +3,9 @@ import contract from '../../styles/themeContract.generated';
 
 const form = {inputBackground:'#ffcc00',inputText:'#fafafa',inputPlaceholderText:'#666666'};
 
-test('keeps the Lave-Go login white with black text when dedicated colors are absent', () => {
+test('uses the theme field colors when dedicated login values are absent even for Lave-Go', () => {
   expect(resolveLoginFieldColors(form, 'https://app.lave-go.com')).toEqual({
-    backgroundColor:'#FFFFFF',textColor:'#000000',placeholderColor:'#000000',
+    backgroundColor:'#ffcc00',textColor:'#fafafa',placeholderColor:'#666666',
   });
 });
 
