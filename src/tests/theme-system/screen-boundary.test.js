@@ -20,3 +20,20 @@ test('two mounted screen boundaries keep their own variable values and preserve 
  expect(boundaries()[1].props.style['--co-theme-cardBackground']).toBeUndefined();expect(mounts).toBe(1);
  expect(tree.root.findByType('form-draft').props.value).toBe('draft form');act(()=>tree.unmount());
 });
+
+test('uses native scrollbar defaults without a pair and marks configured hover per screen',()=>{
+ const raw={'scrollbar-thumb-light':'#666666','scrollbar-track-light':'#eeeeee'};
+ const render=()=> <ScreenThemeBoundary screen={{id:'home',label:'Início'}}><content/></ScreenThemeBoundary>;
+ let tree;mockState={raw:{},mode:'light',preview:null};
+ act(()=>{tree=renderer.create(render());});
+ const boundary=()=>tree.root.findByType('div');
+ expect(boundary().props['data-co-scrollbars']).toBeUndefined();
+ mockState={...mockState,raw};
+ act(()=>tree.update(render()));
+ expect(boundary().props['data-co-scrollbars']).toBe('normal');
+ mockState={...mockState,preview:{...raw,[screenThemeKey('home','scrollbarThumbHover','light')]:'#333333'}};
+ act(()=>tree.update(render()));
+ expect(boundary().props['data-co-scrollbars']).toBe('hover');
+ expect(boundary().props.style['--co-theme-scrollbarThumbHover']).toBe('#333333');
+ act(()=>tree.unmount());
+});

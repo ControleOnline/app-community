@@ -4,7 +4,18 @@ const names=new Set(contract.names);
 export const themeColorKey = (token,mode) => `${token}-${mode}`;
 export const tokenFromKey = key => parseScreenThemeKey(key)?.token || key.replace(/-(light|dark)$/,'');
 export const isOfficialThemeKey = key => names.has(tokenFromKey(key));
+export function legacyThemeFieldSource(colors, token, mode) {
+  const modeKey = themeColorKey(token, mode);
+  if (Object.hasOwn(colors, modeKey)) return modeKey;
+  if (!Object.hasOwn(colors, themeColorKey(token, mode === 'light' ? 'dark' : 'light')) && Object.hasOwn(colors, token)) return token;
+  const legacyKey = themeColorKey(contract.legacyKeys[token], mode);
+  return Object.hasOwn(colors, legacyKey) ? legacyKey : null;
+}
 export const themeFieldValue = (colors,token,mode) => {
+  if (contract.legacyKeys[token]) {
+    const source = legacyThemeFieldSource(colors, token, mode);
+    return source ? colors[source] ?? '' : '';
+  }
   if(Object.hasOwn(colors,`${token}-light`) || Object.hasOwn(colors,`${token}-dark`))return colors[themeColorKey(token,mode)] ?? '';
   return colors[token] ?? '';
 };

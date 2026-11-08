@@ -3,7 +3,7 @@
     "package": "ui-layout",
     "path": "src/react/pages/ThemeManagerPage.js",
     "beforeHash": "19a7f3f88189e750165513fb86b7e88a85163bd4e96e3b850822c17cf3eb3c68",
-    "afterHash": "c5ceed6976c839d3189845c877a559e14c328ca425c3495d1b2bb6e552f11b85",
+    "afterHash": "47ac50638f9b47333a042f557dbc43b5224db55cd731263aef04070e3b9a0096",
     "replacements": [
       {
         "before": "import styles from './ThemeManagerPage.styles';",
@@ -124,6 +124,38 @@
       {
         "before": "{themes.map(themeItem => {",
         "after": "{visibleThemes.map(themeItem => {"
+      },
+      {
+        "before": "  View,\r\n} from 'react-native';",
+        "after": "  View,\r\n  useWindowDimensions,\r\n} from 'react-native';"
+      },
+      {
+        "before": "export default function ThemeManagerPage() {",
+        "after": "export default function ThemeManagerPage() {\r\n  const {width} = useWindowDimensions();\r\n  const compactThemeColumns = width <= 760;\r\n  const [themeColumn, setThemeColumn] = useState('Preview');"
+      },
+      {
+        "before": "                  <View style={styles.columnsRow}>",
+        "after": "                  {compactThemeColumns && <View accessibilityRole=\"tablist\" style={{flexDirection:'row',flexWrap:'wrap',gap:8,marginBottom:10}}>\r\n                    {['Atual','Novo','Preview'].map(column => <TouchableOpacity key={column} accessibilityRole=\"tab\"\r\n                      accessibilityState={{selected:themeColumn===column}} onPress={()=>setThemeColumn(column)}\r\n                      style={[styles.actionButton,{minHeight:44},themeColumn===column && {borderColor:palette.primary}]}>\r\n                      <Text style={[styles.actionButtonText,themeColumn===column && {fontWeight:'700'}]}>{column}</Text>\r\n                    </TouchableOpacity>)}\r\n                  </View>}\r\n                  <View style={styles.columnsRow}>"
+      },
+      {
+        "before": "<View style={[styles.themeColumn, styles.themeColumnQuarter]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <Text style={styles.columnTitle}>Atual</Text>",
+        "after": "<View style={[styles.themeColumn, styles.themeColumnQuarter, compactThemeColumns && themeColumn !== 'Atual' && {display:'none'}]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <Text style={styles.columnTitle}>Atual</Text>"
+      },
+      {
+        "before": "<View style={[styles.themeColumn, styles.themeColumnQuarter]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <Text style={styles.columnTitle}>Novo</Text>",
+        "after": "<View style={[styles.themeColumn, styles.themeColumnQuarter, compactThemeColumns && themeColumn !== 'Novo' && {display:'none'}]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <Text style={styles.columnTitle}>Novo</Text>"
+      },
+      {
+        "before": "<View style={[styles.themeColumn, styles.themeColumnHalf]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <View style={styles.columnHeaderTitleWrap}>",
+        "after": "<View style={[styles.themeColumn, styles.themeColumnHalf, compactThemeColumns && themeColumn !== 'Preview' && {display:'none'}]}>\r\n                      <View style={styles.columnHeader}>\r\n                        <View style={styles.columnHeaderTitleWrap}>"
+      },
+      {
+        "before": "  const compactThemeColumns = width <= 760;",
+        "after": "  const [editorWidth, setEditorWidth] = useState(null);\r\n  const compactThemeColumns = (editorWidth ?? width) <= 760;"
+      },
+      {
+        "before": "<SafeAreaView style={[styles.root, { backgroundColor: palette.background }]} edges={['bottom']}>",
+        "after": "<SafeAreaView style={[styles.root, { backgroundColor: palette.background }]} edges={['bottom']}\r\n      onLayout={event => setEditorWidth(event.nativeEvent.layout.width)}>"
       }
     ]
   },

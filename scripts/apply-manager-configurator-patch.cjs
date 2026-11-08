@@ -10,7 +10,7 @@ for(const file of patch.files){
  const payload=fs.readFileSync(path.join(root,'patches',file.payload));
  if(hash(payload)!==file.after)throw Error('Configurator payload changed; no files were overwritten.');
  if(current===file.after)continue;
- if(current!==file.before)throw Error('Configurator has unrelated changes; no files were overwritten.');
+ if(current!==file.before && current!==file.previousAfter)throw Error('Configurator has unrelated changes; no files were overwritten.');
  changes.push({target,payload});
 }
 for(const {target,payload} of changes)fs.writeFileSync(target,payload);

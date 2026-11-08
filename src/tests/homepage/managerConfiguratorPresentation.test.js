@@ -5,8 +5,10 @@ import ManagerConfiguratorPage,{configuratorPresentation} from '../../components
 import {resolveManagerTheme} from '../../styles/managerTheme';
 import theme from '../../../docs/themes/on-manager-neutral/theme.json';
 let mockPreview={colors:resolveManagerTheme(theme.colors,'light')};let mockWidth=393;
+let mockThemeToolsAvailable=false;
 jest.mock('react-native',()=>({Pressable:'Pressable',Text:'Text',View:'View',useWindowDimensions:()=>({width:mockWidth}),Platform:{select:v=>v.default},StyleSheet:{create:v=>v}}));
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>mockPreview}));
+jest.mock('../../components/theme-editor/ThemeToolsProvider',()=>({useThemeTools:()=>({available:mockThemeToolsAvailable})}));
 jest.mock('@controleonline/ui-config/src/react/pages/ConfiguratorPage',()=> 'ExistingConfigurator');
 it.each(['light','dark'])('maps the hub surfaces and text to the configured %s theme',mode=>{
  const c=resolveManagerTheme(theme.colors,mode),p=configuratorPresentation(c,1200),allowed=new Set(Object.values(c));
@@ -40,3 +42,19 @@ it('hides only its page title when the shared layout owns it',()=>{
  expect(presentation.styles.heroTitle.display).toBe('none');
  act(()=>tree.unmount());
 });
+
+it.each([[true,true,true],[false,true,false],[true,false,false]])(
+ 'gates the theme shortcut on theme access and the registered route (%s, %s)',
+ (available, registered, expected) => {
+  mockThemeToolsAvailable=available;
+  global.IS_REACT_ACT_ENVIRONMENT=true;
+  const navigation={getState:()=>({routeNames:registered?['ThemeManagerPage']:[]})};
+  let tree;
+  try {
+   act(()=>{tree=renderer.create(<ManagerConfiguratorPage navigation={navigation}/>);});
+   expect(tree.root.findByType('ExistingConfigurator').props.showThemeShortcut).toBe(expected);
+  } finally {
+   if(tree)act(()=>tree.unmount());
+   mockThemeToolsAvailable=false;
+  }
+ });

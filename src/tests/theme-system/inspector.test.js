@@ -19,3 +19,20 @@ test('a literal or a malformed annotation never gets an inferred token',()=>{
   expect(inspectThemeElement({closest:()=>null})).toBeNull();
   const node={getAttribute:()=>'{invalid'};expect(inspectThemeElement({closest:selector=>selector.includes('tools')?null:node})).toBeNull();
 });
+test('exposes the shortcut bar background from a tap on an individual shortcut',()=>{
+  const dock={getAttribute:()=>JSON.stringify([
+    {property:'backgroundColor',token:'shortcutBarBackground'},
+    {property:'borderColor',token:'shortcutBarBorder'},
+  ])};
+  const icon={getAttribute:()=>JSON.stringify([{property:'color',token:'navigationIcon'}])};
+  const hit=inspectThemeElement({closest:selector=>{
+    if(selector==='[data-co-theme]')return icon;
+    if(selector.includes('bottom-navigation'))return dock;
+    return null;
+  }});
+  expect(hit.bindings).toEqual([{property:'color',token:'navigationIcon'}]);
+  expect(hit.container).toMatchObject({kind:'shortcut-bar',node:dock,bindings:[
+    {property:'backgroundColor',token:'shortcutBarBackground'},
+    {property:'borderColor',token:'shortcutBarBorder'},
+  ]});
+});

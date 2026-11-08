@@ -4,10 +4,12 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
+import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
 import ManagerOrdersTrend from './ManagerOrdersTrend';
+import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
@@ -16,7 +18,8 @@ import {getAvatarDisplayName} from '@controleonline/ui-common/src/react/utils/us
 
 export default function ManagerOverview({navigation}) {
   const {width} = useWindowDimensions();
-  const {colors: c, experience} = useManagerPreview();
+  const {colors: c, experience, moduleIcons, moduleAccent, moduleAccentPalette} = useManagerPreview();
+  const showModuleIcons = moduleIcons?.value === true;
   const people = useStore('people');
   const {currentCompany} = people.getters;
   const {user} = useStore('auth').getters;
@@ -80,11 +83,35 @@ export default function ManagerOverview({navigation}) {
       // Reuse the ERP client and server-side summary without replacing history state.
       // Never calculate revenue from a paginated list or from payment status.
       readCollection(api, 'orders', {...query, itemsPerPage: 1, page: 1, summary: 'sales'})
-        .then(result => {
+        .then(async result => {
           const totals = resolveHistorySalesTotals(result.summary);
           const summary = result.summary?.sales?.sales || result.summary?.sales;
-          const series = period === 'all' ? summary?.monthly : summary?.daily;
-          publish({series: Array.isArray(series) ? series : null, sales: totals?.revenue ?? null,
+          const rawSeries = period === 'all' ? summary?.monthly : summary?.daily;
+          let series = mapSummarySeries(rawSeries);
+          const pageSize = 200;
+          // Only use the fallback when one page can cover the entire period.
+          if ((!series || !series.length) && !cancelled && result.totalItems > 0 && result.totalItems <= pageSize) {
+            try {
+              const paidPage = await api.fetch('orders', {params: {
+                ...query,
+                itemsPerPage: pageSize,
+                page: 1,
+                'order[id]': 'DESC',
+              }});
+              const orders = paidPage?.member ?? paidPage?.['hydra:member'] ?? paidPage?.items;
+              const total = paidPage?.totalItems ?? paidPage?.['hydra:totalItems'] ?? result.totalItems;
+              if (Array.isArray(orders) && orders.length >= Number(total)) {
+                series = groupPaidOrdersSeries(orders, {
+                  from: range.after,
+                  to: range.before,
+                  longPeriodDays: period === 'all' ? 0 : 60,
+                });
+              }
+            } catch (_) {
+              // Keep the API series state if the fallback cannot be loaded.
+            }
+          }
+          publish({series: series && series.length ? series : (Array.isArray(rawSeries) ? [] : null), sales: totals?.revenue ?? null,
             salesError: totals ? '' : t?.('configs', 'error', 'sales_summary_missing')});
         }).catch(() => publish({salesError: t?.('configs', 'error', 'load_sales')}));
       // Match the existing homepage: orders include every order type.
@@ -258,12 +285,39 @@ export default function ManagerOverview({navigation}) {
       </View>
     </View>
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
-    <View style={s.modules}>{groups.map((group, i) => <View key={group.id || i} style={[s.module, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
-      <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-      {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button" onPress={() => go(item)} style={s.moduleItem}>
-        {icon(item.icon, c.textMuted, 16)}<Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>{icon('chevron-right', c.textMuted, 14)}
-      </Pressable>)}
-    </View>)}</View>
+    <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
+      {groups.map((group, i) => {
+        const accent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
+        const accentBackground = moduleAccentBackground(accent);
+        return <View key={group.id || i}
+          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
+          <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
+          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons && s.moduleGrid}>
+            {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button"
+              accessibilityLabel={item.title} onPress={() => go(item)}
+              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
+                borderColor: c.listItemBorder,
+                backgroundColor: hovered || pressed
+                  ? moduleAccentBackground(accent, true) ?? c.listItemActiveBackground
+                  : accentBackground ?? c.listItemBackground,
+              }] : s.moduleItem}>
+              {showModuleIcons ? <>
+                <View style={[s.moduleTileIcon, !accent && {backgroundColor: c.iconBackground}]}>
+                  {icon(item.icon, accent ?? c.listItemIcon, 22)}
+                </View>
+                <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
+              </> : <>
+                {accent ? <View style={[s.moduleListIcon, {backgroundColor: accentBackground}]}>
+                  {icon(item.icon, accent, 16)}
+                </View> : icon(item.icon, c.textMuted, 16)}
+                <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', c.textMuted, 14)}
+              </>}
+            </Pressable>)}
+          </View>
+        </View>;
+      })}
+    </View>
   </ScrollView>;
 }
 
@@ -293,5 +347,13 @@ const s = StyleSheet.create({
   quickIcon: {width:32,height:32,borderRadius:9,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 12, padding: 16},
   modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
+  moduleCards: {alignItems: 'flex-start'},
+  iconModule: {minWidth: 0, flexShrink: 1},
+  moduleGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
+  moduleTile: {width: 104, maxWidth: '100%', minHeight: 96, padding: 8, gap: 6,
+    alignItems: 'center', borderWidth: 1, borderRadius: 10},
+  moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
+  moduleListIcon: {width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center'},
+  moduleTileLabel: {fontSize: 12, textAlign: 'center', width: '100%'},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13},
 });

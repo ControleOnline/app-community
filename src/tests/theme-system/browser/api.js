@@ -12,10 +12,22 @@ for(const mode of ['light','dark'])for(const token of contract.names){
   colors[`${token}-${mode}`]=value;
 }
 let theme={id:99,theme:'Demonstração local — sem banco',colors};
+const alternative={id:100,theme:'Tema de teste',colors:{...colors,'headerBackground-light':'#e2e8f0','headerBackground-dark':'#0f172a'}};
+let activeThemeId=99;
+const themes=()=>[theme,alternative];
+const domain=()=>({id:7,domain:'localhost:8084',themeId:activeThemeId,canApply:true});
 export const api={fetch:async(resource,options={})=>{
   const name=resource.replace(/^\//,'');
-  if(name==='themes-colors.css')return ':root{'+Object.entries(theme.colors).map(([key,value])=>`--${key}:${value};`).join('')+'}';
+  if(name==='themes-colors.css')return ':root{'+Object.entries(themes().find(item=>item.id===activeThemeId).colors).map(([key,value])=>`--${key}:${value};`).join('')+'}';
   if(name==='people_domains')return {'hydra:member':[{domain:'localhost:8084',theme:'/themes/99'}]};
+  if(name==='theme-management/domain')return {domain:domain()};
+  if(name==='theme-management')return {domain:domain(),canManageGlobal:true,nextPage:null,items:themes().map(({id,theme})=>({
+    id,theme,canEdit:true,usage:{count:0,links:[],hiddenCount:0},
+  }))};
+  if(name==='theme-management/domains/7/theme' && options.method==='PUT'){
+    activeThemeId=options.body.themeId;recordSave();return {domainId:7,themeId:activeThemeId};
+  }
+  if(name==='themes/100')return alternative;
   if(name==='themes/99'){
     if(options.method==='PUT'){theme={...theme,...options.body};recordSave();}
     return JSON.parse(JSON.stringify(theme));

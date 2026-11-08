@@ -15,6 +15,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
+import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -32,8 +33,9 @@ import {resolveManagementPageTitle} from './managementPageTitle';
 export default function ManagerShell({navigation, route, options, children}) {
   const {width} = useWindowDimensions();
   const focused = useIsFocused();
-  const {colors: c, themeIssues = [], themeStatus, themeError, mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar, mobileMenu} = useManagerPreview();
+  const {colors: c, themeIssues = [], themeStatus, themeError, mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar, mobileMenu, sidebar: sidebarPreference, moduleAccent, moduleAccentPalette} = useManagerPreview();
   const themeTools=useThemeTools();
+  const sidebarVisible = sidebarPreference?.visible !== false;
   useJourneyReadiness({experience, route: route.name, focused});
   const tableTheme = useMemo(() => managerTableTheme(c), [c]);
   const themeStore = useStore('theme');
@@ -67,17 +69,19 @@ export default function ManagerShell({navigation, route, options, children}) {
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
   const [mobileHeaderHeight, setMobileHeaderHeight] = useState(64);
+  const [leftHeaderWidth, setLeftHeaderWidth] = useState(0);
+  const [rightHeaderWidth, setRightHeaderWidth] = useState(0);
+  // Side measurements only limit the caption width. Equal insets keep the logo
+  // centered even before either side reports its size.
+  const companyInset = 14 + Math.max(leftHeaderWidth, rightHeaderWidth);
   const [localRail, setLocalRail] = useState(false);
-  const [localHint, setLocalHint] = useState(true);
   const longMenuPress = useRef(false);
   const railVisible = mobileMenu ? mobileMenu.visible : localRail;
-  const menuHint = mobileMenu ? mobileMenu.hint : localHint;
-  const dismissMenuHint = () => mobileMenu ? mobileMenu.dismissHint() : setLocalHint(false);
   const toggleMobileRail = () => {
     longMenuPress.current = true;
     setOpen(false);
     if (mobileMenu) mobileMenu.toggle();
-    else {setLocalRail(value => !value); setLocalHint(false);}
+    else setLocalRail(value => !value);
   };
   const compact = !mobile && (width <= 1060 || collapsed);
   const groups = managerMenu(menus, navigation.getState().routeNames, global.t?.t);
@@ -90,9 +94,9 @@ export default function ManagerShell({navigation, route, options, children}) {
   const section = groups.find(group => group.items.includes(selected));
   const name = getAvatarDisplayName(user) || 'Minha conta';
   useEffect(() => {
-    if (!focused || !mobile) setOpen(false);
+    if (!focused || !mobile || !sidebarVisible) setOpen(false);
     closeAccount();
-  }, [focused, mobile, route.name]);
+  }, [focused, mobile, route.name, sidebarVisible]);
   useEffect(() => {
     if (!mobile || !open || typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
     const close = event => { if (event.key === 'Escape') setOpen(false); };
@@ -116,14 +120,21 @@ export default function ManagerShell({navigation, route, options, children}) {
   const icon = (value, size = 18, color = c.navigationIcon) => <HomeIcon name={value || 'grid'} size={size} color={color} />;
   const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
+    const accent = moduleAccent?.value
+      ? resolveModuleAccent(item.categoryColor, moduleAccentPalette) : undefined;
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
-      onPress={() => go(item)} style={({hovered, pressed}) => [s.navItem,
-        {backgroundColor: active ? c.navigationActiveBackground : hovered || pressed ? c.navigationActiveBackground : c.containerTransparentBackground,
-          borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground}, iconsOnly && s.center]}>
-      {icon(item.icon, 18, active ? c.navigationActiveIcon : c.navigationIcon)}
+      onPress={() => go(item)} style={({hovered, pressed}) => {
+        const highlighted = active || hovered || pressed;
+        return [s.navItem, {
+          backgroundColor: moduleAccentBackground(accent, highlighted) ??
+            (highlighted ? c.navigationActiveBackground : c.containerTransparentBackground),
+          borderLeftColor: active ? (accent ?? c.navigationActiveBorder) : c.containerTransparentBackground,
+        }, iconsOnly && s.center];
+      }}>
+      {icon(item.icon, 18, accent ?? (active ? c.navigationActiveIcon : c.navigationIcon))}
       {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
     </Pressable>;
   };
@@ -161,32 +172,35 @@ export default function ManagerShell({navigation, route, options, children}) {
   const preparingTheme=themeStatus==='idle' || themeStatus==='loading';
   const failedTheme=themeStatus==='error';
   const missingCompany=themeStatus==='ready' && !currentCompany?.id;
-  const preparing=preparingTheme || failedTheme || missingCompany;
+  const themeSettings = route.name === 'ThemeManagerPage';
+  const canOpenThemeSettings = navigation.getState().routeNames.includes('ThemeManagerPage');
+  const preparing = !themeSettings && (preparingTheme || failedTheme || missingCompany);
   const startup=preparingTheme
     ? <ManagerStartup accessibilityLabel="Preparando aparência do sistema" message="Carregando a aparência do sistema…"/>
     : failedTheme
-      ? <ManagerStartup accessibilityLabel="Falha ao carregar aparência" message="Não foi possível carregar a aparência do sistema." busy={false} error={themeError} onRetry={refreshDomainTheme}/>
+      ? <ManagerStartup accessibilityLabel="Falha ao carregar aparência" message="Não foi possível carregar a aparência do sistema." busy={false} error={themeError} onRetry={refreshDomainTheme}
+          onOpenThemeSettings={canOpenThemeSettings ? () => go({name:'ThemeManagerPage'}) : undefined}/>
       : missingCompany
         ? <ManagerStartup accessibilityLabel="Preparando empresa" message={recovering?'Carregando empresa e acessos…':'A empresa ainda não está disponível.'} busy={recovering} error={recoveryError} onRetry={retryContext}/>
         : null;
   return <ScreenThemeBoundary screen={themeScreen}>
-    {startup}
+    {preparing && startup}
     <View testID="manager-shell-presentation" style={[s.shell, {backgroundColor: c.pageBackground}, preparing && {display:'none'}]}>
-    {!mobile && sidebar}
+    {sidebarVisible && !mobile && sidebar}
     <View collapsable={false} style={s.main}>
       <View testID="manager-header" onLayout={event => {if (mobile) setMobileHeaderHeight(Math.round(event.nativeEvent.layout.height));}}
         style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
       <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
-        <View style={[s.headerSide, s.headerLeft,mobile && {flexGrow:0,flexShrink:0,flexBasis:'auto',gap:4}]}>
-          {mobile && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
+        <View style={[s.headerSide, s.headerLeft, mobile && s.mobileHeaderLeft]}
+          onLayout={mobile ? event => setLeftHeaderWidth(event.nativeEvent.layout.width) : undefined}>
+          {sidebarVisible && mobile && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
             accessibilityLabel="Abrir menu" accessibilityHint="Segure para mostrar ou ocultar os atalhos laterais"
-            title="Toque para abrir o menu. Segure para mostrar ou ocultar os atalhos."
             delayLongPress={500}
             onPressIn={() => {longMenuPress.current = false;}}
             onLongPress={toggleMobileRail}
             onPress={() => {
               if (longMenuPress.current) return;
-              dismissMenuHint(); setOpen(true);
+              setOpen(true);
             }}
             style={[s.mobileMenuButton, {borderColor: c.headerBorder}]}>
             {icon('menu', 18, c.headerIcon)}
@@ -205,25 +219,32 @@ export default function ManagerShell({navigation, route, options, children}) {
             {app_type}  /  {section?.title || 'Início'}  /  <Text style={{color: c.headerText, fontWeight: '600'}}>{selected?.title || (route.name === 'HomePage' ? 'Início' : 'Detalhes')}</Text>
           </Text></View>}
         </View>
-        <View style={[s.homeButton,mobile && s.mobileCompany]} testID="manager-header-company">
+        <View testID="manager-header-company" pointerEvents={mobile ? 'box-none' : undefined}
+          style={[!mobile && s.homeButton, mobile && s.mobileCompany,
+            mobile && {left: companyInset, right: companyInset}]}>
           <ManagerCompanySelector colors={c} mode="header" />
         </View>
-        <View style={[s.headerSide, s.headerRight, !mobile && s.headerControls,mobile && {flexGrow:0,flexShrink:0,flexBasis:'auto'}]}>
+        <View style={[s.headerSide, s.headerRight, mobile ? s.mobileHeaderRight : s.headerControls,
+          mobile && width <= 420 && !sidebarVisible && app_type_base === 'ADMIN' && s.mobileHeaderRightStack]}
+          onLayout={mobile ? event => setRightHeaderWidth(event.nativeEvent.layout.width) : undefined}>
           {app_type_base === 'ADMIN' && <AppTypeSwitcher colors={c} compact={mobile} />}
+          {!sidebarVisible && <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'header'}} onPress={() => openAccount('header')} style={s.headerIconOnly}>{avatar(28)}</Pressable>}
         </View>
       </View>
       </View>
-      {mobile && menuHint && <Text style={{fontSize:10, color:c.headerText, paddingHorizontal:12, paddingBottom:4}}>
-        Segure ☰ para mostrar ou ocultar os atalhos.
-      </Text>}
       <ManagerScreenNavigation navigation={navigation} route={route} options={options} colors={c} />
-      {themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder}}><Text style={{color:c.textPrimary}}>Tema incompleto: {themeIssues.join(', ')}.</Text></View>}
+      {!themeSettings && themeIssues.length > 0 && <View accessibilityRole="alert" style={{padding:12,borderBottomWidth:1,borderColor:c.cardBorder,flexDirection:'row',alignItems:'center',flexWrap:'wrap',gap:8}}>
+        <Text style={{color:c.textPrimary}}>Tema incompleto.</Text>
+        {canOpenThemeSettings && <Pressable accessibilityRole="button" onPress={() => go({name:'ThemeManagerPage'})}>
+          <Text style={{color:c.textPrimary,textDecorationLine:'underline'}}>Abrir Configurador de Temas</Text>
+        </Pressable>}
+      </View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
         <Text style={{color:c.textPrimary}}>{recoveryError || (!currentCompany?.id ? 'A empresa ainda não foi carregada.' : 'Nenhum menu foi carregado para este contexto.')}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:44,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
       </View>}
       <View style={s.mobileBody}>
-        {mobile && railVisible && <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor:c.navigationBackground, borderRightColor:c.navigationBorder}]}>
+        {sidebarVisible && mobile && railVisible && <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor:c.navigationBackground, borderRightColor:c.navigationBorder}]}>
           <ScrollView style={s.menu} contentContainerStyle={{paddingHorizontal:2,paddingVertical:4}}>
             {navItem({name:'HomePage',title:'Início',icon:'grid'},'rail-home',true)}
             {items.filter(item=>item.name!=='HomePage').map((item,index)=>navItem(item,`rail-${item.id || item.name}-${index}`,true))}
@@ -236,6 +257,7 @@ export default function ManagerShell({navigation, route, options, children}) {
     {focused && !open && !accountAnchor && <ManagerGuide navigation={navigation} route={route} items={items} />}
     {focused && <ManagerAccountMenu screen={themeScreen} anchor={accountAnchor} mobile={mobile} colors={c} name={name} mode={mode}
       canOpenProfile={canOpenProfile} onClose={closeAccount}
+      sidebarPreference={sidebarPreference}
       bottomBar={mobile ? bottomBar : undefined}
       onBarSession={accountAction(() => bottomBar.setSessionVisible(!bottomBar.visible))}
       onBarRemember={async () => {if (await bottomBar.setRememberedVisible(!bottomBar.rememberedVisible)) closeAccount();}}
@@ -244,7 +266,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       onTheme={accountAction(toggleMode)}
       onThemeEditor={themeTools.available ? accountAction(themeTools.openEditor) : undefined}
       onLogout={auth.actions?.logOut ? accountAction(() => auth.actions.logOut()) : undefined} />}
-    {mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay, {top: mobileHeaderHeight}]}>
+    {sidebarVisible && mobile && open && <View accessibilityViewIsModal style={[StyleSheet.absoluteFill, s.drawerOverlay, {top: mobileHeaderHeight}]}>
       <Pressable accessibilityRole="button" accessibilityLabel="Fechar menu" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, {backgroundColor: c.modalOverlay}]} />
       {sidebar}
     </View>}
@@ -264,8 +286,11 @@ const s = StyleSheet.create({
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10},
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
-  mobileTop: {paddingHorizontal:8,minHeight:64,gap:6,justifyContent:'space-between'},
+  mobileTop: {paddingHorizontal:8,paddingVertical:5,minHeight:64,gap:6,justifyContent:'space-between'},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
+  mobileHeaderLeft: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', gap: 4},
+  mobileHeaderRight: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6},
+  mobileHeaderRightStack: {flexDirection: 'column', alignItems: 'flex-end', gap: 0},
   headerControls: {flexDirection:'row',alignItems:'center',justifyContent:'flex-end',gap:16},
   headerDetails: {paddingHorizontal: 28, paddingBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 16},
   mobileDetails: {paddingHorizontal: 12, justifyContent: 'flex-end'},
@@ -278,6 +303,6 @@ const s = StyleSheet.create({
   mobileBody: {flex:1,minHeight:0,flexDirection:'row'},
   mobileMenuButton: {width:36,height:36,flexShrink:0,borderWidth:1,borderRadius:10,alignItems:'center',justifyContent:'center'},
   homeButton: {width:240,maxWidth:240,minWidth:0,minHeight:34,flexShrink:1,alignItems:'stretch',justifyContent:'center'},
-  mobileCompany: {flex:1,width:undefined,minWidth:0,maxWidth:240},
+  mobileCompany: {position:'absolute',top:0,bottom:0,alignItems:'center',justifyContent:'center'},
   content: {flex: 1, minHeight: 0, minWidth: 0},
 });

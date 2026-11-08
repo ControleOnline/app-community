@@ -10,9 +10,12 @@ export function inspectThemeElement(element) {
     const screenId=scope?.getAttribute?.('data-co-theme-screen');
     const screen=screenId && screenId.length<=200?{id:screenId,label:scope.getAttribute('data-co-theme-screen-label') || 'Tela atual'}:null;
     const scoped=hit=>hit?{...hit,...(screen?{screen}:{})}:hit;
-    const menu=element.closest?.('[role="menu"][data-co-theme]');
-    const menuBindings=validBindings(menu?JSON.parse(menu.getAttribute('data-co-theme')):[]);
-    const container=menu && menu!==node && menuBindings.length?scoped({node:menu,bindings:menuBindings,states:{normal:menuBindings}}):null;
+    const dock=element.closest?.('[data-testid="bottom-navigation"][data-co-theme]');
+    const parent=dock || element.closest?.('[role="menu"][data-co-theme]');
+    const parentBindings=validBindings(parent?JSON.parse(parent.getAttribute('data-co-theme')):[]);
+    const container=parent && parent!==node && parentBindings.length
+      ? scoped({node:parent,bindings:parentBindings,states:{normal:parentBindings},...(dock?{kind:'shortcut-bar'}:{})})
+      : null;
     const bindings=validBindings(node?JSON.parse(node.getAttribute('data-co-theme')):[]);
     // Keep a nested icon/text's own references along with its Pressable interaction states.
     if(stateNode){

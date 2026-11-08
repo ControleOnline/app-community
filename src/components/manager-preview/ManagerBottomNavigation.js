@@ -3,7 +3,17 @@ import RuntimeBottomNavigationBar from '@controleonline/ui-common/src/react/comp
 
 // Runtime menus remain authoritative; only discard routes absent from this app.
 export default function ManagerBottomNavigation({navigation, route, colors}) {
-  return <RuntimeBottomNavigationBar navigation={navigation} colors={colors}
+  const barColors = {
+    ...colors,
+    navigationBackground: colors.shortcutBarBackground ?? colors.navigationBackground,
+    navigationBorder: colors.shortcutBarBorder ?? colors.navigationBorder,
+    navigationIcon: colors.shortcutBarIcon ?? colors.navigationIcon,
+    navigationText: colors.shortcutBarText ?? colors.navigationText,
+    navigationActiveBackground: colors.shortcutBarActiveBackground ?? colors.navigationActiveBackground,
+    navigationActiveIcon: colors.shortcutBarActiveIcon ?? colors.navigationActiveIcon,
+    navigationActiveText: colors.shortcutBarActiveText ?? colors.navigationActiveText,
+  };
+  return <RuntimeBottomNavigationBar navigation={navigation} colors={barColors}
     activeRouteName={route.name} presetKey="managerToolbar" appearance="soft" placement="inline"
     itemFilter={item => navigation.getState().routeNames.includes(item.route)} />;
 }

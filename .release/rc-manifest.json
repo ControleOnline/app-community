@@ -1,25 +1,20 @@
 {
-  "version": "1.10.150",
+  "version": "1.10.151",
   "rc": 1,
-  "branch": "rc/1.10.150-rc.1",
-  "baseMaster": "60d040a49d8b386514d5d0458846ffd5b7fca3a2",
+  "branch": "rc/1.10.151-rc.1",
+  "baseMaster": "d74b81936b01d9512f60ce475e3d2638ecc6cb2e",
   "tasks": [
-    131,
     133,
     134,
-    1411
+    1437
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "14cf5297907b439365811ec0d4d1eb760d6fb3d4",
+    "ControleOnline/app-community": "331e1ab54fb03ea80af60babbdc87b145691dc36",
     "ControleOnline/ui-default": "5249ff2f312efb72b4c3106e5c0f608e8c90e88c",
     "ControleOnline/ui-common": "ea23be69dac91969dd05e1c0b901a223fb3fc28a",
     "ControleOnline/ui-customers": "320371ff28059b66aa85f8c1d780fd2a58b5abf1",
     "ControleOnline/ui-financial": "5cc06a663be8b35d2d2c950acc689dea5d2bbe90"
-  },
-  "validation": {
-    "scope": "task #134: titulo Por meio de pagamento e sub cards cruzados pagamento x dispositivo na tela Caixa (ui-common 1.2.122); mantem demais tasks do staging.",
-    "checks": "node --test cashRegisterSummary (8 pass); phpunit CashRegisterSummaryServiceTest (9 pass)"
   }
 }

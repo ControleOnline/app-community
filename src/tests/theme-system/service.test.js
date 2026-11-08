@@ -8,8 +8,36 @@ jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:jest.fn()}}));
 const theme={id:11,theme:'Domínio',background:4,colors:{cardBackground:'#ffffff',googleLoading:'#aabbcc'}};
 beforeEach(()=>api.fetch.mockReset());
 test('loads the exact domain theme rather than the selected company theme',async()=>{
-  api.fetch.mockResolvedValueOnce({'hydra:member':[{domain:'other.test',theme:'/themes/5'},{domain:'localhost:8081',theme:'/themes/11'}]}).mockResolvedValueOnce(theme);
+  api.fetch.mockResolvedValueOnce({domain:{id:7,domain:'localhost:8081',themeId:11,canApply:true}}).mockResolvedValueOnce(theme);
   expect((await loadDomainTheme()).id).toBe(11);expect(api.fetch).toHaveBeenLastCalledWith('themes/11');
+});
+test('loads the exact linked theme on APIs without the domain management route', async () => {
+  api.fetch.mockRejectedValueOnce(Object.assign(new Error('Not Found'), {status:404}))
+    .mockResolvedValueOnce({member:[
+      {id:2,domain:'another.example',theme:'/themes/5'},
+      {id:7,domain:'localhost:8081',theme:'/themes/11'},
+    ]})
+    .mockResolvedValueOnce(theme);
+
+  await expect(loadDomainTheme()).resolves.toMatchObject({id:11,colors:theme.colors});
+  expect(api.fetch).toHaveBeenNthCalledWith(2, 'people_domains', {
+    params:{domain:'localhost:8081',itemsPerPage:50},
+  });
+  expect(api.fetch).toHaveBeenLastCalledWith('themes/11');
+});
+test('does not fall back when management access is denied', async () => {
+  api.fetch.mockRejectedValueOnce(Object.assign(new Error('Forbidden'), {status:403}));
+  await expect(loadDomainTheme()).rejects.toThrow('Forbidden');
+  expect(api.fetch).toHaveBeenCalledTimes(1);
+});
+test('does not pick a theme from ambiguous legacy domain records', async () => {
+  api.fetch.mockRejectedValueOnce(Object.assign(new Error('Not Found'), {status:404}))
+    .mockResolvedValueOnce({'hydra:member':[
+      {id:7,domain:'localhost:8081',theme:'/themes/11'},
+      {id:8,domain:'localhost:8081',theme:'/themes/5'},
+    ]});
+  await expect(loadDomainTheme()).rejects.toThrow('não possui um tema acessível');
+  expect(api.fetch).toHaveBeenCalledTimes(2);
 });
 test('saves only explicit edits while retaining fresh unrelated values and theme metadata',async()=>{
   api.fetch.mockResolvedValueOnce({...theme,colors:{...theme.colors,textPrimary:'#112233'}}).mockResolvedValueOnce({id:11});
@@ -37,4 +65,15 @@ test('scoped colors survive the existing save/reload JSON transport without chan
  expect(resolveScreenThemeDetails(reloaded.colors,'light',screen).values.cardBackground).toBe('#123456');
  expect(resolveScreenThemeDetails(reloaded.colors,'light','other').values.cardBackground).toBe('#ffffff');
  expect(saved.colors[key]).toBe('#123456');
+});
+
+test('a new domain binding does not reuse the pending colors from the previous theme',async()=>{
+  let resolvePrevious;
+  api.fetch.mockReturnValueOnce(new Promise(resolve=>{resolvePrevious=resolve;}))
+    .mockResolvedValueOnce({id:5,theme:'Novo',colors:{}});
+  const previous=loadDomainTheme({themeId:11});
+  const next=loadDomainTheme({themeId:5});
+  await expect(next).resolves.toMatchObject({id:5});
+  resolvePrevious(theme);
+  await expect(previous).rejects.toThrow('tema mudou');
 });

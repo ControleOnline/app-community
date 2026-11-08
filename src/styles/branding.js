@@ -1,3 +1,4 @@
+import {installThemeScrollbarStyles} from './themeScrollbars';
 import {invalidateWebThemeColors} from './webThemeColorCache';
 import {colors as defaultColors} from '@controleonline/ui-layout/src/styles/colors';
 
@@ -19,7 +20,7 @@ let managed = new Map();
 export const applyThemeCssVariables = ({themeColors = {}} = {}) => {
   if (typeof document === 'undefined') return;
   const root=document.documentElement;
-  if(owner!==root){owner=root;managed=new Map();}
+  if(owner!==root){owner=root;managed=new Map();installThemeScrollbarStyles(document);}
   const next=new Map();
   for(const [key,value] of Object.entries(themeColors)) {
     if(value===undefined || value===null || String(value).trim()==='') continue;
