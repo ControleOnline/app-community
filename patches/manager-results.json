@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-financial",
-      "version": "1.1.44",
+      "version": "1.1.43",
       "file": "src/react/pages/reports/IncomeStatement.js",
       "before": "31b2e04db6805d7b9d63e66c5d2380fad78546d5a86b148f3b3d6cb0f3d5aa27",
       "after": "76c6b73601044fc58bd576cc9fa0d4b95ee6c62ec4b687531a2a787b98c6e24a",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.120",
+      "version": "1.2.116",
       "file": "src/react/components/AnimatedModal.js",
       "before": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",
       "after": "e29bffd79611a2a07df44f147eaa8db2fbb6150ba73479c5c7c96b4ac84db6f6",

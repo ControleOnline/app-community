@@ -1,18 +1,19 @@
 {
-  "version": "1.10.149",
-  "rc": 1,
-  "branch": "rc/1.10.149-rc.1",
-  "baseMaster": "60d040a49d8b386514d5d0458846ffd5b7fca3a2",
+  "version": "1.10.135",
+  "rc": 3,
+  "branch": "rc/1.10.135-rc.3",
+  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
   "tasks": [
-    1433
+    1387
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "ce90601718d500d2d0bf1c2cfd2b8135e03f1df0"
+    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
+    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
   },
   "validation": {
-    "scope": "ManagerOverview declara homeModulesLayout (tema, fallback list); corrige ReferenceError na home.",
-    "checks": "parse esbuild ok; unica ocorrencia da variavel no repo; sem teste de runtime"
+    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
+    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
   }
 }
