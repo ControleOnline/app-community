@@ -53,7 +53,10 @@ export default function ManagerOverview({navigation}) {
     [t, translateMessages, pendingTranslateMessages],
   );
   const selectedPeriod = periods.find(option => option.id === period) || periods[0];
-  const {menus} = useStore('theme').getters;
+  const themeGetters = useStore('theme').getters;
+  const {menus} = themeGetters;
+  // Theme-driven layout; the theme setting may not exist yet, so default to the list view.
+  const homeModulesLayout = themeGetters?.homeModulesLayout === 'buttons' ? 'buttons' : 'list';
   // Every destination comes from the real runtime menu, never a demo capability.
   const groups = useMemo(
     () => managerMenu(menus, navigation.getState().routeNames, t),
