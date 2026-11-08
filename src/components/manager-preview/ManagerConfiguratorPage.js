@@ -4,7 +4,6 @@ import {Text,View,useWindowDimensions} from 'react-native';
 import Configurator from '@controleonline/ui-config/src/react/pages/ConfiguratorPage';
 import {createStyles} from '@controleonline/ui-config/src/react/pages/ConfiguratorPage.styles';
 import {useManagerPreview} from './ManagerPreviewProvider';
-import {useThemeTools} from '../theme-editor/ThemeToolsProvider';
 
 export function configuratorPresentation(c,width) {
   const palette={...c,background:c.pageBackground,text:c.textPrimary,mutedText:c.textMuted,
@@ -40,13 +39,11 @@ export function configuratorPresentation(c,width) {
 export default function ManagerConfiguratorPage(props) {
   const ownsTitle=useManagementPageTitle();
   const preview=useManagerPreview(),{width}=useWindowDimensions();
-  const {available}=useThemeTools();
-  const showThemeShortcut=available && props.navigation?.getState?.()?.routeNames?.includes('ThemeManagerPage') === true;
   const presentation=useMemo(()=>preview?configuratorPresentation(preview.colors,width):null,[preview?.colors,width]);
   const scopedPresentation=useMemo(()=>presentation && ownsTitle ? {...presentation,styles:{...presentation.styles,heroTitle:{...presentation.styles.heroTitle,display:'none'}}} : presentation,[presentation,ownsTitle]);
-  if(!preview)return <Configurator {...props} showThemeShortcut={showThemeShortcut}/>;
+  if(!preview)return <Configurator {...props}/>;
   return <View style={{flex:1,minHeight:0,backgroundColor:preview.colors.pageBackground}}>
 
-    <Configurator {...props} presentation={scopedPresentation} showThemeShortcut={showThemeShortcut}/>
+    <Configurator {...props} presentation={scopedPresentation}/>
   </View>;
 }

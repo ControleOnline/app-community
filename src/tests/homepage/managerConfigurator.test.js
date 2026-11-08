@@ -29,13 +29,10 @@ it('shows no shortcut when the profile is allowed none (empty response is not a 
  mockFetch.mockResolvedValue({response:{success:true,data:{modules:{}}}});
  const {tree}=await renderPage();expect(tree.root.findAllByType('TouchableOpacity')).toHaveLength(0);
 });
-it('offers only the authorized theme shortcut when the company menu is empty',async()=>{
- mockFetch.mockResolvedValue(menuResponse([]));
- const {tree,navigate}=await renderPage({showThemeShortcut:true});
- const cards=tree.root.findAllByType('TouchableOpacity');
- expect(cards.map(card=>card.props.accessibilityLabel)).toEqual(['Temas']);
- act(()=>cards[0].props.onPress());
- expect(navigate).toHaveBeenCalledWith('ThemeManagerPage');
+it('uses only API shortcuts even when the floating editor is available',async()=>{
+ mockFetch.mockResolvedValue(menuResponse(['ConnectionsPage']));
+ const {tree}=await renderPage({showThemeShortcut:true});
+ expect(tree.root.findAllByType('TouchableOpacity').map(card=>card.props.accessibilityLabel)).toEqual(['Conexões']);
  await act(async()=>tree.unmount());
 });
 it('shows no shortcut while the menu is still loading',()=>{

@@ -3,7 +3,7 @@ import { Pressable, Switch, Text, TextInput, View } from 'react-native';
 import { env } from '@env';
 import { resolveAppDomain } from '@controleonline/ui-common/src/utils/appDomain';
 import { useThemeRuntime } from '../../styles/themeRuntime';
-import { resolveManagerThemeDetails, describeResolvedThemeColor, missingManagerThemeTokens, laveGoShortcutSource } from '../../styles/managerTheme';
+import { resolveManagerThemeDetails, describeResolvedThemeColor, missingManagerThemeTokens } from '../../styles/managerTheme';
 import contract from '../../styles/themeContract.generated';
 import { loadDomainBinding, loadDomainTheme, editorContext } from './themeService';
 import ThemeEditorDialog from './ThemeEditorDialog';
@@ -93,7 +93,7 @@ export default function AppliedThemeOverview({ companyThemes = [], onResolved, o
      <Text selectable style={{ color: c.modalText, fontWeight: '600' }}>{token}</Text>
      {['light', 'dark'].map((mode) => {const color = describeResolvedThemeColor(modes[mode], token);return <View key={mode} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
       <View style={{ width: 18, height: 18, borderWidth: 1, borderColor: c.inputBorder, backgroundColor: token === 'buttonDisabledOpacity' ? 'transparent' : color.value || 'transparent' }} />
-      <Text selectable style={{ color: c.textSecondary, flex: 1 }}>{mode === 'light' ? t("Claro") : t("Escuro")}: {color.value || t("Sem valor aplicado")}{t(" · origem: ")}{color.source === laveGoShortcutSource ? t(laveGoShortcutSource) : color.source ? `theme.colors[${color.source}] → CSS` : t("sem variável cadastrada para este papel")}</Text>
+      <Text selectable style={{ color: c.textSecondary, flex: 1 }}>{mode === 'light' ? t("Claro") : t("Escuro")}: {color.value || t("Sem valor aplicado")}{t(" · origem: ")}{color.source ? `theme.colors[${color.source}] → CSS` : t("sem variável cadastrada para este papel")}</Text>
      </View>;})}
     </View>)}
    </View>)}

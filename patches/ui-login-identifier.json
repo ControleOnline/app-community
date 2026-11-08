@@ -43,6 +43,7 @@
     ],
     [
       "  const styles = useMemo(() => createStyles(theme), [theme]);",
+      "  const styles = useMemo(() => createStyles(theme), [theme]);\n  const loginFields = resolveLoginFieldColors(theme);",
       "  const styles = useMemo(() => createStyles(theme), [theme]);\n  const loginFields = resolveLoginFieldColors(theme, APP_ENV.DOMAIN);"
     ],
     [

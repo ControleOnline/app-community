@@ -102,3 +102,16 @@ test('an inspected screen defaults to local editing and explicitly switches to g
  expect(editor().props.draft).toBe('unsaved local color');expect(mockMounts).toBe(1);
  await act(async()=>tree.unmount());
 });
+
+test('selects native scrollbar colors without depending on a scrollbar DOM element',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try {
+  const editor=()=>tree.root.findByType('draft-editor');
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  expect(button(tree,'Barra de rolagem')).toBeDefined();
+  await act(async()=>button(tree,'Barra de rolagem').props.onPress());
+  expect(editor().props.selectedTokens).toEqual(['scrollbarThumb','scrollbarTrack']);
+  await act(async()=>button(tree,'Hover').props.onPress());
+  expect(editor().props.selectedTokens).toEqual(['scrollbarThumbHover']);
+ }finally{await act(async()=>tree.unmount());}
+});
