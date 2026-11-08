@@ -50,7 +50,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.41",
+      "version": "1.0.43",
       "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
       "before": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
       "after": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
@@ -58,7 +58,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.41",
+      "version": "1.0.43",
       "file": "src/react/pages/Products.js",
       "before": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
       "after": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
@@ -66,7 +66,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.41",
+      "version": "1.0.43",
       "file": "src/tests/react/components/ProductItemCustomizationRoute.test.js",
       "before": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
       "after": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
@@ -74,7 +74,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.41",
+      "version": "1.0.43",
       "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
       "before": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
       "after": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
