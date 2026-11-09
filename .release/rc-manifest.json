@@ -1,19 +1,19 @@
 {
-  "version": "1.10.166",
+  "version": "1.10.168",
   "rc": 1,
-  "branch": "rc/1.10.166-rc.1",
-  "baseMaster": "9fbe31ab942ac7fe7d7d922ceef092758db5ab74",
+  "branch": "rc/1.10.168-rc.1",
+  "baseMaster": "43276e1c261d20520b92f72a0448fec389e6aff8",
   "tasks": [
-    1467
+    1468
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "08117e9b7b2ea0e80da135d67c4e0fb3111957f3",
-    "ControleOnline/ui-config": "03bf8222fd3f7a21fc0a9cff5e8d984818d10bb1"
+    "ControleOnline/app-community": "928dadf7fd50df23a6bc1cf887a14fe1ba6ac8cf",
+    "ControleOnline/ui-config": "768a00c15cad9eab250bf54647e467bbd5c41df6"
   },
   "validation": {
-    "scope": "ui-config 1.0.27: Salvar menu ao lado do Ativo/Inativo na menu-access-config-page.",
-    "checks": "menuAccessSaveMenuPlacement.contract (1 pass); Security aceito; homologado pelo usuario em staging (RC 1.10.165-rc.1)"
+    "scope": "ui-config 1.0.28: renumeracao 10,20,30 ao gravar ordem de categoria/menu.",
+    "checks": "menuOrder.test (4) + wiring contract; Security aceito (PATCH exige ROLE_SUPER); RC 1.10.167-rc.1 em staging"
   }
 }
