@@ -37,7 +37,7 @@ export default function ModuleAccentSettings({menus, palette, preference, colors
         thumbColor={enabled ? c.switchOnThumb : c.switchOffThumb} />
     </View>
     <Text style={{color: c.textSecondary}}>{t('Aplica a cor da categoria aos ícones e fundos em Explorar módulos e no menu lateral.')}</Text>
-    <Text style={{color: c.textSecondary}}>{t('Preferência desta conta neste aparelho e domínio. Selecione uma categoria para ver a prévia.')}</Text>
+    <Text style={{color: c.textSecondary}}>{t('Cores de categoria do tema. Selecione uma categoria para ver a prévia.')}</Text>
     {groups.map(group => {
       const color = colorOf(group);
       const name = nameOf(group);
