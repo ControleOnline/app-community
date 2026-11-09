@@ -1,7 +1,7 @@
 {
-  "version": "1.10.172",
+  "version": "1.10.173",
   "rc": 1,
-  "branch": "rc/1.10.172-rc.1",
+  "branch": "rc/1.10.173-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
     1460,
@@ -10,11 +10,11 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "9934a5bb4b921639aca948b6e1eeb4702705983b",
-    "ControleOnline/ui-config": "572550f8e8c15fd9d96fa4703f425ed5d07f1aca"
+    "ControleOnline/app-community": "2402cd1f1833b1456292222eb96d02d099ac6278",
+    "ControleOnline/ui-config": "b2c4dc334b6f7e1eac9bf4dc59b8a44778bbc605"
   },
   "validation": {
-    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master. 1.10.169 (#1469): ui-config 1.0.29 - categorias recolhiveis (inicio recolhido) na menu-access-config-page. 1468 ja esta em master 1.10.168. 1.10.172 (#1470): ui-config 1.0.30 - lixeira (placeholder) na categoria e nos itens. 1468 e 1469 ja estao em master.",
+    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master. 1.10.169 (#1469): ui-config 1.0.29 - categorias recolhiveis (inicio recolhido) na menu-access-config-page. 1468 ja esta em master 1.10.168. 1.10.172 (#1470): ui-config 1.0.30 - lixeira (placeholder) na categoria e nos itens. 1468 e 1469 ja estao em master. 1.10.173 (#1470): aviso da lixeira com toast negativo (vermelho), ui-config 1.0.31.",
     "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente; menuAccessCollapse.contract (1 pass); menuAccessTrashPlaceholder.contract (1 pass)"
   }
 }
