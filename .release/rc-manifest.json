@@ -1,20 +1,20 @@
 {
-  "version": "1.10.175",
+  "version": "1.10.177",
   "rc": 1,
-  "branch": "rc/1.10.175-rc.1",
+  "branch": "rc/1.10.177-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
     1460,
-    1470
+    1484
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "706303fb3036530a9cd67d0348eac57e6cf945f5",
-    "ControleOnline/ui-config": "70063335d399b0460c8d562fcbc5d4e2bbdaeb3f"
+    "ControleOnline/app-community": "14f6066693a85eac29e32cd9c157e297c1b3c7f8",
+    "ControleOnline/ui-common": "870e757c5c085a185d22c30f139ef6b434ce2e42"
   },
   "validation": {
-    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master. 1.10.169 (#1469): ui-config 1.0.29 - categorias recolhiveis (inicio recolhido) na menu-access-config-page. 1468 ja esta em master 1.10.168. 1.10.172 (#1470): ui-config 1.0.30 - lixeira (placeholder) na categoria e nos itens. 1468 e 1469 ja estao em master. 1.10.173 (#1470): aviso da lixeira com toast negativo (vermelho), ui-config 1.0.31. 1.10.175 (#1470): lixeira e toast usam a variavel de tema negative (sem vermelho fixo), ui-config 1.0.32.",
-    "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente; menuAccessCollapse.contract (1 pass); menuAccessTrashPlaceholder.contract (1 pass)"
+    "scope": "ui-common 1.2.123 (#1484): toasts de erro/aviso usam as variaveis de tema negative/warning, sem RGB fixo. Staging mantem a 1460 (nao promovida); 1470 ja esta em master 1.10.176.",
+    "checks": "toastThemeColors.contract (1 pass); toastPresentation.test atualizado (jest nao e executado pelo npm test do pacote)"
   }
 }
