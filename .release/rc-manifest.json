@@ -1,18 +1,19 @@
 {
-  "version": "1.10.158",
+  "version": "1.10.162",
   "rc": 1,
-  "branch": "rc/1.10.158-rc.1",
+  "branch": "rc/1.10.162-rc.1",
   "baseMaster": "d74b81936b01d9512f60ce475e3d2638ecc6cb2e",
   "tasks": [
     133,
     134,
     1450,
-    1453
+    1453,
+    1463
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "9db674c0ffa67c42aacc915d47ff42e82b763b18",
+    "ControleOnline/app-community": "a1cfeb8292b00042e22295c2194936ec40dfb2db",
     "ControleOnline/ui-default": "1ca2828eb269e35e4e304e9c7a405233dffc498a",
     "ControleOnline/ui-common": "ea23be69dac91969dd05e1c0b901a223fb3fc28a",
     "ControleOnline/ui-customers": "47afa285f21ade188dedbdd1565565ceb99d2e5b",
@@ -21,7 +22,7 @@
     "ControleOnline/ui-products": "024e64eb2bac77c97c064e332bb7880415e0953b"
   },
   "validation": {
-    "scope": "1.10.152 (#1442): altura 32px nos botoes da home, acesso rapido e menu lateral. 1.10.153 (#1444): ui-default 1.0.289 - badge ID 32px, row compacta 40px. 1.10.154 (#1447): abas de 40px em ui-customers 1.0.93, ui-crm 1.0.63, ui-products 1.0.43 (ui-contracts nao publicou). 1437 removida do manifesto: ja esta em master. 1.10.156 (#1450): card da categoria usa cor de Categories e botoes a cor de routes (somente fundo). 1442/1444/1447 removidas: ja em master 1.10.155. 1.10.158 (#1453): cores de Categories/routes sem transparencia na home.",
-    "checks": "jest controlHeight.contract (1 pass); parse esbuild ok; sem validacao visual; compactRowHeight.contract (1 pass); sem validacao visual; moduleAccentSource.contract (1 pass); sem validacao visual; moduleAccentSource.contract (1 pass)"
+    "scope": "1.10.152 (#1442): altura 32px nos botoes da home, acesso rapido e menu lateral. 1.10.153 (#1444): ui-default 1.0.289 - badge ID 32px, row compacta 40px. 1.10.154 (#1447): abas de 40px em ui-customers 1.0.93, ui-crm 1.0.63, ui-products 1.0.43 (ui-contracts nao publicou). 1437 removida do manifesto: ja esta em master. 1.10.156 (#1450): card da categoria usa cor de Categories e botoes a cor de routes (somente fundo). 1442/1444/1447 removidas: ja em master 1.10.155. 1.10.158 (#1453): cores de Categories/routes sem transparencia na home. 1.10.162 (#1463): itens dos cards de categoria com 32px e gap 10 como o Acesso rapido.",
+    "checks": "jest controlHeight.contract (1 pass); parse esbuild ok; sem validacao visual; compactRowHeight.contract (1 pass); sem validacao visual; moduleAccentSource.contract (1 pass); sem validacao visual; moduleAccentSource.contract (1 pass); moduleListSpacing.contract (1 pass)"
   }
 }
