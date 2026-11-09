@@ -11,9 +11,6 @@ export function resolveModuleAccent(categoryColor, palette = {}) {
   return typeof argb === 'number' && (argb >>> 24) > 0 ? resolved : undefined;
 }
 
-export function moduleAccentBackground(accent, highlighted = false) {
-  if (!accent) return undefined;
-  const argb = processColor(accent);
-  const opacity = ((argb >>> 24) / 255) * (highlighted ? 0.24 : 0.14);
-  return `rgba(${(argb >>> 16) & 255}, ${(argb >>> 8) & 255}, ${argb & 255}, ${opacity})`;
+export function moduleAccentBackground(accent) {
+  return accent;
 }

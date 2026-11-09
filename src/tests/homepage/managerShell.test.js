@@ -271,13 +271,13 @@ it('uses category colors on sidebar items before and after navigation', () => {
   let tree; act(() => {tree = renderer.create(view());});
   const devices = labeled(tree, 'Dispositivos')[0];
   const inactive = labeled(tree, 'Início')[0];
-  expect(devices.props.style({})[1].backgroundColor).toBe('rgba(20, 117, 104, 0.14)');
-  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('rgba(20, 117, 104, 0.24)');
+  expect(devices.props.style({})[1].backgroundColor).toBe('#147568');
+  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#147568');
   expect(devices.findByType('Icon').props.color).toBe('#147568');
   expect(inactive.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
   expect(devices.props.style({})[1]).toMatchObject({
-    backgroundColor:'rgba(20, 117, 104, 0.24)',borderLeftColor:'#147568',
+    backgroundColor:'#147568',borderLeftColor:'#147568',
   });
   mockModuleAccent = {value:false};
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
