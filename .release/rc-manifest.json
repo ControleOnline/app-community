@@ -4,6 +4,7 @@
   "branch": "rc/1.10.167-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
+    1460,
     1468
   ],
   "taskRepository": "ControleOnline/app-community",
@@ -13,7 +14,7 @@
     "ControleOnline/ui-config": "768a00c15cad9eab250bf54647e467bbd5c41df6"
   },
   "validation": {
-    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam).",
+    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master.",
     "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente"
   }
 }
