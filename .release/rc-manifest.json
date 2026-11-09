@@ -1,19 +1,19 @@
 {
-  "version": "1.10.176",
+  "version": "1.10.178",
   "rc": 1,
-  "branch": "rc/1.10.176-rc.1",
-  "baseMaster": "a4a4f6cdb13caa928bb6ac0b1e73ec9719085aec",
+  "branch": "rc/1.10.178-rc.1",
+  "baseMaster": "a4b0e89d0c263b76819bf2e26957659bff3945b1",
   "tasks": [
-    1470
+    1484
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "83487591b70a64e8c6ce7873bb793041e3d52860",
-    "ControleOnline/ui-config": "70063335d399b0460c8d562fcbc5d4e2bbdaeb3f"
+    "ControleOnline/app-community": "a980078e0d0f34618c8a9e5e97715c6ce42f3f96",
+    "ControleOnline/ui-common": "870e757c5c085a185d22c30f139ef6b434ce2e42"
   },
   "validation": {
-    "scope": "ui-config 1.0.32: lixeira (borda/icone) e toast (borda/indicador) usam a variavel de tema negative, sem vermelho fixo.",
-    "checks": "menuAccessTrashPlaceholder.contract (1 pass); Security aceito (1.0.30; 1.0.32 so troca cores por variavel de tema); RC 1.10.175-rc.1 em staging"
+    "scope": "ui-common 1.2.123: toasts de erro/aviso usam as variaveis de tema negative/warning, sem RGB fixo.",
+    "checks": "toastThemeColors.contract (1 pass); Security aceito; RC 1.10.177-rc.1 em staging"
   }
 }
