@@ -1,18 +1,18 @@
 {
-  "version": "1.10.157",
+  "version": "1.10.159",
   "rc": 1,
-  "branch": "rc/1.10.157-rc.1",
-  "baseMaster": "e7ab06765eb073f0a1443853eca8e5234cd171ee",
+  "branch": "rc/1.10.159-rc.1",
+  "baseMaster": "b51da4afeca38639b29df00112eb35e0970eb43b",
   "tasks": [
-    1450
+    1453
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6b31a93c00b73a6affa7901ea92e0106027ed3b5"
+    "ControleOnline/app-community": "1abdbdd415b18010b8fead310ae11410d679c825"
   },
   "validation": {
-    "scope": "Home Explore Modules: card da categoria usa a cor de Categories; botoes usam a cor de routes (somente fundo).",
-    "checks": "moduleAccentSource.contract (1 pass); Security aceito; RC 1.10.156-rc.1 em staging"
+    "scope": "Home Explore Modules: cores de Categories/routes aplicadas exatamente como vem do banco, sem transparencia.",
+    "checks": "moduleAccentSource.contract (1 pass); Security aceito; RC 1.10.158-rc.1 em staging"
   }
 }
