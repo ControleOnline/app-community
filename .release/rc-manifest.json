@@ -1,18 +1,19 @@
 {
-  "version": "1.10.161",
+  "version": "1.10.163",
   "rc": 1,
-  "branch": "rc/1.10.161-rc.1",
+  "branch": "rc/1.10.163-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
-    1460
+    1460,
+    1463
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b78d86e14e4e7352035c962c5c3bca2e6e9fea80"
+    "ControleOnline/app-community": "4a711ee6b5f5c91dcd904fa9b7d02082caa5a0b3"
   },
   "validation": {
-    "scope": "#1460 theme layout flags in themes.colors + strip screen_* overrides",
-    "checks": "stripScreenThemeKeys node smoke OK; files \u2264500 lines"
+    "scope": "#1460 theme layout flags in themes.colors + strip screen_* overrides 1.10.163 (#1463): itens dos cards de categoria com 32px e gap 10 como o Acesso rapido.",
+    "checks": "stripScreenThemeKeys node smoke OK; files ≤500 lines; moduleListSpacing.contract (1 pass)"
   }
 }
