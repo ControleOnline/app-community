@@ -2,7 +2,7 @@ import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import ModuleAccentSettings from '../../components/theme-editor/ModuleAccentSettings';
 import useManagerPreference from '../../components/manager-preview/useManagerPreference';
-import {resolveModuleAccent} from '../../components/manager-preview/moduleAccent';
+import {moduleAccentBackground, resolveModuleAccent} from '../../components/manager-preview/moduleAccent';
 
 jest.mock('../../components/HomeIcon', () => 'Icon');
 
@@ -34,7 +34,7 @@ test('shows the resolved colors and keeps preview separate from the saved prefer
   expect(save).not.toHaveBeenCalled();
   const finance=tree.root.findByProps({accessibilityLabel:'Prévia de Financeiro'});
   await act(async () => finance.props.onPress());
-  expect(tree.root.findByProps({testID:'module-accent-preview'}).props.style.borderLeftColor).toBe('#757575');
+  expect(tree.root.findByProps({testID:'module-accent-preview'}).props.style).toMatchObject({borderLeftColor:'#757575', backgroundColor:'#757575'});
   await act(async () => tree.root.findByProps({accessibilityLabel:'Salvar preferência de destaque'}).props.onPress());
   expect(save).toHaveBeenCalledWith(true);
   await act(async () => tree.unmount());
@@ -59,4 +59,12 @@ test('remembers the accent only for the same preference key', async () => {
     if (tree) await act(async () => tree.unmount());
     global.localStorage = previousStorage;
   }
+});
+
+test('preserves database colors without adding opacity to normal or highlighted backgrounds', () => {
+  for (const color of ['#147568', 'rgba(20, 117, 104, 0.6)']) {
+    expect(moduleAccentBackground(color)).toBe(color);
+    expect(moduleAccentBackground(color, true)).toBe(color);
+  }
+  expect(moduleAccentBackground(undefined)).toBeUndefined();
 });
