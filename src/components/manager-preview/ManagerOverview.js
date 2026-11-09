@@ -293,7 +293,7 @@ export default function ManagerOverview({navigation}) {
         return <View key={group.id || i}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
           <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons && s.moduleGrid}>
+          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons ? s.moduleGrid : s.moduleList}>
             {group.items.map((item, j) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
               // Database colors are used as-is: no opacity applied (#1453).
@@ -305,7 +305,7 @@ export default function ManagerOverview({navigation}) {
                 backgroundColor: hovered || pressed
                   ? accent ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
-              }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground, borderRadius: 8, paddingHorizontal: 8}]}>
+              }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground}]}>
               {showModuleIcons ? <>
                 <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
                   {icon(item.icon, c.listItemIcon, 22)}
@@ -359,5 +359,7 @@ const s = StyleSheet.create({
   moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   moduleListIcon: {width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center'},
   moduleTileLabel: {fontSize: 12, textAlign: 'center', width: '100%'},
-  moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 13},
+  // List items match the Quick access items: 32px high, 10px apart (#1463).
+  moduleList: {marginTop: 12, gap: 10},
+  moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', minHeight: CONTROL_HEIGHT, paddingVertical: 3, paddingHorizontal: 12, borderRadius: 10},
 });
