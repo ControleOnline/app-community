@@ -34,7 +34,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const [hover, setHover] = useState(null);
   const [selection, setSelection] = useState(null);
   const [interaction, setInteraction] = useState('normal');
-  const [editScope, setEditScope] = useState('screen');
+  const [editScope, setEditScope] = useState('global');
   const [origins, setOrigins] = useState(false);
   const [viewport, setViewport] = useState(visibleViewport);
   const [dockInset, setDockInset] = useState(0);
@@ -71,7 +71,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
       setHover((previous) => previous && rectangle && ['left', 'top', 'width', 'height'].every((key) => previous[key] === rectangle[key]) ? previous : rectangle);
     }, (hit, escape) => {
       setInspecting(false);
-      if (!escape) {setSelection(hit);setInteraction('normal');setEditScope(hit?.screen ? 'screen' : 'global');setError(hit ? '' : t("Este elemento não expõe uma referência de cor do tema. Nenhuma variável foi inferida."));}
+      if (!escape) {setSelection(hit);setInteraction('normal');setEditScope('global');setError(hit ? '' : t("Este elemento não expõe uma referência de cor do tema. Nenhuma variável foi inferida."));}
     });
   }, [inspecting]);
   useEffect(() => {
@@ -154,14 +154,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
             {button(t("Normal"), () => setInteraction('normal'), interaction === 'normal')}
             {!!selection.states?.hover && button(t("Hover"), () => setInteraction('hover'), interaction === 'hover')}
           </View>}
-          {!!selection?.screen && <View style={{ gap: 6 }}>
-            <Text style={{ fontSize: 12, color: c.textSecondary }}>{t("Onde aplicar a alteração?")}</Text>
-            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-              {button(t("Só nesta tela"), () => setEditScope('screen'), editScope === 'screen')}
-              {button(t("Em todas as telas"), () => setEditScope('global'), editScope === 'global')}
-            </View>
-            <Text style={{ fontSize: 12, color: c.textSecondary }}>{editScope === 'screen' ? t("Tela: {{v0}}", { v0: selection.screen.label }) : t("Padrão compartilhado entre as telas que usam esta variável.")}</Text>
-          </View>}
+          {/* per-screen theme overrides removed (#1460) */}
           {!!bindings.length && <>
             {button(origins ? t("Ocultar origens") : t("Ver variáveis e origens"), () => setOrigins((value) => !value))}
             {origins && <View style={{ gap: 4, padding: 8, backgroundColor: c.sectionBackground, borderRadius: 7 }}>
@@ -170,7 +163,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
           </>}
         </View>
         {!!selection && !bindings.length && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
-        <ScrollView style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} screen={editScope === 'screen' ? selection?.screen : null} concise onSaved={setTheme} />}</ScrollView>
+        <ScrollView style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} screen={null} concise onSaved={setTheme} />}</ScrollView>
       </div>
     </div>
   </>, portalHost);

@@ -104,7 +104,7 @@ export default function AppliedThemeOverview({ companyThemes = [], onResolved, o
     {sidebar?.ready && <View style={[actions, {justifyContent: 'space-between'}]}>
      <View style={{flex: 1, gap: 4}}>
       <Text style={{color: c.modalText, fontWeight: '600'}}>{t("Mostrar menu lateral")}</Text>
-      <Text style={text}>{t("Preferência desta conta neste aparelho. Você também pode mudar pelo menu da sua conta.")}</Text>
+      <Text style={text}>{t("Configuração do tema. Grava no cadastro do tema do domínio (não é preferência de usuário ou aparelho).")}</Text>
      </View>
      <Switch accessibilityLabel={t("Mostrar menu lateral")} value={sidebar.visible}
        onValueChange={sidebar.setRememberedVisible}

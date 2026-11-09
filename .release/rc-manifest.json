@@ -1,19 +1,18 @@
 {
-  "version": "1.10.178",
+  "version": "1.10.179",
   "rc": 1,
-  "branch": "rc/1.10.178-rc.1",
-  "baseMaster": "a4b0e89d0c263b76819bf2e26957659bff3945b1",
+  "branch": "rc/1.10.179-rc.1",
+  "baseMaster": "1645fcb7e23faced55afe7372fa5d44e6671f521",
   "tasks": [
-    1484
+    1460
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a980078e0d0f34618c8a9e5e97715c6ce42f3f96",
-    "ControleOnline/ui-common": "870e757c5c085a185d22c30f139ef6b434ce2e42"
+    "ControleOnline/app-community": "537054a0546506b9f147a94a888494b1217ac702"
   },
   "validation": {
-    "scope": "ui-common 1.2.123: toasts de erro/aviso usam as variaveis de tema negative/warning, sem RGB fixo.",
-    "checks": "toastThemeColors.contract (1 pass); Security aceito; RC 1.10.177-rc.1 em staging"
+    "scope": "task #1460: flags de layout (menu lateral e modulos como icones) gravadas no tema do dominio; remocao de chaves screen_* do JSON de cores. Delta isolado sobre o master atual; dependencias (#1437, #1450, #1453, #1456) ja estao no master.",
+    "checks": "security aceito em #1460 e nas dependencias; stripScreenThemeKeys verificado (sem poluicao de prototipo); cherry-pick limpo sobre master"
   }
 }
