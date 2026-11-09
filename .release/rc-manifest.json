@@ -1,21 +1,19 @@
 {
-  "version": "1.10.165",
+  "version": "1.10.167",
   "rc": 1,
-  "branch": "rc/1.10.165-rc.1",
+  "branch": "rc/1.10.167-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
-    1460,
-    1463,
-    1467
+    1468
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a04afa5adda66f74913795b60548f191bbb67e1f",
-    "ControleOnline/ui-config": "03bf8222fd3f7a21fc0a9cff5e8d984818d10bb1"
+    "ControleOnline/app-community": "a909483c48b8385c0077bc232a9f73d88c6ef6e2",
+    "ControleOnline/ui-config": "768a00c15cad9eab250bf54647e467bbd5c41df6"
   },
   "validation": {
-    "scope": "#1460 theme layout flags in themes.colors + strip screen_* overrides 1.10.163 (#1463): itens dos cards de categoria com 32px e gap 10 como o Acesso rapido. 1.10.165 (#1467): ui-config 1.0.27 - Salvar menu ao lado do Ativo/Inativo na menu-access-config-page.",
-    "checks": "stripScreenThemeKeys node smoke OK; files ≤500 lines; moduleListSpacing.contract (1 pass); menuAccessSaveMenuPlacement.contract (1 pass); sem validacao visual"
+    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam).",
+    "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente"
   }
 }
