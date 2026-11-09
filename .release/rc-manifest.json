@@ -1,21 +1,20 @@
 {
-  "version": "1.10.169",
+  "version": "1.10.172",
   "rc": 1,
-  "branch": "rc/1.10.169-rc.1",
+  "branch": "rc/1.10.172-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
     1460,
-    1468,
-    1469
+    1470
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "8d19758ea76dad2f4ce81b44279655032a7fd0eb",
-    "ControleOnline/ui-config": "69e59b58e1899130a5300ee5048639c18b2c695a"
+    "ControleOnline/app-community": "9934a5bb4b921639aca948b6e1eeb4702705983b",
+    "ControleOnline/ui-config": "572550f8e8c15fd9d96fa4703f425ed5d07f1aca"
   },
   "validation": {
-    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master. 1.10.169 (#1469): ui-config 1.0.29 - categorias recolhiveis (inicio recolhido) na menu-access-config-page. 1468 ja esta em master 1.10.168.",
-    "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente; menuAccessCollapse.contract (1 pass)"
+    "scope": "ui-config 1.0.28: ao gravar ordem de categoria ou menu, o nivel afetado e renumerado 10,20,30... (PATCH sortOrder apenas nos registros que mudam). Staging mantem a 1460 (nao promovida ao master); 1463 e 1467 ja estao em master. 1.10.169 (#1469): ui-config 1.0.29 - categorias recolhiveis (inicio recolhido) na menu-access-config-page. 1468 ja esta em master 1.10.168. 1.10.172 (#1470): ui-config 1.0.30 - lixeira (placeholder) na categoria e nos itens. 1468 e 1469 ja estao em master.",
+    "checks": "menuOrder.test (4) + wiring contract; sem validacao no ambiente; menuAccessCollapse.contract (1 pass); menuAccessTrashPlaceholder.contract (1 pass)"
   }
 }
