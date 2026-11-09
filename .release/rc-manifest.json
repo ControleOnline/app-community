@@ -1,19 +1,19 @@
 {
-  "version": "1.10.171",
+  "version": "1.10.174",
   "rc": 1,
-  "branch": "rc/1.10.171-rc.1",
-  "baseMaster": "b9e1f87ef5b59b64e6f967fc312edea4dcaacc94",
+  "branch": "rc/1.10.174-rc.1",
+  "baseMaster": "3f00b9d51da56427e9c345ce2e541a581bdefe1e",
   "tasks": [
-    1469
+    1470
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a26ea65a962e2a20650ba108bf152d427ee381ec",
-    "ControleOnline/ui-config": "69e59b58e1899130a5300ee5048639c18b2c695a"
+    "ControleOnline/app-community": "3cc3f559973d2d2d958fca3507131081065eb1d6",
+    "ControleOnline/ui-config": "b2c4dc334b6f7e1eac9bf4dc59b8a44778bbc605"
   },
   "validation": {
-    "scope": "ui-config 1.0.29: categorias recolhiveis (inicio recolhido) na menu-access-config-page.",
-    "checks": "menuAccessCollapse.contract (1 pass); Security aceito; RC 1.10.169-rc.1 em staging (web publicado)"
+    "scope": "ui-config 1.0.31: lixeira (placeholder) na categoria e nos itens; aviso 'em elaboracao' com toast negativo (vermelho) apenas na lixeira.",
+    "checks": "menuAccessTrashPlaceholder.contract (1 pass); Security aceito (1.0.30; 1.0.31 so troca a variante do toast); RC 1.10.172/173 em staging"
   }
 }
