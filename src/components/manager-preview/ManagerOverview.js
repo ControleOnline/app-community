@@ -4,7 +4,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
+import {resolveModuleAccent} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -287,33 +287,36 @@ export default function ManagerOverview({navigation}) {
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
-        const accent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
-        const accentBackground = moduleAccentBackground(accent);
+        // Category card follows the Categories color; each button follows its own route color (#1450).
+        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
-          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: c.cardBackground, borderColor: c.cardBorder}]}>
+          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
           <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
           <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons && s.moduleGrid}>
-            {group.items.map((item, j) => <Pressable key={item.id || j} accessibilityRole="button"
+            {group.items.map((item, j) => {
+              const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
+              // Database colors are used as-is: no opacity applied (#1453).
+              const accentBackground = accent;
+              return <Pressable key={item.id || j} accessibilityRole="button"
               accessibilityLabel={item.title} onPress={() => go(item)}
               style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
                 borderColor: c.listItemBorder,
                 backgroundColor: hovered || pressed
-                  ? moduleAccentBackground(accent, true) ?? c.listItemActiveBackground
+                  ? accent ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
-              }] : s.moduleItem}>
+              }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground, borderRadius: 8, paddingHorizontal: 8}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, !accent && {backgroundColor: c.iconBackground}]}>
-                  {icon(item.icon, accent ?? c.listItemIcon, 22)}
+                <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
+                  {icon(item.icon, c.listItemIcon, 22)}
                 </View>
                 <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
               </> : <>
-                {accent ? <View style={[s.moduleListIcon, {backgroundColor: accentBackground}]}>
-                  {icon(item.icon, accent, 16)}
-                </View> : icon(item.icon, c.textMuted, 16)}
+                {icon(item.icon, c.textMuted, 16)}
                 <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
                 {icon('chevron-right', c.textMuted, 14)}
               </>}
-            </Pressable>)}
+            </Pressable>;
+            })}
           </View>
         </View>;
       })}
