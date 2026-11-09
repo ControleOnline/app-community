@@ -3,6 +3,7 @@ import {resolveAppDomain} from '@controleonline/ui-common/src/utils/appDomain';
 import {env} from '@env';
 import {scopeFor,sessionVersion} from '../../session/sessionScope';
 import {registerActiveTheme,refreshDomainTheme} from '../../styles/themeRuntime';
+import {stripScreenThemeKeys} from '../../styles/stripScreenThemeKeys';
 
 const idOf = value => String(value?.id || value?.['@id'] || value || '').split('/').pop();
 let pending = null;
@@ -44,7 +45,9 @@ export async function loadDomainTheme(binding) {
       throw new Error('O contexto ou o tema mudou. Abra o editor novamente.');
     }
     registerActiveTheme(id, scopeFor(env));
-    return {...theme, id: theme.id || id, colors: theme.colors || {}};
+    // Never surface per-screen overrides to the editor or runtime consumers.
+    const colors = stripScreenThemeKeys(theme.colors || {});
+    return {...theme, id: theme.id || id, colors};
   }).finally(() => {
     if (pending === request) pending = null;
   });
@@ -55,15 +58,33 @@ export async function saveThemeChanges(theme,changes,context) {
   if(context!==editorContext())throw new Error('A sessão ou o domínio mudou. Abra o editor novamente.');
   const latest=await api.fetch(`themes/${idOf(theme)}`);
   if(context!==editorContext())throw new Error('A sessão ou o domínio mudou. Abra o editor novamente.');
+  const latestColors = stripScreenThemeKeys(latest.colors || {});
+  const themeColors = stripScreenThemeKeys(theme.colors || {});
   for(const key of Object.keys(changes)) {
-    if((latest.colors?.[key] ?? '')!==(theme.colors?.[key] ?? ''))throw new Error(`A cor ${key} foi alterada. Reabra o editor para atualizar.`);
+    if((latestColors[key] ?? '')!==(themeColors[key] ?? ''))throw new Error(`A cor ${key} foi alterada. Reabra o editor para atualizar.`);
   }
-  const body={theme:latest.theme,colors:{...(latest.colors || {}),...changes}};
+  // Persist only global tokens; drop any legacy screen_* keys from the stored JSON.
+  const body={theme:latest.theme,colors:stripScreenThemeKeys({...latestColors,...changes})};
   for(const field of ['background','logo','icon','pin']) {
     if(Object.hasOwn(latest,field))body[field]=latest[field] && typeof latest[field]==='object'?Number(idOf(latest[field])):latest[field];
   }
   const result=await api.fetch(`themes/${idOf(theme)}`,{method:'PUT',body});
   if(context!==editorContext())throw new Error('O contexto mudou durante a gravação. Recarregue o tema.');
   refreshDomainTheme();
-  return {...latest,...result,colors:result?.colors || body.colors};
+  return {...latest,...result,colors:stripScreenThemeKeys(result?.colors || body.colors)};
+}
+
+/** Persist layout flags on the domain theme (not device/account preference). */
+export async function saveThemeLayoutFlags(flags = {}) {
+  const context = editorContext();
+  const theme = await loadDomainTheme();
+  const changes = {};
+  if (Object.hasOwn(flags, 'showLeftMenu')) {
+    changes.showLeftMenu = flags.showLeftMenu ? 'true' : 'false';
+  }
+  if (Object.hasOwn(flags, 'showModulesAsIcons')) {
+    changes.homeModulesLayout = flags.showModulesAsIcons ? 'buttons' : 'list';
+  }
+  if (!Object.keys(changes).length) return theme;
+  return saveThemeChanges(theme, changes, context);
 }
