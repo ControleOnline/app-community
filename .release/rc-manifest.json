@@ -1,24 +1,18 @@
 {
-  "version": "1.10.155",
+  "version": "1.10.157",
   "rc": 1,
-  "branch": "rc/1.10.155-rc.1",
-  "baseMaster": "6670cd9fb5e88234e97d593abd11757cea116d04",
+  "branch": "rc/1.10.157-rc.1",
+  "baseMaster": "e7ab06765eb073f0a1443853eca8e5234cd171ee",
   "tasks": [
-    1442,
-    1444,
-    1447
+    1450
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "753986786dbaac5a553d57a366fd6f2ee0644c30",
-    "ControleOnline/ui-default": "1ca2828eb269e35e4e304e9c7a405233dffc498a",
-    "ControleOnline/ui-customers": "47afa285f21ade188dedbdd1565565ceb99d2e5b",
-    "ControleOnline/ui-crm": "034a1f09019c1464db0287bdf1d3fd8821376e16",
-    "ControleOnline/ui-products": "024e64eb2bac77c97c064e332bb7880415e0953b"
+    "ControleOnline/app-community": "6b31a93c00b73a6affa7901ea92e0106027ed3b5"
   },
   "validation": {
-    "scope": "Altura 32px em botoes (home/acesso rapido/menu lateral/badge ID), rows compactas 40px, abas 40px (customers, crm, products). ui-contracts ficou de fora (publish npm falhou).",
-    "checks": "controlHeight.contract + compactRowHeight.contract; Security aceito em 1442/1444/1447; homologado em staging (RC 1.10.154-rc.1) conforme deploy"
+    "scope": "Home Explore Modules: card da categoria usa a cor de Categories; botoes usam a cor de routes (somente fundo).",
+    "checks": "moduleAccentSource.contract (1 pass); Security aceito; RC 1.10.156-rc.1 em staging"
   }
 }
