@@ -304,16 +304,14 @@ export default function ManagerOverview({navigation}) {
                 backgroundColor: hovered || pressed
                   ? moduleAccentBackground(accent, true) ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
-              }] : s.moduleItem}>
+              }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground, borderRadius: 8, paddingHorizontal: 8}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, !accent && {backgroundColor: c.iconBackground}]}>
-                  {icon(item.icon, accent ?? c.listItemIcon, 22)}
+                <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
+                  {icon(item.icon, c.listItemIcon, 22)}
                 </View>
                 <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
               </> : <>
-                {accent ? <View style={[s.moduleListIcon, {backgroundColor: accentBackground}]}>
-                  {icon(item.icon, accent, 16)}
-                </View> : icon(item.icon, c.textMuted, 16)}
+                {icon(item.icon, c.textMuted, 16)}
                 <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
                 {icon('chevron-right', c.textMuted, 14)}
               </>}
