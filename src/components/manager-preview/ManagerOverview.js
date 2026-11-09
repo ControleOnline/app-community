@@ -4,7 +4,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
+import {resolveModuleAccent} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -291,18 +291,19 @@ export default function ManagerOverview({navigation}) {
         // Category card follows the Categories color; each button follows its own route color (#1450).
         const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
-          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: moduleAccentBackground(groupAccent) ?? c.cardBackground, borderColor: c.cardBorder}]}>
+          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
           <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
           <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons && s.moduleGrid}>
             {group.items.map((item, j) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-              const accentBackground = moduleAccentBackground(accent);
+              // Database colors are used as-is: no opacity applied (#1453).
+              const accentBackground = accent;
               return <Pressable key={item.id || j} accessibilityRole="button"
               accessibilityLabel={item.title} onPress={() => go(item)}
               style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
                 borderColor: c.listItemBorder,
                 backgroundColor: hovered || pressed
-                  ? moduleAccentBackground(accent, true) ?? c.listItemActiveBackground
+                  ? accent ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
               }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground, borderRadius: 8, paddingHorizontal: 8}]}>
               {showModuleIcons ? <>
