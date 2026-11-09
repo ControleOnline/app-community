@@ -11,8 +11,8 @@ import useExperienceRuntime from './useExperienceRuntime';
 import ManagerCatalogImageCache from './ManagerCatalogImageCache';
 import {app_type} from '@appType';
 import {isPosSingleItemMode} from '@controleonline/ui-common/src/react/config/deviceConfigBootstrap';
-import useSidebarPreference from './useSidebarPreference';
 import useBottomNavigationPreference from '@controleonline/ui-common/src/react/hooks/useBottomNavigationPreference';
+import useThemeLayoutPreference from './useThemeLayoutPreference';
 
 const PreviewContext = createContext(null);
 export const useManagerPreview = () => useContext(PreviewContext);
@@ -31,20 +31,22 @@ export default function ManagerPreviewProvider({children}) {
   const principal = user?.id || user?.username;
   const palette = useMemo(() => previewPalette(themeRuntime.preview || themeRuntime.raw, mode),
     [themeRuntime.preview, themeRuntime.raw, mode]);
-  // Domain settings provide defaults. A saved account preference takes precedence.
+  // Theme config is the only source of truth for layout flags (not device/account prefs).
   const sidebarDefault = ![false, 'false', 0, '0'].includes(palette.showLeftMenu ?? palette.enableSidebar);
   const homeLayout = palette.homeModulesLayout ?? theme.getters.homeModulesLayout;
-  const sidebar = useSidebarPreference(active && principal, sidebarDefault);
+  const modulesAsIconsDefault = homeLayout === 'buttons';
+  const layout = useThemeLayoutPreference({
+    showLeftMenuDefault: sidebarDefault,
+    modulesAsIconsDefault,
+  });
+  const sidebar = layout.sidebar;
+  const moduleIcons = layout.moduleIcons;
   const displayScope = active && principal ? encodeURIComponent(JSON.stringify([scopeFor(env), principal])) : '';
+  // Module accent remains a presentation preference for now (category color application).
   const moduleAccent = useManagerPreference(displayScope ? `co.module-accent.v1:${displayScope}` : '', {
     defaultValue: homeLayout === 'list' || homeLayout === 'buttons',
     loadError: 'Não foi possível carregar a preferência de destaque.',
     saveError: 'Não foi possível salvar a preferência de destaque.',
-  });
-  const moduleIcons = useManagerPreference(displayScope ? `co.home-module-icons.v1:${displayScope}` : '', {
-    defaultValue: homeLayout === 'buttons',
-    loadError: 'Não foi possível carregar a preferência de módulos.',
-    saveError: 'Não foi possível salvar a preferência de módulos.',
   });
   const bottomBar = useBottomNavigationPreference({enabled: active,
     principal: String(auth.getters.user?.id || auth.getters.user?.username || ''), appType: app_type});

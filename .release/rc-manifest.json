@@ -1,19 +1,13 @@
 {
-  "version": "1.10.135",
-  "rc": 3,
-  "branch": "rc/1.10.135-rc.3",
-  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
+  "version": "1.10.161",
+  "rc": 0,
+  "branch": "",
+  "baseMaster": "",
   "tasks": [
-    1387
+    1460
   ],
   "taskRepository": "ControleOnline/app-community",
-  "frozen": true,
-  "repositories": {
-    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
-    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
-  },
-  "validation": {
-    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
-    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
-  }
+  "frozen": false,
+  "repositories": {},
+  "validation": {}
 }
