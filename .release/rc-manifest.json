@@ -1,20 +1,18 @@
 {
-  "version": "1.10.160",
+  "version": "1.10.161",
   "rc": 1,
-  "branch": "rc/1.10.160-rc.1",
-  "baseMaster": "10bd4f1bc46268a10a0feac896ae05b815cc7045",
+  "branch": "rc/1.10.161-rc.1",
+  "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
-    1456
+    1460
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6e3e2383e9afd30240779484488ea28e43449b42"
+    "ControleOnline/app-community": "b78d86e14e4e7352035c962c5c3bca2e6e9fea80"
   },
   "validation": {
-    "scope": "Preserve resolved module category colors without multiplying opacity in shared backgrounds. Preserve Home changes #1450/#1453.",
-    "checks": "118 theme tests pass; affected sidebar category test passes. Seven pre-existing unrelated ManagerShell failures remain.",
-    "force_deploy": true,
-    "authorization": "User explicitly requests dev, staging and master publication; temporary DevOps policy allows force_deploy for automated tests."
+    "scope": "#1460 theme layout flags in themes.colors + strip screen_* overrides",
+    "checks": "stripScreenThemeKeys node smoke OK; files \u2264500 lines"
   }
 }
