@@ -94,6 +94,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     setSelection((current) => ({
       kind: 'scrollbar',
       screen: current?.screen,
+      sharedLabel: current?.sharedLabel,
       states: {
         normal: [
           {property: 'scrollbar thumb', token: 'scrollbarThumb'},
@@ -154,6 +155,9 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
             {button(t("Normal"), () => setInteraction('normal'), interaction === 'normal')}
             {!!selection.states?.hover && button(t("Hover"), () => setInteraction('hover'), interaction === 'hover')}
           </View>}
+          {!!selection?.sharedLabel && <Text style={{ fontSize: 12, color: c.textSecondary }}>
+            {t(selection.sharedLabel)} · {t("Em todas as telas")}
+          </Text>}
           {!!selection?.screen && <View style={{ gap: 6 }}>
             <Text style={{ fontSize: 12, color: c.textSecondary }}>{t("Onde aplicar a alteração?")}</Text>
             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>

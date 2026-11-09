@@ -25,7 +25,7 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
         <Text style={{color:highlighted ? c.menuActiveText : c.menuText, fontSize:13}}>{label}</Text></>;
     }}
   </Pressable>;
-  return <View accessibilityRole="menu" accessibilityLabel={global.t?.t('configs', 'a11y', 'user_options')} accessibilityViewIsModal
+  return <View testID="manager-account-menu" accessibilityRole="menu" accessibilityLabel={global.t?.t('configs', 'a11y', 'user_options')} accessibilityViewIsModal
     style={[s.panel, {backgroundColor: c.menuBackground, borderColor: c.menuBorder}, position,
       {maxHeight: Math.max(0, frame.height - top - bottom)}]}>
     <ScrollView style={s.options}>
@@ -52,7 +52,7 @@ export default function ManagerAccountMenu(props) {
   if (!props.anchor) return null;
   return <Modal transparent visible animationType="fade" onRequestClose={props.onClose}>
     <SafeAreaProvider style={s.layer}>
-      <ScreenThemeBoundary screen={props.screen}>
+      <ScreenThemeBoundary>
       <View style={s.layer} dataSet={{coThemeEditorHost:'true'}}>
         <Pressable accessibilityRole="button" accessibilityLabel="Fechar opções do usuário" onPress={props.onClose}
           style={[StyleSheet.absoluteFill, {backgroundColor: props.colors.overlayBackground}]} />

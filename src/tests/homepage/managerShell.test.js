@@ -47,6 +47,21 @@ beforeEach(() => {
 });
 afterEach(() => {delete global.window;});
 
+it('scopes route colors to the content on desktop and mobile',()=>{
+  let tree;
+  act(()=>{tree=renderer.create(view('DevicesIndex'));});
+  const scope=()=>tree.root.findAllByType('div').find(node=>node.props['data-co-theme-screen']);
+  expect(scope().findByType('content')).toBeDefined();
+  expect(scope().findAllByProps({testID:'manager-sidebar'})).toHaveLength(0);
+  expect(scope().findAllByProps({testID:'manager-header'})).toHaveLength(0);
+  mockWidth=390;
+  mockBottomBar={visible:true};
+  act(()=>tree.update(view('DevicesIndex')));
+  expect(tree.root.findByType('RuntimeToolbar')).toBeDefined();
+  expect(scope().findAllByType('RuntimeToolbar')).toHaveLength(0);
+  act(()=>tree.unmount());
+});
+
 it('provides the Manager identity to a shared table on any module route',()=>{
   let tree;
   act(()=>{tree=renderer.create(<ManagerShell navigation={navigation} route={{name:'FinancialHubPage'}}><TableThemeProbe/></ManagerShell>);});

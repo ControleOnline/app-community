@@ -184,7 +184,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       : missingCompany
         ? <ManagerStartup accessibilityLabel="Preparando empresa" message={recovering?'Carregando empresa e acessos…':'A empresa ainda não está disponível.'} busy={recovering} error={recoveryError} onRetry={retryContext}/>
         : null;
-  return <ScreenThemeBoundary screen={themeScreen}>
+  return <ScreenThemeBoundary>
     {preparing && startup}
     <View testID="manager-shell-presentation" style={[s.shell, {backgroundColor: c.pageBackground}, preparing && {display:'none'}]}>
     {sidebarVisible && !mobile && sidebar}
@@ -251,12 +251,18 @@ export default function ManagerShell({navigation, route, options, children}) {
             {items.filter(item=>item.name!=='HomePage').map((item,index)=>navItem(item,`rail-${item.id || item.name}-${index}`,true))}
           </ScrollView>
         </View>}
-        <View style={s.content}><DefaultTableThemeContext.Provider value={tableTheme}><ManagementPageTitleContext.Provider value={route.name !== 'HomePage' && !(route.name === 'DisplayDetails' && options?.headerShown === false)}>{children}</ManagementPageTitleContext.Provider></DefaultTableThemeContext.Provider></View>
+        <ScreenThemeBoundary screen={themeScreen} style={s.content}>
+          <DefaultTableThemeContext.Provider value={tableTheme}>
+            <ManagementPageTitleContext.Provider value={route.name !== 'HomePage' && !(route.name === 'DisplayDetails' && options?.headerShown === false)}>
+              {children}
+            </ManagementPageTitleContext.Provider>
+          </DefaultTableThemeContext.Provider>
+        </ScreenThemeBoundary>
       </View>
       {mobile && focused && bottomBar?.visible && <ManagerBottomNavigation navigation={navigation} route={route} colors={c} />}
     </View>
     {focused && !open && !accountAnchor && <ManagerGuide navigation={navigation} route={route} items={items} />}
-    {focused && <ManagerAccountMenu screen={themeScreen} anchor={accountAnchor} mobile={mobile} colors={c} name={name} mode={mode}
+    {focused && <ManagerAccountMenu anchor={accountAnchor} mobile={mobile} colors={c} name={name} mode={mode}
       canOpenProfile={canOpenProfile} onClose={closeAccount}
       sidebarPreference={sidebarPreference}
       bottomBar={mobile ? bottomBar : undefined}

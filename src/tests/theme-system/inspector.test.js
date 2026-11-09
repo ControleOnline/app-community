@@ -36,3 +36,38 @@ test('exposes the shortcut bar background from a tap on an individual shortcut',
     {property:'borderColor',token:'shortcutBarBorder'},
   ]});
 });
+
+
+test.each([
+  ['manager-sidebar', 'Menu lateral'],
+  ['manager-mobile-rail', 'Menu lateral'],
+  ['manager-header', 'Cabeçalho'],
+  ['manager-account-menu', 'Menu da conta'],
+  ['bottom-navigation', 'Barra de atalhos'],
+])('keeps %s global even when a route context exists', (id, label) => {
+  const bindings = [{property:'backgroundColor', token:'navigationBackground'}];
+  const node = {getAttribute:()=>JSON.stringify(bindings)};
+  const scope = {getAttribute:()=> 'screen-context'};
+  const shared = {getAttribute:()=>id};
+  const hit = inspectThemeElement({closest:selector=>{
+    if (selector === '[data-co-theme]') return node;
+    if (selector === '[data-co-theme-screen]') return scope;
+    if (selector.includes('manager-sidebar')) return shared;
+    return null;
+  }});
+  expect(hit).toMatchObject({sharedLabel:label, bindings});
+  expect(hit.screen).toBeUndefined();
+});
+
+test('keeps screen editing available for page content', () => {
+  const bindings = [{property:'backgroundColor', token:'cardBackground'}];
+  const node = {getAttribute:()=>JSON.stringify(bindings)};
+  const scope = {getAttribute:key=>key === 'data-co-theme-screen' ? 'financial-screen' : 'Financeiro'};
+  const hit = inspectThemeElement({closest:selector=>{
+    if (selector === '[data-co-theme]') return node;
+    if (selector === '[data-co-theme-screen]') return scope;
+    return null;
+  }});
+  expect(hit.screen).toEqual({id:'financial-screen', label:'Financeiro'});
+  expect(hit.sharedLabel).toBeUndefined();
+});

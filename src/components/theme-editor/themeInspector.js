@@ -1,5 +1,13 @@
 const validBindings=value=>Array.isArray(value)?value.filter(item=>typeof item?.token==='string'&&typeof item?.property==='string'):[];
 const uniqueBindings=bindings=>[...new Map(bindings.map(item=>[`${item.property}:${item.token}`,item])).values()];
+const sharedThemeLabels={
+  'manager-sidebar':'Menu lateral',
+  'manager-mobile-rail':'Menu lateral',
+  'manager-header':'Cabeçalho',
+  'manager-account-menu':'Menu da conta',
+  'bottom-navigation':'Barra de atalhos',
+};
+const sharedThemeSelector=Object.keys(sharedThemeLabels).map(id=>`[data-testid="${id}"]`).join(',');
 export function inspectThemeElement(element) {
   if(!element || element.closest?.('[data-co-theme-tools="true"]'))return null;
   const node=element.closest?.('[data-co-theme]');
@@ -9,7 +17,9 @@ export function inspectThemeElement(element) {
     const scope=element.closest?.('[data-co-theme-screen]');
     const screenId=scope?.getAttribute?.('data-co-theme-screen');
     const screen=screenId && screenId.length<=200?{id:screenId,label:scope.getAttribute('data-co-theme-screen-label') || 'Tela atual'}:null;
-    const scoped=hit=>hit?{...hit,...(screen?{screen}:{})}:hit;
+    const shared=element.closest?.(sharedThemeSelector);
+    const sharedLabel=sharedThemeLabels[shared?.getAttribute('data-testid')];
+    const scoped=hit=>hit?{...hit,...(sharedLabel?{sharedLabel}:screen?{screen}:{})}:hit;
     const dock=element.closest?.('[data-testid="bottom-navigation"][data-co-theme]');
     const parent=dock || element.closest?.('[role="menu"][data-co-theme]');
     const parentBindings=validBindings(parent?JSON.parse(parent.getAttribute('data-co-theme')):[]);
