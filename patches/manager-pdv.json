@@ -1,6 +1,6 @@
 {
   "package": "@controleonline/ui-products",
-  "version": "1.0.43",
+  "version": "1.0.41",
   "files": [
     {
       "file": "src/react/pages/CategoriesPage/CategoryCard.js",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.289",
+      "version": "1.0.288",
       "file": "src/react/components/files/DefaultFile.js",
       "before": "fc15f936f0c1151be1444e0340cee61799e4cdb1ceccbd233c4ecbf4d476d0bf",
       "after": "fc15f936f0c1151be1444e0340cee61799e4cdb1ceccbd233c4ecbf4d476d0bf",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.289",
+      "version": "1.0.288",
       "file": "src/react/components/table/DefaultTableCards.js",
       "before": "d483eb5e440b4a3a47cc94d1e529abf2cc3b2942a2f015afe443dac906999964",
       "after": "d483eb5e440b4a3a47cc94d1e529abf2cc3b2942a2f015afe443dac906999964",
@@ -68,7 +68,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.289",
+      "version": "1.0.288",
       "file": "src/react/components/table/DefaultSearchModal.js",
       "before": "9fa73029332823bc1c0c34cd47be2ccd8f96359850a60d1689d88596ec14f216",
       "after": "9fa73029332823bc1c0c34cd47be2ccd8f96359850a60d1689d88596ec14f216",
@@ -110,7 +110,7 @@
       "after": "e3b579e73468b7ff055adf14f0721980b83ce3594134bd9eda2e7a3f5ba77aa7",
       "payload": "manager-productCatalogCacheRevision.after.js",
       "package": "@controleonline/ui-common",
-      "version": "1.2.122"
+      "version": "1.2.116"
     },
     {
       "file": "src/react/components/ProductCatalogCacheService.js",
@@ -118,7 +118,7 @@
       "after": "86ffd03ccc4d2d139ce8fca768eb54ff82fcccae16651627f6e823ae7ad6ef64",
       "payload": "manager-ProductCatalogCacheService.after.js",
       "package": "@controleonline/ui-common",
-      "version": "1.2.122"
+      "version": "1.2.116"
     },
     {
       "file": "src/react/pages/checkout/AddProductScreen.js",

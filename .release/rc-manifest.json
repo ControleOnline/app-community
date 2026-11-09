@@ -1,18 +1,19 @@
 {
-  "version": "1.10.159",
-  "rc": 1,
-  "branch": "rc/1.10.159-rc.1",
-  "baseMaster": "b51da4afeca38639b29df00112eb35e0970eb43b",
+  "version": "1.10.135",
+  "rc": 3,
+  "branch": "rc/1.10.135-rc.3",
+  "baseMaster": "43a637856adc1d80118f65a25bf88ba405897174",
   "tasks": [
-    1453
+    1387
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "1abdbdd415b18010b8fead310ae11410d679c825"
+    "ControleOnline/app-community": "3076ee47ea505e06bf8e0d811c523b95787f539a",
+    "ControleOnline/ui-customers": "5c59c1eb04534b2632784b136bf5e57835b8f5a9"
   },
   "validation": {
-    "scope": "Home Explore Modules: cores de Categories/routes aplicadas exatamente como vem do banco, sem transparencia.",
-    "checks": "moduleAccentSource.contract (1 pass); Security aceito; RC 1.10.158-rc.1 em staging"
+    "scope": "ui-customers 1.0.87: documentos do client-details com nome do tipo e mascara.",
+    "checks": "node --test documentsTabContract/documentsTabHelpers (11 pass)"
   }
 }
