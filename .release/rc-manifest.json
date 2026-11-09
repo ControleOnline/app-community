@@ -1,18 +1,19 @@
 {
-  "version": "1.10.164",
+  "version": "1.10.166",
   "rc": 1,
-  "branch": "rc/1.10.164-rc.1",
-  "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
+  "branch": "rc/1.10.166-rc.1",
+  "baseMaster": "9fbe31ab942ac7fe7d7d922ceef092758db5ab74",
   "tasks": [
-    1463
+    1467
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b132523c14e8debc8226aba9b09e97d98f4abcad"
+    "ControleOnline/app-community": "08117e9b7b2ea0e80da135d67c4e0fb3111957f3",
+    "ControleOnline/ui-config": "03bf8222fd3f7a21fc0a9cff5e8d984818d10bb1"
   },
   "validation": {
-    "scope": "Home: itens do modo lista dos cards de categoria com 32px e gap 10 como o Acesso rapido.",
-    "checks": "moduleListSpacing.contract (1 pass); Security aceito; RC 1.10.163-rc.1 em staging"
+    "scope": "ui-config 1.0.27: Salvar menu ao lado do Ativo/Inativo na menu-access-config-page.",
+    "checks": "menuAccessSaveMenuPlacement.contract (1 pass); Security aceito; homologado pelo usuario em staging (RC 1.10.165-rc.1)"
   }
 }
