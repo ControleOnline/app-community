@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/react/pages/Products.js",
       "payload": "single-item-flow/productsPage.js",
       "before": "e41f566b49ec2b2c7d27879fe515ea4c317b789edff386dbde9040ee377c5d3a",
@@ -33,7 +33,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/react/components/products/SingleItemProductCard.js",
       "payload": "single-item-flow/singleItemProductCard.js",
       "before": "995721f5ce60a03b96cb95fd280067cf4d947b59218cb658409d8ebdee0d11e1",

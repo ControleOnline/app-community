@@ -1,18 +1,13 @@
 {
-  "version": "1.10.183",
-  "rc": 1,
-  "branch": "rc/1.10.183-rc.1",
-  "baseMaster": "a3333490ef56f9ca3c3f6bb271cb14ceecdacfea",
+  "version": "1.10.161",
+  "rc": 0,
+  "branch": "",
+  "baseMaster": "",
   "tasks": [
-    1493
+    1460
   ],
   "taskRepository": "ControleOnline/app-community",
-  "frozen": true,
-  "repositories": {
-    "ControleOnline/app-community": "38ecb816657cedb0b3a086eb024122df14459802"
-  },
-  "validation": {
-    "scope": "config/env.local.sample: ZOOM 70 -> 80. Em producao o deploy.yml passa zoom vazio e a action web-export-deploy usa o ZOOM do sample ao gerar o env.local.js.",
-    "checks": "somente config; nao validado visualmente; vale apos novo deploy de producao"
-  }
+  "frozen": false,
+  "repositories": {},
+  "validation": {}
 }
