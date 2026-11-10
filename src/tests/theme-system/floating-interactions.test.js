@@ -105,17 +105,19 @@ test('the editor moves inside the modal focus boundary and back without remounti
   await act(async()=>tree.unmount());expect(disconnect).toHaveBeenCalled();expect(host.remove).toHaveBeenCalled();
  }finally{delete global.MutationObserver;}
 });
-test('an inspected screen defaults to local editing and explicitly switches to global without losing its draft',async()=>{
+test('an inspected screen keeps global editing and its draft without offering retired local scope',async()=>{
  let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
  const editor=()=>tree.root.findByType('draft-editor');const screen={id:'stable-route',label:'Centro financeiro'};
  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
  const bindings=[{property:'backgroundColor',token:'cardBackground'}];
  await act(async()=>attachThemeInspector.mock.calls.at(-1)[2]({bindings,states:{normal:bindings},screen}));
- expect(editor().props.screen).toEqual(screen);expect(button(tree,'Só nesta tela')).toBeDefined();
- await act(async()=>editor().props.setDraft('unsaved local color'));
- await act(async()=>button(tree,'Em todas as telas').props.onPress());expect(editor().props.screen).toBeNull();
- await act(async()=>button(tree,'Só nesta tela').props.onPress());expect(editor().props.screen).toEqual(screen);
- expect(editor().props.draft).toBe('unsaved local color');expect(mockMounts).toBe(1);
+ expect(editor().props.screen).toBeNull();
+ expect(button(tree,'Só nesta tela')).toBeUndefined();
+ await act(async()=>editor().props.setDraft('unsaved global color'));
+ await act(async()=>button(tree,'Voltar à inspeção').props.onPress());
+ await act(async()=>attachThemeInspector.mock.calls.at(-1)[2]({bindings,states:{normal:bindings},screen}));
+ expect(editor().props.screen).toBeNull();
+ expect(editor().props.draft).toBe('unsaved global color');expect(mockMounts).toBe(1);
  await act(async()=>tree.unmount());
 });
 

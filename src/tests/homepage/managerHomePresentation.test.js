@@ -20,7 +20,7 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useMan
   moduleAccentPalette:{primary:'#147568',...mockIndicatorPalette},
 })}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[
-  {id:1,label:'Menu',color:'$primary',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
+  {id:1,label:'Menu',color:'$primary',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',color:'#0284c7',menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
   {id:2,label:'Comercial',menus:[{id:2,route:'ClientsIndex',label:'Clientes',menuType:'home'}]},
 ]}:{messages:{}}})}));
 const navigation={getState:()=>({routeNames:['OrderHistoryPage','ClientsIndex']}),navigate:jest.fn()};
@@ -115,7 +115,7 @@ it('switches Explore Modules to icons and back with the same groups and route pa
 });
 
 it.each([[false, '#345678'], [true, '#876543']])(
-  'uses the category accent for Home icons and their backgrounds (grid: %s)',
+  'uses route backgrounds and independent theme icons, restoring the theme when disabled (grid: %s)',
   async (grid, themeColor) => {
     mockModuleIcons = grid;
     let tree;
@@ -123,7 +123,7 @@ it.each([[false, '#345678'], [true, '#876543']])(
     const shortcuts = () => tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable');
     const iconColors = () => shortcuts().map(item => item.findAllByType('Icon')[0].props.color);
     const backgrounds = () => shortcuts().map(item => {
-      const style = grid ? item.props.style({}) : item.findAllByType('Icon')[0].parent.props.style;
+      const style = grid ? item.props.style({}) : item.props.style;
       return Array.isArray(style) ? Object.assign({}, ...style).backgroundColor : style?.backgroundColor;
     });
     const themeBackground = grid ? '#F1F1F1' : undefined;
@@ -132,8 +132,8 @@ it.each([[false, '#345678'], [true, '#876543']])(
       expect(backgrounds()).toEqual([themeBackground, themeBackground]);
       mockModuleAccent = true;
       await act(async () => tree.update(view()));
-      expect(iconColors()).toEqual(['#147568', themeColor]);
-      expect(backgrounds()).toEqual(['rgba(20, 117, 104, 0.14)', themeBackground]);
+      expect(iconColors()).toEqual([themeColor, themeColor]);
+      expect(backgrounds()).toEqual(['#0284c7', themeBackground]);
       mockModuleAccent = false;
       await act(async () => tree.update(view()));
       expect(iconColors()).toEqual([themeColor, themeColor]);

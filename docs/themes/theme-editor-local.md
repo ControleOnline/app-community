@@ -286,3 +286,13 @@ carregar o cliente dependente de armazenamento do navegador, e a verificar que
 nenhuma requisição é feita nesses cenários. Os quatro testes do arquivo passaram.
 Na suíte de temas, 155 testes passaram; resta uma falha na expectativa antiga de
 edição por tela, já reproduzida na master sem as alterações. Sem gravações reais.
+
+### Revalidação para integração da task-1496
+
+Atualizadas as expectativas legadas dos testes alterados: inspeção global sem
+edição por tela, seletor de empresa no cabeçalho, traduções simuladas nas ações
+da conta e fundos dos módulos por rota com ícones independentes. O feedback do
+inspetor usa variáveis da paleta do editor, sem cores hexadecimais fixas.
+Passaram 156 testes de temas e 49 testes de Home/navegação nas suítes afetadas,
+com API simulada e sem gravações reais no banco. Esse resultado substitui as
+pendências registradas na preparação anterior.

@@ -292,7 +292,7 @@ export default function ManagerOverview({navigation}) {
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
-        // Category card follows the Categories color; each button follows its own route color (#1450).
+        // Category card follows the Categories color; each button follows its own route color (issue 1450).
         const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
           dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
@@ -302,7 +302,7 @@ export default function ManagerOverview({navigation}) {
             {group.items.map((item, j) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
               const appearance = moduleListAppearance({accent, colors: c});
-              // Database colors are used as-is: no opacity applied (#1453).
+              // Database colors are used as-is: no opacity applied (issue 1453).
               const accentBackground = accent;
               return <Pressable key={item.id || j} accessibilityRole="button"
               dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
@@ -366,7 +366,7 @@ const s = StyleSheet.create({
   moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   moduleListIcon: {width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center'},
   moduleTileLabel: {fontSize: 12, textAlign: 'center', width: '100%'},
-  // List items match the Quick access items: 32px high, 10px apart (#1463).
+  // List items match the Quick access items: 32px high, 10px apart (issue 1463).
   moduleList: {marginTop: 12, gap: 10},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', minHeight: CONTROL_HEIGHT, paddingVertical: 3, paddingHorizontal: 12, borderRadius: 10},
 });

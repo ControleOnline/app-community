@@ -43,9 +43,10 @@ beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
   mockExtraMenus = [];
-  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
+  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true;
+  global.t={t:(_section,_type,key)=>({my_profile:'Meu perfil',manager_help:'Ajuda do On Manager',use_dark_theme:'Usar tema escuro',logout:'Sair da conta'}[key])}; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
-afterEach(() => {delete global.window;});
+afterEach(() => {delete global.window;delete global.t;});
 
 it('provides the Manager identity to a shared table on any module route',()=>{
   let tree;
@@ -57,7 +58,7 @@ it('provides the Manager identity to a shared table on any module route',()=>{
   act(()=>tree.unmount());
 });
 
-it('keeps company selection in the sidebar and theme switching in the account menu', () => {
+it('keeps company selection in the header and theme switching in the account menu', () => {
   let tree; act(() => {tree = renderer.create(view());});
   act(() => {labeled(tree, 'Dispositivos')[0].props.onPress();});
   expect(mockGo).toHaveBeenCalledWith('DevicesIndex', {source: 'manager'});
@@ -66,8 +67,8 @@ it('keeps company selection in the sidebar and theme switching in the account me
   act(() => labeled(tree, 'Usar tema escuro')[0].props.onPress());
   expect(mockToggle).toHaveBeenCalledTimes(1);
   expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
-  expect(tree.root.findByProps({testID: 'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
-  expect(tree.root.findByProps({testID: 'manager-topbar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
+  expect(tree.root.findByProps({testID: 'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
+  expect(tree.root.findByProps({testID: 'manager-topbar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
   act(() => tree.unmount());
 });
 
@@ -123,7 +124,7 @@ it('keeps a single left-aligned themed account control in the sidebar without na
   expect(tree.root.findByProps({testID:'manager-topbar'}).findAllByType('HomeAvatar')).toHaveLength(0);
   const control=labeled(tree, 'Abrir opções do usuário')[0];
   expect(control.props.style[0]).toMatchObject({alignItems:'center',justifyContent:'flex-start'});
-  expect(control.props.style[1]).toMatchObject({backgroundColor:mockColors.selectBackground,borderColor:mockColors.selectBorder});
+  expect(control.props.style[1]).toMatchObject({backgroundColor:mockColors.navigationAccountBackground,borderColor:mockColors.navigationAccountBorder});
   act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   expect(mockGo).not.toHaveBeenCalled();
   expect(labeled(tree, 'Meu perfil')).toHaveLength(1);
@@ -151,11 +152,11 @@ it('reuses guide, appearance and logout actions from the account menu', () => {
   act(() => tree.unmount());
 });
 
-it('offers a direct branded home control on mobile and names the drawer destination Início', () => {
+it('keeps the mobile company selector in the header and names the drawer destination Início', () => {
   mockWidth = 360;
   let tree; act(() => {tree = renderer.create(view('DevicesIndex'));});
-  act(() => labeled(tree, 'Ir para o início')[0].props.onPress());
-  expect(mockGo).toHaveBeenLastCalledWith('HomePage', undefined);
+  expect(tree.root.findByProps({testID:'manager-header-company'}).findByType('ManagerCompanySelector').props.mode).toBe('header');
+  expect(mockGo).not.toHaveBeenCalled();
   act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
   expect(labeled(tree, 'Início')).toHaveLength(1);
   act(() => labeled(tree, 'Início')[0].props.onPress());
@@ -203,13 +204,13 @@ it('keeps a fresh internal catalog reset signal when reselecting the focused PDV
   act(() => tree.unmount());
 });
 
-it('keeps selection inside the mobile drawer and home in the header', () => {
+it('keeps company selection in the mobile header while opening the drawer', () => {
   mockWidth = 400;
   let tree; act(() => {tree = renderer.create(view());});
-  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(0);
-  expect(labeled(tree, 'Ir para o início')).toHaveLength(1);
+  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID:'manager-header-company'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
   act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
-  expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
   act(() => tree.unmount());
 });
 
@@ -218,7 +219,7 @@ it.each([1440,900])('keeps desktop navigation beside the menu at width %s withou
  const topbar=tree.root.findByProps({testID:'manager-topbar'});
  const breadcrumb=tree.root.findByProps({testID:'manager-breadcrumb'});
  expect(topbar.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(1);
- expect(breadcrumb.parent).toBe(labeled(tree,'Alternar menu compacto')[0].parent);
+ expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Expandir menu'}).length + tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Recolher menu'}).length).toBe(1);
  act(()=>tree.unmount());
 });
 it('keeps the mobile header free of desktop breadcrumbs',()=>{
