@@ -16,7 +16,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
-import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
+import {moduleListAppearance, resolveModuleAccent, moduleAccentSource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -64,7 +64,7 @@ export default function ManagerShell({navigation, route, options, children}) {
   const closeAccount = () => setAccountAnchor(null);
   const openAccount = anchor => {setOpen(false); setGuideOpen(false); setAccountAnchor(anchor);};
   const accountAction = action => () => {closeAccount(); action();};
-  const avatar = size => <HomeAvatar imageUrl={resolveHomeAvatar(user, currentCompany)} name={getAvatarDisplayName(user)} size={size} backgroundColor={c.cardIconBackground} borderColor={c.cardBorder} textColor={c.textPrimary} />;
+  const avatar = size => <HomeAvatar imageUrl={resolveHomeAvatar(user, currentCompany)} name={getAvatarDisplayName(user)} size={size} backgroundColor={c.navigationAvatarBackground} borderColor={c.navigationAvatarBorder} textColor={c.navigationAvatarText} />;
   const [open, setOpen] = useState(false);
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -122,21 +122,22 @@ export default function ManagerShell({navigation, route, options, children}) {
   const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     const accent = moduleAccent?.value
-      ? resolveModuleAccent(item.categoryColor, moduleAccentPalette) : undefined;
+      ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
+    const appearance = moduleListAppearance({accent, colors: c, sidebar: true, active});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
+      dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
         return [s.navItem, {
-          backgroundColor: moduleAccentBackground(accent, highlighted) ??
-            (highlighted ? c.navigationActiveBackground : c.containerTransparentBackground),
-          borderLeftColor: active ? (accent ?? c.navigationActiveBorder) : c.containerTransparentBackground,
+          backgroundColor: moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted}).backgroundColor,
+          borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground,
         }, iconsOnly && s.center];
       }}>
-      {icon(item.icon, 18, accent ?? (active ? c.navigationActiveIcon : c.navigationIcon))}
-      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
+      {icon(item.icon, 18, appearance.iconColor)}
+      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
     </Pressable>;
   };
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
@@ -155,17 +156,17 @@ export default function ManagerShell({navigation, route, options, children}) {
       )}
     </View>
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
-      {!compact && <Text style={[s.caption, {color: c.textMuted}]}>INÍCIO</Text>}
+      {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
       {groups.map((group, i) => <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: c.textMuted}]}>{group.title}</Text>}
+        {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
       </View>)}
-      {!groups.length && !compact && <Text style={[s.navText, {color: c.textMuted}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
+      {!groups.length && !compact && <Text style={[s.navText, {color: c.navigationCaptionText}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
     </ScrollView>
-    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.center]}>{avatar(34)}
-      {!compact && <View style={{flexShrink: 1, minWidth: 0}}><Text numberOfLines={1} style={[s.navText, {color: c.selectText}]}>{String(name)}</Text>
-        <Text style={{fontSize: 11, color: c.textMuted}}>Minha conta</Text></View>}
+    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.navigationAccountBorder, backgroundColor: c.navigationAccountBackground}, compact && s.center]}>{avatar(34)}
+      {!compact && <View style={{flexShrink: 1, minWidth: 0}}><Text numberOfLines={1} style={[s.navText, {color: c.navigationAccountText}]}>{String(name)}</Text>
+        <Text style={{fontSize: 11, color: c.navigationAccountSecondaryText}}>Minha conta</Text></View>}
     </Pressable>
   </View>;
   // Keep module instances mounted during appearance refreshes: forms and local

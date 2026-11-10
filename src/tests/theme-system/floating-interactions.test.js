@@ -5,7 +5,7 @@ import {attachThemeInspector} from '../../components/theme-editor/themeInspector
 let mockWidth=393,mockMounts=0;
 jest.mock('react-dom',()=>({createPortal:node=>node}));
 jest.mock('react-native',()=>({...jest.requireActual('react-native'),useWindowDimensions:()=>({width:mockWidth,height:852})}));
-jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',raw:{},themeId:2})}));
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',raw:{},themeId:2}),getThemeSnapshot:()=>({mode:'light',raw:{},themeId:2})}));
 jest.mock('../../components/theme-editor/themeService',()=>({editorContext:()=> 'session',loadDomainTheme:jest.fn().mockResolvedValue({id:2,theme:'Local',colors:{}})}));
 jest.mock('../../components/theme-editor/themeInspector',()=>({attachThemeInspector:jest.fn(()=>()=>{})}));
 jest.mock('../../components/theme-editor/ThemeColorEditor',()=>{
@@ -14,6 +14,22 @@ jest.mock('../../components/theme-editor/ThemeColorEditor',()=>{
 const button=(tree,label)=>tree.root.findAllByType('Pressable').find(n=>n.findAllByType('Text').some(t=>t.children.join('')===label));
 beforeEach(()=>{mockWidth=393;mockMounts=0;attachThemeInspector.mockClear();global.window={innerWidth:393,innerHeight:852,addEventListener:jest.fn(),removeEventListener:jest.fn()};global.document={body:{},addEventListener:jest.fn(),removeEventListener:jest.fn()};});
 afterEach(()=>{delete global.window;delete global.document;});
+test('inspecting a large container keeps its content visible and displays its dimensions',async()=>{
+ mockWidth=1440;global.window.innerWidth=1440;
+ global.window.getComputedStyle=()=>({getPropertyValue:()=> '#123456'});
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try{
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  await act(async()=>attachThemeInspector.mock.calls.at(-1)[1]({bindings:[{property:'backgroundColor',token:'cardBackground'}],node:{tagName:'DIV',
+    getBoundingClientRect:()=>({left:250,top:140,width:1100,height:2400})}}));
+  const highlight=tree.root.findByProps({'data-co-theme-highlight':'true'});
+  expect(highlight.props.style.background).toBe('transparent');
+  expect(highlight.props.style.pointerEvents).toBe('none');
+  expect(highlight.props.style.outline).toBeTruthy();
+  expect(tree.root.findAllByType('div').some(node=>node.children.join('').includes('1100 × 2400'))).toBe(true);
+  expect(tree.root.findAllByType('span').some(node=>node.children.join('').includes('cardBackground · #123456'))).toBe(true);
+ }finally{await act(async()=>tree.unmount());}
+});
 test('keeps the shortcut bar uncovered during mobile inspection and editing',async()=>{
  let bar={getBoundingClientRect:()=>({top:758,width:393,height:56})};
  let notify;

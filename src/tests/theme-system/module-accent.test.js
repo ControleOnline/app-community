@@ -5,6 +5,7 @@ import useManagerPreference from '../../components/manager-preview/useManagerPre
 import {moduleAccentBackground, resolveModuleAccent} from '../../components/manager-preview/moduleAccent';
 
 jest.mock('../../components/HomeIcon', () => 'Icon');
+jest.mock('../../components/theme-editor/ModuleAppearanceCatalog', () => 'ModuleAppearanceCatalog');
 
 const categories = [
   {id:122, label:'Comercial', color:'$primary', menus:[{menuType:'home'}]},
@@ -29,13 +30,11 @@ test('shows the resolved colors and keeps preview separate from the saved prefer
       preference={{ready:true,value:false,setValue:save}} colors={colors} />);
   });
   const label = 'Usar as cores das categorias do menu';
-  expect(tree.root.findAllByType('Text').map(node=>node.children.join('')).join(' ')).toContain('$primary → #147568');
+  expect(tree.root.findByType('ModuleAppearanceCatalog').props.enabled).toBe(false);
   await act(async () => tree.root.findByProps({accessibilityLabel:label}).props.onValueChange(true));
   expect(save).not.toHaveBeenCalled();
-  const finance=tree.root.findByProps({accessibilityLabel:'Prévia de Financeiro'});
-  await act(async () => finance.props.onPress());
-  expect(tree.root.findByProps({testID:'module-accent-preview'}).props.style).toMatchObject({borderLeftColor:'#757575', backgroundColor:'#757575'});
-  await act(async () => tree.root.findByProps({accessibilityLabel:'Salvar preferência de destaque'}).props.onPress());
+  expect(tree.root.findByType('ModuleAppearanceCatalog').props.enabled).toBe(true);
+  await act(async () => tree.root.findByProps({accessibilityLabel:'Salvar opção no tema'}).props.onPress());
   expect(save).toHaveBeenCalledWith(true);
   await act(async () => tree.unmount());
 });

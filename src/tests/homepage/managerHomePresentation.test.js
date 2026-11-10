@@ -1,7 +1,10 @@
 import React from 'react';
 import renderer,{act} from 'react-test-renderer';
 import ManagerOverview from '../../components/manager-preview/ManagerOverview';
+import {resolveManagerTheme} from '../../styles/managerTheme';
+import {initializeGlobalChromeColors} from '../../styles/globalChromeTheme';
 let mockWidth=393,mockTexts=true,mockModuleIcons=false,mockModuleAccent=false;
+let mockIndicatorColors={},mockIndicatorPalette={};
 const mockFetch=jest.fn(async()=>({totalItems:0,summary:{sales:{totals:{revenue:0,orders:0,averageTicket:0},daily:[]}}}));
 jest.mock('react-native',()=>({processColor:require('../theme-system/nativeMock.cjs').processColor,Platform:{OS:'web'},View:'View',Text:'Text',ScrollView:'ScrollView',Pressable:'Pressable',StyleSheet:{create:x=>x},useWindowDimensions:()=>({width:mockWidth})}));
 jest.mock('@react-navigation/native',()=>({useIsFocused:()=>true}));
@@ -11,10 +14,10 @@ jest.mock('../../components/HomeIcon',()=> 'Icon');
 jest.mock('../../components/manager-preview/ManagerStartup',()=> 'ManagerStartup');
 jest.mock('../../components/manager-preview/ManagerOrdersTrend',()=> 'Trend');
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({
-  colors:{cardText:'#123456',listItemText:'#654321',textMuted:'#345678',listItemIcon:'#876543',listItemBackground:'#F1F1F1'},
+  colors:{cardText:'#123456',listItemText:'#654321',textMuted:'#345678',listItemIcon:'#876543',listItemBackground:'#F1F1F1',...mockIndicatorColors},
   moduleIcons:{value:mockModuleIcons},
   moduleAccent:{value:mockModuleAccent},
-  moduleAccentPalette:{primary:'#147568'},
+  moduleAccentPalette:{primary:'#147568',...mockIndicatorPalette},
 })}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[
   {id:1,label:'Menu',color:'$primary',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
@@ -23,7 +26,30 @@ jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompan
 const navigation={getState:()=>({routeNames:['OrderHistoryPage','ClientsIndex']}),navigate:jest.fn()};
 const view=()=> <ManagerOverview navigation={navigation}/>;
 beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockModuleIcons=false;mockModuleAccent=false;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
-afterEach(()=>delete global.t);
+afterEach(()=>{delete global.t;mockIndicatorColors={};mockIndicatorPalette={};});
+it('renders independent Home indicator appearances while preserving original glyphs and stable identities',async()=>{
+ const raw=initializeGlobalChromeColors({'indicatorCardBackground-light':'#ffffff','indicatorCardBackground-dark':'#112233',
+   'homeMetricPrimaryBackground-light':'#00ff00','homeMetricPrimaryBackground-dark':'#006600',
+   homeMetricClosedSalesAppearance:'primary',homeMetricPrimaryGlyph:'star',indicatorCardGlyph:'star',
+   'homeMetricPrimaryIconColor-light':'#123abc','homeMetricPrimaryIconBackground-light':'#fedcba',
+   homeMetricClientsAppearance:'specific','homeMetricClientsBackground-light':'#abcdef'});
+ mockIndicatorColors=resolveManagerTheme(raw,'light');mockIndicatorPalette=mockIndicatorColors;
+ let tree;await act(async()=>{tree=renderer.create(view());});
+ const card=id=>tree.root.findByProps({testID:`manager-metric-${id}`}).findByType('Pressable');
+ expect(card('closed-sales').props.style.at(-1).backgroundColor).toBe('#00ff00');
+ expect(card('closed-sales').findByType('Icon').props.name).toBe('credit-card');
+ expect(card('closed-sales').findByType('Icon').props.color).toBe('#123abc');
+ expect(card('closed-sales').findByType('Icon').parent.props.style.at(-1).backgroundColor).toBe('#fedcba');
+ expect(card('clients').props.style.at(-1).backgroundColor).toBe('#abcdef');
+ expect(card('period-orders').props.style.at(-1).backgroundColor).toBe('#ffffff');
+ expect(card('open-orders').props.style.at(-1).backgroundColor).toBe('#ffffff');
+ expect(card('closed-sales').props.dataSet.coHomeMetric).toBe('closed-sales');
+ mockIndicatorColors=resolveManagerTheme(raw,'dark');mockIndicatorPalette=mockIndicatorColors;
+ await act(async()=>tree.update(view()));
+ expect(card('closed-sales').props.style.at(-1).backgroundColor).toBe('#006600');
+ expect(card('clients').props.style.at(-1).backgroundColor).toBe('#112233');
+ await act(async()=>tree.unmount());
+});
 it('keeps four semantic card identities across text and period changes',async()=>{
  let tree;await act(async()=>{tree=renderer.create(view());});
  const ids=()=>tree.root.findAll(node=>node.props.testID?.startsWith('manager-metric-')).map(node=>node.props.testID);

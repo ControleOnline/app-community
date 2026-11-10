@@ -1,8 +1,11 @@
 import React from 'react';
 import renderer,{act} from 'react-test-renderer';
+import {api} from '@controleonline/ui-common/src/api';
 import AppliedThemeOverview from '../../components/theme-editor/AppliedThemeOverview';
 import {loadDomainBinding,loadDomainTheme} from '../../components/theme-editor/themeService';
 const runtime={status:'ready',mode:'light',raw:{'cardText-light':'#123456','cardText-dark':'#abcdef'},themeId:11};
+// Domain loading is mocked below; importing the module catalog must not load the browser API client.
+jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:jest.fn(()=>{throw new Error('Unexpected API request in AppliedThemeOverview test');})}}));
 jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>runtime}));
 let mockModuleIcons;
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({moduleIcons:mockModuleIcons})}));
@@ -14,6 +17,8 @@ jest.mock('../../components/theme-editor/ThemeEditorDialog',()=> 'ThemeEditorDia
 jest.mock('../../components/theme-editor/themeService',()=>({editorContext:()=> 'local',loadDomainBinding:jest.fn(),loadDomainTheme:jest.fn()}));
 const textOf=tree=>tree.root.findAllByType('Text').map(node=>node.children.join('')).join('\n');
 const press=(tree,label)=>tree.root.findAllByType('Pressable').find(node=>node.findAllByType('Text').some(text=>text.children.join('')===label));
+beforeEach(()=>api.fetch.mockClear());
+afterEach(()=>expect(api.fetch).not.toHaveBeenCalled());
 test('keeps domain #11 separate from company Gyros #5 and shows the applied values and their original keys',async()=>{
  loadDomainBinding.mockResolvedValue({id:7,themeId:11,canApply:true});
  loadDomainTheme.mockResolvedValue({id:11,theme:'Domínio real',colors:runtime.raw});

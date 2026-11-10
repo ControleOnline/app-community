@@ -26,7 +26,7 @@ it.each([['light',light],['dark',dark]])('%s contains canonical tokens and repor
  const map=fs.readFileSync(path.join(process.cwd(),'docs/themes/themes-map.md'),'utf8');
  const allowed=new Set([...map.matchAll(/^- `([^`]+)`/gm)].map(match=>match[1]));
  expect(Object.keys(fixture).filter(key=>!allowed.has(key))).toEqual([]);
- expect(missingManagerThemeTokens({},mode,fixture)).toEqual(['cardShadow','containerTransparentBackground','iconBackground','textDanger']);
+ expect(missingManagerThemeTokens({},mode,fixture)).toEqual(['cardShadow','containerTransparentBackground','iconBackground','navigationDisabledBackground','navigationDisabledBorder','navigationDisabledIcon','navigationDisabledText','navigationShadow','textDanger']);
  const changed={...fixture}; delete changed.cardIconBackground;
  expect(missingManagerThemeTokens({},mode,changed)).toContain('cardIconBackground');
  global.window={location:location('localhost',`?lavegoThemePreview=${mode}`)};

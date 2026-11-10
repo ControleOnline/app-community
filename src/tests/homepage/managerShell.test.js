@@ -15,7 +15,7 @@ const mockLogout = jest.fn();
 let mockBottomBar;
 let mockSidebar;
 let mockModuleAccent;
-const mockColors = previewPalette({}, 'light');
+const mockColors = {...previewPalette({}, 'light'), moduleListIcon:'#627387', moduleListText:'#0f172a', navigationActiveBorder:'#117463'};
 jest.mock('react-native', () => ({
   processColor:require('../theme-system/nativeMock.cjs').processColor, Platform: {OS: 'web'}, Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
   StyleSheet: {create: x => x, absoluteFill: {}}, useWindowDimensions: () => ({width: mockWidth}),
@@ -33,7 +33,7 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
 }));
 let mockExtraMenus = [];
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'theme'
-  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
+  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', color:'#0284c7', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
   : {user: {name: 'Usuário local'}}, actions: {logOut: mockLogout}})}));
 const navigation = {navigate: mockGo, getState: () => ({routeNames: ['HomePage', 'DevicesIndex', 'ProfilePage']})};
 const view = (route, params) => <ManagerShell navigation={navigation} route={{name: route || 'HomePage', params}}><content /></ManagerShell>;
@@ -266,18 +266,19 @@ it.each([
   act(() => tree.unmount());
 });
 
-it('uses category colors on sidebar items before and after navigation', () => {
+it('uses route colors and list foregrounds before and after navigation, restoring the sidebar theme when disabled', () => {
   mockModuleAccent = {value:true};
   let tree; act(() => {tree = renderer.create(view());});
   const devices = labeled(tree, 'Dispositivos')[0];
   const inactive = labeled(tree, 'Início')[0];
-  expect(devices.props.style({})[1].backgroundColor).toBe('#147568');
-  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#147568');
-  expect(devices.findByType('Icon').props.color).toBe('#147568');
+  expect(devices.props.style({})[1].backgroundColor).toBe('#0284c7');
+  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#0284c7');
+  expect(devices.findByType('Icon').props.color).toBe(mockColors.moduleListIcon);
+  expect(JSON.parse(devices.props.dataSet.coThemeSource)[0]).toMatchObject({source:'routes.color',reference:'#0284c7',property:'backgroundColor'});
   expect(inactive.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
   expect(devices.props.style({})[1]).toMatchObject({
-    backgroundColor:'#147568',borderLeftColor:'#147568',
+    backgroundColor:'#0284c7',borderLeftColor:mockColors.navigationActiveBorder,
   });
   mockModuleAccent = {value:false};
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
