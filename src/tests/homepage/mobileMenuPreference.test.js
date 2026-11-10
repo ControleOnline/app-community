@@ -1,12 +1,14 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
 import ManagerPreviewProvider, {useManagerPreview} from '../../components/manager-preview/ManagerPreviewProvider';
+import {saveThemeLayoutFlags} from '../../components/theme-editor/themeService';
 let mockLogged = true;
 let mockUser = 'admin-1';
 let mockTheme = {};
 jest.mock('react-native',()=>({Platform:{OS:'web'}}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='auth'?{isLogged:mockLogged,user:{id:mockUser}}:name==='theme'?{colors:{}}:name==='people'?{currentCompany:{id:5}}:{item:{}}})}));
-jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({status:'loading',mode:'light',raw:mockTheme}),setThemeMode:jest.fn()}));
+jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({status:'ready',mode:'light',raw:mockTheme}),setThemeMode:jest.fn()}));
+jest.mock('../../components/theme-editor/themeService',()=>({editorContext:()=>`domain:${mockUser}`,saveThemeLayoutFlags:jest.fn().mockResolvedValue({})}));
 jest.mock('../../components/manager-preview/model',()=>({managerPreviewEnabled:true,previewPalette:colors=>colors}));
 jest.mock('@experimental-avatar',()=>({useAvatarRuntime:()=>({})}));
 jest.mock('../../components/manager-preview/useExperienceRuntime',()=>()=>({}));
@@ -32,7 +34,7 @@ it('retains the rail between screens and resets it when the login changes',()=>{
  act(()=>tree.unmount());
 });
 
-it('uses domain presentation defaults until the account saves a preference', async () => {
+it('uses the shared domain theme flag and saves explicitly without account storage', async () => {
   function Preferences() {
     const {sidebar, moduleIcons, moduleAccent} = useManagerPreview();
     return <preferences sidebar={sidebar} icons={moduleIcons} accent={moduleAccent} />;
@@ -54,11 +56,16 @@ it('uses domain presentation defaults until the account saves a preference', asy
       await current().icons.setValue(false);
       await current().accent.setValue(false);
     });
-    mockTheme = {enableSidebar:0, homeModulesLayout:'buttons'};
+    expect(saveThemeLayoutFlags).toHaveBeenCalledWith({useModuleColors:false});
+    mockTheme = {enableSidebar:0, homeModulesLayout:'buttons', useModuleColors:'false'};
     await act(async () => tree.update(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>));
     expect(current().sidebar.visible).toBe(true);
     expect(current().icons.value).toBe(false);
     expect(current().accent.value).toBe(false);
+    mockUser='another-user';
+    await act(async () => tree.update(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>));
+    expect(current().accent.value).toBe(false);
+    expect(values.size).toBe(0);
   } finally {
     if (tree) await act(async () => tree.unmount());
     global.localStorage = previousStorage;

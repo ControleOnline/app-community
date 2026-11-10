@@ -8,6 +8,7 @@ import {applyPaletteToRuntimeColors, applyThemeCssVariables} from './branding';
 import {applyThemeScrollbarStyles} from './scrollbarTheme';
 import {colors as runtimeColors} from '@controleonline/ui-layout/src/styles/colors';
 import contract from './themeContract.generated';
+import {initializeGlobalChromeColors} from './globalChromeTheme';
 
 const names = new Set(contract.names);
 const listeners = new Set();
@@ -42,7 +43,7 @@ export function useDomainThemeFetch({api,parseThemeCss,setBaseThemeColors,curren
     update({status:'loading',error:'',raw:{},preview:null,context,themeId:null});
     api.fetch('themes-colors.css',{responseType:'text',skipSession:true}).then(text=>{
       if(!current)return;
-      const raw=parseThemeCss(text);
+      const raw=initializeGlobalChromeColors(parseThemeCss(text));
       if(!Object.keys(raw).length)throw new Error('A API não retornou cores para este domínio.');
       setBaseThemeColors(raw);
       update({raw,status:'ready',error:''});

@@ -28,17 +28,17 @@ export default function ManagerCompanySelector({colors: c, compact = false, mode
         <ManagerBrand colors={c} home homeSize={40} homeWidth={Math.min(headerWidth, mobile ? 64 : 80)} textColor={c.headerText} compact subtitle={false} />
         <View style={[s.logoCaption, canSwitch && s.captionWithChevron]}>
           <CompanyName key={JSON.stringify([label, mobile, headerWidth, canSwitch])}
-            label={label} color={c.selectText} dense small={mobile} complete lines={1} />
+            label={label} color={c.headerCompanyText} dense small={mobile} complete lines={1} />
           {canSwitch && <View testID="manager-company-chevron" style={s.logoChevron}>
-            <HomeIcon name="chevron-down" size={12} color={c.selectIcon} />
+            <HomeIcon name="chevron-down" size={12} color={c.headerCompanyIcon} />
           </View>}
         </View>
       </View>
-    : <ManagerBrand colors={c} textColor={c.selectText} compact={iconOnly} dense={dense} small={dense && mobile} subtitle={false}
-        trailing={canSwitch && !iconOnly ? <View style={[s.chevron,dense && {width:12}]}><HomeIcon name="chevron-down" size={dense?12:18} color={c.selectIcon} /></View> : null} />;
+    : <ManagerBrand colors={c} textColor={c.navigationCompanyText} compact={iconOnly} dense={dense} small={dense && mobile} subtitle={false}
+        trailing={canSwitch && !iconOnly ? <View style={[s.chevron,dense && {width:12}]}><HomeIcon name="chevron-down" size={dense?12:18} color={c.navigationCompanyIcon} /></View> : null} />;
   const triggerStyle = isLogo
     ? [s.logoTrigger]
-    : [s.trigger, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, iconOnly && s.compact, dense && s.dense, dense && mobile && {minHeight:32}];
+    : [s.trigger, {borderColor: c.navigationCompanyBorder, backgroundColor: c.navigationCompanyBackground}, iconOnly && s.compact, dense && s.dense, dense && mobile && {minHeight:32}];
   return <>
     {canSwitch ? <Pressable testID="manager-company-trigger" accessibilityRole="button"
       accessibilityLabel={`Selecionar empresa. Atual: ${label}`} accessibilityState={{expanded: open}}

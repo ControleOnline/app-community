@@ -50,7 +50,9 @@ it('passes the dedicated Manager dock colors to the rendered shortcut bar', asyn
   const colors={navigationBackground:'var(--co-theme-navigationBackground)',
     navigationBorder:'var(--co-theme-navigationBorder)',
     shortcutBarBackground:'var(--co-theme-shortcutBarBackground)',
-    shortcutBarBorder:'var(--co-theme-shortcutBarBorder)'};
+    shortcutBarBorder:'var(--co-theme-shortcutBarBorder)',
+    shortcutBarActiveBorder:'#123456', shortcutBarDisabledIcon:'#abcdef',
+    shortcutBarShadow:'#654321'};
   let tree;
   await act(async () => {tree=renderer.create(<ManagerBottomNavigation navigation={navigation}
     route={{name:'ProfilePage'}} colors={colors}/>);});
@@ -58,6 +60,8 @@ it('passes the dedicated Manager dock colors to the rendered shortcut bar', asyn
     expect(tree.root.findByType('Bar').props.colors).toMatchObject({
       navigationBackground:'var(--co-theme-shortcutBarBackground)',
       navigationBorder:'var(--co-theme-shortcutBarBorder)',
+      navigationActiveBorder:'#123456', navigationDisabledIcon:'#abcdef',
+      navigationShadow:'#654321',
     });
     expect(colors.navigationBackground).toBe('var(--co-theme-navigationBackground)');
   } finally {
