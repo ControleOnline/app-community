@@ -1,18 +1,18 @@
 {
-  "version": "1.10.182",
+  "version": "1.10.183",
   "rc": 1,
-  "branch": "rc/1.10.182-rc.1",
-  "baseMaster": "ea6582c04f2bde9e27a7164582e3b12e133a4ec3",
+  "branch": "rc/1.10.183-rc.1",
+  "baseMaster": "a3333490ef56f9ca3c3f6bb271cb14ceecdacfea",
   "tasks": [
-    1491
+    1493
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e285a29309c858708c871e03354ac00ba36b40e9"
+    "ControleOnline/app-community": "38ecb816657cedb0b3a086eb024122df14459802"
   },
   "validation": {
-    "scope": "android-deploy-lavego-shop.yml: upload-google-play com changesNotSentForReview=true (track production), para o commit da edicao nao falhar com 'Changes cannot be sent for review automatically'.",
-    "checks": "YAML valido; workflow nao executado; envio para revisao passa a ser manual no Play Console"
+    "scope": "config/env.local.sample: ZOOM 70 -> 80. Em producao o deploy.yml passa zoom vazio e a action web-export-deploy usa o ZOOM do sample ao gerar o env.local.js.",
+    "checks": "somente config; nao validado visualmente; vale apos novo deploy de producao"
   }
 }
