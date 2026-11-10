@@ -1,4 +1,5 @@
 import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {CONTROL_HEIGHT} from './controlHeight';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useStore, getAllStores} from '@store';
@@ -15,7 +16,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
-import {moduleAccentBackground, resolveModuleAccent} from './moduleAccent';
+import {moduleListAppearance, resolveModuleAccent, moduleAccentSource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -63,7 +64,7 @@ export default function ManagerShell({navigation, route, options, children}) {
   const closeAccount = () => setAccountAnchor(null);
   const openAccount = anchor => {setOpen(false); setGuideOpen(false); setAccountAnchor(anchor);};
   const accountAction = action => () => {closeAccount(); action();};
-  const avatar = size => <HomeAvatar imageUrl={resolveHomeAvatar(user, currentCompany)} name={getAvatarDisplayName(user)} size={size} backgroundColor={c.cardIconBackground} borderColor={c.cardBorder} textColor={c.textPrimary} />;
+  const avatar = size => <HomeAvatar imageUrl={resolveHomeAvatar(user, currentCompany)} name={getAvatarDisplayName(user)} size={size} backgroundColor={c.navigationAvatarBackground} borderColor={c.navigationAvatarBorder} textColor={c.navigationAvatarText} />;
   const [open, setOpen] = useState(false);
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
@@ -121,21 +122,22 @@ export default function ManagerShell({navigation, route, options, children}) {
   const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     const accent = moduleAccent?.value
-      ? resolveModuleAccent(item.categoryColor, moduleAccentPalette) : undefined;
+      ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
+    const appearance = moduleListAppearance({accent, colors: c, sidebar: true, active});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
+      dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
         return [s.navItem, {
-          backgroundColor: moduleAccentBackground(accent, highlighted) ??
-            (highlighted ? c.navigationActiveBackground : c.containerTransparentBackground),
-          borderLeftColor: active ? (accent ?? c.navigationActiveBorder) : c.containerTransparentBackground,
+          backgroundColor: moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted}).backgroundColor,
+          borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground,
         }, iconsOnly && s.center];
       }}>
-      {icon(item.icon, 18, accent ?? (active ? c.navigationActiveIcon : c.navigationIcon))}
-      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: active ? c.navigationActiveText : c.navigationText}]}>{item.title}</Text>}
+      {icon(item.icon, 18, appearance.iconColor)}
+      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
     </Pressable>;
   };
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
@@ -154,17 +156,17 @@ export default function ManagerShell({navigation, route, options, children}) {
       )}
     </View>
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
-      {!compact && <Text style={[s.caption, {color: c.textMuted}]}>INÍCIO</Text>}
+      {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
       {groups.map((group, i) => <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: c.textMuted}]}>{group.title}</Text>}
+        {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
       </View>)}
-      {!groups.length && !compact && <Text style={[s.navText, {color: c.textMuted}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
+      {!groups.length && !compact && <Text style={[s.navText, {color: c.navigationCaptionText}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
     </ScrollView>
-    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.selectBorder, backgroundColor: c.selectBackground}, compact && s.center]}>{avatar(34)}
-      {!compact && <View style={{flexShrink: 1, minWidth: 0}}><Text numberOfLines={1} style={[s.navText, {color: c.selectText}]}>{String(name)}</Text>
-        <Text style={{fontSize: 11, color: c.textMuted}}>Minha conta</Text></View>}
+    <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.navigationAccountBorder, backgroundColor: c.navigationAccountBackground}, compact && s.center]}>{avatar(34)}
+      {!compact && <View style={{flexShrink: 1, minWidth: 0}}><Text numberOfLines={1} style={[s.navText, {color: c.navigationAccountText}]}>{String(name)}</Text>
+        <Text style={{fontSize: 11, color: c.navigationAccountSecondaryText}}>Minha conta</Text></View>}
     </Pressable>
   </View>;
   // Keep module instances mounted during appearance refreshes: forms and local
@@ -241,7 +243,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       </View>}
       {(!currentCompany?.id || !items.length) && <View accessibilityRole="alert" style={{padding:12,gap:8,borderBottomWidth:1,borderColor:c.cardBorder,backgroundColor:c.cardBackground}}>
         <Text style={{color:c.textPrimary}}>{recoveryError || (!currentCompany?.id ? 'A empresa ainda não foi carregada.' : 'Nenhum menu foi carregado para este contexto.')}</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:44,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Tentar carregar empresa e menus" disabled={recovering} onPress={retryContext} style={{minHeight:CONTROL_HEIGHT,justifyContent:'center'}}><Text style={{color:c.textPrimary,fontWeight:'600'}}>{recovering ? 'Carregando contexto…' : 'Tentar novamente'}</Text></Pressable>
       </View>}
       <View style={s.mobileBody}>
         {sidebarVisible && mobile && railVisible && <View testID="manager-mobile-rail" style={[s.mobileRail, {backgroundColor:c.navigationBackground, borderRightColor:c.navigationBorder}]}>
@@ -281,7 +283,7 @@ const s = StyleSheet.create({
   brand: {flexShrink: 0, padding: 12}, compactBrand: {paddingHorizontal: 8},
   close: {alignSelf: 'flex-end', marginRight: 12, padding: 8}, menu: {flex: 1, minHeight: 0}, group: {marginTop: 22},
   caption: {fontSize: 10, fontWeight: '700', letterSpacing: 1.3, textTransform: 'uppercase', margin: 12},
-  navItem: {minHeight: 42, paddingVertical: 10, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
+  navItem: {minHeight: CONTROL_HEIGHT, paddingVertical: 4, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 10, borderLeftWidth: 3, marginBottom: 3},
   navText: {fontSize: 12, fontWeight: '600', flexShrink: 1}, center: {justifyContent: 'center', paddingHorizontal: 0},
   account: {flexShrink: 0, margin: 12, padding: 12, borderWidth: 1, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10},
   main: {flex: 1, minWidth: 0},

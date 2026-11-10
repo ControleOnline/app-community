@@ -1,5 +1,6 @@
 import contract from './themeContract.generated';
 import {legacyThemeFieldSource} from './themeEditorModel';
+import {applyHomeMetricAppearances, isHomeAppearanceColorToken} from './homeMetricAppearance';
 const canonical = new Set(contract.names);
 const tableMap=mode=>({tableHeaderBackground:`bg-headers-${mode}`,tableRowEvenBackground:`bg-even-${mode}`,tableRowOddBackground:`bg-odd-${mode}`});
 const darkMap={
@@ -47,7 +48,7 @@ export function resolveManagerThemeDetails(input={},mode='light'){
  const values={...theme},sources=Object.fromEntries(Object.keys(theme).map(key=>[key,key]));
  const modern = Object.keys(theme).some(key => {
   const token = key.replace(/-(light|dark)$/, '');
-  return token !== key && canonical.has(token) && !contract.variants?.[token] && !contract.legacyKeys[token];
+  return token !== key && canonical.has(token) && !isHomeAppearanceColorToken(token) && !contract.variants?.[token] && !contract.legacyKeys[token];
  });
  if(modern){
   for(const key of Object.keys(values)){
@@ -82,6 +83,7 @@ export function resolveManagerThemeDetails(input={},mode='light'){
    values[token]=values[base];sources[token]=sources[base];
   }
  }
+ applyHomeMetricAppearances(theme,mode,values,sources);
  return {values,sources};
 }
 export function resolveManagerTheme(theme={},mode='light'){return resolveManagerThemeDetails(theme,mode).values;}

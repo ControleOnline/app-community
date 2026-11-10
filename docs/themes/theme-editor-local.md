@@ -136,3 +136,163 @@ O inspetor abre em Normal e oferece Hover quando o próprio estilo do Pressable 
 No navegador móvel, iniciar a inspeção recolhe o painel; selecionar reabre o editor, mantendo o rascunho montado. Arrastar permite rolar sem selecionar. O toque de seleção bloqueia o clique posterior. Campos ficam em uma coluna, com controles de cor de44 px e ações de cancelar/salvar acessíveis durante a rolagem. O painel acompanha a área visível quando o teclado aparece.
 
 Validação local:71 testes em19 suítes e exportação web passaram. Na sessão autenticada, Normal mostrou listItemBackground e Hover mostrou listItemActiveBackground no acesso rápido Dispositivos; a URL permaneceu na Home. Em393 px, o painel recolheu/reabriu e os campos ficaram em uma coluna. Toque e supressão do clique posterior foram verificados por testes automatizados; a ferramenta do navegador não oferece toque nativo, portanto não houve conferência em aparelho físico. Nenhuma cor ou vínculo real foi salvo.
+
+### Separação local das cores das áreas permanentes — 2026-11-10
+
+Os controles de conta/avatar, títulos do menu lateral, identificação da empresa no
+cabeçalho e título de seção do menu do usuário passam a consumir variáveis próprias.
+A shortcut bar também expõe borda ativa, estados desabilitados e sombra separados.
+O mapa oficial continua sendo `themes-map.md`; o contrato é gerado a partir dele.
+
+Na leitura, `initializeGlobalChromeColors` captura os valores anteriores nos dois
+modos para preservar a aparência e impedir que a prévia de uma cor de conteúdo
+altere esses controles. Valores próprios já cadastrados têm precedência. O editor
+usa a mesma inicialização e, ao salvar, mantém as novas propriedades no JSON
+`theme.colors`, preservando as demais chaves armazenadas. Sem salvar pelo editor,
+essa inicialização permanece em memória; não há migração nem gravação automática.
+
+Esta etapa não modifica o chaveamento de cores dos módulos, suas permissões ou
+cadastros, nem a persistência local da chave. A mudança para uma chave compartilhada
+será uma etapa posterior. Não foram criadas colunas nem executadas gravações no banco.
+
+### Etapa 2 — chave de cores dos módulos compartilhada pelo tema
+
+A origem da chave passa a ser `theme.colors.useModuleColors`, sem sufixo de modo,
+com os valores `true`/`false` em texto, seguindo as opções de layout. A aplicação
+lê a configuração recebida pela API do tema do domínio. O botão “Salvar opção no
+tema” usa o fluxo existente de gravação de temas e suas permissões; não altera
+vínculos, categorias, rotas nem suas cores. Sem a propriedade, permanece o antigo
+padrão de ausência de preferência: ligado para layouts `list`/`buttons`.
+
+A chave local `co.module-accent.v1:*` deixa de ser consultada para essa opção. Não
+é copiada para o tema nem apagada. A leitura não dispara salvamentos. A preferência
+compartilhada é recebida pelos demais usuários/domínios que utilizam o tema ao
+carregarem ou recarregarem seus dados; não foi acrescentada sincronização em tempo
+real. Rejeição da API mantém o valor aplicado e exibe o erro.
+
+Validação desta etapa feita somente com API simulada: leitura da chave, salvamento
+explícito, rejeição, troca de contexto e preservação das cores existentes. Nenhuma
+gravação real no banco ou migração de colunas foi executada pelo agente.
+
+### Etapa 3 — catálogo e prévias de aparência dos módulos
+
+“Cores dos módulos” reúne categorias e suas rotas sem descartar menus de Home ou
+atalhos de uma categoria repetida. A consulta normal usa somente os menus recebidos
+pelo contexto. A edição mantém a mesma exigência da tela existente de menus:
+`app_type_base === ADMIN` e usuário `ROLE_SUPER`, além da autorização da API.
+Nesse caso, o painel carrega todas as páginas de `menu-config` do app atual,
+incluindo registros desativados, sem criar menus ou alterar vínculos.
+
+Cada categoria/rota possui edição da cor e do ícone existentes, com seleção de
+ícones e de cores e aceitação de referências como `$primary`. O botão “Salvar
+cadastro” envia somente os campos `color`/`icon` alterados ao endpoint existente.
+Não envia ordenação, permissões, categoria, rota vinculada ou campos de prévia.
+Após salvar, consulta novamente os cadastros e atualiza os menus permitidos da
+empresa atual. O salvamento da chave compartilhada continua separado.
+
+As prévias locais de Home em lista, Home em grade e menu lateral reproduzem a
+aplicação atual. Por enquanto, o menu lateral usa a cor da categoria; os botões da
+Home usam a cor da rota. A unificação permanece para a etapa 4. Cor do texto, cor
+do ícone e fundo do ícone na grade são campos temporários, identificados como sem
+coluna no banco. Só afetam a prévia local; não são enviados ao banco nem ao tema.
+Descartar a prévia ou fechar o painel remove os rascunhos sem gravação.
+
+Esta etapa foi validada com API simulada (paginação, permissões, salvamento
+explícito e payload restrito). O agente não executou gravações reais no banco.
+
+#### Navegação das categorias e rotas
+
+Categorias começam recolhidas. Cada cabeçalho abre/recolhe seus campos e rotas,
+com seta e estado acessível de expansão. Uma categoria fica aberta por vez; cada
+categoria lembra a última rota expandida. Os campos e a prévia da rota ficam junto
+a ela, em vez de no fim da lista de categorias. Cores adicionais começam recolhidas
+em uma seção própria de prévia. Recolher, reabrir ou alternar categorias/rotas não
+limpa rascunhos nem dispara salvamentos; o descarte continua explícito por cadastro.
+A memória dos rascunhos vale enquanto o painel está montado no mesmo contexto.
+
+### Etapa 4 — cores de rota no menu lateral e na Home em lista
+
+Com a chave ligada e uma cor de rota válida, o fundo do item lateral usa
+`routes.color`, igual ao botão da Home em lista. O ícone não recebe mais a mesma
+cor do fundo. Ambos usam `moduleListIcon` e `moduleListText` para os primeiros
+planos, resolvidos pela mesma função de apresentação (`moduleListAppearance`).
+Essas duas variáveis pertencem ao JSON do tema; são inicializadas com os valores
+anteriores de `textMuted` e `cardText` nos dois modos, sem gravação automática.
+Assim, editar cores genéricas de conteúdo não muda os primeiros planos dos
+módulos com o destaque aplicado. Valores próprios já cadastrados são preservados.
+
+Com a chave desligada, ou sem cor de rota válida, a Home conserva os papéis
+anteriores de lista e o menu lateral conserva `navigation*`, incluindo hover e
+estado ativo. O fundo externo, títulos dos grupos, cabeçalho, menu do usuário e
+shortcut bar continuam seguindo suas variáveis de tema. A borda do item lateral
+ativo usa `navigationActiveBorder`. Cartões de categoria da Home continuam usando
+`category.color`; a grade mantém sua regra de aplicação de fundos de rota.
+
+As prévias de lista e menu lateral usam a mesma apresentação; as cores temporárias
+extras continuam limitadas às prévias. O inspetor informa `routes.color` como
+origem do fundo lateral, sem atribuir esse campo à cor do ícone ou à borda ativa.
+Foram executados 33 testes focados com sucesso, sem gravações reais no banco ou
+criação de colunas. A validação visual no navegador fica com o usuário.
+
+### Variações dos quatro indicadores da Home e separação de Resultados
+
+Os indicadores usam identidades estáveis: `closed-sales`, `period-orders`,
+`open-orders` e `clients`. O inspetor reconhece essa finalidade mesmo quando um
+texto ou ícone interno é selecionado. Só nesses quatro indicadores, o editor
+oferece Padrão, Primária, Secundária e Específica. A escolha faz parte do mesmo
+rascunho e salvamento explícito das cores; cancelar ou fechar o inspetor desfaz a
+prévia. Trocar de indicador mantém os rascunhos no editor montado.
+
+Padrão continua sendo `indicatorCard*`. Primária/Secundária possuem as propriedades
+`homeMetricPrimary*`/`homeMetricSecondary*`, herdando o padrão quando faltam valores.
+Cada específica tem propriedades estáveis pelo indicador, como
+`homeMetricClosedSalesBackground-light`, e pode receber um nome editável. Ao criar
+uma específica, ela herda da aparência anteriormente selecionada; voltar ao padrão
+não apaga suas cores, nome ou base. Fundo, borda, valor principal, título/período,
+mensagens e cores/fundo do ícone têm claro/escuro independentes. O desenho do ícone
+permanece o original de cada indicador e não participa das variações.
+O painel informa os indicadores potencialmente afetados por valores compartilhados.
+
+Tudo usa propriedades escalares no JSON existente `theme.colors`: escolhas como
+`homeMetricClosedSalesAppearance`, base da específica, propriedades de cor e o
+nome legível codificado como texto hexadecimal com prefixo `v1_`. Esse formato
+preserva acentos, espaços e símbolos sem inserir objetos JSON ou delimitadores no
+CSS publicado pela API atual. O identificador não depende do nome. Não foi criada
+coluna nem alterada a API. As variáveis `*Applied*` são calculadas no cliente para
+aplicação/inspeção e não são gravadas. Novos tokens não alteram a resolução de
+paletas legadas. Campos de modos diferentes não emprestam cores entre si.
+
+Resultados usa `homeResults*`, inicializado na leitura com sua aparência anterior
+nos dois modos. O próximo salvamento explícito preserva esses valores no tema,
+permitindo editar o padrão dos indicadores sem alterar a faixa Resultados. Essa
+faixa continua sendo editável por suas próprias variáveis, sem seletor de indicador.
+Nada foi modificado nos cálculos, permissões, navegação, tabelas, filtros ou regras
+de cores dos módulos. A opção das variações está restrita aos quatro indicadores.
+
+Validação: 58 testes de tema/editor/transporte/inspeção mais um teste de integração
+da Home passaram. Foram usados serviços simulados, sem gravação real no banco.
+
+### Ajuste: desenho dos ícones preservado
+
+Removidos o seletor de desenho e a substituição de ícones pelas variações dos
+indicadores. Cor e fundo continuam editáveis por aparência nos dois modos.
+Propriedades antigas `*Glyph`, caso já armazenadas, permanecem preservadas pelo
+salvamento, mas não são aplicadas aos indicadores. Nenhuma gravação real no banco.
+
+### Conferência da preparação da task-1496
+
+O teste de `AppliedThemeOverview` passou a simular explicitamente a API, sem
+carregar o cliente dependente de armazenamento do navegador, e a verificar que
+nenhuma requisição é feita nesses cenários. Os quatro testes do arquivo passaram.
+Na suíte de temas, 155 testes passaram; resta uma falha na expectativa antiga de
+edição por tela, já reproduzida na master sem as alterações. Sem gravações reais.
+
+### Revalidação para integração da task-1496
+
+Atualizadas as expectativas legadas dos testes alterados: inspeção global sem
+edição por tela, seletor de empresa no cabeçalho, traduções simuladas nas ações
+da conta e fundos dos módulos por rota com ícones independentes. O feedback do
+inspetor usa variáveis da paleta do editor, sem cores hexadecimais fixas.
+Passaram 156 testes de temas e 49 testes de Home/navegação nas suítes afetadas,
+com API simulada e sem gravações reais no banco. Esse resultado substitui as
+pendências registradas na preparação anterior.

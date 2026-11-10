@@ -1,5 +1,21 @@
 import {themeBindings} from '../../styles/themeProvenance';
 import {inspectThemeElement,attachThemeInspector} from '../../components/theme-editor/themeInspector';
+test('nested indicator elements expose their stable purpose to the appearance selector',()=>{
+ const text={getAttribute:()=>JSON.stringify([{property:'color',token:'homeMetricClosedSalesAppliedText'}])};
+ const metric={getAttribute:()=> 'closed-sales'};
+ const hit=inspectThemeElement({closest:selector=>selector==='[data-co-theme]'?text:selector==='[data-co-home-metric]'?metric:null});
+ expect(hit.homeMetric).toBe('closed-sales');
+ expect(hit.bindings[0].token).toBe('homeMetricClosedSalesAppliedText');
+});
+test('the inspection cursor is removed when inspection ends',()=>{
+ const style={remove:jest.fn()};
+ const document={createElement:()=>style,head:{appendChild:jest.fn()},
+  addEventListener:jest.fn(),removeEventListener:jest.fn()};
+ const cleanup=attachThemeInspector(document,jest.fn(),jest.fn());
+ expect(document.head.appendChild).toHaveBeenCalledWith(style);
+ expect(style.textContent).toContain('crosshair');
+ cleanup();expect(style.remove).toHaveBeenCalledTimes(1);
+});
 test('records variable identity even when two roles have the same visible color',()=>{
   expect(themeBindings([{color:'var(--co-theme-cardText)'},{backgroundColor:'var(--co-theme-cardBackground)',color:'var(--co-theme-textPrimary)'}])).toEqual([{property:'color',token:'textPrimary'},{property:'backgroundColor',token:'cardBackground'}]);
   expect(themeBindings({backgroundColor:'#ffffff'})).toEqual([]);

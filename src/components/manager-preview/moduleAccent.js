@@ -14,3 +14,22 @@ export function resolveModuleAccent(categoryColor, palette = {}) {
 export function moduleAccentBackground(accent) {
   return accent;
 }
+
+// List modules share foreground roles only while a registered route color applies.
+// Without that accent, each surface retains its own original theme roles.
+export function moduleListAppearance({accent, colors: c, sidebar = false, active = false, highlighted = active}) {
+  if (accent) return {backgroundColor: accent, iconColor: c.moduleListIcon ?? c.textMuted, textColor: c.moduleListText ?? c.cardText};
+  if (sidebar) return {
+    backgroundColor: highlighted ? c.navigationActiveBackground : c.containerTransparentBackground,
+    iconColor: active ? c.navigationActiveIcon : c.navigationIcon,
+    textColor: active ? c.navigationActiveText : c.navigationText,
+  };
+  return {
+    backgroundColor: c.containerTransparentBackground, iconColor: c.textMuted, textColor: c.cardText,
+  };
+}
+
+// Explicit provenance: runtime menu IDs identify menus, not database route IDs.
+export function moduleAccentSource(value, source, record, reference, properties = ['backgroundColor']) {
+  return value ? JSON.stringify(properties.map(property => ({property, source, record, reference, value}))) : undefined;
+}

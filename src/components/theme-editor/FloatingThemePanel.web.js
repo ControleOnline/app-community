@@ -4,15 +4,16 @@ import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-na
 import ThemeColorEditor from './ThemeColorEditor';
 import { loadDomainTheme, editorContext } from './themeService';
 import { attachThemeInspector } from './themeInspector';
-import { useThemeRuntime } from '../../styles/themeRuntime';
+import ThemeInspectionHighlight, {groupInspectionColors} from './ThemeInspectionHighlight';
+import { useThemeRuntime, getThemeSnapshot } from '../../styles/themeRuntime';
 import { resolveManagerTheme, describeThemeColor } from '../../styles/managerTheme';
 import { resolveScreenThemeDetails } from '../../styles/screenTheme';
 import { parseScreenThemeKey } from '../../styles/screenThemeKeys';
 
 const visibleViewport = () => {
-  if (typeof window === 'undefined') return { height: 800, inset: 0 };
+  if (typeof window === 'undefined') return { width: 1024, height: 800, inset: 0 };
   const viewport = window.visualViewport;
-  return { height: viewport?.height || window.innerHeight, inset: viewport ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) : 0 };
+  return { width: viewport?.width || window.innerWidth, height: viewport?.height || window.innerHeight, inset: viewport ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) : 0 };
 };
 
 const shortcutBarInset = () => {
@@ -68,7 +69,19 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     if (!inspecting) return;
     return attachThemeInspector(document, (hit) => {
       const rectangle = hit ? hit.node.getBoundingClientRect() : null;
-      setHover((previous) => previous && rectangle && ['left', 'top', 'width', 'height'].every((key) => previous[key] === rectangle[key]) ? previous : rectangle);
+      const snapshot = getThemeSnapshot();
+      const values = resolveScreenThemeDetails(snapshot.preview || snapshot.raw, snapshot.mode, hit?.screen?.id).values;
+      const computed = hit ? window.getComputedStyle?.(hit.node) : null;
+      const bindings = hit?.node.matches?.(':hover') && hit.states?.hover ? hit.states.hover : hit?.bindings || [];
+      const colors = groupInspectionColors([
+        ...(hit?.sources || []).map(source => ({...source, token: source.source})),
+        ...bindings.map(({property, token}) => ({property, token,
+          value: computed?.getPropertyValue(`--co-theme-${token}`).trim() || values[token] || ''})),
+      ]);
+      const target = rectangle ? {left: rectangle.left, top: rectangle.top, width: rectangle.width, height: rectangle.height,
+        name: hit.node.tagName?.toLowerCase() || t('Elemento'), colors} : null;
+      setHover((previous) => previous && target && ['left', 'top', 'width', 'height', 'name'].every((key) => previous[key] === target[key])
+        && JSON.stringify(previous.colors) === JSON.stringify(colors) ? previous : target);
     }, (hit, escape) => {
       setInspecting(false);
       if (!escape) {setSelection(hit);setInteraction('normal');setEditScope('global');setError(hit ? '' : t("Este elemento não expõe uma referência de cor do tema. Nenhuma variável foi inferida."));}
@@ -122,7 +135,8 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .78),
     viewport.height + viewport.inset - mobileBottom - 12));
   return createPortal(<>
-    {hover && inspecting && <div aria-hidden style={{ pointerEvents: 'none', position: 'fixed', left: hover.left, top: hover.top, width: hover.width, height: hover.height, border: `2px solid ${c.modalBorder}`, background: c.selectOptionSelectedBackground, zIndex: 2147482999 }} />}
+    {hover && inspecting && <ThemeInspectionHighlight hover={hover} viewport={viewport}
+      panel={panel} panelPosition={position} translate={t} />}
     <div ref={panel} data-co-theme-tools="true" role="dialog" aria-modal="false" aria-label={t("Configurador flutuante de temas")}
     style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
       <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -162,8 +176,15 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
             </View>}
           </>}
         </View>
-        {!!selection && !bindings.length && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
-        <ScrollView style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} screen={null} concise onSaved={setTheme} />}</ScrollView>
+        {!!selection?.sources?.length && <View style={{padding: 10, gap: 4}}>
+          <Text style={{fontSize: 12, color: c.textSecondary}}>{t('Cores vindas dos cadastros dos módulos; não são variáveis do tema.')}</Text>
+          {groupInspectionColors(selection.sources.map(source => ({...source, token: source.source}))).map(source =>
+            <Text key={`${source.property}:${source.source}`} selectable style={{fontSize: 12, color: c.textPrimary}}>
+              {source.source} · {source.record} · {source.value} ({source.property})
+            </Text>)}
+        </View>}
+        {!!selection && !bindings.length && !selection.sources?.length && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
+        <ScrollView style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} concise onSaved={setTheme} />}</ScrollView>
       </div>
     </div>
   </>, portalHost);

@@ -56,3 +56,16 @@ test('a web color preview updates CSS without republishing unchanged variable re
  expect(publishCount).toBe(before);
  await act(async()=>clearThemePreview());
 });
+
+test('scalar appearance choices survive the CSS transport and publish per-indicator colors in both modes',async()=>{
+ const api={fetch:jest.fn().mockResolvedValue(':root{--indicatorCardBackground-light:#ffffff;--indicatorCardBackground-dark:#112233;--homeMetricClosedSalesAppearance:primary;--homeMetricPrimaryBackground-light:#00ff00;}')};
+ await act(async()=>{tree=renderer.create(<Probe api={api}/>);});
+ await act(async()=>setThemeMode('light'));
+ expect(getThemeSnapshot().raw.homeMetricClosedSalesAppearance).toBe('primary');
+ expect(document.vars.get('--co-theme-homeMetricClosedSalesAppliedBackground')).toBe('#00ff00');
+ expect(document.vars.get('--co-theme-homeMetricClientsAppliedBackground')).toBe('#ffffff');
+ expect(document.vars.get('--co-theme-homeResultsBackground')).toBe('#ffffff');
+ await act(async()=>setThemeMode('dark'));
+ expect(document.vars.get('--co-theme-homeMetricClosedSalesAppliedBackground')).toBe('#112233');
+ await act(async()=>setThemeMode('light'));
+});
