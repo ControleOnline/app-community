@@ -1,20 +1,18 @@
 {
-  "version": "1.10.177",
+  "version": "1.10.181",
   "rc": 1,
-  "branch": "rc/1.10.177-rc.1",
+  "branch": "rc/1.10.181-rc.1",
   "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
   "tasks": [
-    1460,
-    1484
+    1488
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "14f6066693a85eac29e32cd9c157e297c1b3c7f8",
-    "ControleOnline/ui-common": "870e757c5c085a185d22c30f139ef6b434ce2e42"
+    "ControleOnline/app-community": "d127ff113cfbbd84e15f5133a04fbcb7158fc29b"
   },
   "validation": {
-    "scope": "ui-common 1.2.123 (#1484): toasts de erro/aviso usam as variaveis de tema negative/warning, sem RGB fixo. Staging mantem a 1460 (nao promovida); 1470 ja esta em master 1.10.176.",
-    "checks": "toastThemeColors.contract (1 pass); toastPresentation.test atualizado (jest nao e executado pelo npm test do pacote)"
+    "scope": "package.json declara react-native-blob-util 0.25.1 (peer exigido por react-native-pdf; sem declaracao o npm install sem lock resolve 1.1.1, que exige react-native>=0.84 e quebra com ERESOLVE). package-lock.json nao e versionado.",
+    "checks": "somente package.json; build nativo Android nao validado"
   }
 }
