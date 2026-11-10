@@ -1,18 +1,18 @@
 {
-  "version": "1.10.179",
+  "version": "1.10.180",
   "rc": 1,
-  "branch": "rc/1.10.179-rc.1",
-  "baseMaster": "1645fcb7e23faced55afe7372fa5d44e6671f521",
+  "branch": "rc/1.10.180-rc.1",
+  "baseMaster": "2d666afa6f04eaf015d19f535f34ae1644481448",
   "tasks": [
-    1460
+    1488
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "537054a0546506b9f147a94a888494b1217ac702"
+    "ControleOnline/app-community": "ff08a8fa97989e6530fd05ff89e3e45ca7c017e6"
   },
   "validation": {
-    "scope": "task #1460: flags de layout (menu lateral e modulos como icones) gravadas no tema do dominio; remocao de chaves screen_* do JSON de cores. Delta isolado sobre o master atual; dependencias (#1437, #1450, #1453, #1456) ja estao no master.",
-    "checks": "security aceito em #1460 e nas dependencias; stripScreenThemeKeys verificado (sem poluicao de prototipo); cherry-pick limpo sobre master"
+    "scope": "package.json declara react-native-blob-util 0.25.1 (peer exigido por react-native-pdf; sem declaracao o npm install sem lock resolve 1.1.1, que exige react-native>=0.84 e quebra com ERESOLVE). package-lock.json nao e versionado.",
+    "checks": "somente package.json; build nativo Android nao validado"
   }
 }
