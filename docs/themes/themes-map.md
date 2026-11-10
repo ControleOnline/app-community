@@ -136,6 +136,56 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `summaryCardSuccessText` <!-- base: textSuccess; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
 - `summaryCardDangerText` <!-- base: textDanger; variant: summary; label: Cards de resumo financeiro; usage: Cards mensais e caixas de métricas do relatório de resultados -->
 
+- `homeMetricPrimaryBackground`
+- `homeMetricPrimaryBorder`
+- `homeMetricPrimaryText`
+- `homeMetricPrimarySecondaryText`
+- `homeMetricPrimaryMutedText`
+- `homeMetricPrimaryIconBackground`
+- `homeMetricPrimaryIconColor`
+- `homeMetricSecondaryBackground`
+- `homeMetricSecondaryBorder`
+- `homeMetricSecondaryText`
+- `homeMetricSecondarySecondaryText`
+- `homeMetricSecondaryMutedText`
+- `homeMetricSecondaryIconBackground`
+- `homeMetricSecondaryIconColor`
+- `homeMetricClosedSalesBackground`
+- `homeMetricClosedSalesBorder`
+- `homeMetricClosedSalesText`
+- `homeMetricClosedSalesSecondaryText`
+- `homeMetricClosedSalesMutedText`
+- `homeMetricClosedSalesIconBackground`
+- `homeMetricClosedSalesIconColor`
+- `homeMetricPeriodOrdersBackground`
+- `homeMetricPeriodOrdersBorder`
+- `homeMetricPeriodOrdersText`
+- `homeMetricPeriodOrdersSecondaryText`
+- `homeMetricPeriodOrdersMutedText`
+- `homeMetricPeriodOrdersIconBackground`
+- `homeMetricPeriodOrdersIconColor`
+- `homeMetricOpenOrdersBackground`
+- `homeMetricOpenOrdersBorder`
+- `homeMetricOpenOrdersText`
+- `homeMetricOpenOrdersSecondaryText`
+- `homeMetricOpenOrdersMutedText`
+- `homeMetricOpenOrdersIconBackground`
+- `homeMetricOpenOrdersIconColor`
+- `homeMetricClientsBackground`
+- `homeMetricClientsBorder`
+- `homeMetricClientsText`
+- `homeMetricClientsSecondaryText`
+- `homeMetricClientsMutedText`
+- `homeMetricClientsIconBackground`
+- `homeMetricClientsIconColor`
+- `homeResultsBackground`
+- `homeResultsBorder`
+- `homeResultsText`
+- `homeResultsSecondaryText`
+- `homeResultsMutedText`
+- `homeResultsIconBackground`
+- `homeResultsIconColor`
+
 ### checkbox
 
 - `checkboxBackground`
@@ -183,6 +233,8 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `headerIcon`
 - `headerLink`
 - `headerText`
+- `headerCompanyText` <!-- base: selectText; variant: globalChrome; label: Áreas permanentes; usage: Nome da empresa no cabeçalho -->
+- `headerCompanyIcon` <!-- base: selectIcon; variant: globalChrome; label: Áreas permanentes; usage: Seta da empresa no cabeçalho -->
 
 ### icon
 
@@ -269,6 +321,7 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `menuSelectedText`
 - `menuShadow`
 - `menuText`
+- `menuSectionText` <!-- base: textSecondary; variant: globalChrome; label: Áreas permanentes; usage: Título de seção do menu do usuário -->
 
 ### modal
 
@@ -334,6 +387,20 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `navigationIcon`
 - `navigationShadow`
 - `navigationText`
+- `moduleListIcon` <!-- base: textMuted; variant: moduleList; label: Módulos em lista; usage: Cor dos ícones dos módulos na Home em lista e no menu lateral com cores de rota ligadas -->
+- `moduleListText` <!-- base: cardText; variant: moduleList; label: Módulos em lista; usage: Cor do texto dos módulos na Home em lista e no menu lateral com cores de rota ligadas -->
+- `navigationCaptionText` <!-- base: textMuted; variant: globalChrome; label: Áreas permanentes; usage: Títulos dos grupos do menu lateral -->
+- `navigationAccountBackground` <!-- base: selectBackground; variant: globalChrome; label: Áreas permanentes; usage: Fundo da conta no menu lateral -->
+- `navigationAccountBorder` <!-- base: selectBorder; variant: globalChrome; label: Áreas permanentes; usage: Borda da conta no menu lateral -->
+- `navigationAccountText` <!-- base: selectText; variant: globalChrome; label: Áreas permanentes; usage: Nome do usuário no menu lateral -->
+- `navigationAccountSecondaryText` <!-- base: textMuted; variant: globalChrome; label: Áreas permanentes; usage: Legenda da conta no menu lateral -->
+- `navigationAvatarBackground` <!-- base: cardIconBackground; variant: globalChrome; label: Áreas permanentes; usage: Fundo do avatar nas áreas permanentes -->
+- `navigationAvatarBorder` <!-- base: cardBorder; variant: globalChrome; label: Áreas permanentes; usage: Borda do avatar nas áreas permanentes -->
+- `navigationAvatarText` <!-- base: textPrimary; variant: globalChrome; label: Áreas permanentes; usage: Texto do avatar nas áreas permanentes -->
+- `navigationCompanyBackground` <!-- base: selectBackground; variant: globalChrome; label: Áreas permanentes; usage: Fundo do seletor de empresa no menu lateral -->
+- `navigationCompanyBorder` <!-- base: selectBorder; variant: globalChrome; label: Áreas permanentes; usage: Borda do seletor de empresa no menu lateral -->
+- `navigationCompanyText` <!-- base: selectText; variant: globalChrome; label: Áreas permanentes; usage: Nome da empresa no menu lateral -->
+- `navigationCompanyIcon` <!-- base: selectIcon; variant: globalChrome; label: Áreas permanentes; usage: Seta do seletor de empresa no menu lateral -->
 - `shortcutBarBackground` <!-- base: navigationBackground; variant: shortcutBar; label: Barra de atalhos; usage: Fundo da barra de atalhos inferior do Manager -->
 - `shortcutBarBorder` <!-- base: navigationBorder; variant: shortcutBar; label: Barra de atalhos; usage: Borda da barra de atalhos inferior do Manager -->
 - `shortcutBarIcon` <!-- base: navigationIcon; variant: shortcutBar; label: Barra de atalhos; usage: Ícone do atalho no estado normal -->
@@ -341,6 +408,12 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `shortcutBarActiveBackground` <!-- base: navigationActiveBackground; variant: shortcutBar; label: Barra de atalhos; usage: Fundo do atalho selecionado -->
 - `shortcutBarActiveIcon` <!-- base: navigationActiveIcon; variant: shortcutBar; label: Barra de atalhos; usage: Ícone do atalho selecionado -->
 - `shortcutBarActiveText` <!-- base: navigationActiveText; variant: shortcutBar; label: Barra de atalhos; usage: Texto do atalho selecionado -->
+- `shortcutBarActiveBorder` <!-- base: navigationActiveBorder; variant: shortcutBar; label: Barra de atalhos; usage: Borda do atalho selecionado -->
+- `shortcutBarDisabledBackground` <!-- base: navigationDisabledBackground; variant: shortcutBar; label: Barra de atalhos; usage: Fundo do atalho desabilitado -->
+- `shortcutBarDisabledBorder` <!-- base: navigationDisabledBorder; variant: shortcutBar; label: Barra de atalhos; usage: Borda do atalho desabilitado -->
+- `shortcutBarDisabledIcon` <!-- base: navigationDisabledIcon; variant: shortcutBar; label: Barra de atalhos; usage: Ícone do atalho desabilitado -->
+- `shortcutBarDisabledText` <!-- base: navigationDisabledText; variant: shortcutBar; label: Barra de atalhos; usage: Texto do atalho desabilitado -->
+- `shortcutBarShadow` <!-- base: navigationShadow; variant: shortcutBar; label: Barra de atalhos; usage: Sombra da barra de atalhos -->
 
 ### overlay
 

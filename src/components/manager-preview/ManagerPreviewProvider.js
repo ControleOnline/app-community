@@ -1,9 +1,8 @@
 import React, {createContext, useContext, useEffect, useMemo, useState} from 'react';
 import {useThemeRuntime,setThemeMode} from '../../styles/themeRuntime';
 import {useStore} from '@store';
-import {env} from '@env';
-import {scopeFor} from '../../session/sessionScope';
-import useManagerPreference from './useManagerPreference';
+import {editorContext} from '../theme-editor/themeService';
+import useModuleColorsPreference from './useModuleColorsPreference';
 import {managerPreviewEnabled, previewPalette} from './model';
 import {missingManagerThemeTokens} from '../../styles/managerTheme';
 import {useAvatarRuntime} from '@experimental-avatar';
@@ -27,8 +26,6 @@ export default function ManagerPreviewProvider({children}) {
   const {item: device} = useStore('device_config').getters;
   const singleItemActive = app_type === 'POS' && isPosSingleItemMode(device?.configs);
   const active = (managerPreviewEnabled || singleItemActive) && !!auth.getters.isLogged;
-  const user = auth.getters.user;
-  const principal = user?.id || user?.username;
   const palette = useMemo(() => previewPalette(themeRuntime.preview || themeRuntime.raw, mode),
     [themeRuntime.preview, themeRuntime.raw, mode]);
   // Theme config is the only source of truth for layout flags (not device/account prefs).
@@ -41,13 +38,8 @@ export default function ManagerPreviewProvider({children}) {
   });
   const sidebar = layout.sidebar;
   const moduleIcons = layout.moduleIcons;
-  const displayScope = active && principal ? encodeURIComponent(JSON.stringify([scopeFor(env), principal])) : '';
-  // Module accent remains a presentation preference for now (category color application).
-  const moduleAccent = useManagerPreference(displayScope ? `co.module-accent.v1:${displayScope}` : '', {
-    defaultValue: homeLayout === 'list' || homeLayout === 'buttons',
-    loadError: 'Não foi possível carregar a preferência de destaque.',
-    saveError: 'Não foi possível salvar a preferência de destaque.',
-  });
+  const moduleAccent = useModuleColorsPreference({colors: themeRuntime.raw, homeLayout,
+    ready: active && themeRuntime.status === 'ready', context: editorContext()});
   const bottomBar = useBottomNavigationPreference({enabled: active,
     principal: String(auth.getters.user?.id || auth.getters.user?.username || ''), appType: app_type});
   const avatar = useAvatarRuntime({active: managerPreviewEnabled,

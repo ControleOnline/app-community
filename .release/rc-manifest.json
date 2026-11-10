@@ -1,18 +1,20 @@
 {
-  "version": "1.10.181",
-  "rc": 1,
-  "branch": "rc/1.10.181-rc.1",
-  "baseMaster": "fe22962052810e7ac5cb0187eee09bf8bc76ed30",
+  "version": "1.10.184",
+  "rc": 2,
+  "branch": "rc/1.10.184-rc.2",
+  "baseMaster": "54df612b1553f2b47ef2cc68db7d0d6d41cfe728",
   "tasks": [
-    1488
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d127ff113cfbbd84e15f5133a04fbcb7158fc29b"
+    "ControleOnline/app-community": "036e9f1308959e5c9a72b5820d84f4fd6342ce17"
   },
   "validation": {
-    "scope": "package.json declara react-native-blob-util 0.25.1 (peer exigido por react-native-pdf; sem declaracao o npm install sem lock resolve 1.1.1, que exige react-native>=0.84 e quebra com ERESOLVE). package-lock.json nao e versionado.",
-    "checks": "somente package.json; build nativo Android nao validado"
+    "scope": "Task 1496: global Manager theme isolation, inspector, shared module-color flag, category/route catalog and previews, sidebar route backgrounds, four Home indicator appearances and independent Results. Existing schema and permissions preserved. No product database writes.",
+    "checks": "156 theme tests + 49 Home/navigation tests passed on exact dev ca73afa3; 2 node menu translation checks passed. Versioned task source 9cdfad56. RC2 reconciles historical staging ancestry with identical reviewed product tree, enabling protected PR promotion; no staging-only product changes were dropped (diff against master consists only of version/config/workflow metadata already superseded in master).",
+    "devCommit": "ca73afa3359e57c4052d784165fe7c5d99670b82",
+    "taskSource": "9cdfad56"
   }
 }

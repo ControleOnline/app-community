@@ -12,6 +12,12 @@ export default function ManagerBottomNavigation({navigation, route, colors}) {
     navigationActiveBackground: colors.shortcutBarActiveBackground ?? colors.navigationActiveBackground,
     navigationActiveIcon: colors.shortcutBarActiveIcon ?? colors.navigationActiveIcon,
     navigationActiveText: colors.shortcutBarActiveText ?? colors.navigationActiveText,
+    navigationActiveBorder: colors.shortcutBarActiveBorder ?? colors.navigationActiveBorder,
+    navigationDisabledBackground: colors.shortcutBarDisabledBackground ?? colors.navigationDisabledBackground,
+    navigationDisabledBorder: colors.shortcutBarDisabledBorder ?? colors.navigationDisabledBorder,
+    navigationDisabledIcon: colors.shortcutBarDisabledIcon ?? colors.navigationDisabledIcon,
+    navigationDisabledText: colors.shortcutBarDisabledText ?? colors.navigationDisabledText,
+    navigationShadow: colors.shortcutBarShadow ?? colors.navigationShadow,
   };
   return <RuntimeBottomNavigationBar navigation={navigation} colors={barColors}
     activeRouteName={route.name} presetKey="managerToolbar" appearance="soft" placement="inline"
