@@ -1,18 +1,28 @@
 {
-  "version": "1.10.186",
-  "rc": 1,
-  "branch": "rc/1.10.186-rc.1",
+  "version": "1.10.185",
+  "rc": 2,
+  "branch": "rc/1.10.185-rc.2",
   "baseMaster": "54df612b1553f2b47ef2cc68db7d0d6d41cfe728",
   "tasks": [
-    1495
+    1495,
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "eb0158c159b4213df2710fd56383cd4c50985d2c"
+    "ControleOnline/app-community": "b002a395a798b434bbdc1d1ab3b58182958edd75"
   },
   "validation": {
-    "scope": "Home Explore Modules (modo icones): tiles distribuidos pela largura do card (margens 20/20, espaco minimo 8 entre colunas, linhas nas mesmas colunas) e 14px acima do titulo (+1 borda), modos icone e lista.",
-    "checks": "jest (moduleTileLayout, ModuleTileGrid, contrato); geometria conferida em chromium; Security aceito; RC 1.10.185-rc.1 em staging"
+    "devCommit": "8e6571fddfd6ae4fca168fdc5ddc616b35a6662a",
+    "taskSource": "8ffd14bf4f6585eab6d662971115b57cff4d973b",
+    "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
+    "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
+    "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
+    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only",
+    "databaseMigrationExecuted": false,
+    "databaseWrites": false,
+    "deploymentMode": "frontend-compatible-with-old-api",
+    "apiCommonRuntimePin": "1.0.9",
+    "runtimeActivationRequiresSeparateAuthorization": true
   }
 }

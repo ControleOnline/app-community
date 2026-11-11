@@ -1,15 +1,23 @@
+import {homeMetrics} from '../../styles/homeMetricAppearance';
 const validBindings=value=>Array.isArray(value)?value.filter(item=>typeof item?.token==='string'&&typeof item?.property==='string'):[];
 const uniqueBindings=bindings=>[...new Map(bindings.map(item=>[`${item.property}:${item.token}`,item])).values()];
 export function inspectThemeElement(element) {
   if(!element || element.closest?.('[data-co-theme-tools="true"]'))return null;
-  const node=element.closest?.('[data-co-theme]');
+  let node=element.closest?.('[data-co-theme]');
   const stateNode=element.closest?.('[data-co-theme-states]');
+  const sourceNode=element.closest?.('[data-co-theme-source]');
+  if(sourceNode && (!node || node.contains?.(sourceNode)))node=sourceNode;
   if(!node && !stateNode)return null;
   try {
     const scope=element.closest?.('[data-co-theme-screen]');
     const screenId=scope?.getAttribute?.('data-co-theme-screen');
     const screen=screenId && screenId.length<=200?{id:screenId,label:scope.getAttribute('data-co-theme-screen-label') || 'Tela atual'}:null;
-    const scoped=hit=>hit?{...hit,...(screen?{screen}:{})}:hit;
+    const sourceValue=sourceNode?.getAttribute?.('data-co-theme-source');
+    const sources=sourceValue?JSON.parse(sourceValue):[];
+    const metricId=element.closest?.('[data-co-home-metric]')?.getAttribute?.('data-co-home-metric');
+    const scoped=hit=>hit?{...hit,...(screen?{screen}:{}),...(Object.hasOwn(homeMetrics,metricId)?{homeMetric:metricId}:{}),
+      ...(hit.node===sourceNode && Array.isArray(sources)?{sources:sources.filter(item=>
+        typeof item.property==='string' && ['category.color','routes.color','category.text_color','category.icon_color','routes.text_color','routes.icon_color','routes.icon_background_color'].includes(item.source) && typeof item.value==='string')}:{})}:hit;
     const dock=element.closest?.('[data-testid="bottom-navigation"][data-co-theme]');
     const parent=dock || element.closest?.('[role="menu"][data-co-theme]');
     const parentBindings=validBindings(parent?JSON.parse(parent.getAttribute('data-co-theme')):[]);
@@ -28,11 +36,17 @@ export function inspectThemeElement(element) {
       for(const state of ['normal','hover'])if(Array.isArray(declared?.[state]))states[state]=uniqueBindings([...validBindings(declared[state]),...own]);
       if(Object.values(states).some(value=>value.length))return scoped({node:stateNode,bindings:states.normal || [],states,...(container?{container}:{})});
     }
-    return bindings.length?scoped({node,bindings,states:{normal:bindings},...(container?{container}:{})}):null;
+    return bindings.length || sources.length?scoped({node,bindings,states:{normal:bindings},...(container?{container}:{})}):null;
   } catch{return null;}
 }
 export function attachThemeInspector(document,onHover,onSelect) {
   let touch=null,moved=false;
+  // Inspector feedback must stay independent of the palette being edited.
+  const cursorStyle=document.createElement?.('style');
+  if(cursorStyle){
+    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; }';
+    document.head?.appendChild?.(cursorStyle);
+  }
   const tools=event=>event.target.closest?.('[data-co-theme-tools="true"]');
   const block=event=>{event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();};
   const select=event=>{block(event);onSelect(inspectThemeElement(event.target));};
@@ -69,5 +83,5 @@ export function attachThemeInspector(document,onHover,onSelect) {
   const blockTouch=event=>{if(!tools(event)){event.stopPropagation();event.stopImmediatePropagation?.();}};
   const listeners={pointermove:move,pointerdown:down,pointerup:touchUp,pointercancel:cancelTouch,mousedown:down,touchstart:blockTouch,touchend:blockTouch,click,keydown:key};
   for(const [name,handler] of Object.entries(listeners))document.addEventListener(name,handler,true);
-  return()=>{for(const [name,handler] of Object.entries(listeners))document.removeEventListener(name,handler,true);onHover(null);};
+  return()=>{for(const [name,handler] of Object.entries(listeners))document.removeEventListener(name,handler,true);cursorStyle?.remove?.();onHover(null);};
 }
