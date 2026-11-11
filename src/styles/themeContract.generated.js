@@ -247,7 +247,9 @@ module.exports = {
         "inputText",
         "loginInputBackground",
         "loginInputText",
-        "loginInputPlaceholderText"
+        "loginInputPlaceholderText",
+        "loginLabelCreateAccount",
+        "loginLabelForgotPassword"
       ]
     },
     {
@@ -677,6 +679,8 @@ module.exports = {
     "loginInputBackground",
     "loginInputText",
     "loginInputPlaceholderText",
+    "loginLabelCreateAccount",
+    "loginLabelForgotPassword",
     "linkDisabledText",
     "linkHoverText",
     "linkText",
