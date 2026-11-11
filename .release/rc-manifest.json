@@ -1,18 +1,21 @@
 {
-  "version": "1.10.183",
+  "version": "1.10.185",
   "rc": 1,
-  "branch": "rc/1.10.183-rc.1",
-  "baseMaster": "a3333490ef56f9ca3c3f6bb271cb14ceecdacfea",
+  "branch": "rc/1.10.185-rc.1",
+  "baseMaster": "54df612b1553f2b47ef2cc68db7d0d6d41cfe728",
   "tasks": [
-    1493
+    1495,
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "38ecb816657cedb0b3a086eb024122df14459802"
+    "ControleOnline/app-community": "a87d616f074f0280084e8cbdf8743ced7e35b04c"
   },
   "validation": {
-    "scope": "config/env.local.sample: ZOOM 70 -> 80. Em producao o deploy.yml passa zoom vazio e a action web-export-deploy usa o ZOOM do sample ao gerar o env.local.js.",
-    "checks": "somente config; nao validado visualmente; vale apos novo deploy de producao"
+    "scope": "Task 1496: global Manager theme isolation, inspector, shared module-color flag, category/route catalog and previews, sidebar route backgrounds, four Home indicator appearances and independent Results. Existing schema and permissions preserved. No product database writes. 1.10.185 (#1495): cards de categoria da home em modo icones: tiles distribuidos pela largura (margens 20/20, espaco minimo 8 entre colunas, linhas nas mesmas colunas) e 14px acima do titulo (+1 borda), modos icone e lista.",
+    "checks": "156 theme tests + 49 Home/navigation tests passed on exact dev ca73afa3; 2 node menu translation checks passed. Versioned task source 9cdfad56. RC2 reconciles historical staging ancestry with identical reviewed product tree, enabling protected PR promotion; no staging-only product changes were dropped (diff against master consists only of version/config/workflow metadata already superseded in master).; moduleTileLayout/ModuleTileGrid tests + contrato (jest); geometria conferida em chromium (margem esq/dir 20, titulo a 15px); sem validacao no app",
+    "devCommit": "ca73afa3359e57c4052d784165fe7c5d99670b82",
+    "taskSource": "9cdfad56"
   }
 }

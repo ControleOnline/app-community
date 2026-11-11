@@ -1,5 +1,6 @@
 import contract from './themeContract.generated';
 import {parseScreenThemeKey} from './screenThemeKeys';
+import {homeMetricFieldLabel} from './homeMetricAppearance';
 const names=new Set(contract.names);
 export const themeColorKey = (token,mode) => `${token}-${mode}`;
 export const tokenFromKey = key => parseScreenThemeKey(key)?.token || key.replace(/-(light|dark)$/,'');
@@ -24,6 +25,28 @@ export const themeFieldLabel = (token,translate=value=>value) => {
   const variant=token.includes('Secondary')?'Secundário':token.startsWith('button')?'Primário':'';
   return variant ? `${token} · ${translate(variant)}` : token;
 };
+const displayLabels = {
+  textMuted: 'Texto de apoio — padrão global',
+  textPrimary: 'Texto principal — padrão global',
+  textSecondary: 'Texto secundário — padrão global',
+  cardBackground: 'Fundo dos cards', cardBorder: 'Borda dos cards', cardText: 'Texto dos cards',
+  cardIconBackground: 'Fundo dos ícones dos cards', cardIconColor: 'Cor dos ícones dos cards',
+  indicatorCardBackground: 'Indicadores — fundo', indicatorCardBorder: 'Indicadores — borda',
+  indicatorCardText: 'Indicadores — valor principal',
+  indicatorCardSecondaryText: 'Indicadores — título e período',
+  indicatorCardMutedText: 'Indicadores — descrição e mensagens',
+  indicatorCardIconBackground: 'Indicadores — fundo do ícone', indicatorCardIconColor: 'Indicadores — cor do ícone',
+  headerBackground: 'Cabeçalho — fundo', headerBorder: 'Cabeçalho — borda',
+  headerText: 'Cabeçalho — texto', headerIcon: 'Cabeçalho — ícones',
+  navigationBackground: 'Menu lateral — fundo', navigationBorder: 'Menu lateral — borda',
+  navigationText: 'Menu lateral — texto dos itens', navigationIcon: 'Menu lateral — ícones dos itens',
+  navigationActiveBackground: 'Menu lateral — fundo do item ativo',
+  navigationActiveText: 'Menu lateral — texto do item ativo', navigationActiveIcon: 'Menu lateral — ícone do item ativo',
+  moduleListIcon: 'Módulos em lista — cor dos ícones',
+  moduleListText: 'Módulos em lista — cor do texto',
+};
+export const themeFieldDisplayName = (token, translate=value=>value) =>
+  translate(displayLabels[token] || homeMetricFieldLabel(token) || contract.variants?.[token]?.usage || token);
 export const validThemeValue = (token,value) => {
   if(value==='')return true;
   if(token==='buttonDisabledOpacity')return /^(0(\.\d+)?|1(\.0+)?)$/.test(String(value));

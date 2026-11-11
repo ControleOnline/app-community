@@ -4,6 +4,7 @@ import {env} from '@env';
 import {scopeFor,sessionVersion} from '../../session/sessionScope';
 import {registerActiveTheme,refreshDomainTheme} from '../../styles/themeRuntime';
 import {stripScreenThemeKeys} from '../../styles/stripScreenThemeKeys';
+import {initializeGlobalChromeColors} from '../../styles/globalChromeTheme';
 
 const idOf = value => String(value?.id || value?.['@id'] || value || '').split('/').pop();
 let pending = null;
@@ -46,7 +47,7 @@ export async function loadDomainTheme(binding) {
     }
     registerActiveTheme(id, scopeFor(env));
     // Never surface per-screen overrides to the editor or runtime consumers.
-    const colors = stripScreenThemeKeys(theme.colors || {});
+    const colors = initializeGlobalChromeColors(stripScreenThemeKeys(theme.colors || {}));
     return {...theme, id: theme.id || id, colors};
   }).finally(() => {
     if (pending === request) pending = null;
@@ -58,13 +59,13 @@ export async function saveThemeChanges(theme,changes,context) {
   if(context!==editorContext())throw new Error('A sessão ou o domínio mudou. Abra o editor novamente.');
   const latest=await api.fetch(`themes/${idOf(theme)}`);
   if(context!==editorContext())throw new Error('A sessão ou o domínio mudou. Abra o editor novamente.');
-  const latestColors = stripScreenThemeKeys(latest.colors || {});
-  const themeColors = stripScreenThemeKeys(theme.colors || {});
+  const latestColors = initializeGlobalChromeColors(stripScreenThemeKeys(latest.colors || {}));
+  const themeColors = initializeGlobalChromeColors(stripScreenThemeKeys(theme.colors || {}));
   for(const key of Object.keys(changes)) {
     if((latestColors[key] ?? '')!==(themeColors[key] ?? ''))throw new Error(`A cor ${key} foi alterada. Reabra o editor para atualizar.`);
   }
-  // Persist only global tokens; drop any legacy screen_* keys from the stored JSON.
-  const body={theme:latest.theme,colors:stripScreenThemeKeys({...latestColors,...changes})};
+  // Preserve stored keys outside this edit, including legacy screen overrides.
+  const body={theme:latest.theme,colors:{...latest.colors,...latestColors,...stripScreenThemeKeys(changes)}};
   for(const field of ['background','logo','icon','pin']) {
     if(Object.hasOwn(latest,field))body[field]=latest[field] && typeof latest[field]==='object'?Number(idOf(latest[field])):latest[field];
   }
@@ -84,6 +85,9 @@ export async function saveThemeLayoutFlags(flags = {}) {
   }
   if (Object.hasOwn(flags, 'showModulesAsIcons')) {
     changes.homeModulesLayout = flags.showModulesAsIcons ? 'buttons' : 'list';
+  }
+  if (Object.hasOwn(flags, 'useModuleColors')) {
+    changes.useModuleColors = flags.useModuleColors ? 'true' : 'false';
   }
   if (!Object.keys(changes).length) return theme;
   return saveThemeChanges(theme, changes, context);

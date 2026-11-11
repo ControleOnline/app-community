@@ -1,10 +1,11 @@
+import {homeMetricColors, homeResultsColors} from '../../styles/homeMetricAppearance';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {resolveModuleAccent} from './moduleAccent';
+import {resolveModuleAccent, moduleAccentSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -12,6 +13,7 @@ import ManagerOrdersTrend from './ManagerOrdersTrend';
 import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
 import {CONTROL_HEIGHT} from './controlHeight';
+import ModuleTileGrid from './ModuleTileGrid';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
 import {readCollection} from '../../experience/collections';
@@ -148,13 +150,14 @@ export default function ManagerOverview({navigation}) {
   const quick = ['PdvPage', 'DevicesIndex', 'ProductShowcasesPage', 'Inventory', 'FinancialHubPage', 'ConfiguratorPage', 'Integrations', 'MyCompaniesPage']
     .map(find).filter(Boolean);
   const columns = width > 1450 ? 4 : 2;
-  const icon = (name, color = c.cardIconColor, size = 19) => <HomeIcon name={name || 'grid'} size={size} color={color} />;
+  const icon = (name, color = c.cardIconColor, size = 19, source) => <HomeIcon dataSet={source ? {coThemeSource: source} : undefined} name={name || 'grid'} size={size} color={color} />;
   const go = item => {experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params);};
   const button = (item, primary = false) => item && <Pressable accessibilityRole="button" onPress={() => go(item)}
     style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, borderColor: primary ? c.buttonBorder : c.buttonBorderSecondary}]}>
     {icon(primary ? 'arrow-right' : item.icon, primary ? c.buttonIcon : c.buttonIconSecondary, 16)}
     <Text style={{color: primary ? c.buttonText : c.buttonTextSecondary, fontSize: 12, fontWeight: '600'}}>{item.title}</Text>
   </Pressable>;
+  const resultsColors = homeResultsColors(c);
   const cards = [
     [
       [t?.('configs', 'metric', 'closed_sales'), selectedPeriod.suffix].filter(Boolean).join(' '),
@@ -246,18 +249,20 @@ export default function ManagerOverview({navigation}) {
         </Pressable>
       </View>
     </View>
-    <View style={s.metrics}>{cards.map(([label, value, help, glyph, scope, error, allowed, money, destination, id]) => <View key={id} testID={`manager-metric-${id}`}
+    <View style={s.metrics}>{cards.map(([label, value, help, glyph, scope, error, allowed, money, destination, id]) => {
+      const metric = homeMetricColors(c, id);
+      return <View key={id} testID={`manager-metric-${id}`}
       style={[s.metricSlot, {width: `${100 / columns}%`}]}>
-      <Pressable accessibilityRole={destination ? "button" : undefined} accessibilityLabel={destination ? `Abrir ${label}` : undefined} disabled={!destination} onPress={() => go(destination)} style={[s.metric, width <= 760 && s.metricMobile, {backgroundColor: c.indicatorCardBackground, borderColor: c.indicatorCardBorder}]}>
-      <View style={s.between}><Text style={[s.label, {color: c.indicatorCardSecondaryText}]}>{label}</Text>
-        <View style={[s.puck, {backgroundColor: c.indicatorCardIconBackground}]}>{icon(glyph, c.indicatorCardIconColor)}</View></View>
-      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: c.indicatorCardText}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
-      <Text style={[s.help, {color: c.indicatorCardMutedText}]}>{help}</Text>
-      <Text style={[s.scope, {color: c.indicatorCardSecondaryText}]}>{scope}</Text>
-      <Text style={[s.help, {color: c.indicatorCardMutedText}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !allowed ? t?.('configs', 'message', 'no_access_profile') : error || (value === undefined ? t?.('configs', 'message', 'loading') : t?.('configs', 'message', 'api_data'))}</Text>
+      <Pressable dataSet={{coHomeMetric:id}} accessibilityRole={destination ? "button" : undefined} accessibilityLabel={destination ? `Abrir ${label}` : undefined} disabled={!destination} onPress={() => go(destination)} style={[s.metric, width <= 760 && s.metricMobile, {backgroundColor: metric.Background, borderColor: metric.Border}]}>
+      <View style={s.between}><Text style={[s.label, {color: metric.SecondaryText}]}>{label}</Text>
+        <View style={[s.puck, {backgroundColor: metric.IconBackground}]}>{icon(glyph, metric.IconColor)}</View></View>
+      <Text numberOfLines={2} style={[s.value, width <= 760 && {fontSize: 20}, {color: metric.Text}]}>{error || !allowed || value === null ? '—' : value === undefined ? '…' : money ? Formatter.formatMoney(value) : Number(value).toLocaleString('pt-BR')}</Text>
+      <Text style={[s.help, {color: metric.MutedText}]}>{help}</Text>
+      <Text style={[s.scope, {color: metric.SecondaryText}]}>{scope}</Text>
+      <Text style={[s.help, {color: metric.MutedText}]}>{!companyId ? t?.('configs', 'message', 'select_company') : !allowed ? t?.('configs', 'message', 'no_access_profile') : error || (value === undefined ? t?.('configs', 'message', 'loading') : t?.('configs', 'message', 'api_data'))}</Text>
       </Pressable>
-    </View>)}</View>
-    {results && <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'button_title', 'results') || results?.title} onPress={() => go(results)} style={[s.results, {backgroundColor: c.indicatorCardBackground, borderColor: c.indicatorCardBorder}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: c.indicatorCardText}]}>{t?.('configs', 'button_title', 'results') || results?.title}</Text><Text style={[s.sub, {color: c.indicatorCardSecondaryText}]}>{t?.('configs', 'section_title', 'resultsDescription')}</Text></View>{icon('arrow-right', c.indicatorCardText)}</Pressable>}
+    </View>;})}</View>
+    {results && <Pressable accessibilityRole="button" accessibilityLabel={t?.('configs', 'button_title', 'results') || results?.title} onPress={() => go(results)} style={[s.results, {backgroundColor: resultsColors.Background, borderColor: resultsColors.Border}]}><View style={{flex: 1}}><Text style={[s.panelTitle, {color: resultsColors.Text}]}>{t?.('configs', 'button_title', 'results') || results?.title}</Text><Text style={[s.sub, {color: resultsColors.SecondaryText}]}>{t?.('configs', 'section_title', 'resultsDescription')}</Text></View>{icon('arrow-right', resultsColors.Text)}</Pressable>}
     <View style={[s.panels, width <= 1060 && {flexDirection: 'column'}]}>
       <View testID="manager-orders-movement" style={[s.panel, width <= 1060 && s.stackedPanel, {backgroundColor: c.panelBackground, borderColor: c.panelBorder}]}>
         <Text style={[s.panelTitle, {color: c.cardText}]}>Movimento de pedidos</Text>
@@ -288,37 +293,43 @@ export default function ManagerOverview({navigation}) {
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
-        // Category card follows the Categories color; each button follows its own route color (#1450).
+        // Category card follows the Categories color; each button follows its own route color (issue 1450).
         const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
+          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons ? s.moduleGrid : s.moduleList}>
-            {group.items.map((item, j) => {
+          <Text dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}} style={[s.panelTitle, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.cardText}]}>{group.title}</Text>
+          {(() => {
+            const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-              // Database colors are used as-is: no opacity applied (#1453).
+              const appearance = moduleListAppearance({accent, colors: c, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
+              // Database colors are used as-is: no opacity applied (issue 1453).
               const accentBackground = accent;
               return <Pressable key={item.id || j} accessibilityRole="button"
+              dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
               accessibilityLabel={item.title} onPress={() => go(item)}
-              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
+              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
                 borderColor: c.listItemBorder,
                 backgroundColor: hovered || pressed
                   ? accent ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
               }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
-                  {icon(item.icon, c.listItemIcon, 22)}
+                <View style={[s.moduleTileIcon, {backgroundColor: (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
+                  {icon(item.icon, (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
                 </View>
-                <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
+                <Text style={[s.moduleTileLabel, {color: (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
               </> : <>
-                {icon(item.icon, c.textMuted, 16)}
-                <Text style={{color: c.cardText, fontSize: 12, flex: 1}}>{item.title}</Text>
-                {icon('chevron-right', c.textMuted, 14)}
+                {icon(item.icon, appearance.iconColor, 16, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', appearance.iconColor, 14, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
               </>}
             </Pressable>;
-            })}
-          </View>
+            };
+            return showModuleIcons
+              ? <ModuleTileGrid testID="manager-module-icon-grid" items={group.items} renderTile={renderItem} />
+              : <View style={s.moduleList}>{group.items.map((item, j) => renderItem(item, j, null))}</View>;
+          })()}
         </View>;
       })}
     </View>
@@ -350,16 +361,15 @@ const s = StyleSheet.create({
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
   quickIcon: {width:24,height:24,borderRadius:7,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 10, minHeight: CONTROL_HEIGHT, paddingHorizontal: 12, paddingVertical: 3},
-  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
+  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, paddingTop: 14, paddingHorizontal: 20, paddingBottom: 20},
   moduleCards: {alignItems: 'flex-start'},
   iconModule: {minWidth: 0, flexShrink: 1},
-  moduleGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
   moduleTile: {width: 104, maxWidth: '100%', minHeight: 96, padding: 8, gap: 6,
     alignItems: 'center', borderWidth: 1, borderRadius: 10},
   moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
   moduleListIcon: {width: 24, height: 24, borderRadius: 6, alignItems: 'center', justifyContent: 'center'},
   moduleTileLabel: {fontSize: 12, textAlign: 'center', width: '100%'},
-  // List items match the Quick access items: 32px high, 10px apart (#1463).
+  // List items match the Quick access items: 32px high, 10px apart (issue 1463).
   moduleList: {marginTop: 12, gap: 10},
   moduleItem: {flexDirection: 'row', gap: 10, alignItems: 'center', minHeight: CONTROL_HEIGHT, paddingVertical: 3, paddingHorizontal: 12, borderRadius: 10},
 });
