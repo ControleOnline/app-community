@@ -1,15 +1,17 @@
 {
-  "version": "1.10.187",
+  "version": "1.10.188",
   "rc": 1,
-  "branch": "rc/1.10.187-rc.1",
+  "branch": "rc/1.10.188-rc.1",
   "baseMaster": "084cedac3927ca96303fd78c1f808009edee07dc",
   "tasks": [
-    1496
+    1496,
+    1506
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6e618f79044b2c72ba761da8a7b748c799479d81"
+    "ControleOnline/app-community": "05b72ac06b6ba7cf790b2e24fb883e283280e618",
+    "ControleOnline/ui-login": "de87c0a3ad517c0cd76122e648f6252fb36d28ff"
   },
   "validation": {
     "devCommit": "7ac9f9a3b65d422a348f6347609c790a4416d423",
@@ -17,7 +19,7 @@
     "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
     "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
     "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
-    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only",
+    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only; jest.theme (32/33 suites; startup-presentation falha tambem sem a mudanca); ui-login contract test + checagem comportamental do fallback",
     "databaseMigrationExecuted": false,
     "databaseWrites": false,
     "deploymentMode": "frontend-compatible-with-old-api",
@@ -28,6 +30,7 @@
     "relatedSourceIntegration": {
       "ControleOnline/api-platform-common": "8b2f48bc6a4c2cad9ade85287adf77259bcadf61",
       "ControleOnline/api-community": "520fd45c11ec62f0a723204eaf9a08e982ebb454"
-    }
+    },
+    "scope": "1.10.188 (#1506): tokens de tema loginLabelCreateAccount e loginLabelForgotPassword (contrato + ui-login 1.0.120; fallback para linkText)."
   }
 }
