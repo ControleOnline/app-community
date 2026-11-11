@@ -1,19 +1,19 @@
 {
-  "version": "1.10.195",
+  "version": "1.10.196",
   "rc": 1,
-  "branch": "rc/1.10.195-rc.1",
-  "baseMaster": "110d49c4ec2f2a7860a908386500505e0fb758c2",
+  "branch": "rc/1.10.196-rc.1",
+  "baseMaster": "3bd20cc9b5d078bc8ef2d09df21efdcf22ecdbae",
   "tasks": [
-    1515
+    1523
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "659d2d77d4474c4de1ba3add2aef695e6a274cc6",
+    "ControleOnline/app-community": "5e3e078cdc84dc217d5310372cc4d9601f51900b",
     "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
   },
   "validation": {
-    "scope": "Token de tema loginLabelWellcome (contrato + ui-login 1.0.121) para o texto 'Entre com suas credenciais para acessar', com fallback para textSecondary.",
-    "checks": "jest.theme contract + login-fields; ui-login contract tests e checagem comportamental do fallback; Security aceito; RC 1.10.194-rc.1 em staging"
+    "scope": "Workflows _v2 (PDV Cielo APK e Shop AAB) com upload FTP extras via lftp put, sem apagar arquivos nem diretorio da versao; apenas workflow_dispatch.",
+    "checks": "YAML validado; PR para dev com source-policy e baseline-checks ok"
   }
 }
