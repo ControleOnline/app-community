@@ -1,18 +1,18 @@
 {
-  "version": "1.10.183",
+  "version": "1.10.186",
   "rc": 1,
-  "branch": "rc/1.10.183-rc.1",
-  "baseMaster": "a3333490ef56f9ca3c3f6bb271cb14ceecdacfea",
+  "branch": "rc/1.10.186-rc.1",
+  "baseMaster": "54df612b1553f2b47ef2cc68db7d0d6d41cfe728",
   "tasks": [
-    1493
+    1495
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "38ecb816657cedb0b3a086eb024122df14459802"
+    "ControleOnline/app-community": "eb0158c159b4213df2710fd56383cd4c50985d2c"
   },
   "validation": {
-    "scope": "config/env.local.sample: ZOOM 70 -> 80. Em producao o deploy.yml passa zoom vazio e a action web-export-deploy usa o ZOOM do sample ao gerar o env.local.js.",
-    "checks": "somente config; nao validado visualmente; vale apos novo deploy de producao"
+    "scope": "Home Explore Modules (modo icones): tiles distribuidos pela largura do card (margens 20/20, espaco minimo 8 entre colunas, linhas nas mesmas colunas) e 14px acima do titulo (+1 borda), modos icone e lista.",
+    "checks": "jest (moduleTileLayout, ModuleTileGrid, contrato); geometria conferida em chromium; Security aceito; RC 1.10.185-rc.1 em staging"
   }
 }
