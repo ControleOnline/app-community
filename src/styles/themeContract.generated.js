@@ -249,7 +249,8 @@ module.exports = {
         "loginInputText",
         "loginInputPlaceholderText",
         "loginLabelCreateAccount",
-        "loginLabelForgotPassword"
+        "loginLabelForgotPassword",
+        "loginLabelWellcome"
       ]
     },
     {
@@ -681,6 +682,7 @@ module.exports = {
     "loginInputPlaceholderText",
     "loginLabelCreateAccount",
     "loginLabelForgotPassword",
+    "loginLabelWellcome",
     "linkDisabledText",
     "linkHoverText",
     "linkText",

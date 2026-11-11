@@ -8,7 +8,7 @@ const {parseThemeMap}=require('../../../scripts/lib/theme-contract.cjs');
 test('the generated contract exactly matches Markdown and preserves all 26 preview groups',()=>{
   const parsed=parseThemeMap(fs.readFileSync(path.join(process.cwd(),'docs/themes/themes-map.md'),'utf8'));
   expect(contract.names).toEqual(parsed.names);expect(contract.groups).toEqual(parsed.groups);
-  expect(new Set(contract.names).size).toBe(362);
+  expect(new Set(contract.names).size).toBe(363);
   expect(contract.variants).toEqual(parsed.variants);
   expect(contract.legacyKeys).toEqual(parsed.legacyKeys);
   expect(themeEditorGroups()).toHaveLength(26);

@@ -1,20 +1,16 @@
 {
-  "version": "1.10.192",
+  "version": "1.10.194",
   "rc": 1,
-  "branch": "rc/1.10.192-rc.1",
+  "branch": "rc/1.10.194-rc.1",
   "baseMaster": "084cedac3927ca96303fd78c1f808009edee07dc",
   "tasks": [
-    1496,
-    1506,
-    1509,
-    1512
+    1515
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d5bbf7e89be53f157114464da528ac0bf5695a71",
-    "ControleOnline/ui-login": "de87c0a3ad517c0cd76122e648f6252fb36d28ff",
-    "ControleOnline/ui-common": "7b9941a2431e7669c3c22cac8dc4f6d0c6c6e682"
+    "ControleOnline/app-community": "ec6295f8a0d41215585eb6dee731c3b3c37a872e",
+    "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
   },
   "validation": {
     "devCommit": "7ac9f9a3b65d422a348f6347609c790a4416d423",
@@ -22,7 +18,7 @@
     "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
     "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
     "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
-    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only; jest.theme (32/33 suites; startup-presentation falha tambem sem a mudanca); ui-login contract test + checagem comportamental do fallback; theme-tools-fixed-header (2) + jest.theme 32/33 (startup-presentation falha tambem sem a mudanca); estrutura conferida em chromium (replica); app-type-switcher-width (2) + simulacao do manager:prepare (patch aplica em 1.2.124 e rejeita 1.2.123)",
+    "checks": "jest.theme contract + login-fields; ui-login contract tests e checagem comportamental do fallback",
     "databaseMigrationExecuted": false,
     "databaseWrites": false,
     "deploymentMode": "frontend-compatible-with-old-api",
@@ -34,6 +30,6 @@
       "ControleOnline/api-platform-common": "8b2f48bc6a4c2cad9ade85287adf77259bcadf61",
       "ControleOnline/api-community": "520fd45c11ec62f0a723204eaf9a08e982ebb454"
     },
-    "scope": "1.10.188 (#1506): tokens de tema loginLabelCreateAccount e loginLabelForgotPassword (contrato + ui-login 1.0.120; fallback para linkText). 1.10.190 (#1509): configurador flutuante de temas com busca/Claro-Escuro/salvar fixos fora do scroll, botoes de 24px, busca e botao de origens pela metade. 1.10.192 (#1512): modal Selecionar tipo de app com 480px (ui-common 1.2.124; patch overlay ui-common-object-theme e pins acompanham)."
+    "scope": "Token de tema loginLabelWellcome (contrato + ui-login 1.0.121) para o texto \"Entre com suas credenciais para acessar\", com fallback para textSecondary. Tasks 1496/1506/1509/1512 do manifesto anterior ja estao em master."
   }
 }
