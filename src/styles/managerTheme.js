@@ -83,6 +83,17 @@ export function resolveManagerThemeDetails(input={},mode='light'){
    values[token]=values[base];sources[token]=sources[base];
   }
  }
+ // Footer tokens (#1518): footerBackground keeps the previous visible color (page background) and
+ // footerLabelInfo defaults to black (dark mode reuses footerText) when the theme has no own value.
+ const empty=token=>values[token]===undefined || values[token]===null || String(values[token]).trim()==='';
+ if(empty('footerBackground')){
+  const source=['background','navigationBackground'].find(token=>!empty(token));
+  if(source){values.footerBackground=values[source];sources.footerBackground=sources[source];}
+ }
+ if(empty('footerLabelInfo')){
+  if(mode==='dark' && !empty('footerText')){values.footerLabelInfo=values.footerText;sources.footerLabelInfo=sources.footerText;}
+  else{values.footerLabelInfo='#000000';delete sources.footerLabelInfo;}
+ }
  applyHomeMetricAppearances(theme,mode,values,sources);
  return {values,sources};
 }

@@ -41,10 +41,12 @@ export function inspectThemeElement(element) {
 }
 export function attachThemeInspector(document,onHover,onSelect) {
   let touch=null,moved=false;
-  // Inspector feedback must stay independent of the palette being edited.
+  // Inspector feedback must stay independent of the palette being edited. Theme-bound elements that are
+  // click-through at runtime (for example the runtime footer, pointer-events: none) must still be hit
+  // while inspecting, otherwise the click reaches the full-screen container behind them (#1520).
   const cursorStyle=document.createElement?.('style');
   if(cursorStyle){
-    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; }';
+    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; } [data-co-theme], [data-co-theme-states], [data-co-theme-source] { pointer-events: auto !important; }';
     document.head?.appendChild?.(cursorStyle);
   }
   const tools=event=>event.target.closest?.('[data-co-theme-tools="true"]');
