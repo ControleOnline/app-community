@@ -296,3 +296,42 @@ inspetor usa variáveis da paleta do editor, sem cores hexadecimais fixas.
 Passaram 156 testes de temas e 49 testes de Home/navegação nas suítes afetadas,
 com API simulada e sem gravações reais no banco. Esse resultado substitui as
 pendências registradas na preparação anterior.
+
+### Preparação local: persistência das cores adicionais dos módulos
+
+Preparados `textColor`/`iconColor` de categorias e `textColor`/`iconColor`/
+`iconBackgroundColor` de rotas. A fonte backend e a migração ficam no checkout
+local de api-platform-common. A API instalada não foi substituída e a migração
+não foi executada; não há atualização de pins nem publicação. Os commits
+desta preparação são apenas locais.
+
+O catálogo reconhece suporte pela presença explícita das propriedades na resposta,
+inclusive com null. Com API antiga, os campos continuam sendo prévias identificadas
+e não entram no PATCH. Com API atualizada, ADMIN/ROLE_SUPER pode salvá-los, limpar
+um campo com null e reler o valor no catálogo. PATCH continua limitado à aparência;
+nenhum vínculo, ordem, perfil ou estado é enviado junto.
+
+A Home em lista/grade, o menu lateral e as prévias aplicam as propriedades enquanto
+a chave está ligada. Desligada, voltam às cores próprias do tema. Campo vazio usa
+o papel existente do tema; nenhuma cor de rota/categoria é copiada para theme.colors.
+Fundo do ícone da rota só é usado na grade. Cor do ícone da categoria não introduz
+ícones em áreas que não os têm; funciona nas representações existentes, como a
+prévia da categoria. O inspetor identifica a origem das novas propriedades.
+
+Verificação local: 164 testes de temas e 52 de Home/navegação passaram, com API
+simulada. Corrigida a contagem do teste de grade para contar os Views renderizados,
+sem duplicar componente composto + View após a mudança anterior da task 1495.
+
+Esta preparação pertence à mesma issue app-community #1496. As branches locais
+nos três checkouts envolvidos se chamam `task-1496`. No app, a branch atual parte
+do staging 89cb0a17, preservando também a entrega 1495 do time. A referência local
+anterior da task integrada em dev foi preservada em `task-1496-integrated-dev`
+(e6077aef); a branch remota task-1496 não foi alterada. Antes de publicar nova
+entrega, conciliar esse histórico por merge revisado, sem force-push. Os commits desta preparação são somente locais, autorizados pelo solicitante;
+nenhuma nova integração em dev/staging ou publicação foi realizada nesta etapa. A issue voltou a Working; os aceites anteriores não
+validam automaticamente as novas colunas/propriedades.
+
+Referências locais relacionadas: pacote comum `504a5437465c7eacb809ce27812781862467bef4`
+(código, migração e testes); API `8afdb515fb470ab7a240edaaded8ecfe14217749`
+(documentação de ativação, sem mudança de dependências). Não foram publicados
+esses commits nem realizadas novas integrações em dev/staging nesta etapa.

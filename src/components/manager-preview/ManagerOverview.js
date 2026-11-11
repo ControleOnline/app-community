@@ -5,7 +5,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {resolveModuleAccent, moduleAccentSource, moduleListAppearance} from './moduleAccent';
+import {resolveModuleAccent, moduleAccentSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -13,6 +13,7 @@ import ManagerOrdersTrend from './ManagerOrdersTrend';
 import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
 import {CONTROL_HEIGHT} from './controlHeight';
+import ModuleTileGrid from './ModuleTileGrid';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
 import {readCollection} from '../../experience/collections';
@@ -149,7 +150,7 @@ export default function ManagerOverview({navigation}) {
   const quick = ['PdvPage', 'DevicesIndex', 'ProductShowcasesPage', 'Inventory', 'FinancialHubPage', 'ConfiguratorPage', 'Integrations', 'MyCompaniesPage']
     .map(find).filter(Boolean);
   const columns = width > 1450 ? 4 : 2;
-  const icon = (name, color = c.cardIconColor, size = 19) => <HomeIcon name={name || 'grid'} size={size} color={color} />;
+  const icon = (name, color = c.cardIconColor, size = 19, source) => <HomeIcon dataSet={source ? {coThemeSource: source} : undefined} name={name || 'grid'} size={size} color={color} />;
   const go = item => {experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params);};
   const button = (item, primary = false) => item && <Pressable accessibilityRole="button" onPress={() => go(item)}
     style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, borderColor: primary ? c.buttonBorder : c.buttonBorderSecondary}]}>
@@ -297,35 +298,38 @@ export default function ManagerOverview({navigation}) {
         return <View key={group.id || i}
           dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons ? s.moduleGrid : s.moduleList}>
-            {group.items.map((item, j) => {
+          <Text dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}} style={[s.panelTitle, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.cardText}]}>{group.title}</Text>
+          {(() => {
+            const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-              const appearance = moduleListAppearance({accent, colors: c});
+              const appearance = moduleListAppearance({accent, colors: c, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
               // Database colors are used as-is: no opacity applied (issue 1453).
               const accentBackground = accent;
               return <Pressable key={item.id || j} accessibilityRole="button"
               dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
               accessibilityLabel={item.title} onPress={() => go(item)}
-              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
+              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
                 borderColor: c.listItemBorder,
                 backgroundColor: hovered || pressed
                   ? accent ?? c.listItemActiveBackground
                   : accentBackground ?? c.listItemBackground,
               }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
-                  {icon(item.icon, c.listItemIcon, 22)}
+                <View style={[s.moduleTileIcon, {backgroundColor: (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
+                  {icon(item.icon, (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
                 </View>
-                <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
+                <Text style={[s.moduleTileLabel, {color: (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
               </> : <>
-                {icon(item.icon, appearance.iconColor, 16)}
-                <Text style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
-                {icon('chevron-right', appearance.iconColor, 14)}
+                {icon(item.icon, appearance.iconColor, 16, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', appearance.iconColor, 14, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
               </>}
             </Pressable>;
-            })}
-          </View>
+            };
+            return showModuleIcons
+              ? <ModuleTileGrid testID="manager-module-icon-grid" items={group.items} renderTile={renderItem} />
+              : <View style={s.moduleList}>{group.items.map((item, j) => renderItem(item, j, null))}</View>;
+          })()}
         </View>;
       })}
     </View>
@@ -357,10 +361,9 @@ const s = StyleSheet.create({
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
   quickIcon: {width:24,height:24,borderRadius:7,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 10, minHeight: CONTROL_HEIGHT, paddingHorizontal: 12, paddingVertical: 3},
-  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
+  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, paddingTop: 14, paddingHorizontal: 20, paddingBottom: 20},
   moduleCards: {alignItems: 'flex-start'},
   iconModule: {minWidth: 0, flexShrink: 1},
-  moduleGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
   moduleTile: {width: 104, maxWidth: '100%', minHeight: 96, padding: 8, gap: 6,
     alignItems: 'center', borderWidth: 1, borderRadius: 10},
   moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
