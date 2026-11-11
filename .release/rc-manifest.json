@@ -1,35 +1,19 @@
 {
-  "version": "1.10.194",
+  "version": "1.10.196",
   "rc": 1,
-  "branch": "rc/1.10.194-rc.1",
-  "baseMaster": "084cedac3927ca96303fd78c1f808009edee07dc",
+  "branch": "rc/1.10.196-rc.1",
+  "baseMaster": "3bd20cc9b5d078bc8ef2d09df21efdcf22ecdbae",
   "tasks": [
-    1515
+    1523
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "ec6295f8a0d41215585eb6dee731c3b3c37a872e",
+    "ControleOnline/app-community": "5e3e078cdc84dc217d5310372cc4d9601f51900b",
     "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
   },
   "validation": {
-    "devCommit": "7ac9f9a3b65d422a348f6347609c790a4416d423",
-    "taskSource": "b867a5a990aaf617fb8b4dadd85cc1a234a546ed",
-    "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
-    "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
-    "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
-    "checks": "jest.theme contract + login-fields; ui-login contract tests e checagem comportamental do fallback",
-    "databaseMigrationExecuted": false,
-    "databaseWrites": false,
-    "deploymentMode": "frontend-compatible-with-old-api",
-    "apiCommonRuntimePin": "1.0.9",
-    "runtimeActivationRequiresSeparateAuthorization": true,
-    "supersedes": "rc/1.10.185-rc.2 (unmerged; master advanced during interruption)",
-    "teamReleasePreserved": "084cedac3927ca96303fd78c1f808009edee07dc",
-    "relatedSourceIntegration": {
-      "ControleOnline/api-platform-common": "8b2f48bc6a4c2cad9ade85287adf77259bcadf61",
-      "ControleOnline/api-community": "520fd45c11ec62f0a723204eaf9a08e982ebb454"
-    },
-    "scope": "Token de tema loginLabelWellcome (contrato + ui-login 1.0.121) para o texto \"Entre com suas credenciais para acessar\", com fallback para textSecondary. Tasks 1496/1506/1509/1512 do manifesto anterior ja estao em master."
+    "scope": "Workflows _v2 (PDV Cielo APK e Shop AAB) com upload FTP extras via lftp put, sem apagar arquivos nem diretorio da versao; apenas workflow_dispatch.",
+    "checks": "YAML validado; PR para dev com source-policy e baseline-checks ok"
   }
 }
