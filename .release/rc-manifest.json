@@ -1,19 +1,19 @@
 {
-  "version": "1.10.193",
+  "version": "1.10.195",
   "rc": 1,
-  "branch": "rc/1.10.193-rc.1",
-  "baseMaster": "8c9f03987bcb8f8f44aa30db472d66b4efedd14a",
+  "branch": "rc/1.10.195-rc.1",
+  "baseMaster": "110d49c4ec2f2a7860a908386500505e0fb758c2",
   "tasks": [
-    1512
+    1515
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d598f142fe2d2df23e9432ecf1c6ff1df6b2d953",
-    "ControleOnline/ui-common": "7b9941a2431e7669c3c22cac8dc4f6d0c6c6e682"
+    "ControleOnline/app-community": "659d2d77d4474c4de1ba3add2aef695e6a274cc6",
+    "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
   },
   "validation": {
-    "scope": "Modal 'Selecionar tipo de app' com 480px de largura (ui-common 1.2.124); patch overlay ui-common-object-theme (before/after) e pins de ui-common acompanham 1.2.124.",
-    "checks": "app-type-switcher-width (2) + simulacao do manager:prepare (aplica em 1.2.124, rejeita 1.2.123); Security aceito; RC 1.10.192-rc.1 em staging"
+    "scope": "Token de tema loginLabelWellcome (contrato + ui-login 1.0.121) para o texto 'Entre com suas credenciais para acessar', com fallback para textSecondary.",
+    "checks": "jest.theme contract + login-fields; ui-login contract tests e checagem comportamental do fallback; Security aceito; RC 1.10.194-rc.1 em staging"
   }
 }
