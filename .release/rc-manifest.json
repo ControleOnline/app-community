@@ -1,20 +1,19 @@
 {
-  "version": "1.10.185",
-  "rc": 2,
-  "branch": "rc/1.10.185-rc.2",
-  "baseMaster": "54df612b1553f2b47ef2cc68db7d0d6d41cfe728",
+  "version": "1.10.187",
+  "rc": 1,
+  "branch": "rc/1.10.187-rc.1",
+  "baseMaster": "084cedac3927ca96303fd78c1f808009edee07dc",
   "tasks": [
-    1495,
     1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b002a395a798b434bbdc1d1ab3b58182958edd75"
+    "ControleOnline/app-community": "6e618f79044b2c72ba761da8a7b748c799479d81"
   },
   "validation": {
-    "devCommit": "8e6571fddfd6ae4fca168fdc5ddc616b35a6662a",
-    "taskSource": "8ffd14bf4f6585eab6d662971115b57cff4d973b",
+    "devCommit": "7ac9f9a3b65d422a348f6347609c790a4416d423",
+    "taskSource": "b867a5a990aaf617fb8b4dadd85cc1a234a546ed",
     "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
     "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
     "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
@@ -23,6 +22,12 @@
     "databaseWrites": false,
     "deploymentMode": "frontend-compatible-with-old-api",
     "apiCommonRuntimePin": "1.0.9",
-    "runtimeActivationRequiresSeparateAuthorization": true
+    "runtimeActivationRequiresSeparateAuthorization": true,
+    "supersedes": "rc/1.10.185-rc.2 (unmerged; master advanced during interruption)",
+    "teamReleasePreserved": "084cedac3927ca96303fd78c1f808009edee07dc",
+    "relatedSourceIntegration": {
+      "ControleOnline/api-platform-common": "8b2f48bc6a4c2cad9ade85287adf77259bcadf61",
+      "ControleOnline/api-community": "520fd45c11ec62f0a723204eaf9a08e982ebb454"
+    }
   }
 }
