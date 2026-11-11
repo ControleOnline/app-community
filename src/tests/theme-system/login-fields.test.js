@@ -25,5 +25,5 @@ test('retains the shared field colors on domains without a login palette', () =>
 });
 
 test('the sign-in link labels have their own theme tokens (#1506)', () => {
-  expect(contract.names).toEqual(expect.arrayContaining(['loginLabelCreateAccount', 'loginLabelForgotPassword']));
+  expect(contract.names).toEqual(expect.arrayContaining(['loginLabelCreateAccount', 'loginLabelForgotPassword', 'loginLabelWellcome']));
 });
