@@ -16,7 +16,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
-import {moduleListAppearance, resolveModuleAccent, moduleAccentSource} from './moduleAccent';
+import {moduleListAppearance, resolveModuleAccent, moduleAccentSource, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -118,12 +118,12 @@ export default function ManagerShell({navigation, route, options, children}) {
       : item.params;
     navigation.navigate(item.name, params);
   };
-  const icon = (value, size = 18, color = c.navigationIcon) => <HomeIcon name={value || 'grid'} size={size} color={color} />;
+  const icon = (value, size = 18, color = c.navigationIcon, source) => <HomeIcon dataSet={source ? {coThemeSource: source} : undefined} name={value || 'grid'} size={size} color={color} />;
   const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     const accent = moduleAccent?.value
       ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-    const appearance = moduleListAppearance({accent, colors: c, sidebar: true, active});
+    const appearance = moduleListAppearance({accent, colors: c, sidebar: true, active, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
       dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
@@ -132,12 +132,12 @@ export default function ManagerShell({navigation, route, options, children}) {
       onPress={() => go(item)} style={({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
         return [s.navItem, {
-          backgroundColor: moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted}).backgroundColor,
+          backgroundColor: moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette}).backgroundColor,
           borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground,
         }, iconsOnly && s.center];
       }}>
-      {icon(item.icon, 18, appearance.iconColor)}
-      {!iconsOnly && <Text numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
+      {icon(item.icon, 18, appearance.iconColor, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+      {!iconsOnly && <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
     </Pressable>;
   };
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
@@ -159,7 +159,7 @@ export default function ManagerShell({navigation, route, options, children}) {
       {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
       {groups.map((group, i) => <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>{group.title}</Text>}
+        {!compact && <Text style={[s.caption, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.navigationCaptionText}]} dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
       </View>)}
       {!groups.length && !compact && <Text style={[s.navText, {color: c.navigationCaptionText}]}>Aguardando os menus disponíveis para seu perfil.</Text>}

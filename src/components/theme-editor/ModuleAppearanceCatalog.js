@@ -7,8 +7,8 @@ import IconPicker from '@controleonline/ui-default/src/react/components/inputs/D
 import HomeIcon from '../HomeIcon';
 import NativeColorInput from './NativeColorInput';
 import ModuleAppearancePreview from './ModuleAppearancePreview';
-import {resolveModuleAccent} from '../manager-preview/moduleAccent';
-import {loadModuleAppearance, mergeModuleGroups, moduleAppearanceContext, refreshModuleMenus, saveModuleAppearance} from './moduleAppearanceService';
+import {resolveModuleAccent, modulePropertyColor} from '../manager-preview/moduleAccent';
+import {loadModuleAppearance, mergeModuleGroups, moduleAppearanceContext, refreshModuleMenus, saveModuleAppearance, persistedAppearanceFields} from './moduleAppearanceService';
 import {themeEditorText as t} from './themeToolPresentation';
 
 export default function ModuleAppearanceCatalog({menus, palette, enabled, colors: c}) {
@@ -49,14 +49,14 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
       committed = true;
       if (context !== moduleAppearanceContext()) return;
       setCatalog({context, groups: await loadModuleAppearance(context)});
-      // Temporary properties have no database columns and are never sent to the API.
+      // Fields unsupported by the current API remain local previews and are never sent.
       setDrafts(previous => {
         const next = {...previous};
-        const temporary = Object.fromEntries(Object.entries(next[keyOf(kind, item)] || {}).filter(([field]) => !['color', 'icon'].includes(field)));
+        const temporary = Object.fromEntries(Object.entries(next[keyOf(kind, item)] || {}).filter(([field]) => !persistedAppearanceFields(item, kind).includes(field)));
         next[keyOf(kind, item)] = temporary;
         return next;
       });
-      setNotice(t('Cor e ícone salvos no cadastro. Campos de prévia não foram gravados.'));
+      setNotice(t('Propriedades de aparência salvas no cadastro. Campos de prévia não foram gravados.'));
       const companyId = people.getters.currentCompany?.id;
       try {await refreshModuleMenus(companyId, theme.actions, context, () => people.getters.currentCompany?.id === companyId);}
       catch {if (context === moduleAppearanceContext()) setNotice(t('Cadastro salvo. Recarregue a página para atualizar os menus.'));}
@@ -73,9 +73,9 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
     color: c.inputText, backgroundColor: c.inputBackground, flexGrow: 1};
   const colorField = (kind, item, field, label, temporary = false) => {
     const value = draftOf(kind, item)[field] || '';
-    const resolved = resolveModuleAccent(value, palette);
+    const resolved = ['textColor', 'iconColor', 'iconBackgroundColor'].includes(field) ? modulePropertyColor(value, palette) : resolveModuleAccent(value, palette);
     return <View key={field} style={{gap: 4}}>
-      <Text style={{color: c.modalText}}>{label}{temporary ? ` · ${t('somente prévia — sem coluna no banco')}` : ''}</Text>
+      <Text style={{color: c.modalText}}>{label}{temporary ? ` · ${t('somente prévia')}` : ''}</Text>
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
         <View style={{width: 20, height: 20, backgroundColor: resolved, borderColor: c.modalBorder, borderWidth: 1}} />
         <TextInput accessibilityLabel={label} value={value} editable={temporary ? !saving : editable} style={input}
@@ -84,12 +84,13 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
         <NativeColorInput value={resolved} label={label} disabled={temporary ? saving : !editable}
           onColor={next => edit(kind, item, field, next)} />
       </View>
+      {temporary && !Object.hasOwn(item, field) && <Text style={{color: c.textSecondary, fontSize: 12}}>{t('A gravação deste campo depende da atualização da API e do banco.')}</Text>}
       {!!value && <Text style={{color: c.textSecondary, fontSize: 12}}>{value}{value !== resolved ? ` → ${resolved || t('Cor inválida ou referência sem valor')}` : ''}</Text>}
     </View>;
   };
   const fields = (kind, item) => {
     const draft = draftOf(kind, item);
-    const dirty = ['color', 'icon'].some(field => String(draft[field] || '').trim() !== String(item[field] || '').trim());
+    const dirty = persistedAppearanceFields(item, kind).some(field => String(draft[field] || '').trim() !== String(item[field] || '').trim());
     const prefix = kind === 'category' ? t('Categoria') : t('Rota');
     return <View style={{gap: 10, padding: 12, borderWidth: 1, borderRadius: 8, borderColor: c.modalBorder}}>
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
@@ -106,12 +107,12 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
         onPress={() => setAdditionalFields(previous => ({...previous, [keyOf(kind, item)]: !previous[keyOf(kind, item)]}))}
         style={{flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44}}>
         <HomeIcon name={additionalFields[keyOf(kind, item)] ? 'chevron-down' : 'chevron-right'} size={16} color={c.menuIcon} />
-        <Text style={{color: c.modalText}}>{t('Cores adicionais — somente prévia')}</Text>
+        <Text style={{color: c.modalText}}>{t('Cores adicionais')}</Text>
       </Pressable>
       {!!additionalFields[keyOf(kind, item)] && <View style={{gap: 10}}>
-        {colorField(kind, item, 'textColor', `${prefix} — ${t('cor do texto')}`, true)}
-        {colorField(kind, item, 'iconColor', `${prefix} — ${t('cor do ícone')}`, true)}
-        {kind === 'route' && colorField(kind, item, 'iconBackgroundColor', `${prefix} — ${t('fundo do ícone na grade')}`, true)}
+        {colorField(kind, item, 'textColor', `${prefix} — ${t('cor do texto')}`, !Object.hasOwn(item, 'textColor') || !canManage)}
+        {colorField(kind, item, 'iconColor', `${prefix} — ${t('cor do ícone')}`, !Object.hasOwn(item, 'iconColor') || !canManage)}
+        {kind === 'route' && colorField(kind, item, 'iconBackgroundColor', `${prefix} — ${t('fundo do ícone na grade')}`, !Object.hasOwn(item, 'iconBackgroundColor') || !canManage)}
       </View>}
       <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8}}>
         {canManage && button(`${t('Salvar cadastro')}: ${nameOf(item)}`, () => save(kind, item), !editable || !dirty)}

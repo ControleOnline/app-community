@@ -32,8 +32,9 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
   useManagerPreview: () => ({bottomBar: mockBottomBar, sidebar: mockSidebar, moduleAccent: mockModuleAccent, moduleAccentPalette: {primary: '#147568'}, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
 }));
 let mockExtraMenus = [];
+let mockRouteAppearance={},mockCategoryAppearance={};
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'theme'
-  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', color:'#0284c7', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
+  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', ...mockCategoryAppearance, menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', color:'#0284c7', ...mockRouteAppearance, menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
   : {user: {name: 'Usuário local'}}, actions: {logOut: mockLogout}})}));
 const navigation = {navigate: mockGo, getState: () => ({routeNames: ['HomePage', 'DevicesIndex', 'ProfilePage']})};
 const view = (route, params) => <ManagerShell navigation={navigation} route={{name: route || 'HomePage', params}}><content /></ManagerShell>;
@@ -42,7 +43,7 @@ const labeled = (tree, label) => tree.root.findAllByType('Pressable').filter(x =
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
-  mockExtraMenus = [];
+  mockExtraMenus = [];mockRouteAppearance={};mockCategoryAppearance={};
   mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true;
   global.t={t:(_section,_type,key)=>({my_profile:'Meu perfil',manager_help:'Ajuda do On Manager',use_dark_theme:'Usar tema escuro',logout:'Sair da conta'}[key])}; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
@@ -286,4 +287,19 @@ it('uses route colors and list foregrounds before and after navigation, restorin
   expect(devices.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   expect(devices.props.style({})[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
   act(() => tree.unmount());
+});
+
+it('applies route foregrounds and category caption color without changing glyphs or themed disabled behavior',()=>{
+ mockModuleAccent={value:true};mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary'};mockCategoryAppearance={textColor:'#ffff00'};
+ let tree;act(()=>{tree=renderer.create(view());});
+ const device=()=>labeled(tree,'Dispositivos')[0];
+ expect(device().findByType('Icon').props).toMatchObject({name:'monitor',color:'#147568'});
+ expect(JSON.parse(device().findByType('Icon').props.dataSet.coThemeSource)[0].source).toBe('routes.icon_color');
+ expect(device().findByType('Text').props.style.at(-1).color).toBe('#ffffff');
+ const caption=tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
+ expect(caption.props.style.at(-1).color).toBe('#ffff00');
+ mockModuleAccent={value:false};act(()=>tree.update(view()));
+ expect(device().findByType('Icon').props.color).toBe(mockColors.navigationIcon);
+ expect(device().findByType('Text').props.style.at(-1).color).toBe(mockColors.navigationText);
+ act(()=>tree.unmount());
 });

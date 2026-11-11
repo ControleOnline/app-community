@@ -49,3 +49,31 @@ test('previews use the route rather than category for sidebar items and restore 
   expect(mainText('list')).toBe(colors.cardText);
   await act(async()=>tree.unmount());
 });
+
+test('registered foregrounds override each surface independently only while the switch is enabled', () => {
+  const record={textColor:'#ffffff',iconColor:'$primary'};
+  for(const sidebar of [false,true]) {
+    expect(moduleListAppearance({colors,sidebar,record,enabled:true,palette:{primary:'#ffff00'}})).toMatchObject({textColor:'#ffffff',iconColor:'#ffff00'});
+    expect(moduleListAppearance({accent:undefined,colors,sidebar,record,enabled:false})).toEqual(moduleListAppearance({colors,sidebar}));
+    expect(moduleListAppearance({accent:'#0284c7',colors,sidebar,record:{textColor:null,iconColor:null},enabled:true})).toMatchObject({textColor:colors.moduleListText,iconColor:colors.moduleListIcon});
+  }
+});
+
+test('category icon color is visible in category-only previews, without borrowing route properties', async () => {
+  let tree;await act(async()=>{tree=renderer.create(<ModuleAppearancePreview enabled palette={colors} category={{label:'Commercial',color:'#020202',textColor:'#ffffff',iconColor:'#ffff00',icon:'grid'}} route={null}/>);});
+  expect(tree.root.findByProps({testID:'module-preview-item-grid'}).findByType('Icon').props.color).toBe('#ffff00');
+  expect(tree.root.findByProps({testID:'module-preview-item-grid'}).findByType('Text').props.style.color).toBe('#ffffff');
+  await act(async()=>tree.unmount());
+});
+
+test('grid preview applies transparent icon background and all route foregrounds, then restores theme colors', async () => {
+  const props={palette:{...colors,iconBackground:'#eeeeee',listItemIcon:'#123456',listItemText:'#234567'},category:{label:'Commercial'},route:{label:'Clients',textColor:'#ffffff',iconColor:'#ffff00',iconBackgroundColor:'transparent'}};
+  let tree;await act(async()=>{tree=renderer.create(<ModuleAppearancePreview {...props} enabled/>);});
+  const grid=()=>tree.root.findByProps({testID:'module-preview-item-grid'});
+  expect(grid().findByType('Icon').props.color).toBe('#ffff00');
+  expect(grid().findByType('Icon').parent.props.style.backgroundColor).toBe('transparent');
+  await act(async()=>tree.update(<ModuleAppearancePreview {...props} enabled={false}/>));
+  expect(grid().findByType('Icon').props.color).toBe('#123456');
+  expect(grid().findByType('Icon').parent.props.style.backgroundColor).toBe('#eeeeee');
+  await act(async()=>tree.unmount());
+});

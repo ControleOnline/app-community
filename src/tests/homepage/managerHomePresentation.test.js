@@ -4,7 +4,7 @@ import ManagerOverview from '../../components/manager-preview/ManagerOverview';
 import {resolveManagerTheme} from '../../styles/managerTheme';
 import {initializeGlobalChromeColors} from '../../styles/globalChromeTheme';
 let mockWidth=393,mockTexts=true,mockModuleIcons=false,mockModuleAccent=false;
-let mockIndicatorColors={},mockIndicatorPalette={};
+let mockIndicatorColors={},mockIndicatorPalette={},mockRouteAppearance={},mockCategoryAppearance={};
 const mockFetch=jest.fn(async()=>({totalItems:0,summary:{sales:{totals:{revenue:0,orders:0,averageTicket:0},daily:[]}}}));
 jest.mock('react-native',()=>({processColor:require('../theme-system/nativeMock.cjs').processColor,Platform:{OS:'web'},View:'View',Text:'Text',ScrollView:'ScrollView',Pressable:'Pressable',StyleSheet:{create:x=>x},useWindowDimensions:()=>({width:mockWidth})}));
 jest.mock('@react-navigation/native',()=>({useIsFocused:()=>true}));
@@ -20,13 +20,13 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useMan
   moduleAccentPalette:{primary:'#147568',...mockIndicatorPalette},
 })}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[
-  {id:1,label:'Menu',color:'$primary',menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',color:'#0284c7',menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
+  {id:1,label:'Menu',color:'$primary',...mockCategoryAppearance,menus:[{id:1,route:'OrderHistoryPage',label:'Pedidos',color:'#0284c7',...mockRouteAppearance,menuType:'home',routeParams:{orderTypeFilter:'sale'}}]},
   {id:2,label:'Comercial',menus:[{id:2,route:'ClientsIndex',label:'Clientes',menuType:'home'}]},
 ]}:{messages:{}}})}));
 const navigation={getState:()=>({routeNames:['OrderHistoryPage','ClientsIndex']}),navigate:jest.fn()};
 const view=()=> <ManagerOverview navigation={navigation}/>;
 beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockModuleIcons=false;mockModuleAccent=false;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
-afterEach(()=>{delete global.t;mockIndicatorColors={};mockIndicatorPalette={};});
+afterEach(()=>{delete global.t;mockIndicatorColors={};mockIndicatorPalette={};mockRouteAppearance={};mockCategoryAppearance={};});
 it('renders independent Home indicator appearances while preserving original glyphs and stable identities',async()=>{
  const raw=initializeGlobalChromeColors({'indicatorCardBackground-light':'#ffffff','indicatorCardBackground-dark':'#112233',
    'homeMetricPrimaryBackground-light':'#00ff00','homeMetricPrimaryBackground-dark':'#006600',
@@ -96,11 +96,11 @@ it('switches Explore Modules to icons and back with the same groups and route pa
   const shortcuts = () => modules().findAllByType('Pressable');
   const labels = shortcuts().map(node => node.props.accessibilityLabel);
   expect(labels).toHaveLength(2);
-  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(0);
+  expect(modules().findAllByType('View').filter(node=>node.props.testID==='manager-module-icon-grid')).toHaveLength(0);
 
   mockModuleIcons=true;
   await act(async () => tree.update(view()));
-  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(2);
+  expect(modules().findAllByType('View').filter(node=>node.props.testID==='manager-module-icon-grid')).toHaveLength(2);
   expect(shortcuts().map(node => node.props.accessibilityLabel)).toEqual(labels);
   expect(shortcuts()[0].findAllByType('Icon')).toHaveLength(1);
   expect(shortcuts()[0].findByType('Text').props.style[1].color).toBe('#654321');
@@ -109,7 +109,7 @@ it('switches Explore Modules to icons and back with the same groups and route pa
 
   mockModuleIcons=false;
   await act(async () => tree.update(view()));
-  expect(modules().findAllByProps({testID:'manager-module-icon-grid'})).toHaveLength(0);
+  expect(modules().findAllByType('View').filter(node=>node.props.testID==='manager-module-icon-grid')).toHaveLength(0);
   expect(shortcuts()[0].findAllByType('Icon')).toHaveLength(2);
   await act(async () => tree.unmount());
 });
@@ -143,3 +143,22 @@ it.each([[false, '#345678'], [true, '#876543']])(
     }
   },
 );
+
+it.each([false,true])('applies registered route foregrounds and category text, keeping the theme when disabled (grid %s)',async grid=>{
+ mockModuleIcons=grid;mockModuleAccent=true;
+ mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:'transparent'};
+ mockCategoryAppearance={textColor:'#ffff00'};
+ let tree;await act(async()=>{tree=renderer.create(view());});
+ const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
+ const itemTextColor=()=>{const style=first().findByType('Text').props.style;return (Array.isArray(style)?Object.assign({},...style):style).color;};
+ expect(first().findAllByType('Icon')[0].props.color).toBe('#147568');
+ expect(itemTextColor()).toBe('#ffffff');
+ const category=()=>tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
+ expect(category().props.style.at(-1).color).toBe('#ffff00');
+ if(grid)expect(first().findByType('Icon').parent.props.style.at(-1).backgroundColor).toBe('transparent');
+ mockModuleAccent=false;await act(async()=>tree.update(view()));
+ expect(first().findAllByType('Icon')[0].props.color).toBe(grid?'#876543':'#345678');
+ expect(itemTextColor()).toBe(grid?'#654321':'#123456');
+ expect(first().findAllByType('Icon')[0].props.dataSet).toBeUndefined();
+ await act(async()=>tree.unmount());
+});
