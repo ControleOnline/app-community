@@ -1,5 +1,6 @@
 import { themeEditorText as t, useThemeEditorPalette } from "./themeToolPresentation";import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { THEME_TOOL_BUTTON_HEIGHT } from './themeToolMetrics';
 import contract from '../../styles/themeContract.generated';
 import { resolveManagerThemeDetails, describeResolvedThemeColor } from '../../styles/managerTheme';
 import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey } from '../../styles/themeEditorModel';
@@ -14,7 +15,7 @@ import HomeMetricAppearanceControls from './HomeMetricAppearanceControls';
 const emptyColors = Object.freeze({});
 
 // Tool chrome deliberately stays readable while the administrator edits the app palette.
-export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null }) {const c = useThemeEditorPalette();const s = editorStyles(c);
+export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
   const mobile = useWindowDimensions().width <= 600;
   const [changes, setChanges] = useState({});
   const [error, setError] = useState('');
@@ -88,24 +89,28 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
       if (filter && !`${token} ${group.label} ${themeFieldDisplayName(token,t)}`.toLowerCase().includes(filter.toLowerCase())) return false;
       return !!metric || !onlyFilled || ['light', 'dark'].some((mode) => themeFieldValue(draft, token, mode) !== '');
     }) })).filter((group) => group.tokens.length);
-  return <View style={s.editor} dataSet={{ coThemeTools: 'true' }}>
-    {metric && <HomeMetricAppearanceControls id={metric} colors={draft} palette={c} disabled={saving}
-      onChange={patch => {setChanges(current => ({...current,...patch}));setError('');}} />}
+  const metricControls = metric && <HomeMetricAppearanceControls id={metric} colors={draft} palette={c} disabled={saving}
+      onChange={patch => {setChanges(current => ({...current,...patch}));setError('');}} />;
+  const toolbar = (
     <View style={s.toolbar}>
-      {!compact && <TextInput accessibilityLabel={t("Buscar variável ou grupo")} placeholder={t("Buscar variável ou grupo")} value={filter} onChangeText={setFilter} style={[s.input, { flex: 1 }]} />}
-      {['light', 'dark'].map((mode) => <Pressable key={mode} accessibilityRole="button" accessibilityState={{ selected: runtime.mode === mode }} onPress={() => setThemeMode(mode)} style={[s.button, runtime.mode === mode && s.active]}><Text style={{color:runtime.mode===mode?c.buttonText:c.buttonTextSecondary}}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text></Pressable>)}
+      {!compact && <TextInput accessibilityLabel={t("Buscar variável ou grupo")} placeholder={t("Buscar variável ou grupo")} value={filter} onChangeText={setFilter} style={[s.input, fixedHeader ? s.toolSearch : { flex: 1 }]} />}
+      {['light', 'dark'].map((mode) => <Pressable key={mode} accessibilityRole="button" accessibilityState={{ selected: runtime.mode === mode }} onPress={() => setThemeMode(mode)} style={[s.button, fixedHeader && s.toolButton, runtime.mode === mode && s.active]}><Text style={{color:runtime.mode===mode?c.buttonText:c.buttonTextSecondary}}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text></Pressable>)}
     </View>
-    {!concise && <>
+  );
+  const notices = !concise && <>
       <Text style={s.caption}>{t("Variáveis do themes-map.md · cores compartilhadas inicializam os dois modos antes da edição.")}</Text>
       {selectedTokens.length > 0 ? scopes.length ? scopes.map((scope) => <Text key={scope.label} style={s.notice}>{t("Variação: ")}{t(scope.label)}{t(". Alcance: ")}{t(scope.usage)}{t(". As cores padrão e as outras variações não são alteradas.")}</Text>) : <Text style={s.notice}>{t("Padrão compartilhado: alterações afetam todos os componentes que usam estas variáveis e as variações que ainda herdam delas.")}</Text> : <Text style={s.notice}>{t("Cada campo identifica o padrão compartilhado ou a variação. Variações sem cor própria herdam o padrão no mesmo modo.")}</Text>}
       <Text style={s.notice}>{t("Editando cadastro: ")}{theme.theme} #{theme.id}. {runtime.themeId ? String(runtime.themeId) !== String(theme.id) ? t("Tema aplicado pelo domínio: #{{v0}}. Este cadastro não altera a prévia global.", { v0: runtime.themeId }) : t("Este é o tema aplicado pelo domínio.") : t("A identificação do tema aplicado está em andamento.")}</Text>
-    </>}
-    {!!error && <Text accessibilityRole="alert" style={s.error}>{t(error)}</Text>}
+    </>;
+  const errorNode = !!error && <Text accessibilityRole="alert" style={s.error}>{t(error)}</Text>;
+  const footer = (
     <View style={[s.footer, mobile && Platform.OS === 'web' && { position: 'sticky', top: 0, zIndex: 2, backgroundColor: c.modalBackground }]}>
       <Text style={[s.caption, { minWidth: mobile ? 0 : 135, ...(mobile ? { width: '100%' } : {}) }]}>{dirty ? t("Prévia local · {{v0}} alteração(ões)", { v0: Object.keys(changes).length }) : t("Nenhuma alteração pendente")}</Text>
-      <Pressable accessibilityRole="button" disabled={saving || !dirty} onPress={cancel} style={[s.button, mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
-      <Pressable accessibilityRole="button" disabled={saving || !dirty || Object.entries(changes).some(([key, value]) => !validThemeValue(tokenFromKey(key), value))} onPress={save} style={[s.button, s.active, mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonText}}>{saving ? t("Salvando…") : t("Salvar cores")}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={saving || !dirty} onPress={cancel} style={[s.button, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={saving || !dirty || Object.entries(changes).some(([key, value]) => !validThemeValue(tokenFromKey(key), value))} onPress={save} style={[s.button, s.active, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonText}}>{saving ? t("Salvando…") : t("Salvar cores")}</Text></Pressable>
     </View>
+  );
+  const groupsNode = (<>
     {groups.map((group) => <View key={group.label} style={s.group}>
       <Text style={s.groupTitle}>{t(group.label)}</Text>
       {group.tokens.map((token) => <View key={token} style={s.token}>
@@ -119,12 +124,24 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
       <TextInput accessibilityLabel={t("Cor legada {{v0}}", { v0: token })} value={String(draft[token] ?? '')} onChangeText={(value) => edit(token, value.trim())} editable={!saving} style={s.input} />
     </View>)}
     {!groups.length && !selectedTokens.some((token) => Object.hasOwn(raw, token)) && <Text style={s.notice}>{t("Nenhuma variável corresponde à seleção.")}</Text>}
-
+  </>);
+  // Floating configurator: search, Claro/Escuro, pending changes and Save stay fixed above the
+  // scrolling group list (#1509). Other consumers keep the single scrolling layout.
+  if (fixedHeader) return <View style={[s.editor, s.editorFixed]} dataSet={{ coThemeTools: 'true' }}>
+    <View style={s.fixedTools}>{toolbar}{errorNode}{footer}</View>
+    <ScrollView style={s.scrollArea} contentContainerStyle={s.scrollContent}>{metricControls}{notices}{groupsNode}</ScrollView>
+  </View>;
+  return <View style={s.editor} dataSet={{ coThemeTools: 'true' }}>
+    {metricControls}{toolbar}{notices}{errorNode}{footer}{groupsNode}
   </View>;
 });
 const editorStyles = (c) => StyleSheet.create({
   editor: { padding: 10, gap: 10, backgroundColor: c.modalBackground }, toolbar: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' },
   button: { paddingHorizontal: 10, paddingVertical: 8, borderWidth: 1, borderColor: c.modalBorder, borderRadius: 7, backgroundColor: c.buttonBackgroundSecondary }, active: { backgroundColor: c.buttonBackground, borderColor: c.buttonBorder },
+  editorFixed: { padding: 0, gap: 0, flexShrink: 1, minHeight: 0 }, fixedTools: { padding: 10, paddingBottom: 0, gap: 10 },
+  scrollArea: { flexShrink: 1, minHeight: 0 }, scrollContent: { padding: 10, paddingTop: 0, gap: 10 },
+  toolButton: { minHeight: THEME_TOOL_BUTTON_HEIGHT, paddingVertical: 0, justifyContent: 'center' },
+  toolSearch: { flexGrow: 0, flexShrink: 1, flexBasis: '33%', minWidth: 120 },
   caption: { fontSize: 11, color: c.textSecondary }, key: { fontSize: 10, color: c.textMuted, marginTop: 3 }, notice: { fontSize: 12, color: c.textSecondary },
   group: { gap: 4 }, groupTitle: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', color: c.textSecondary, paddingVertical: 8 },
   token: { paddingVertical: 8, borderBottomWidth: 1, borderColor: c.dividerBackground, gap: 6 }, tokenName: { fontSize: 12, fontWeight: '600', color: c.modalText },
