@@ -17,7 +17,7 @@ export function inspectThemeElement(element) {
     const metricId=element.closest?.('[data-co-home-metric]')?.getAttribute?.('data-co-home-metric');
     const scoped=hit=>hit?{...hit,...(screen?{screen}:{}),...(Object.hasOwn(homeMetrics,metricId)?{homeMetric:metricId}:{}),
       ...(hit.node===sourceNode && Array.isArray(sources)?{sources:sources.filter(item=>
-        typeof item.property==='string' && ['category.color','routes.color'].includes(item.source) && typeof item.value==='string')}:{})}:hit;
+        typeof item.property==='string' && ['category.color','routes.color','category.text_color','category.icon_color','routes.text_color','routes.icon_color','routes.icon_background_color'].includes(item.source) && typeof item.value==='string')}:{})}:hit;
     const dock=element.closest?.('[data-testid="bottom-navigation"][data-co-theme]');
     const parent=dock || element.closest?.('[role="menu"][data-co-theme]');
     const parentBindings=validBindings(parent?JSON.parse(parent.getAttribute('data-co-theme')):[]);

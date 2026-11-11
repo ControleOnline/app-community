@@ -117,3 +117,24 @@ test('category, route and additional-color folding preserves drafts without savi
   expect(tree.root.findByProps({accessibilityLabel: 'Categoria — cor cadastrada (fundo)'}).props.value).toBe('#112233');
   await act(async () => tree.unmount());
 });
+
+test('authorized users can save only additional colors when the API supports them, and reload the saved values', async () => {
+  mockSuper=true;
+  const migrated=[{...groups[0],textColor:null,iconColor:null,menus:groups[0].menus.map(item=>({...item,textColor:null,iconColor:null,iconBackgroundColor:null}))}];
+  loadModuleAppearance.mockResolvedValue(migrated);
+  let tree;await act(async()=>{tree=renderer.create(view());});
+  await openRoute(tree);await expand(tree,'Rota — cores adicionais');
+  const field=()=>tree.root.findByProps({accessibilityLabel:'Rota — cor do texto'});
+  expect(field().props.editable).toBe(true);
+  await act(async()=>field().props.onChangeText('#ffffff'));
+  const saved=[{...migrated[0],menus:migrated[0].menus.map(item=>({...item,textColor:'#ffffff'}))}];
+  loadModuleAppearance.mockResolvedValue(saved);
+  const save=tree.root.findByProps({accessibilityLabel:'Salvar cadastro: Centro financeiro'});
+  expect(save.props.disabled).toBe(false);
+  await act(async()=>save.props.onPress());
+  expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind:'route',draft:expect.objectContaining({textColor:'#ffffff'})}));
+  await act(async()=>tree.root.findByProps({accessibilityLabel:'Rota: Centro financeiro'}).props.onPress());
+  await openRoute(tree);
+  expect(field().props.value).toBe('#ffffff');
+  await act(async()=>tree.unmount());
+});

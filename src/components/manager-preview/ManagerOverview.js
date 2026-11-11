@@ -5,7 +5,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {resolveModuleAccent, moduleAccentSource, moduleListAppearance} from './moduleAccent';
+import {resolveModuleAccent, moduleAccentSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -150,7 +150,7 @@ export default function ManagerOverview({navigation}) {
   const quick = ['PdvPage', 'DevicesIndex', 'ProductShowcasesPage', 'Inventory', 'FinancialHubPage', 'ConfiguratorPage', 'Integrations', 'MyCompaniesPage']
     .map(find).filter(Boolean);
   const columns = width > 1450 ? 4 : 2;
-  const icon = (name, color = c.cardIconColor, size = 19) => <HomeIcon name={name || 'grid'} size={size} color={color} />;
+  const icon = (name, color = c.cardIconColor, size = 19, source) => <HomeIcon dataSet={source ? {coThemeSource: source} : undefined} name={name || 'grid'} size={size} color={color} />;
   const go = item => {experience?.begin(item.name, 'click'); navigation.navigate(item.name, item.params);};
   const button = (item, primary = false) => item && <Pressable accessibilityRole="button" onPress={() => go(item)}
     style={[s.button, {backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, borderColor: primary ? c.buttonBorder : c.buttonBorderSecondary}]}>
@@ -298,11 +298,11 @@ export default function ManagerOverview({navigation}) {
         return <View key={group.id || i}
           dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
+          <Text dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}} style={[s.panelTitle, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.cardText}]}>{group.title}</Text>
           {(() => {
             const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-              const appearance = moduleListAppearance({accent, colors: c});
+              const appearance = moduleListAppearance({accent, colors: c, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
               // Database colors are used as-is: no opacity applied (issue 1453).
               const accentBackground = accent;
               return <Pressable key={item.id || j} accessibilityRole="button"
@@ -315,14 +315,14 @@ export default function ManagerOverview({navigation}) {
                   : accentBackground ?? c.listItemBackground,
               }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, {backgroundColor: c.iconBackground}]}>
-                  {icon(item.icon, c.listItemIcon, 22)}
+                <View style={[s.moduleTileIcon, {backgroundColor: (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
+                  {icon(item.icon, (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
                 </View>
-                <Text style={[s.moduleTileLabel, {color: c.listItemText}]}>{item.title}</Text>
+                <Text style={[s.moduleTileLabel, {color: (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
               </> : <>
-                {icon(item.icon, appearance.iconColor, 16)}
-                <Text style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
-                {icon('chevron-right', appearance.iconColor, 14)}
+                {icon(item.icon, appearance.iconColor, 16, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', appearance.iconColor, 14, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
               </>}
             </Pressable>;
             };

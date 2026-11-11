@@ -2,7 +2,7 @@ import {api} from '@controleonline/ui-common/src/api';
 import {normalizeRuntimeMenuResponse} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import {app_type} from '@appType';
 import {editorContext} from './themeService';
-import {resolveModuleAccent} from '../manager-preview/moduleAccent';
+import {resolveModuleAccent, modulePropertyColor} from '../manager-preview/moduleAccent';
 import glyphs from 'react-native-vector-icons/glyphmaps/Feather.json';
 
 export const moduleAppearanceContext = () => `${editorContext()}|${app_type}`;
@@ -37,24 +37,31 @@ export async function loadModuleAppearance(context) {
   }
   return mergeModuleGroups(rows.map(item => ({...item.category, label: item.category?.name,
     menus: [{...item, routeId: item.route?.id, route: item.route?.route,
-      color: item.route?.color ?? item.color, icon: item.route?.icon ?? item.icon}]})));
+      color: item.route?.color ?? item.color, icon: item.route?.icon ?? item.icon,
+      ...Object.fromEntries(['textColor', 'iconColor', 'iconBackgroundColor'].filter(field => Object.hasOwn(item.route || {}, field)).map(field => [field, item.route[field]]))}]})));
 }
 
-export function appearanceChanges(original, draft, palette) {
+export const additionalAppearanceFields = kind => kind === 'category' ? ['textColor', 'iconColor'] : ['textColor', 'iconColor', 'iconBackgroundColor'];
+export const persistedAppearanceFields = (original, kind = 'route') => ['color', 'icon',
+  ...additionalAppearanceFields(kind).filter(field => Object.hasOwn(original, field))];
+
+export function appearanceChanges(original, draft, palette, kind = 'route') {
   const changes = {};
-  for (const field of ['color', 'icon']) {
+  for (const field of persistedAppearanceFields(original, kind)) {
     const next = String(draft[field] ?? '').trim();
     if (next === String(original[field] ?? '').trim()) continue;
     if (field === 'color' && !resolveModuleAccent(next, palette)) throw new Error('Informe uma cor válida ou uma referência existente, como $primary.');
     if (field === 'icon' && !Object.hasOwn(glyphs, next)) throw new Error('Selecione um ícone válido.');
-    changes[field] = next;
+    const optional = additionalAppearanceFields(kind).includes(field);
+    if (optional && next && !modulePropertyColor(next, palette)) throw new Error('Informe uma cor válida ou uma referência existente, como $primary.');
+    changes[field] = optional && !next ? null : next;
   }
   return changes;
 }
 
 export async function saveModuleAppearance({kind, original, draft, palette, context}) {
   assertContext(context);
-  const changes = appearanceChanges(original, draft, palette);
+  const changes = appearanceChanges(original, draft, palette, kind);
   if (!Object.keys(changes).length) return original;
   if (!/^\d+$/.test(String(original.id))) throw new Error('Cadastro indisponível para edição.');
   const path = kind === 'category' ? `menu-config/categories/${original.id}` : kind === 'route' ? `menu-config/${original.id}` : null;

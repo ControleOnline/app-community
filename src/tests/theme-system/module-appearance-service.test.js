@@ -55,3 +55,29 @@ test('invalid colors and stale contexts cannot write, while references keep thei
     context: 'another-domain'})).rejects.toThrow('contexto');
   expect(api.fetch).not.toHaveBeenCalled();
 });
+
+test('a migrated API saves optional route colors independently and clears them with null', async () => {
+  const original={id:99,routeId:42,color:'#0284c7',icon:'users',textColor:null,iconColor:null,iconBackgroundColor:'#ffffff'};
+  await saveModuleAppearance({kind:'route',original,draft:{...original,textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:'',enabled:false,category:8},palette:{primary:'#ffff00'},context:moduleAppearanceContext()});
+  expect(api.fetch).toHaveBeenCalledWith('menu-config/99',{method:'PATCH',body:{textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:null}});
+  expect(original.iconBackgroundColor).toBe('#ffffff');
+});
+
+test('a migrated category saves foregrounds but never adds the route-only icon background', async () => {
+  const original={id:3,color:'#020202',icon:'grid',textColor:null,iconColor:null};
+  await saveModuleAppearance({kind:'category',original,draft:{...original,textColor:'#ffffff',iconColor:'transparent',iconBackgroundColor:'#abcdef'},palette:{},context:moduleAppearanceContext()});
+  expect(api.fetch).toHaveBeenCalledWith('menu-config/categories/3',{method:'PATCH',body:{textColor:'#ffffff',iconColor:'transparent'}});
+});
+
+test('optional invalid colors are refused before any write', async () => {
+  const original={id:3,color:'#020202',icon:'grid',textColor:null};
+  await expect(saveModuleAppearance({kind:'category',original,draft:{...original,textColor:'red;display:none'},palette:{},context:moduleAppearanceContext()})).rejects.toThrow('cor válida');
+  expect(api.fetch).not.toHaveBeenCalled();
+});
+
+test('catalog loading keeps the optional field capability and values from nested route data', async () => {
+  api.fetch.mockResolvedValueOnce({member:[{id:99,category:{id:3,textColor:null,iconColor:'#ffff00'},route:{id:42,route:'ClientsIndex',color:'#0284c7',icon:'users',textColor:'#ffffff',iconColor:null,iconBackgroundColor:'transparent'}}],totalItems:1});
+  const [group]=await loadModuleAppearance(moduleAppearanceContext());
+  expect(group).toMatchObject({textColor:null,iconColor:'#ffff00'});
+  expect(group.menus[0]).toMatchObject({routeId:42,textColor:'#ffffff',iconColor:null,iconBackgroundColor:'transparent'});
+});
