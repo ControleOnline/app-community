@@ -1,19 +1,18 @@
 {
-  "version": "1.10.189",
+  "version": "1.10.191",
   "rc": 1,
-  "branch": "rc/1.10.189-rc.1",
-  "baseMaster": "8e8a67c5d3e3a13a1b067f728abd4dac61d7b1f6",
+  "branch": "rc/1.10.191-rc.1",
+  "baseMaster": "240450b83c6fcee372527166924f061c782a53d1",
   "tasks": [
-    1506
+    1509
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "143b97d666a60a104cd57d564a0c7f9f6802fb45",
-    "ControleOnline/ui-login": "de87c0a3ad517c0cd76122e648f6252fb36d28ff"
+    "ControleOnline/app-community": "590e9fc4061a136926a5b802550e5dc610f2dcb1"
   },
   "validation": {
-    "scope": "Tokens de tema loginLabelCreateAccount e loginLabelForgotPassword (contrato + ui-login 1.0.120) para 'Nova conta' e 'Esqueci minha senha', com fallback para linkText.",
-    "checks": "jest.theme contract + login-fields; ui-login contract test e checagem comportamental do fallback; Security aceito; RC 1.10.188-rc.1 em staging"
+    "scope": "Configurador flutuante de temas: busca, Claro/Escuro, erro e salvar fixos fora do scroll; botoes de 24px; busca e botao 'Ver variaveis e origens' pela metade.",
+    "checks": "theme-tools-fixed-header (2) + contract + editor; estrutura conferida em chromium (replica); RC 1.10.190-rc.1 em staging; Security nao executado (so layout)"
   }
 }
