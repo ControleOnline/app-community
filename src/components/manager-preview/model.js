@@ -91,6 +91,7 @@ export function managerMenu(menus, availableRoutes, translate, menuType = 'home'
           return {
             ...item,
             categoryColor: group.color,
+            categoryId: group.id,
             name,
             params,
             title:

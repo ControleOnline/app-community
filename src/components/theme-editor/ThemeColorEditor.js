@@ -2,17 +2,19 @@ import { themeEditorText as t, useThemeEditorPalette } from "./themeToolPresenta
 import { Platform, Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import contract from '../../styles/themeContract.generated';
 import { resolveManagerThemeDetails, describeResolvedThemeColor } from '../../styles/managerTheme';
-import { themeFieldValue, themeFieldLabel, themeColorKey, validThemeValue, tokenFromKey } from '../../styles/themeEditorModel';
+import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey } from '../../styles/themeEditorModel';
 import { useThemeRuntime, previewTheme, clearThemePreview, setThemeMode } from '../../styles/themeRuntime';
 import { editorContext, loadDomainTheme, saveThemeChanges } from './themeService';
 import NativeColorInput from './NativeColorInput';
 import { describeThemeScope } from '../../styles/themeVariations';
 import { resolveScreenThemeDetails } from '../../styles/screenTheme';
 import { screenThemeKey, parseScreenThemeKey } from '../../styles/screenThemeKeys';
+import {homeMetrics, metricChoice, metricTokens} from '../../styles/homeMetricAppearance';
+import HomeMetricAppearanceControls from './HomeMetricAppearanceControls';
 const emptyColors = Object.freeze({});
 
 // Tool chrome deliberately stays readable while the administrator edits the app palette.
-export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
+export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null }) {const c = useThemeEditorPalette();const s = editorStyles(c);
   const mobile = useWindowDimensions().width <= 600;
   const [changes, setChanges] = useState({});
   const [error, setError] = useState('');
@@ -23,6 +25,8 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
   const context = useRef(editorContext());
   const raw = theme.colors || {};
   const draft = useMemo(() => ({ ...raw, ...changes }), [raw, changes]);
+  const metric = Object.hasOwn(homeMetrics,homeMetric) ? homeMetric : null;
+  const chosenTokens = metric ? metricTokens(metric,metricChoice(draft,metric)) : selectedTokens;
   const appliedColors = runtime.preview || runtime.raw || emptyColors;
   const appliedModes = useMemo(() => ({ light: resolveScreenThemeDetails(appliedColors, 'light', screen?.id), dark: resolveScreenThemeDetails(appliedColors, 'dark', screen?.id) }), [appliedColors, screen?.id]);
   const draftModes = useMemo(() => ({ light: resolveScreenThemeDetails(draft, 'light', screen?.id), dark: resolveScreenThemeDetails(draft, 'dark', screen?.id) }), [draft, screen?.id]);
@@ -57,7 +61,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
     const own = describeResolvedThemeColor(draftModes[mode], token);
     const direct = screen ? draft[key] || '' : themeFieldValue(draft, token, mode);
     const variation = contract.variants?.[token];
-    const value = (screen || variation) && !direct ? own.value : direct;
+    const value = (screen || variation || metric) && !direct ? own.value : direct;
     const inherited = !Object.hasOwn(draft, `${token}-light`) && !Object.hasOwn(draft, `${token}-dark`) && !!raw[token];
     const invalid = !validThemeValue(token, String(value));
     const applied = describeResolvedThemeColor(appliedModes[mode], token);
@@ -76,15 +80,17 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
         {!!own.value && own.source !== key && own.source !== token && <Text selectable style={[s.key, mobile && { fontSize: 12 }]}>{t("Neste cadastro: ")}{own.value}{t(" · origem: ")}{own.source}</Text>}
         <Text selectable style={[s.key, mobile && { fontSize: 12 }]}>{t("Aplicação: ")}{applied.value || t("Sem valor aplicado")}{t(" · origem: ")}{applied.source || t("sem variável cadastrada")}</Text>
       </>}
-      {!!(screen || variation) && !!direct && <Pressable accessibilityRole="button" accessibilityLabel={t("Usar padrão {{v0}} {{v1}}", { v0: token, v1: mode==='light'?t("claro"):t("escuro") })} disabled={saving} onPress={() => edit(key, '')} style={s.button}><Text style={{color:c.buttonTextSecondary}}>{screen ? t("Usar cor global") : t("Usar padrão")}</Text></Pressable>}
+      {!!(screen || variation || (metric && metricChoice(draft,metric)!=='default')) && !!direct && <Pressable accessibilityRole="button" accessibilityLabel={t("Usar padrão {{v0}} {{v1}}", { v0: token, v1: mode==='light'?t("claro"):t("escuro") })} disabled={saving} onPress={() => edit(key, '')} style={s.button}><Text style={{color:c.buttonTextSecondary}}>{screen ? t("Usar cor global") : t("Usar padrão")}</Text></Pressable>}
     </View>;
   };
   const groups = contract.groups.map((group) => ({ ...group, tokens: group.tokens.filter((token) => {
-      if (selectedTokens.length && !selectedTokens.includes(token)) return false;
-      if (filter && !`${token} ${group.label}`.toLowerCase().includes(filter.toLowerCase())) return false;
-      return !onlyFilled || ['light', 'dark'].some((mode) => themeFieldValue(draft, token, mode) !== '');
+      if (chosenTokens.length && !chosenTokens.includes(token)) return false;
+      if (filter && !`${token} ${group.label} ${themeFieldDisplayName(token,t)}`.toLowerCase().includes(filter.toLowerCase())) return false;
+      return !!metric || !onlyFilled || ['light', 'dark'].some((mode) => themeFieldValue(draft, token, mode) !== '');
     }) })).filter((group) => group.tokens.length);
   return <View style={s.editor} dataSet={{ coThemeTools: 'true' }}>
+    {metric && <HomeMetricAppearanceControls id={metric} colors={draft} palette={c} disabled={saving}
+      onChange={patch => {setChanges(current => ({...current,...patch}));setError('');}} />}
     <View style={s.toolbar}>
       {!compact && <TextInput accessibilityLabel={t("Buscar variável ou grupo")} placeholder={t("Buscar variável ou grupo")} value={filter} onChangeText={setFilter} style={[s.input, { flex: 1 }]} />}
       {['light', 'dark'].map((mode) => <Pressable key={mode} accessibilityRole="button" accessibilityState={{ selected: runtime.mode === mode }} onPress={() => setThemeMode(mode)} style={[s.button, runtime.mode === mode && s.active]}><Text style={{color:runtime.mode===mode?c.buttonText:c.buttonTextSecondary}}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text></Pressable>)}
@@ -103,7 +109,8 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
     {groups.map((group) => <View key={group.label} style={s.group}>
       <Text style={s.groupTitle}>{t(group.label)}</Text>
       {group.tokens.map((token) => <View key={token} style={s.token}>
-        <Text selectable style={s.tokenName}>{concise ? token : themeFieldLabel(token,t)}</Text>
+        <Text selectable style={s.tokenName}>{themeFieldDisplayName(token,t)}</Text>
+        {themeFieldDisplayName(token,t) !== token && <Text selectable style={s.key}>{token}</Text>}
         <View style={[s.modes, mobile && { flexDirection: 'column' }]}>{field(token, 'light')}{field(token, 'dark')}</View>
       </View>)}
     </View>)}

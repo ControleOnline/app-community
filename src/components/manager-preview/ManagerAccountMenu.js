@@ -38,7 +38,7 @@ function AccountPanel({anchor, mobile, colors: c, name, mode, canOpenProfile, on
       {!!sidebarPreference?.error && <Text accessibilityRole="alert" style={{color: c.menuText}}>{sidebarPreference.error}</Text>}
       {onThemeEditor && option('Configurar temas', 'sliders', onThemeEditor)}
       {bottomBar?.ready && <View style={[s.barOptions, {borderTopColor: c.menuBorder}]}>
-        <Text style={[s.barTitle, {color: c.textSecondary}]}>{global.t?.t('configs', 'section_title', 'shortcut_bar')}</Text>
+        <Text style={[s.barTitle, {color: c.menuSectionText}]}>{global.t?.t('configs', 'section_title', 'shortcut_bar')}</Text>
         {option(bottomBar.visible ? 'Ocultar nesta sessão' : 'Mostrar nesta sessão', 'layout', onBarSession)}
         {option(bottomBar.rememberedVisible ? 'Manter oculta neste aparelho' : 'Manter visível neste aparelho', 'save', onBarRemember)}
         {!!bottomBar.error && <Text accessibilityRole="alert" style={{color: c.menuText, padding: 12}}>{bottomBar.error}</Text>}

@@ -15,7 +15,7 @@ const mockLogout = jest.fn();
 let mockBottomBar;
 let mockSidebar;
 let mockModuleAccent;
-const mockColors = previewPalette({}, 'light');
+const mockColors = {...previewPalette({}, 'light'), moduleListIcon:'#627387', moduleListText:'#0f172a', navigationActiveBorder:'#117463'};
 jest.mock('react-native', () => ({
   processColor:require('../theme-system/nativeMock.cjs').processColor, Platform: {OS: 'web'}, Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
   StyleSheet: {create: x => x, absoluteFill: {}}, useWindowDimensions: () => ({width: mockWidth}),
@@ -32,8 +32,9 @@ jest.mock('../../components/manager-preview/ManagerPreviewProvider', () => ({
   useManagerPreview: () => ({bottomBar: mockBottomBar, sidebar: mockSidebar, moduleAccent: mockModuleAccent, moduleAccentPalette: {primary: '#147568'}, avatarEnabled:true,colors: mockColors, mode: 'light', toggleMode: mockToggle, setGuideOpen: mockGuide}),
 }));
 let mockExtraMenus = [];
+let mockRouteAppearance={},mockCategoryAppearance={};
 jest.mock('@store', () => ({useStore: name => ({getters: name === 'theme'
-  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
+  ? {menus: [{id: 'settings', label: 'Configurações', color: '$primary', ...mockCategoryAppearance, menus: [{id: 'devices', label: 'Dispositivos', route: 'DevicesIndex', color:'#0284c7', ...mockRouteAppearance, menuType: 'home', icon: 'monitor', routeParams: {source: 'manager'}}, ...mockExtraMenus]}]}
   : {user: {name: 'Usuário local'}}, actions: {logOut: mockLogout}})}));
 const navigation = {navigate: mockGo, getState: () => ({routeNames: ['HomePage', 'DevicesIndex', 'ProfilePage']})};
 const view = (route, params) => <ManagerShell navigation={navigation} route={{name: route || 'HomePage', params}}><content /></ManagerShell>;
@@ -42,10 +43,11 @@ const labeled = (tree, label) => tree.root.findAllByType('Pressable').filter(x =
 beforeEach(() => {
   global.IS_REACT_ACT_ENVIRONMENT = true;
   global.window = {addEventListener: jest.fn(), removeEventListener: jest.fn()};
-  mockExtraMenus = [];
-  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
+  mockExtraMenus = [];mockRouteAppearance={};mockCategoryAppearance={};
+  mockBaseAppType = 'MANAGER'; mockBottomBar = undefined; mockSidebar = undefined; mockModuleAccent = undefined; mockWidth = 1440; mockFocused = true;
+  global.t={t:(_section,_type,key)=>({my_profile:'Meu perfil',manager_help:'Ajuda do On Manager',use_dark_theme:'Usar tema escuro',logout:'Sair da conta'}[key])}; mockGo.mockClear(); mockToggle.mockClear(); mockGuide.mockClear(); mockLogout.mockClear();
 });
-afterEach(() => {delete global.window;});
+afterEach(() => {delete global.window;delete global.t;});
 
 it('provides the Manager identity to a shared table on any module route',()=>{
   let tree;
@@ -57,7 +59,7 @@ it('provides the Manager identity to a shared table on any module route',()=>{
   act(()=>tree.unmount());
 });
 
-it('keeps company selection in the sidebar and theme switching in the account menu', () => {
+it('keeps company selection in the header and theme switching in the account menu', () => {
   let tree; act(() => {tree = renderer.create(view());});
   act(() => {labeled(tree, 'Dispositivos')[0].props.onPress();});
   expect(mockGo).toHaveBeenCalledWith('DevicesIndex', {source: 'manager'});
@@ -66,8 +68,8 @@ it('keeps company selection in the sidebar and theme switching in the account me
   act(() => labeled(tree, 'Usar tema escuro')[0].props.onPress());
   expect(mockToggle).toHaveBeenCalledTimes(1);
   expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
-  expect(tree.root.findByProps({testID: 'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
-  expect(tree.root.findByProps({testID: 'manager-topbar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
+  expect(tree.root.findByProps({testID: 'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
+  expect(tree.root.findByProps({testID: 'manager-topbar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
   act(() => tree.unmount());
 });
 
@@ -123,7 +125,7 @@ it('keeps a single left-aligned themed account control in the sidebar without na
   expect(tree.root.findByProps({testID:'manager-topbar'}).findAllByType('HomeAvatar')).toHaveLength(0);
   const control=labeled(tree, 'Abrir opções do usuário')[0];
   expect(control.props.style[0]).toMatchObject({alignItems:'center',justifyContent:'flex-start'});
-  expect(control.props.style[1]).toMatchObject({backgroundColor:mockColors.selectBackground,borderColor:mockColors.selectBorder});
+  expect(control.props.style[1]).toMatchObject({backgroundColor:mockColors.navigationAccountBackground,borderColor:mockColors.navigationAccountBorder});
   act(() => labeled(tree, 'Abrir opções do usuário')[0].props.onPress());
   expect(mockGo).not.toHaveBeenCalled();
   expect(labeled(tree, 'Meu perfil')).toHaveLength(1);
@@ -151,11 +153,11 @@ it('reuses guide, appearance and logout actions from the account menu', () => {
   act(() => tree.unmount());
 });
 
-it('offers a direct branded home control on mobile and names the drawer destination Início', () => {
+it('keeps the mobile company selector in the header and names the drawer destination Início', () => {
   mockWidth = 360;
   let tree; act(() => {tree = renderer.create(view('DevicesIndex'));});
-  act(() => labeled(tree, 'Ir para o início')[0].props.onPress());
-  expect(mockGo).toHaveBeenLastCalledWith('HomePage', undefined);
+  expect(tree.root.findByProps({testID:'manager-header-company'}).findByType('ManagerCompanySelector').props.mode).toBe('header');
+  expect(mockGo).not.toHaveBeenCalled();
   act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
   expect(labeled(tree, 'Início')).toHaveLength(1);
   act(() => labeled(tree, 'Início')[0].props.onPress());
@@ -203,13 +205,13 @@ it('keeps a fresh internal catalog reset signal when reselecting the focused PDV
   act(() => tree.unmount());
 });
 
-it('keeps selection inside the mobile drawer and home in the header', () => {
+it('keeps company selection in the mobile header while opening the drawer', () => {
   mockWidth = 400;
   let tree; act(() => {tree = renderer.create(view());});
-  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(0);
-  expect(labeled(tree, 'Ir para o início')).toHaveLength(1);
+  expect(tree.root.findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID:'manager-header-company'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
   act(() => labeled(tree, 'Abrir menu')[0].props.onPress());
-  expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(1);
+  expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('ManagerCompanySelector')).toHaveLength(0);
   act(() => tree.unmount());
 });
 
@@ -218,7 +220,7 @@ it.each([1440,900])('keeps desktop navigation beside the menu at width %s withou
  const topbar=tree.root.findByProps({testID:'manager-topbar'});
  const breadcrumb=tree.root.findByProps({testID:'manager-breadcrumb'});
  expect(topbar.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(1);
- expect(breadcrumb.parent).toBe(labeled(tree,'Alternar menu compacto')[0].parent);
+ expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Expandir menu'}).length + tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Recolher menu'}).length).toBe(1);
  act(()=>tree.unmount());
 });
 it('keeps the mobile header free of desktop breadcrumbs',()=>{
@@ -266,22 +268,38 @@ it.each([
   act(() => tree.unmount());
 });
 
-it('uses category colors on sidebar items before and after navigation', () => {
+it('uses route colors and list foregrounds before and after navigation, restoring the sidebar theme when disabled', () => {
   mockModuleAccent = {value:true};
   let tree; act(() => {tree = renderer.create(view());});
   const devices = labeled(tree, 'Dispositivos')[0];
   const inactive = labeled(tree, 'Início')[0];
-  expect(devices.props.style({})[1].backgroundColor).toBe('#147568');
-  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#147568');
-  expect(devices.findByType('Icon').props.color).toBe('#147568');
+  expect(devices.props.style({})[1].backgroundColor).toBe('#0284c7');
+  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#0284c7');
+  expect(devices.findByType('Icon').props.color).toBe(mockColors.moduleListIcon);
+  expect(JSON.parse(devices.props.dataSet.coThemeSource)[0]).toMatchObject({source:'routes.color',reference:'#0284c7',property:'backgroundColor'});
   expect(inactive.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
   expect(devices.props.style({})[1]).toMatchObject({
-    backgroundColor:'#147568',borderLeftColor:'#147568',
+    backgroundColor:'#0284c7',borderLeftColor:mockColors.navigationActiveBorder,
   });
   mockModuleAccent = {value:false};
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
   expect(devices.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   expect(devices.props.style({})[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
   act(() => tree.unmount());
+});
+
+it('applies route foregrounds and category caption color without changing glyphs or themed disabled behavior',()=>{
+ mockModuleAccent={value:true};mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary'};mockCategoryAppearance={textColor:'#ffff00'};
+ let tree;act(()=>{tree=renderer.create(view());});
+ const device=()=>labeled(tree,'Dispositivos')[0];
+ expect(device().findByType('Icon').props).toMatchObject({name:'monitor',color:'#147568'});
+ expect(JSON.parse(device().findByType('Icon').props.dataSet.coThemeSource)[0].source).toBe('routes.icon_color');
+ expect(device().findByType('Text').props.style.at(-1).color).toBe('#ffffff');
+ const caption=tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
+ expect(caption.props.style.at(-1).color).toBe('#ffff00');
+ mockModuleAccent={value:false};act(()=>tree.update(view()));
+ expect(device().findByType('Icon').props.color).toBe(mockColors.navigationIcon);
+ expect(device().findByType('Text').props.style.at(-1).color).toBe(mockColors.navigationText);
+ act(()=>tree.unmount());
 });
