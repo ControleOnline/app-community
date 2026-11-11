@@ -1,10 +1,16 @@
 # esse é o aplicativo para lave-go, de localização de franquias, 
 # é publicado na loja google -> lave-go
 
-name: Deploy Android Lave-Go Shop V2
+name: Deploy Android Lave-Go Shop (force)
 
 on:
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "Publicação humana autorizada sem aguardar aprovações de staging"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,9 +25,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET_SHA: ${{ github.sha }}
+          FORCE_DEPLOY: ${{ github.event_name == 'workflow_dispatch' && inputs.force_deploy || false }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          if [ "$FORCE_DEPLOY" = "true" ]; then
+            echo "Production explicitly authorized by workflow_dispatch; staging approval deferred for $TARGET_SHA."
+            exit 0
+          fi
           # Accept successful Pull Request Checks on staging when:
           # 1) headSha == TARGET_SHA (fast-forward promote), or
           # 2) headSha is an ancestor of TARGET_SHA (staging tip + post-promote commits), or
@@ -322,8 +333,11 @@ jobs:
           serviceAccountJson: /tmp/service_account.json
           packageName: ${{ env.PACKAGE_NAME }}
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
-          track: internal
+          track: production
           status: completed
+          # Play refuses to auto-send this app's changes for review; commit the edit and
+          # send it for review manually in the Play Console (#1491).
+          changesNotSentForReview: true
 
 
       - name: Upload AAB to Extra FTP (sem apagar)
