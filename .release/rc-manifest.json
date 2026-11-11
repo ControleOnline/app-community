@@ -1,16 +1,17 @@
 {
-  "version": "1.10.188",
+  "version": "1.10.190",
   "rc": 1,
-  "branch": "rc/1.10.188-rc.1",
+  "branch": "rc/1.10.190-rc.1",
   "baseMaster": "084cedac3927ca96303fd78c1f808009edee07dc",
   "tasks": [
     1496,
-    1506
+    1506,
+    1509
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "05b72ac06b6ba7cf790b2e24fb883e283280e618",
+    "ControleOnline/app-community": "3fbf47938c4e681371d53d35e28639ecf13993c0",
     "ControleOnline/ui-login": "de87c0a3ad517c0cd76122e648f6252fb36d28ff"
   },
   "validation": {
@@ -19,7 +20,7 @@
     "isolatedDeltaBase": "89cb0a172844af06228926ad40e93f75dc3e1258",
     "isolatedDeltaTip": "9ce223cfabe98e4f8e65dc554966b5cdf3f23eed",
     "preservedStaging": "89cb0a172844af06228926ad40e93f75dc3e1258",
-    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only; jest.theme (32/33 suites; startup-presentation falha tambem sem a mudanca); ui-login contract test + checagem comportamental do fallback",
+    "checks": "164 theme + 52 Home/navigation + 2 i18n + 15 PHP tests (125 assertions); mocked database only; jest.theme (32/33 suites; startup-presentation falha tambem sem a mudanca); ui-login contract test + checagem comportamental do fallback; theme-tools-fixed-header (2) + jest.theme 32/33 (startup-presentation falha tambem sem a mudanca); estrutura conferida em chromium (replica)",
     "databaseMigrationExecuted": false,
     "databaseWrites": false,
     "deploymentMode": "frontend-compatible-with-old-api",
@@ -31,6 +32,6 @@
       "ControleOnline/api-platform-common": "8b2f48bc6a4c2cad9ade85287adf77259bcadf61",
       "ControleOnline/api-community": "520fd45c11ec62f0a723204eaf9a08e982ebb454"
     },
-    "scope": "1.10.188 (#1506): tokens de tema loginLabelCreateAccount e loginLabelForgotPassword (contrato + ui-login 1.0.120; fallback para linkText)."
+    "scope": "1.10.188 (#1506): tokens de tema loginLabelCreateAccount e loginLabelForgotPassword (contrato + ui-login 1.0.120; fallback para linkText). 1.10.190 (#1509): configurador flutuante de temas com busca/Claro-Escuro/salvar fixos fora do scroll, botoes de 24px, busca e botao de origens pela metade."
   }
 }

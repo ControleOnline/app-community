@@ -1,7 +1,8 @@
 import { themeEditorText as t, useThemeEditorPalette } from "./themeToolPresentation";import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 import ThemeColorEditor from './ThemeColorEditor';
+import { THEME_TOOL_BUTTON_HEIGHT } from './themeToolMetrics';
 import { loadDomainTheme, editorContext } from './themeService';
 import { attachThemeInspector } from './themeInspector';
 import ThemeInspectionHighlight, {groupInspectionColors} from './ThemeInspectionHighlight';
@@ -129,7 +130,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     stopDrag.current?.();stopDrag.current = stop;
     document.addEventListener('pointermove', move);document.addEventListener('pointerup', stop, { once: true });
   };
-  const button = (label, action, selected = false) => <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected }} onPress={action} style={{ minHeight: mobile ? 44 : 34, justifyContent: 'center', padding: 9, borderWidth: 1, borderColor: selected ? c.buttonBorder : c.modalBorder, borderRadius: 7, backgroundColor: selected ? c.buttonBackground : c.buttonBackgroundSecondary }}><Text style={{ fontSize: 12, color: selected ? c.buttonText : c.buttonTextSecondary }}>{label}</Text></Pressable>;
+  const button = (label, action, selected = false, extraStyle = null) => <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected }} onPress={action} style={{ minHeight: THEME_TOOL_BUTTON_HEIGHT, justifyContent: 'center', paddingVertical: 0, paddingHorizontal: 9, ...extraStyle, borderWidth: 1, borderColor: selected ? c.buttonBorder : c.modalBorder, borderRadius: 7, backgroundColor: selected ? c.buttonBackground : c.buttonBackgroundSecondary }}><Text style={{ fontSize: 12, color: selected ? c.buttonText : c.buttonTextSecondary }}>{label}</Text></Pressable>;
   const compactInspection = mobile && inspecting;
   const mobileBottom = 12 + Math.ceil(Math.max(viewport.inset, dockInset));
   const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .78),
@@ -141,7 +142,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
       <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <strong>{t("Configurador de temas")}</strong>
-        <button onClick={onClose} aria-label={t("Fechar painel e cancelar prévia")} style={{ border: 0, background: c.containerTransparentBackground, color: c.modalText, minHeight: mobile ? 44 : 32, minWidth: mobile ? 44 : 32, padding: 8, cursor: 'pointer' }}>✕</button>
+        <button onClick={onClose} aria-label={t("Fechar painel e cancelar prévia")} style={{ border: 0, background: c.containerTransparentBackground, color: c.modalText, minHeight: THEME_TOOL_BUTTON_HEIGHT, minWidth: THEME_TOOL_BUTTON_HEIGHT, padding: 0, cursor: 'pointer' }}>✕</button>
       </div>
       {compactInspection && <View style={{ padding: 10, gap: 6 }}>
         <Text style={{ fontSize: 12, color: c.textLink }}>{t("Toque no elemento para editar suas cores. Arraste a página para rolar.")}</Text>
@@ -170,7 +171,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
           </View>}
           {/* per-screen theme overrides removed (#1460) */}
           {!!bindings.length && <>
-            {button(origins ? t("Ocultar origens") : t("Ver variáveis e origens"), () => setOrigins((value) => !value))}
+            {button(origins ? t("Ocultar origens") : t("Ver variáveis e origens"), () => setOrigins((value) => !value), false, { width: '50%' })}
             {origins && <View style={{ gap: 4, padding: 8, backgroundColor: c.sectionBackground, borderRadius: 7 }}>
               {bindings.map((binding, index) => {const source = actual.sources[binding.token];return <Text key={`${binding.property}-${binding.token}-${index}`} selectable style={{ fontSize: 12, color: c.modalText }}>{binding.property} → {binding.token}: {String(values[binding.token] ?? t("Sem valor neste modo"))}{t(" · origem: ")}{parseScreenThemeKey(source || '') ? t("Nesta tela · {{v0}}-{{v1}}", { v0: binding.token, v1: runtime.mode }) : source || t("sem referência cadastrada")}</Text>;})}
             </View>}
@@ -184,7 +185,7 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
             </Text>)}
         </View>}
         {!!selection && !bindings.length && !selection.sources?.length && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
-        <ScrollView style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} concise onSaved={setTheme} />}</ScrollView>
+        <View style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} concise fixedHeader onSaved={setTheme} />}</View>
       </div>
     </div>
   </>, portalHost);
