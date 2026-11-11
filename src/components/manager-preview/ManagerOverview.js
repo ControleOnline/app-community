@@ -13,6 +13,7 @@ import ManagerOrdersTrend from './ManagerOrdersTrend';
 import {groupPaidOrdersSeries, mapSummarySeries} from './groupPaidOrdersSeries';
 import ManagerStartup from './ManagerStartup';
 import {CONTROL_HEIGHT} from './controlHeight';
+import ModuleTileGrid from './ModuleTileGrid';
 import Formatter from '@controleonline/ui-common/src/utils/formatter';
 import {api} from '@controleonline/ui-common/src/api';
 import {readCollection} from '../../experience/collections';
@@ -298,8 +299,8 @@ export default function ManagerOverview({navigation}) {
           dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
           <Text style={[s.panelTitle, {color: c.cardText}]}>{group.title}</Text>
-          <View testID={showModuleIcons ? 'manager-module-icon-grid' : undefined} style={showModuleIcons ? s.moduleGrid : s.moduleList}>
-            {group.items.map((item, j) => {
+          {(() => {
+            const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
               const appearance = moduleListAppearance({accent, colors: c});
               // Database colors are used as-is: no opacity applied (issue 1453).
@@ -307,7 +308,7 @@ export default function ManagerOverview({navigation}) {
               return <Pressable key={item.id || j} accessibilityRole="button"
               dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
               accessibilityLabel={item.title} onPress={() => go(item)}
-              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, {
+              style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
                 borderColor: c.listItemBorder,
                 backgroundColor: hovered || pressed
                   ? accent ?? c.listItemActiveBackground
@@ -324,8 +325,11 @@ export default function ManagerOverview({navigation}) {
                 {icon('chevron-right', appearance.iconColor, 14)}
               </>}
             </Pressable>;
-            })}
-          </View>
+            };
+            return showModuleIcons
+              ? <ModuleTileGrid testID="manager-module-icon-grid" items={group.items} renderTile={renderItem} />
+              : <View style={s.moduleList}>{group.items.map((item, j) => renderItem(item, j, null))}</View>;
+          })()}
         </View>;
       })}
     </View>
@@ -357,10 +361,9 @@ const s = StyleSheet.create({
   panelTitle: {fontSize: 15, fontWeight: '700'}, pending: {marginTop: 20, minHeight: 210, borderRadius: 12, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 12},
   quickIcon: {width:24,height:24,borderRadius:7,alignItems:'center',justifyContent:'center'},
   quick: {marginTop: 18, gap: 10}, quickItem: {flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 10, minHeight: CONTROL_HEIGHT, paddingHorizontal: 12, paddingVertical: 3},
-  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, padding: 20},
+  modules: {flexDirection: 'row', flexWrap: 'wrap', gap: 16}, module: {flexGrow: 1, flexBasis: 280, borderRadius: 16, borderWidth: 1, paddingTop: 14, paddingHorizontal: 20, paddingBottom: 20},
   moduleCards: {alignItems: 'flex-start'},
   iconModule: {minWidth: 0, flexShrink: 1},
-  moduleGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
   moduleTile: {width: 104, maxWidth: '100%', minHeight: 96, padding: 8, gap: 6,
     alignItems: 'center', borderWidth: 1, borderRadius: 10},
   moduleTileIcon: {width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center'},
