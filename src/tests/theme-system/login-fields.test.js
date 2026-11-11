@@ -23,3 +23,7 @@ test('retains the shared field colors on domains without a login palette', () =>
     backgroundColor:'#ffcc00',textColor:'#fafafa',placeholderColor:'#666666',
   });
 });
+
+test('the sign-in link labels have their own theme tokens (#1506)', () => {
+  expect(contract.names).toEqual(expect.arrayContaining(['loginLabelCreateAccount', 'loginLabelForgotPassword', 'loginLabelWellcome']));
+});

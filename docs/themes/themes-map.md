@@ -268,6 +268,9 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `loginInputBackground`
 - `loginInputText`
 - `loginInputPlaceholderText`
+- `loginLabelCreateAccount`
+- `loginLabelForgotPassword`
+- `loginLabelWellcome`
 
 ### link
 
