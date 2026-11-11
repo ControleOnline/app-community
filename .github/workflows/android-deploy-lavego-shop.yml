@@ -335,9 +335,6 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: production
           status: completed
-          # Play refuses to auto-send this app's changes for review; commit the edit and
-          # send it for review manually in the Play Console (#1491).
-          changesNotSentForReview: true
 
 
       - name: Deploy AAB to Extra FTP (Explicit FTPS)

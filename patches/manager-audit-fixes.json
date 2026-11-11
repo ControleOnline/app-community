@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.123",
+      "version": "1.2.116",
       "file": "src/api/index.js",
       "before": "68385ec57371849882d285d27a3e46cad623be583625c70a3de3b5a3adc7cdbe",
       "after": "68385ec57371849882d285d27a3e46cad623be583625c70a3de3b5a3adc7cdbe",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.123",
+      "version": "1.2.116",
       "file": "src/react/components/UserAvatar.js",
       "before": "39ef92a30e77f29297855c40200e306c9a619aa70dea91816b03500857589652",
       "after": "39ef92a30e77f29297855c40200e306c9a619aa70dea91816b03500857589652",
@@ -18,7 +18,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.123",
+      "version": "1.2.116",
       "file": "src/utils/storedSessionToken.js",
       "before": "f236653aa8bdb3b4b5faba1fc433ba43c42d71e33b6438c5b1132e486753d6d2",
       "after": "f236653aa8bdb3b4b5faba1fc433ba43c42d71e33b6438c5b1132e486753d6d2",
@@ -26,7 +26,7 @@
     },
     {
       "package": "@controleonline/ui-common",
-      "version": "1.2.123",
+      "version": "1.2.116",
       "file": "src/tests/react/utils/storedSessionToken.test.js",
       "before": "003babeae801aba7e73091baa35175fc161dabad512ee25faed09dce076acc5d",
       "after": "003babeae801aba7e73091baa35175fc161dabad512ee25faed09dce076acc5d",
@@ -42,7 +42,7 @@
     },
     {
       "package": "@controleonline/ui-default",
-      "version": "1.0.289",
+      "version": "1.0.288",
       "file": "src/react/components/table/useDefaultTableStoreSync.js",
       "before": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
       "after": "598a84da1eeb74d47a02065a18c10eda3507e6d442716225b724409fcb42c317",
@@ -50,7 +50,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/react/pages/CategoriesPage/categoryPresentationPalette.js",
       "before": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
       "after": "49b9f8189563cdf1aaad7c8b42e6733d129a9e0a1bcb4cfcf74fb89bbc7ec2be",
@@ -58,7 +58,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/react/pages/Products.js",
       "before": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
       "after": "412a7c9b33d9440d94961cb390d36385f01ee261bd4756cb18c277ef34c2f4c4",
@@ -66,7 +66,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/tests/react/components/ProductItemCustomizationRoute.test.js",
       "before": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
       "after": "02f1d81200a669d102e37897c3feff74b74140df936dd8411dea3acc1cb56f0b",
@@ -74,7 +74,7 @@
     },
     {
       "package": "@controleonline/ui-products",
-      "version": "1.0.43",
+      "version": "1.0.41",
       "file": "src/tests/react/pages/CategoriesPage/waiterCatalogRecovery.test.js",
       "before": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
       "after": "3b081b6561eb321b4bb3e36f29b2b4da66e0616973200ac0897038dacd4a00ec",
