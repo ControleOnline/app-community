@@ -1,0 +1,242 @@
+# aplicativo PDV para loja da Cielo
+# usando APINEW
+
+name: DEPLOY CIELO PDV LAVEGO MASTER V2
+
+on:
+ workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      EXPO_IDENTITY_SOURCE: app-json
+      APP_DISPLAY_NAME: PDV
+      APP_SLUG: pos
+      PACKAGE_NAME: com.lavego.staging
+      ASSETS_VARIANT: pos_lavego
+      GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_GMAPS_GOOGLE_CLIENT_ID: ${{ secrets.GMAPS_GOOGLE_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Update Submodules
+        run: |
+          git submodule sync --recursive
+          git submodule update --recursive --init --checkout
+
+      - uses: gradle/actions/setup-gradle@v3
+
+      - uses: amyu/setup-android@v4
+        with:
+          sdk-version: 36
+          build-tools-version: 36.0.0
+          ndk-version: 27.1.12297006
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Generate Dynamic Configs
+        run: |
+          echo "const env = {\
+          API_ENTRYPOINT: 'https://apinew.lave-go.com',\
+          DOMAIN: 'https://pos.lave-go.com',\
+          MANAGER_APP: 'https://app.lave-go.com',\
+          SOCKET: 'wss://apinew.lave-go.com',\
+          NEW_RELIC:{\
+            LICENSE_KEY:'${{ secrets.NEW_RELIC_LICENSE_KEY }}',\
+            APPLICATION_ID:'${{ secrets.NEW_RELIC_APPLICATION_ID }}',\
+            ACCOUNT_ID:'${{ secrets.NEW_RELIC_ACCOUNT_ID }}',\
+            TRUST_KEY:'${{ secrets.NEW_RELIC_TRUST_KEY }}',\
+            BEACON:'${{ secrets.NEW_RELIC_BEACON }}',\
+            ERROR_BEACON:'${{ secrets.NEW_RELIC_ERROR_BEACON }}'\
+          }\
+          };\
+          module.exports = { env };" > ./config/env.local.js
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Update app.json dynamically
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            app.expo.name                = 'Lave-Go Staging';
+            app.expo.android.package     = 'com.lavego.staging';
+            app.expo.slug                = 'pos-controle-online';
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "           
+
+      - name: Update version and versionCode in app.json (Positional)
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          node -e "
+            const fs = require('fs');
+            const app = require('./app.json');
+            
+            // Separa a versão '1.7.4' em [1, 7, 4]
+            const [major, minor, patch] = '$VERSION'.split('.').map(Number);
+            
+            // Calcula o código posicional
+            const calculatedVersionCode = (major * 100000) + (minor * 1000) + patch;
+            
+            // 🌟 ATUALIZA OS DOIS CAMPOS AGORA:
+            app.expo.version = '$VERSION'; // Injeta '1.7.4' para visualização do lojista
+            app.expo.android.versionCode = calculatedVersionCode; // Injeta 10704 para validação da Cielo
+            
+            fs.writeFileSync('./app.json', JSON.stringify(app, null, 2));
+          "
+
+      - name: Extract App Version and VersionCode
+        run: |
+          # 1. Extrai a versão de exibição do app.json
+          APP_VERSION=$(node -p "require('./app.json').expo.version")
+          echo "versão visível (Cielo Store): $APP_VERSION"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+
+          # 2. Extrai o versionCode numérico do app.json
+          VERSION_CODE=$(node -p "require('./app.json').expo.android.versionCode")
+          echo "versionCode interno (Controle Android): $VERSION_CODE"
+          echo "APP_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+
+      - name: Copy pos_lavego assets to default assets folder
+        run: |
+          cp -r src/assets/pos_lavego/* src/assets/ 2>/dev/null || true
+          echo "Assets pos_lavego copiados para src/assets/"
+
+      - name: Prebuild
+        run: npx expo prebuild --clean
+
+      - name: Validate vector icon fonts hook
+        run: grep -q 'react-native-vector-icons/fonts.gradle' android/app/build.gradle
+
+      - name: Create Android Signing Files
+        run: |
+          mkdir -p ./config/android
+          echo "${{ secrets.CERT }}" | base64 -d > ./config/android/controle-online.keystore
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=./config/android/controle-online.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=controle-online"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          } > ./config/android/env.properties
+
+      - name: Build Android APK
+        run: |
+          set -o pipefail
+          cd android
+          ./gradlew assembleRelease \
+            --init-script ../signing.gradle \
+            --stacktrace \
+            --info \
+            --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8" \
+            -Dorg.gradle.parallel=false \
+            2>&1 | tee /tmp/gradle-assemble-release.log | tail -300
+
+      - name: Validate generated APK
+        run: |
+          APK_PATH=$(find ./android/app/build/outputs/apk -type f -name '*.apk' | sort | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "Nenhum APK foi gerado dentro de ./android/app/build/outputs/apk" >&2
+            echo
+            echo "Conteudo disponivel em ./android/app/build/outputs:"
+            find ./android/app/build/outputs -maxdepth 4 -type f | sort || true
+            exit 1
+          fi
+  
+          APK_DIR=$(dirname "$APK_PATH")
+          APK_FILENAME=$(basename "$APK_PATH")
+
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+          echo "APK_DIR=$APK_DIR" >> "$GITHUB_ENV"
+          echo "APK_FILENAME=$APK_FILENAME" >> "$GITHUB_ENV"
+
+          ls -lah "$APK_DIR"
+          echo "APK localizado: $APK_FILENAME"
+
+      - name: Upload APK to Website (FTP)
+        uses: locaweb/ftp-deploy@1.0.0
+        with:
+          host: ${{ secrets.ADMIN_HOST }}
+          user: ${{ secrets.ADMIN_USER }}
+          password: ${{ secrets.ADMIN_PASS }}
+          localDir: ${{ env.APK_DIR }}
+          remoteDir: "public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          forceSsl: false
+
+      - name: Verify uploaded APK on FTP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+          # 🌟 CORRIGIDO: Agora usando o mapeamento de variáveis correto do GitHub
+          REMOTE_DIR="public_html/${{ env.APP_VERSION }}/${{ env.PACKAGE_NAME }}/apk"
+          LOG_FILE="$(mktemp)"
+
+          set +e
+          lftp -d -u "${{ secrets.ADMIN_USER }},${{ secrets.ADMIN_PASS }}" "ftp://${{ secrets.ADMIN_HOST }}" -e "
+            set cmd:fail-exit yes
+            set net:timeout 20
+            set net:max-retries 1
+            set ftp:passive-mode true
+            set ftp:ssl-allow no
+            set ftp:ssl-force no
+            set ssl:verify-certificate no
+            cls -la ${REMOTE_DIR}
+            bye
+          " 2>&1 | tee "$LOG_FILE"
+          LFTP_STATUS=${PIPESTATUS}
+          set -e
+
+          if [ "$LFTP_STATUS" -ne 0 ]; then
+            echo "Falha ao listar o diretório remoto após o upload." >&2
+            exit "$LFTP_STATUS"
+          fi
+
+          if grep -Fq "${{ env.APK_FILENAME }}" "$LOG_FILE"; then
+            echo "arquivo enviado com sucesso: ${REMOTE_DIR}/${{ env.APK_FILENAME }}"
+          else
+            echo "O upload terminou sem erro, mas o arquivo ${{ env.APK_FILENAME }} não apareceu na listagem de ${REMOTE_DIR}." >&2
+            exit 1
+          fi
+
+      - name: Upload APK to Extra FTP (sem apagar)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+          lftp -u "${{ secrets.FTPUSER_EXTRASLAVEGO }},${{ secrets.FTPPASS_EXTRASLAVEGO }}" "ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}" -e "
+            set cmd:fail-exit yes
+            set ftp:ssl-allow yes
+            set ftp:ssl-force true
+            set ssl:verify-certificate no
+            set ftp:passive-mode true
+            mkdir -p /${{ env.APP_VERSION }};
+            put -O /${{ env.APP_VERSION }}/ ${{ env.APK_PATH }};
+            bye
+          "
+
+      - name: Validar se o arquivo realmente subiu para o FTP (Via curl)
+        run: |
+          # Monta a URL exata do arquivo usando as variáveis do GitHub
+          REMOTE_FILE_URL="ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}/${{ env.APP_VERSION }}/${{ env.APK_FILENAME }}"
+          
+          echo "Verificando a existência do arquivo em: $REMOTE_FILE_URL"
+          
+          # Executa o curl com o --ftp-ssl-reqd que você testou no seu Mac.
+          # O parâmetro --head (-I) serve apenas para checar se o arquivo existe sem baixar o conteúdo inteiro.
+          curl --ftp-ssl-reqd -k -s -I \
+            -u "${{ secrets.FTPUSER_EXTRASLAVEGO }}:${{ secrets.FTPPASS_EXTRASLAVEGO }}" \
+            "$REMOTE_FILE_URL"
+          
+          # Se o curl retornar um código diferente de 0, significa que o arquivo não existe ou a conexão falhou
+          if [ $? -eq 0 ]; then
+            echo "SUCESSO: O arquivo ${{ env.APK_FILENAME }} foi encontrado no FTP!"
+          else
+            echo "ERRO CRITICO: O arquivo ${{ env.APK_FILENAME }} NÃO foi localizado no diretório remoto." >&2
+            exit 1
+          fi
