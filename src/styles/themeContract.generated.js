@@ -197,6 +197,7 @@ module.exports = {
         "footerBackground",
         "footerBorder",
         "footerIcon",
+        "footerLabelInfo",
         "footerLink",
         "footerText"
       ]
@@ -644,6 +645,7 @@ module.exports = {
     "footerBackground",
     "footerBorder",
     "footerIcon",
+    "footerLabelInfo",
     "footerLink",
     "footerText",
     "headerBackground",
