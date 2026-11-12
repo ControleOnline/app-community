@@ -350,7 +350,9 @@ jobs:
             set ftp:ssl-force true
             set ssl:verify-certificate no
             set ftp:passive-mode true
+            set cmd:fail-exit no
             mkdir -p /${{ env.VERSION }};
+            set cmd:fail-exit yes
             put -O /${{ env.VERSION }}/ ${{ env.AAB_PATH }};
             bye
           "
