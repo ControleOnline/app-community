@@ -1,19 +1,19 @@
 {
-  "version": "1.10.197",
+  "version": "1.10.198",
   "rc": 1,
-  "branch": "rc/1.10.197-rc.1",
-  "baseMaster": "59ad1474814b4a92c27e054194f70fe577636122",
+  "branch": "rc/1.10.198-rc.1",
+  "baseMaster": "86e50267b644ad40d499007c2992be26c06b3b4c",
   "tasks": [
-    1528
+    1532
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "631023812d8b3efed22b83a4fd53816b925bf672",
+    "ControleOnline/app-community": "42322d8d122914b6f65e876cb42080cfc0f3b38c",
     "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
   },
   "validation": {
-    "scope": "Workflows _v2 refeitos a partir dos originais (PDV Cielo e Shop force); unica alteracao: upload FTP extras via lftp put sem apagar.",
-    "checks": "YAML validado; diff contra originais limitado ao passo de FTP; PR dev com source-policy e baseline-checks ok"
+    "scope": "Workflows _v2: mkdir do FTP extras tolera pasta existente (550 File exists); put segue com fail-exit.",
+    "checks": "YAML validado; diff limitado a 2 linhas por arquivo; PR dev com source-policy e baseline-checks ok"
   }
 }
