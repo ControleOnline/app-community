@@ -1,20 +1,19 @@
 {
-  "version": "1.10.202",
-  "rc": 1,
-  "branch": "rc/1.10.202-rc.1",
-  "baseMaster": "78c642c1578b276bc8b8a5c5c1da159c53ec29aa",
+  "version": "1.10.203",
+  "rc": 2,
+  "branch": "rc/1.10.203-rc.2",
+  "baseMaster": "f9b367ec50ae91df6a02fbf7deb95fc86261c8e5",
   "tasks": [
-    1536,
-    1540
+    1545
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4c288cb436e58a26ba9867efeafd60b54a5668fa",
-    "ControleOnline/ui-products": "3d5c31a6b90006480d8b00e571c4b629a2d4d640"
+    "ControleOnline/app-community": "3b305fb94012f63a0834944e3b2e4c5ccfbce3dd",
+    "ControleOnline/ui-common": "15fe9362ec2cdc6f98c1eefc6241ff1ed682aa28"
   },
   "validation": {
-    "scope": "Categorias (ui-products 1.0.45): formulario com seletor de icones padrao, mais estreito, cores lado a lado e botoes corretos (#1536); cards com margem, caixa de icone, badge em pilula e acoes alinhadas (#1540).",
-    "checks": "Security aceito (#1536, #1540); ui-products npm test (13/13); diff do pacote 1.0.43 x 1.0.45 limitado aos arquivos de categorias; patches do app conferidos; RC 1.10.199 e 1.10.200 em staging. QA nao concedido; nao validado visualmente em emulador."
+    "scope": "Rodape: ids nao-IPv4 hex/UUID exibidos como …xxxx:xxxx (ui-common 1.2.126, #138). Overlays patches/ atualizados (versao e checksum do RuntimeInfoFooter.js).",
+    "checks": "ui-common npm run test:runtime-footer 26/26; checksums dos 17 overlays ui-common conferidos contra v1.2.126; Security aceito (ui-common#138). Nao validado visualmente em dispositivo."
   }
 }
