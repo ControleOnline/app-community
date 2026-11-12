@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.197",
+  "version": "1.10.198",
   "private": true,
   "scripts": {
     "android": "npm run manager:prepare && node scripts/apply-native-screens-patch.cjs && expo run:android",
