@@ -1,19 +1,19 @@
 {
-  "version": "1.10.198",
+  "version": "1.10.199",
   "rc": 1,
-  "branch": "rc/1.10.198-rc.1",
-  "baseMaster": "86e50267b644ad40d499007c2992be26c06b3b4c",
+  "branch": "rc/1.10.199-rc.1",
+  "baseMaster": "936c37152834aecd575f4fe6b92d1baea065e0cd",
   "tasks": [
-    1532
+    1536
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "42322d8d122914b6f65e876cb42080cfc0f3b38c",
-    "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
+    "ControleOnline/app-community": "495b01138f38848eefb98c2ebe8c3436433773f8",
+    "ControleOnline/ui-products": "aadc8149152fbe5bfab2975dabe9f0cb4bb13e15"
   },
   "validation": {
-    "scope": "Workflows _v2: mkdir do FTP extras tolera pasta existente (550 File exists); put segue com fail-exit.",
-    "checks": "YAML validado; diff limitado a 2 linhas por arquivo; PR dev com source-policy e baseline-checks ok"
+    "scope": "Formulario de categorias (ui-products 1.0.44): seletor de icones padrao (DefaultFeatherIconPicker), formulario mais estreito, cores lado a lado e botoes Cancelar/Salvar com estilos corretos.",
+    "checks": "ui-products test:category-form (3) + npm test (5/5); diff 1.0.43 x 1.0.44 limitado aos arquivos do formulario; patches do app conferidos (arquivos patchados inalterados). Nao validado em emulador/navegador."
   }
 }
