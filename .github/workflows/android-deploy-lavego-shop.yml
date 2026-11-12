@@ -340,18 +340,23 @@ jobs:
           changesNotSentForReview: true
 
 
-      - name: Deploy AAB to Extra FTP (Explicit FTPS)
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTPHOST_EXTRASLAVEGO }}
-          username: ${{ secrets.FTPUSER_EXTRASLAVEGO }}
-          password: ${{ secrets.FTPPASS_EXTRASLAVEGO }}
-          protocol: ftps
-          port: 21
-          security: loose
-          local-dir: ${{ env.AAB_DIR }}/
-          server-dir: /${{ env.VERSION }}/
-          
+      - name: Upload AAB to Extra FTP (sem apagar)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+          lftp -u "${{ secrets.FTPUSER_EXTRASLAVEGO }},${{ secrets.FTPPASS_EXTRASLAVEGO }}" "ftp://${{ secrets.FTPHOST_EXTRASLAVEGO }}" -e "
+            set cmd:fail-exit yes
+            set ftp:ssl-allow yes
+            set ftp:ssl-force true
+            set ssl:verify-certificate no
+            set ftp:passive-mode true
+            set cmd:fail-exit no
+            mkdir -p /${{ env.VERSION }};
+            set cmd:fail-exit yes
+            put -O /${{ env.VERSION }}/ ${{ env.AAB_PATH }};
+            bye
+          "
+
       - name: Validar se o arquivo realmente subiu para o FTP (Via curl)
         run: |
           # Monta a URL exata do arquivo usando as variáveis corretas do GitHub (VERSION)
