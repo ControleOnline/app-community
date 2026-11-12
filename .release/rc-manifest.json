@@ -1,19 +1,19 @@
 {
-  "version": "1.10.203",
+  "version": "1.10.204",
   "rc": 2,
-  "branch": "rc/1.10.203-rc.2",
-  "baseMaster": "f9b367ec50ae91df6a02fbf7deb95fc86261c8e5",
+  "branch": "rc/1.10.204-rc.2",
+  "baseMaster": "225a3e128585bf7bf78795a236a4781e8c4fead8",
   "tasks": [
-    1545
+    1548
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "3b305fb94012f63a0834944e3b2e4c5ccfbce3dd",
-    "ControleOnline/ui-common": "15fe9362ec2cdc6f98c1eefc6241ff1ed682aa28"
+    "ControleOnline/app-community": "f7d806efa9205d13944035210ee08a28c2adaae7",
+    "ControleOnline/ui-people": "b020ac6db5061c7019609011638296112227da16"
   },
   "validation": {
-    "scope": "Rodape: ids nao-IPv4 hex/UUID exibidos como …xxxx:xxxx (ui-common 1.2.126, #138). Overlays patches/ atualizados (versao e checksum do RuntimeInfoFooter.js).",
-    "checks": "ui-common npm run test:runtime-footer 26/26; checksums dos 17 overlays ui-common conferidos contra v1.2.126; Security aceito (ui-common#138). Nao validado visualmente em dispositivo."
+    "scope": "Perfil: timezone do usuario marcado quando vem por id, IRI ou nome (ui-people 1.0.103, #48).",
+    "checks": "profileTimezone.test.js 5/5 (jest do app); patch People.js sem mudanca entre 1.0.102 e 1.0.103; Security aceito (#1548). Nao validado em dispositivo."
   }
 }

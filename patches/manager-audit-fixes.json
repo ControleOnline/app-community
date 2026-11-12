@@ -98,7 +98,7 @@
     },
     {
       "package": "@controleonline/ui-people",
-      "version": "1.0.102",
+      "version": "1.0.103",
       "file": "src/react/pages/People.js",
       "before": "d9466f73825ef6cb48da2a937e1cdd4226c0159223d96548cfa4fe14b97b4e3b",
       "after": "d9466f73825ef6cb48da2a937e1cdd4226c0159223d96548cfa4fe14b97b4e3b",
