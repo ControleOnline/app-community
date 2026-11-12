@@ -1,19 +1,19 @@
 {
-  "version": "1.10.199",
+  "version": "1.10.200",
   "rc": 1,
-  "branch": "rc/1.10.199-rc.1",
+  "branch": "rc/1.10.200-rc.1",
   "baseMaster": "936c37152834aecd575f4fe6b92d1baea065e0cd",
   "tasks": [
-    1536
+    1540
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "495b01138f38848eefb98c2ebe8c3436433773f8",
-    "ControleOnline/ui-products": "aadc8149152fbe5bfab2975dabe9f0cb4bb13e15"
+    "ControleOnline/app-community": "75cc2fd054ead5ec660060995c175d114444c8b4",
+    "ControleOnline/ui-products": "3d5c31a6b90006480d8b00e571c4b629a2d4d640"
   },
   "validation": {
-    "scope": "Formulario de categorias (ui-products 1.0.44): seletor de icones padrao (DefaultFeatherIconPicker), formulario mais estreito, cores lado a lado e botoes Cancelar/Salvar com estilos corretos.",
-    "checks": "ui-products test:category-form (3) + npm test (5/5); diff 1.0.43 x 1.0.44 limitado aos arquivos do formulario; patches do app conferidos (arquivos patchados inalterados). Nao validado em emulador/navegador."
+    "scope": "Cards de categorias (ui-products 1.0.45): margem interna, caixa de icone com a cor da categoria, badge de contexto em pilula, acoes alinhadas; estilos inexistentes corrigidos (dialogo de exclusao, filtros, seletor de categoria pai).",
+    "checks": "ui-products npm test (13/13 incl. contrato de estilos das 3 telas); sintaxe validada com Babel; diff 1.0.44 x 1.0.45 limitado aos arquivos de categorias. Nao validado visualmente em navegador/emulador. RC baseada em staging (contem #1536)."
   }
 }
