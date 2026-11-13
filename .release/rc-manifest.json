@@ -1,7 +1,7 @@
 {
   "version": "1.10.205",
-  "rc": 1,
-  "branch": "rc/1.10.205-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.205-rc.2",
   "baseMaster": "54354c49d416394369037c1a9b9121a7b8d81293",
   "tasks": [
     1496
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f3d3dcdcd85e969d7122164e91616fed9d0e78d1"
+    "ControleOnline/app-community": "fbcf9c1fc97565b9a300ed99cdb36f086b977816"
   },
   "validation": {
     "scope": "Theme configurator, login preview, header and footer theme inspection. Existing team product code and dependency pins preserved. App only; no API, database or migration actions.",
-    "checks": "QA + Security accepted exact task SHA; 218 local tests passed (183 themes, 9 login/footer, 26 runtime footer), 183 themes repeated on dev composition.",
-    "devMerge": "f448438d1e8cc049c8867ea4c307dded5eb37f06",
+    "checks": "Previous 218 product tests passed. Runner correction:12 workflow/domain tests passed; 2-line OS pin, no product changes. Remote Chromium installation must be repeated.",
+    "devMerge": "89337e2ddc975d12a6d2369f81b882ad5d5b80ba",
     "authorization": "Only dev and staging; no master promotion or database changes."
   }
 }
