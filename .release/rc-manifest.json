@@ -1,19 +1,18 @@
 {
   "version": "1.10.204",
-  "rc": 2,
-  "branch": "rc/1.10.204-rc.2",
-  "baseMaster": "225a3e128585bf7bf78795a236a4781e8c4fead8",
+  "rc": 3,
+  "branch": "rc/1.10.204-rc.3",
+  "baseMaster": "5e8937e2dada26b5a79e50ab23b072056ad03127",
   "tasks": [
-    1548
+    1552
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f7d806efa9205d13944035210ee08a28c2adaae7",
-    "ControleOnline/ui-people": "b020ac6db5061c7019609011638296112227da16"
+    "ControleOnline/app-community": "5e252a624def164c8503e0de3f5112f4d3c6fc64"
   },
   "validation": {
-    "scope": "Perfil: timezone do usuario marcado quando vem por id, IRI ou nome (ui-people 1.0.103, #48).",
-    "checks": "profileTimezone.test.js 5/5 (jest do app); patch People.js sem mudanca entre 1.0.102 e 1.0.103; Security aceito (#1548). Nao validado em dispositivo."
+    "scope": "CI: setup-java 17 antes do setup-gradle nos 3 workflows Android. Sem mudanca de versao do app.",
+    "checks": "Mudanca apenas em .github/workflows (15 linhas); validacao ocorre no proximo run dos workflows. Security aceito (#1552)."
   }
 }
