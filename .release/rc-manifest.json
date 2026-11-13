@@ -1,19 +1,18 @@
 {
-  "version": "1.10.198",
-  "rc": 1,
-  "branch": "rc/1.10.198-rc.1",
-  "baseMaster": "86e50267b644ad40d499007c2992be26c06b3b4c",
+  "version": "1.10.204",
+  "rc": 3,
+  "branch": "rc/1.10.204-rc.3",
+  "baseMaster": "5e8937e2dada26b5a79e50ab23b072056ad03127",
   "tasks": [
-    1532
+    1552
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "42322d8d122914b6f65e876cb42080cfc0f3b38c",
-    "ControleOnline/ui-login": "bbd31e970473a3e146fef3504953d96abc2e06f4"
+    "ControleOnline/app-community": "5e252a624def164c8503e0de3f5112f4d3c6fc64"
   },
   "validation": {
-    "scope": "Workflows _v2: mkdir do FTP extras tolera pasta existente (550 File exists); put segue com fail-exit.",
-    "checks": "YAML validado; diff limitado a 2 linhas por arquivo; PR dev com source-policy e baseline-checks ok"
+    "scope": "CI: setup-java 17 antes do setup-gradle nos 3 workflows Android. Sem mudanca de versao do app.",
+    "checks": "Mudanca apenas em .github/workflows (15 linhas); validacao ocorre no proximo run dos workflows. Security aceito (#1552)."
   }
 }

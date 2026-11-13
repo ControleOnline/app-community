@@ -198,7 +198,8 @@ module.exports = {
         "footerBorder",
         "footerIcon",
         "footerLink",
-        "footerText"
+        "footerText",
+        "footerCompanyText"
       ]
     },
     {
@@ -210,7 +211,13 @@ module.exports = {
         "headerLink",
         "headerText",
         "headerCompanyText",
-        "headerCompanyIcon"
+        "headerCompanyIcon",
+        "headerAppTypeBackground",
+        "headerAppTypeBorder",
+        "headerAppTypeText",
+        "headerAppTypeIcon",
+        "headerAppTypeLabelText",
+        "headerAppTypeResetText"
       ]
     },
     {
@@ -646,6 +653,7 @@ module.exports = {
     "footerIcon",
     "footerLink",
     "footerText",
+    "footerCompanyText",
     "headerBackground",
     "headerBorder",
     "headerIcon",
@@ -653,6 +661,12 @@ module.exports = {
     "headerText",
     "headerCompanyText",
     "headerCompanyIcon",
+    "headerAppTypeBackground",
+    "headerAppTypeBorder",
+    "headerAppTypeText",
+    "headerAppTypeIcon",
+    "headerAppTypeLabelText",
+    "headerAppTypeResetText",
     "iconActive",
     "iconBackground",
     "iconColor",
@@ -934,6 +948,12 @@ module.exports = {
       "label": "Cards de resumo financeiro",
       "usage": "Cards mensais e caixas de métricas do relatório de resultados"
     },
+    "footerCompanyText": {
+      "base": "footerText",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Texto de empresa e informações no rodapé"
+    },
     "headerCompanyText": {
       "base": "selectText",
       "variant": "globalChrome",
@@ -945,6 +965,42 @@ module.exports = {
       "variant": "globalChrome",
       "label": "Áreas permanentes",
       "usage": "Seta da empresa no cabeçalho"
+    },
+    "headerAppTypeBackground": {
+      "base": "selectBackground",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Fundo do seletor de tipo de app"
+    },
+    "headerAppTypeBorder": {
+      "base": "selectBorder",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Borda do seletor de tipo de app"
+    },
+    "headerAppTypeText": {
+      "base": "selectText",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Texto do seletor de tipo de app"
+    },
+    "headerAppTypeIcon": {
+      "base": "selectIcon",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Seta do seletor de tipo de app"
+    },
+    "headerAppTypeLabelText": {
+      "base": "textMuted",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Legenda do seletor de tipo de app"
+    },
+    "headerAppTypeResetText": {
+      "base": "linkText",
+      "variant": "globalChrome",
+      "label": "Áreas permanentes",
+      "usage": "Link para voltar ao ADMIN"
     },
     "menuSectionText": {
       "base": "textSecondary",
@@ -1137,6 +1193,7 @@ module.exports = {
     "cardShadow",
     "cardText",
     "containerTransparentBackground",
+    "footerCompanyText",
     "headerBackground",
     "headerBorder",
     "headerCompanyIcon",

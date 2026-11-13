@@ -13,9 +13,11 @@ export default function ThemeToolsProvider({children}) {
   const available=Platform.OS==='web' && (is_admin_build || app_type==='MANAGER') && !!auth.getters.isLogged
     && canAdministerCompany({company:currentCompany,mainCompany,user:auth.getters.user});
   const [open,setOpen]=useState(false);
+  const [initialView,setInitialView]=useState('screen');
+  const [viewRequest,setViewRequest]=useState(0);
   useEffect(()=>{if(!available){setOpen(false);clearThemePreview();}},[available]);
-  return <Context.Provider value={{available,openEditor:()=>{if(available)setOpen(true);}}}>
+  return <Context.Provider value={{available,openEditor:options=>{if(available){setInitialView(options?.preview==='login'?'login':'screen');setViewRequest(value=>value+1);setOpen(true);}}}}>
     {children}
-    {available && open && <FloatingThemePanel onClose={()=>setOpen(false)} />}
+    {available && open && <FloatingThemePanel initialView={initialView} viewRequest={viewRequest} onClose={()=>setOpen(false)} />}
   </Context.Provider>;
 }

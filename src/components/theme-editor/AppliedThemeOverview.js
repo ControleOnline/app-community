@@ -81,6 +81,7 @@ export default function AppliedThemeOverview({ companyThemes = [], onResolved, o
      {binding?.canApply && <ThemeCatalog mode="apply" primary />}
      {theme && tools.available && button(t("Editar tema aplicado"), () => setOpen(true))}
      {tools.available && button(t("Abrir painel e inspetor"), tools.openEditor)}
+     {tools.available && button(t("Prévia do login"), () => tools.openEditor({preview: 'login'}))}
      {button(expanded ? t("Ocultar detalhes") : t("Ver detalhes"), () => setExpanded((value) => !value))}
     </View>
   {expanded && <View style={{ gap: 10 }}>

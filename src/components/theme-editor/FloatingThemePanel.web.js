@@ -10,6 +10,9 @@ import { useThemeRuntime, getThemeSnapshot } from '../../styles/themeRuntime';
 import { resolveManagerTheme, describeThemeColor } from '../../styles/managerTheme';
 import { resolveScreenThemeDetails } from '../../styles/screenTheme';
 import { parseScreenThemeKey } from '../../styles/screenThemeKeys';
+import LoginThemePreview from './LoginThemePreview.web';
+import LoginPreviewOrigins from './LoginPreviewOrigins';
+import {loadLoginPreviewCompany} from './loginPreviewModel';
 
 const visibleViewport = () => {
   if (typeof window === 'undefined') return { width: 1024, height: 800, inset: 0 };
@@ -26,7 +29,7 @@ const shortcutBarInset = () => {
   return inset;
 };
 
-export default function FloatingThemePanel({ onClose }) {const c = useThemeEditorPalette();
+export default function FloatingThemePanel({ onClose, initialView = 'screen', viewRequest = 0 }) {const c = useThemeEditorPalette();
   const runtime = useThemeRuntime();
   const mobile = useWindowDimensions().width <= 760;
   const [theme, setTheme] = useState(null);
@@ -38,6 +41,9 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const [interaction, setInteraction] = useState('normal');
   const [editScope, setEditScope] = useState('global');
   const [origins, setOrigins] = useState(false);
+  const [loginPreview, setLoginPreview] = useState(false);
+  const [loginCompany, setLoginCompany] = useState(null);
+  const [loginError, setLoginError] = useState('');
   const [viewport, setViewport] = useState(visibleViewport);
   const [dockInset, setDockInset] = useState(0);
   const [position, setPosition] = useState({ x: null, y: 16 });
@@ -45,6 +51,14 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const [portalHost] = useState(() => document.createElement ? document.createElement('div') : document.body);
   const stopDrag = useRef(null);
   const context = editorContext();
+  useEffect(() => {
+    if (!loginPreview) return;
+    let alive = true;
+    setLoginCompany(null);setLoginError('');
+    loadLoginPreviewCompany().then(company => {if (alive) setLoginCompany(company);})
+      .catch(error => {if (alive) {setLoginError(error.message);setInspecting(false);}});
+    return () => {alive = false;};
+  }, [loginPreview, context]);
   useEffect(() => {
     // Keep the same portal root (and draft) inside an open account modal's focus
     // boundary. Moving the DOM host avoids remounting the editor on menu changes.
@@ -66,6 +80,11 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
     loadDomainTheme().then((value) => {if (alive) setTheme(value);}).catch((e) => {if (alive) setError(e.message || t("Não foi possível abrir o tema."));});
     return () => {alive = false;};
   }, [context, reload]);
+  useEffect(() => {
+    setLoginPreview(initialView === 'login');setInspecting(initialView === 'login');
+    setSelection(null);setHover(null);
+  // Repeated entry requests must reopen the requested view without remounting drafts.
+  }, [initialView, viewRequest]);
   useEffect(() => {
     if (!inspecting) return;
     return attachThemeInspector(document, (hit) => {
@@ -136,6 +155,12 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
   const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .78),
     viewport.height + viewport.inset - mobileBottom - 12));
   return createPortal(<>
+    {loginPreview && !loginCompany && <div role="status" style={{position: 'fixed', inset: 0,
+      right: mobile ? 0 : 580, zIndex: 2147482990, display: 'grid', placeItems: 'center',
+      background: c.pageBackground, color: c.textPrimary, padding: 24}}>
+      {loginError ? t(loginError) : t('Carregando a prévia do login…')}
+    </div>}
+    {loginPreview && loginCompany && <LoginThemePreview company={loginCompany} mobile={mobile} />}
     {hover && inspecting && <ThemeInspectionHighlight hover={hover} viewport={viewport}
       panel={panel} panelPosition={position} translate={t} />}
     <div ref={panel} data-co-theme-tools="true" role="dialog" aria-modal="false" aria-label={t("Configurador flutuante de temas")}
@@ -156,6 +181,9 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {button(inspecting ? t("Parar inspeção") : selection ? t("Voltar à inspeção") : t("⌖ Inspecionar elemento"), () => setInspecting((value) => !value))}
             {button(t("Barra de rolagem"), selectScrollbar, selection?.kind === 'scrollbar')}
+            {button(loginPreview ? t('Voltar à tela atual') : t('Prévia do login'), () => {
+              setLoginPreview(value => !value);setSelection(null);setInspecting(!loginPreview);setHover(null);
+            }, loginPreview)}
             {!!selection && button(t("Todas as variáveis"), () => setSelection(null))}
             {!!selection?.container && button(
               t(selection.container.kind === 'shortcut-bar' ? "Fundo e borda da barra de atalhos" : "Fundo e borda do menu"),
@@ -165,10 +193,23 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
           </View>
           {inspecting && !mobile && <Text style={{ fontSize: 12, color: c.textLink }}>{t("Passe sobre a tela e clique no elemento. Esc encerra a inspeção.")}</Text>}
           {!!error && <Text accessibilityRole="alert" style={{ fontSize: 12, color: c.textDanger }}>{t(error)}</Text>}
+          {loginPreview && <>
+            <Text style={{fontSize: 12, color: c.textSecondary}}>{t('Prévia do login do domínio. Use o inspetor para editar as cores; variáveis compartilhadas também afetam outras telas. Nenhum acesso ou envio de credenciais é executado.')}</Text>
+            {loginError ? <Text accessibilityRole="alert" style={{color: c.textDanger}}>{t(loginError)}</Text>
+              : !loginCompany ? <Text style={{color: c.textSecondary}}>{t('Carregando imagens e empresa do domínio…')}</Text>
+              : <details open={!!selection?.media}><summary style={{cursor: 'pointer'}}>{t('Origem do logo e do fundo')}</summary>
+                <div style={{maxHeight: 220, overflow: 'auto'}}>
+                <LoginPreviewOrigins company={loginCompany} selectedType={selection?.media?.type} />
+                </div>
+              </details>}
+          </>}
           {!!selection && <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {button(t("Normal"), () => setInteraction('normal'), interaction === 'normal')}
             {!!selection.states?.hover && button(t("Hover"), () => setInteraction('hover'), interaction === 'hover')}
           </View>}
+          {!!selection && !inspecting && <Text style={{fontSize: 12, color: c.textSecondary}}>
+            {t('Para selecionar outro elemento, clique em Voltar à inspeção.')}
+          </Text>}
           {/* per-screen theme overrides removed (#1460) */}
           {!!bindings.length && <>
             {button(origins ? t("Ocultar origens") : t("Ver variáveis e origens"), () => setOrigins((value) => !value), false, { width: '50%' })}
@@ -184,8 +225,8 @@ export default function FloatingThemePanel({ onClose }) {const c = useThemeEdito
               {source.source} · {source.record} · {source.value} ({source.property})
             </Text>)}
         </View>}
-        {!!selection && !bindings.length && !selection.sources?.length && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
-        <View style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} concise fixedHeader onSaved={setTheme} />}</View>
+        {!!selection && !bindings.length && !selection.sources?.length && !selection.media && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
+        <View style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} fixedMode={loginPreview} concise fixedHeader onSaved={setTheme} />}</View>
       </div>
     </div>
   </>, portalHost);
