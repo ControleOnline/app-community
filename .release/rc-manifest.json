@@ -1,18 +1,19 @@
 {
   "version": "1.10.204",
-  "rc": 4,
-  "branch": "rc/1.10.204-rc.4",
-  "baseMaster": "54354c49d416394369037c1a9b9121a7b8d81293",
+  "rc": 5,
+  "branch": "rc/1.10.204-rc.5",
+  "baseMaster": "0a9418da6b07ee722aa5d6fb1fad8efe4dfbb729",
   "tasks": [
-    1558
+    1560
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "5d797083f0123ce4254ad4383214752674f522bc"
+    "ControleOnline/app-community": "d82c5f7205daf4057623264af3f3c2642b6db510",
+    "ControleOnline/ui-default": "17ae683bd49985ddc8f7aaa0dc828cd6b126cf90"
   },
   "validation": {
-    "scope": "CI: setup-java 17 na action composta android-build (usada por deploy.yml, deploy-lave-go.yml e native-build-checks.yml). Sem mudanca de versao do app.",
-    "checks": "Mudanca de 5 linhas em .github/actions/android-build/action.yml; validacao no proximo run do deploy. Security aceito (#1558)."
+    "scope": "Mapa nativo: import das funcoes de navegacao corrigido (ui-default 1.0.290, #64). Sem mudanca de versao do app.",
+    "checks": "DefaultNativeMap.imports.test.js 3/3 (falha na 1.0.289); arquivos patchados do ui-default inalterados entre 1.0.289 e 1.0.290; Security aceito (#1560, ui-default#64). Nao validado visualmente depois da correcao."
   }
 }
