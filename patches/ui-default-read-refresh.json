@@ -1,6 +1,6 @@
 {
   "package": "@controleonline/ui-default",
-  "version": "1.0.289",
+  "version": "1.0.290",
   "file": "src/store/default/actions.js",
   "before": "a5ef6bb307282f29f41b0d20d430777754ae155d038bf119cb8c5d56cda97375",
   "after": "a5ef6bb307282f29f41b0d20d430777754ae155d038bf119cb8c5d56cda97375",
