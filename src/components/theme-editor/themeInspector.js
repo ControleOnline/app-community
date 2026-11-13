@@ -3,6 +3,14 @@ const validBindings=value=>Array.isArray(value)?value.filter(item=>typeof item?.
 const uniqueBindings=bindings=>[...new Map(bindings.map(item=>[`${item.property}:${item.token}`,item])).values()];
 export function inspectThemeElement(element) {
   if(!element || element.closest?.('[data-co-theme-tools="true"]'))return null;
+  const mediaNode = element.closest?.('[data-co-login-media]');
+  if (mediaNode) {
+    try {
+      const media = JSON.parse(mediaNode.getAttribute('data-co-login-media'));
+      if (['logo', 'background'].includes(media?.type) && media.companyId)
+        return {node: mediaNode, bindings: [], states: {normal: []}, kind: 'login-media', media};
+    } catch {return null;}
+  }
   let node=element.closest?.('[data-co-theme]');
   const stateNode=element.closest?.('[data-co-theme-states]');
   const sourceNode=element.closest?.('[data-co-theme-source]');
@@ -44,7 +52,8 @@ export function attachThemeInspector(document,onHover,onSelect) {
   // Inspector feedback must stay independent of the palette being edited.
   const cursorStyle=document.createElement?.('style');
   if(cursorStyle){
-    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; }';
+    // The informational footer is click-through normally; only inspection enables its targets.
+    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; } [data-testid="runtime-info-footer"], [data-testid="runtime-info-footer"] * { pointer-events: auto !important; }';
     document.head?.appendChild?.(cursorStyle);
   }
   const tools=event=>event.target.closest?.('[data-co-theme-tools="true"]');
