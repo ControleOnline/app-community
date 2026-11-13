@@ -1,5 +1,13 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {useThemeEditorPalette} from './themeToolPresentation';
+
+// Inspector chrome must stay visible independently of the theme being inspected.
+const inspectorPalette = Object.freeze({
+  outline: '#218aff',
+  background: '#182235',
+  text: '#ffffff',
+  secondaryText: '#c4d4e7',
+  swatchBorder: '#ffffff',
+});
 
 export function groupInspectionColors(colors) {
   const result = new Map();
@@ -27,7 +35,7 @@ export function inspectionLabelPosition(target, size, viewport, panel) {
 }
 
 export default function ThemeInspectionHighlight({hover, viewport, panel, panelPosition, translate: t}) {
-  const c = useThemeEditorPalette();
+  const c = inspectorPalette;
   const label = useRef(null);
   const [position, setPosition] = useState({left: 4, top: 4});
   useLayoutEffect(() => {
@@ -39,17 +47,17 @@ export default function ThemeInspectionHighlight({hover, viewport, panel, panelP
   return <>
     <div aria-hidden data-co-theme-highlight="true" style={{pointerEvents: 'none', position: 'fixed',
       left: hover.left, top: hover.top, width: hover.width, height: hover.height,
-      outline: `2px solid ${c.inputFocusBorder}`, outlineOffset: -2, background: 'transparent', zIndex: 2147482999}} />
+      outline: `2px solid ${c.outline}`, outlineOffset: -2, background: 'transparent', zIndex: 2147482999}} />
     <div ref={label} aria-hidden data-co-theme-inspection-label="true" style={{pointerEvents: 'none', position: 'fixed',
       ...position, width: Math.min(440, viewport.width - 8), boxSizing: 'border-box', maxHeight: viewport.height - 8,
-      overflow: 'hidden', padding: '5px 8px', borderRadius: 5, background: c.modalBackground, color: c.modalText,
+      overflow: 'hidden', padding: '5px 8px', borderRadius: 5, background: c.background, color: c.text,
       fontSize: 12, fontFamily: 'monospace', zIndex: 2147483001}}>
       <div>{hover.name} · {Math.round(hover.width)} × {Math.round(hover.height)}</div>
       {hover.colors.slice(0, 5).map(({property, token, value, source, record, reference}) =>
         <div key={`${property}:${token}:${record || ''}`} style={{display: 'flex', alignItems: 'center', gap: 6, marginTop: 5, overflowWrap: 'anywhere'}}>
-          <span style={{display: 'inline-block', width: 12, height: 12, flexShrink: 0, border: `1px solid ${c.modalBorder}`, background: value || 'transparent'}} />
-          <span>{token} · {value || t('Sem valor')} <span style={{color: c.textSecondary}}>({property})</span>
-            {source && <span style={{display: 'block', color: c.textSecondary}}>{t('Cadastro')}: {record}
+          <span style={{display: 'inline-block', width: 12, height: 12, flexShrink: 0, border: `1px solid ${c.swatchBorder}`, background: value || 'transparent'}} />
+          <span>{token} · {value || t('Sem valor')} <span style={{color: c.secondaryText}}>({property})</span>
+            {source && <span style={{display: 'block', color: c.secondaryText}}>{t('Cadastro')}: {record}
               {reference && reference !== value ? ` · ${reference} → ${value}` : ''}</span>}
           </span>
         </div>)}

@@ -3,6 +3,9 @@ import renderer,{act} from 'react-test-renderer';
 import FloatingThemePanel from '../../components/theme-editor/FloatingThemePanel.web';
 import {attachThemeInspector} from '../../components/theme-editor/themeInspector';
 let mockWidth=393,mockMounts=0;
+jest.mock('../../components/theme-editor/LoginThemePreview.web',()=> 'LoginPreview');
+jest.mock('../../components/theme-editor/LoginPreviewOrigins',()=> 'LoginOrigins');
+jest.mock('../../components/theme-editor/loginPreviewModel',()=>({loadLoginPreviewCompany:jest.fn().mockResolvedValue({id:7,alias:'Domain company'})}));
 jest.mock('react-dom',()=>({createPortal:node=>node}));
 jest.mock('react-native',()=>({...jest.requireActual('react-native'),useWindowDimensions:()=>({width:mockWidth,height:852})}));
 jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',raw:{},themeId:2}),getThemeSnapshot:()=>({mode:'light',raw:{},themeId:2})}));
@@ -14,6 +17,40 @@ jest.mock('../../components/theme-editor/ThemeColorEditor',()=>{
 const button=(tree,label)=>tree.root.findAllByType('Pressable').find(n=>n.findAllByType('Text').some(t=>t.children.join('')===label));
 beforeEach(()=>{mockWidth=393;mockMounts=0;attachThemeInspector.mockClear();global.window={innerWidth:393,innerHeight:852,addEventListener:jest.fn(),removeEventListener:jest.fn()};global.document={body:{},addEventListener:jest.fn(),removeEventListener:jest.fn()};});
 afterEach(()=>{delete global.window;delete global.document;});
+test('direct theme-page entry starts in the login preview',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel initialView="login" onClose={jest.fn()}/>);});
+ try {
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(tree.root.findByType('draft-editor').props.fixedMode).toBe(true);
+ }finally{await act(async()=>tree.unmount());}
+});
+test('opens and closes the login preview without remounting the editor draft',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try {
+  const editor=()=>tree.root.findByType('draft-editor');
+  await act(async()=>editor().props.setDraft('pending colors'));
+  await act(async()=>button(tree,'Prévia do login').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(editor().props.fixedMode).toBe(true);
+  await act(async()=>button(tree,'Cancelar inspeção').props.onPress());
+  await act(async()=>button(tree,'Voltar à tela atual').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(0);
+  expect(editor().props.draft).toBe('pending colors');
+  expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
+test('repeated direct entry reopens login after returning to the screen and preserves drafts',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel initialView="login" viewRequest={1}/>);});
+ try {
+  await act(async()=>tree.root.findByType('draft-editor').props.setDraft('pending colors'));
+  await act(async()=>button(tree,'Voltar à tela atual').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(0);
+  await act(async()=>tree.update(<FloatingThemePanel initialView="login" viewRequest={2}/>));
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(tree.root.findByType('draft-editor').props.draft).toBe('pending colors');
+  expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
 test('inspecting a large container keeps its content visible and displays its dimensions',async()=>{
  mockWidth=1440;global.window.innerWidth=1440;
  global.window.getComputedStyle=()=>({getPropertyValue:()=> '#123456'});

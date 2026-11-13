@@ -130,6 +130,11 @@ jobs:
           git submodule sync --recursive
           git submodule update --recursive --init --checkout
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - uses: gradle/actions/setup-gradle@v3
 
       - uses: amyu/setup-android@v4

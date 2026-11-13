@@ -1,19 +1,20 @@
 {
-  "version": "1.10.204",
+  "version": "1.10.205",
   "rc": 1,
-  "branch": "rc/1.10.204-rc.1",
-  "baseMaster": "225a3e128585bf7bf78795a236a4781e8c4fead8",
+  "branch": "rc/1.10.205-rc.1",
+  "baseMaster": "54354c49d416394369037c1a9b9121a7b8d81293",
   "tasks": [
-    1548
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e922f08b2086355e9b778eab3cc5eee074d5cb11",
-    "ControleOnline/ui-people": "b020ac6db5061c7019609011638296112227da16"
+    "ControleOnline/app-community": "f3d3dcdcd85e969d7122164e91616fed9d0e78d1"
   },
   "validation": {
-    "scope": "Perfil: timezone do usuario marcado quando vem por id, IRI ou nome (ui-people 1.0.103, #48).",
-    "checks": "profileTimezone.test.js 5/5 (jest do app); patch People.js sem mudanca entre 1.0.102 e 1.0.103; Security aceito (#1548). Nao validado em dispositivo."
+    "scope": "Theme configurator, login preview, header and footer theme inspection. Existing team product code and dependency pins preserved. App only; no API, database or migration actions.",
+    "checks": "QA + Security accepted exact task SHA; 218 local tests passed (183 themes, 9 login/footer, 26 runtime footer), 183 themes repeated on dev composition.",
+    "devMerge": "f448438d1e8cc049c8867ea4c307dded5eb37f06",
+    "authorization": "Only dev and staging; no master promotion or database changes."
   }
 }
