@@ -1,18 +1,20 @@
 {
-  "version": "1.10.204",
-  "rc": 3,
-  "branch": "rc/1.10.204-rc.3",
-  "baseMaster": "5e8937e2dada26b5a79e50ab23b072056ad03127",
+  "version": "1.10.205",
+  "rc": 2,
+  "branch": "rc/1.10.205-rc.2",
+  "baseMaster": "54354c49d416394369037c1a9b9121a7b8d81293",
   "tasks": [
-    1552
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "5e252a624def164c8503e0de3f5112f4d3c6fc64"
+    "ControleOnline/app-community": "fbcf9c1fc97565b9a300ed99cdb36f086b977816"
   },
   "validation": {
-    "scope": "CI: setup-java 17 antes do setup-gradle nos 3 workflows Android. Sem mudanca de versao do app.",
-    "checks": "Mudanca apenas em .github/workflows (15 linhas); validacao ocorre no proximo run dos workflows. Security aceito (#1552)."
+    "scope": "Theme configurator, login preview, header and footer theme inspection. Existing team product code and dependency pins preserved. App only; no API, database or migration actions.",
+    "checks": "Previous 218 product tests passed. Runner correction:12 workflow/domain tests passed; 2-line OS pin, no product changes. Remote Chromium installation must be repeated.",
+    "devMerge": "89337e2ddc975d12a6d2369f81b882ad5d5b80ba",
+    "authorization": "Only dev and staging; no master promotion or database changes."
   }
 }
