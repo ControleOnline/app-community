@@ -1,18 +1,20 @@
 {
-  "version": "1.10.204",
-  "rc": 3,
-  "branch": "rc/1.10.204-rc.3",
-  "baseMaster": "5e8937e2dada26b5a79e50ab23b072056ad03127",
+  "version": "1.10.205",
+  "rc": 1,
+  "branch": "rc/1.10.205-rc.1",
+  "baseMaster": "54354c49d416394369037c1a9b9121a7b8d81293",
   "tasks": [
-    1552
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "5e252a624def164c8503e0de3f5112f4d3c6fc64"
+    "ControleOnline/app-community": "f3d3dcdcd85e969d7122164e91616fed9d0e78d1"
   },
   "validation": {
-    "scope": "CI: setup-java 17 antes do setup-gradle nos 3 workflows Android. Sem mudanca de versao do app.",
-    "checks": "Mudanca apenas em .github/workflows (15 linhas); validacao ocorre no proximo run dos workflows. Security aceito (#1552)."
+    "scope": "Theme configurator, login preview, header and footer theme inspection. Existing team product code and dependency pins preserved. App only; no API, database or migration actions.",
+    "checks": "QA + Security accepted exact task SHA; 218 local tests passed (183 themes, 9 login/footer, 26 runtime footer), 183 themes repeated on dev composition.",
+    "devMerge": "f448438d1e8cc049c8867ea4c307dded5eb37f06",
+    "authorization": "Only dev and staging; no master promotion or database changes."
   }
 }
