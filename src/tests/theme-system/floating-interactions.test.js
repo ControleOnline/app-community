@@ -3,6 +3,9 @@ import renderer,{act} from 'react-test-renderer';
 import FloatingThemePanel from '../../components/theme-editor/FloatingThemePanel.web';
 import {attachThemeInspector} from '../../components/theme-editor/themeInspector';
 let mockWidth=393,mockMounts=0;
+jest.mock('../../components/theme-editor/LoginThemePreview.web',()=> 'LoginPreview');
+jest.mock('../../components/theme-editor/LoginPreviewOrigins',()=> 'LoginOrigins');
+jest.mock('../../components/theme-editor/loginPreviewModel',()=>({loadLoginPreviewCompany:jest.fn().mockResolvedValue({id:7,alias:'Domain company'})}));
 jest.mock('react-dom',()=>({createPortal:node=>node}));
 jest.mock('react-native',()=>({...jest.requireActual('react-native'),useWindowDimensions:()=>({width:mockWidth,height:852})}));
 jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',raw:{},themeId:2}),getThemeSnapshot:()=>({mode:'light',raw:{},themeId:2})}));
@@ -12,8 +15,84 @@ jest.mock('../../components/theme-editor/ThemeColorEditor',()=>{
  const React=require('react');return function MockEditor(props){const [draft,setDraft]=React.useState('original');React.useEffect(()=>{mockMounts++;},[]);return React.createElement('draft-editor',{...props,draft,setDraft});};
 });
 const button=(tree,label)=>tree.root.findAllByType('Pressable').find(n=>n.findAllByType('Text').some(t=>t.children.join('')===label));
+test('split desktop collapses only during inspection and restores the editor draft on selection',async()=>{
+ mockWidth=1000;global.window={innerWidth:1000,innerHeight:852,addEventListener:jest.fn(),removeEventListener:jest.fn()};
+ global.document={body:{},addEventListener:jest.fn(),removeEventListener:jest.fn()};
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel/>);});
+ try {
+  const editor=()=>tree.root.findByType('draft-editor');
+  await act(async()=>editor().props.setDraft('split-screen draft'));
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  expect(button(tree,'Cancelar inspeção')).toBeDefined();
+  const hidden=tree.root.findAllByType('div').find(node=>node.props.style?.display==='none');
+  expect(hidden).toBeDefined();
+  await act(async()=>attachThemeInspector.mock.calls.at(-1)[2]({bindings:[{property:'color',token:'textPrimary'}]}));
+  expect(button(tree,'Cancelar inspeção')).toBeUndefined();
+  expect(tree.root.findAllByType('div').some(node=>node.props.style?.display==='none')).toBe(false);
+  expect(editor().props.draft).toBe('split-screen draft');expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
 beforeEach(()=>{mockWidth=393;mockMounts=0;attachThemeInspector.mockClear();global.window={innerWidth:393,innerHeight:852,addEventListener:jest.fn(),removeEventListener:jest.fn()};global.document={body:{},addEventListener:jest.fn(),removeEventListener:jest.fn()};});
 afterEach(()=>{delete global.window;delete global.document;});
+test.each([320,393,760])('mobile width %i reserves half the screen and uses one small inspection strip',async(width)=>{
+ mockWidth=width;global.window.innerWidth=width;
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try {
+  const panel=()=>tree.root.findByProps({role:'dialog'});
+  const editor=()=>tree.root.findByType('draft-editor');
+  expect(panel().props.style.maxHeight).toBeLessThanOrEqual(426);
+  expect(tree.root.findByProps({'data-co-theme-editor-body':'true'}).props.style.overflowY).toBe('auto');
+  await act(async()=>editor().props.setDraft('mobile draft'));
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  const strip=tree.root.findByProps({'data-co-theme-inspection-strip':'true'});
+  expect(strip.props.style.flexWrap).toBe('nowrap');
+  expect(strip.findAllByType('Pressable')).toHaveLength(1);
+  expect(strip.findAllByType('Pressable')[0].props.style.minHeight).toBeGreaterThanOrEqual(44);
+  expect(tree.root.findAllByType('strong')).toHaveLength(0);
+  expect(button(tree,'Barra de rolagem')).toBeDefined(); // Mounted editor stays hidden, preserving its controls and draft.
+  await act(async()=>button(tree,'Cancelar inspeção').props.onPress());
+  expect(tree.root.findAllByType('strong')).toHaveLength(1);
+  expect(editor().props.draft).toBe('mobile draft');
+  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
+  await act(async()=>attachThemeInspector.mock.calls.at(-1)[2]({bindings:[{property:'color',token:'textPrimary'}]}));
+  expect(editor().props.selectedTokens).toEqual(['textPrimary']);
+  expect(editor().props.draft).toBe('mobile draft');expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
+test('direct theme-page entry starts in the login preview',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel initialView="login" onClose={jest.fn()}/>);});
+ try {
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(tree.root.findByType('draft-editor').props.fixedMode).toBe(true);
+ }finally{await act(async()=>tree.unmount());}
+});
+test('opens and closes the login preview without remounting the editor draft',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
+ try {
+  const editor=()=>tree.root.findByType('draft-editor');
+  await act(async()=>editor().props.setDraft('pending colors'));
+  await act(async()=>button(tree,'Prévia do login').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(editor().props.fixedMode).toBe(true);
+  await act(async()=>button(tree,'Cancelar inspeção').props.onPress());
+  await act(async()=>button(tree,'Voltar à tela atual').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(0);
+  expect(editor().props.draft).toBe('pending colors');
+  expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
+test('repeated direct entry reopens login after returning to the screen and preserves drafts',async()=>{
+ let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel initialView="login" viewRequest={1}/>);});
+ try {
+  await act(async()=>tree.root.findByType('draft-editor').props.setDraft('pending colors'));
+  await act(async()=>button(tree,'Voltar à tela atual').props.onPress());
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(0);
+  await act(async()=>tree.update(<FloatingThemePanel initialView="login" viewRequest={2}/>));
+  expect(tree.root.findAllByType('LoginPreview')).toHaveLength(1);
+  expect(tree.root.findByType('draft-editor').props.draft).toBe('pending colors');
+  expect(mockMounts).toBe(1);
+ }finally{await act(async()=>tree.unmount());}
+});
 test('inspecting a large container keeps its content visible and displays its dimensions',async()=>{
  mockWidth=1440;global.window.innerWidth=1440;
  global.window.getComputedStyle=()=>({getPropertyValue:()=> '#123456'});
@@ -125,7 +204,6 @@ test('selects native scrollbar colors without depending on a scrollbar DOM eleme
  let tree;await act(async()=>{tree=renderer.create(<FloatingThemePanel onClose={jest.fn()}/>);});
  try {
   const editor=()=>tree.root.findByType('draft-editor');
-  await act(async()=>button(tree,'⌖ Inspecionar elemento').props.onPress());
   expect(button(tree,'Barra de rolagem')).toBeDefined();
   await act(async()=>button(tree,'Barra de rolagem').props.onPress());
   expect(editor().props.selectedTokens).toEqual(['scrollbarThumb','scrollbarTrack']);
