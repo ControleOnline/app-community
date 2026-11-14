@@ -1,15 +1,16 @@
 {
   "version": "1.10.206",
-  "rc": 1,
-  "branch": "rc/1.10.206-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.206-rc.2",
   "baseMaster": "e8d93300ab37cd7919c713cf3b581ccd99d5c633",
   "tasks": [
-    1496
+    1496,
+    1335
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6fed19f9c79efbdcdee21f71ce4ba87d6dfc3d6a"
+    "ControleOnline/app-community": "eabcd182e47fc7b12a38dd17a14b458e9d4fe2f8"
   },
   "validation": {
     "scope": "Task 1496 theme inspector desktop/split/mobile, login preview and theme chrome. Team master updates preserved. No API/database/migration actions.",
@@ -17,6 +18,7 @@
     "devMerge": "624db9645546074701eb6dd97f193a74d62f210c",
     "priorStaging": "c99a79a46fe6fa42c70df08380da1360519011e6",
     "authorization": "User authorized dev and staging only. No master promotion, database writes or migrations.",
-    "history": "Prior staging contributes only history and release metadata; product tree equals current master plus task-1496."
+    "history": "Prior staging contributes only history and release metadata; product tree equals current master plus task-1496.",
+    "rc2": "rc.1 (task #1496, unchanged) + task #1335: @controleonline/ui-crm 1.0.64 -> 1.0.65 (/ai via WebSocket, ticket mode, CRM/Support funnels). User requested this frozen release to staging; task #1496 must be re-homologated in rc.2."
   }
 }
