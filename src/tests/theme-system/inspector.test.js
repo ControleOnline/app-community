@@ -13,7 +13,9 @@ test('the inspection cursor is removed when inspection ends',()=>{
   addEventListener:jest.fn(),removeEventListener:jest.fn()};
  const cleanup=attachThemeInspector(document,jest.fn(),jest.fn());
  expect(document.head.appendChild).toHaveBeenCalledWith(style);
- expect(style.textContent).toContain('crosshair');
+ expect(style.textContent).toContain('data:image/svg+xml');
+ expect(decodeURIComponent(style.textContent)).toContain('#218aff');
+ expect(decodeURIComponent(style.textContent)).toContain('stroke="white"');
  cleanup();expect(style.remove).toHaveBeenCalledTimes(1);
 });
 test('records variable identity even when two roles have the same visible color',()=>{
