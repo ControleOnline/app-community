@@ -87,7 +87,7 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
   }, [initialView, viewRequest]);
   useEffect(() => {
     if (!inspecting) return;
-    return attachThemeInspector(document, (hit) => {
+    return attachThemeInspector(document, (hit, pointer) => {
       const rectangle = hit ? hit.node.getBoundingClientRect() : null;
       const snapshot = getThemeSnapshot();
       const values = resolveScreenThemeDetails(snapshot.preview || snapshot.raw, snapshot.mode, hit?.screen?.id).values;
@@ -99,9 +99,10 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
           value: computed?.getPropertyValue(`--co-theme-${token}`).trim() || values[token] || ''})),
       ]);
       const target = rectangle ? {left: rectangle.left, top: rectangle.top, width: rectangle.width, height: rectangle.height,
-        name: hit.node.tagName?.toLowerCase() || t('Elemento'), colors} : null;
+        name: hit.node.tagName?.toLowerCase() || t('Elemento'), colors, pointer} : null;
       setHover((previous) => previous && target && ['left', 'top', 'width', 'height', 'name'].every((key) => previous[key] === target[key])
-        && JSON.stringify(previous.colors) === JSON.stringify(colors) ? previous : target);
+        && JSON.stringify(previous.colors) === JSON.stringify(colors)
+        && previous.pointer?.x === pointer?.x && previous.pointer?.y === pointer?.y ? previous : target);
     }, (hit, escape) => {
       setInspecting(false);
       if (!escape) {setSelection(hit);setInteraction('normal');setEditScope('global');setError(hit ? '' : t("Este elemento não expõe uma referência de cor do tema. Nenhuma variável foi inferida."));}
@@ -150,9 +151,9 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
     document.addEventListener('pointermove', move);document.addEventListener('pointerup', stop, { once: true });
   };
   const button = (label, action, selected = false, extraStyle = null) => <Pressable key={label} accessibilityRole="button" accessibilityState={{ selected }} onPress={action} style={{ minHeight: THEME_TOOL_BUTTON_HEIGHT, justifyContent: 'center', paddingVertical: 0, paddingHorizontal: 9, ...extraStyle, borderWidth: 1, borderColor: selected ? c.buttonBorder : c.modalBorder, borderRadius: 7, backgroundColor: selected ? c.buttonBackground : c.buttonBackgroundSecondary }}><Text style={{ fontSize: 12, color: selected ? c.buttonText : c.buttonTextSecondary }}>{label}</Text></Pressable>;
-  const compactInspection = mobile && inspecting;
+  const compactInspection = viewport.width <= 1100 && inspecting;
   const mobileBottom = 12 + Math.ceil(Math.max(viewport.inset, dockInset));
-  const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .78),
+  const mobileMaxHeight = Math.max(0, Math.min(Math.floor(viewport.height * .5),
     viewport.height + viewport.inset - mobileBottom - 12));
   return createPortal(<>
     {loginPreview && !loginCompany && <div role="status" style={{position: 'fixed', inset: 0,
@@ -164,19 +165,19 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
     {hover && inspecting && <ThemeInspectionHighlight hover={hover} viewport={viewport}
       panel={panel} panelPosition={position} translate={t} />}
     <div ref={panel} data-co-theme-tools="true" role="dialog" aria-modal="false" aria-label={t("Configurador flutuante de temas")}
-    style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
-      <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+    style={{ position: 'fixed', ...(mobile ? { left: 12, bottom: mobileBottom, width: 'calc(100vw - 24px)', maxHeight: mobileMaxHeight } : { right: position.x === null ? 16 : undefined, left: position.x ?? undefined, top: position.y, width: compactInspection ? 'min(320px, calc(100vw - 24px))' : 'min(540px, calc(100vw - 24px))', maxHeight: 'calc(100vh - 32px)' }), display: 'flex', flexDirection: 'column', background: c.modalBackground, border: `1px solid ${c.modalBorder}`, borderRadius: 14, boxShadow: `0 12px 42px ${c.modalShadow}`, zIndex: 2147483000, color: c.modalText, fontFamily: 'system-ui, sans-serif' }}>
+      {!(mobile && compactInspection) && <div onPointerDown={drag} style={{ padding: 12, cursor: mobile ? 'auto' : 'move', userSelect: 'none', borderBottom: `1px solid ${c.dividerBackground}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <strong>{t("Configurador de temas")}</strong>
         <button onClick={onClose} aria-label={t("Fechar painel e cancelar prévia")} style={{ border: 0, background: c.containerTransparentBackground, color: c.modalText, minHeight: THEME_TOOL_BUTTON_HEIGHT, minWidth: THEME_TOOL_BUTTON_HEIGHT, padding: 0, cursor: 'pointer' }}>✕</button>
-      </div>
-      {compactInspection && <View style={{ padding: 10, gap: 6 }}>
-        <Text style={{ fontSize: 12, color: c.textLink }}>{t("Toque no elemento para editar suas cores. Arraste a página para rolar.")}</Text>
-        {button(t("Barra de rolagem"), selectScrollbar)}
-        {button(t("Cancelar inspeção"), () => setInspecting(false))}
-      </View>}
-      {/* Keep the editor mounted while inspecting so touch selection never discards the draft. */}
-      <div style={{ display: compactInspection ? 'none' : 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden' }}>
-        <View style={{ padding: 10, gap: 8 }}>
+      </div>}
+      {compactInspection && <div data-co-theme-inspection-strip="true" style={{ display: 'flex', flexDirection: mobile ? 'row' : 'column', flexWrap: 'nowrap', alignItems: mobile ? 'center' : 'stretch', padding: mobile ? 8 : 10, gap: mobile ? 8 : 6 }}>
+        <Text style={{ fontSize: 12, color: c.textLink, ...(mobile ? { flex: 1, minWidth: 0 } : {}) }}>{mobile ? t("Toque para selecionar.") : t("Passe sobre a tela e clique no elemento. Esc encerra a inspeção.")}</Text>
+        {!mobile && button(t("Barra de rolagem"), selectScrollbar)}
+        {button(t("Cancelar inspeção"), () => setInspecting(false), false, mobile ? { minHeight: 44, flexShrink: 0 } : null)}
+      </div>}
+      {/* Keep the editor mounted while inspecting so selection never discards the draft. */}
+      <div data-co-theme-editor-body="true" style={{ display: compactInspection ? 'none' : 'flex', flexDirection: 'column', minHeight: 0, flex: 1, overflow: 'hidden', ...(mobile ? { overflowY: 'auto', overscrollBehavior: 'contain' } : {}) }}>
+        <View style={{ padding: 10, gap: 8, flexShrink: 0 }}>
           <Text style={{ fontSize: 12, color: c.textSecondary }}>{theme ? t("{{v0}} · tema #{{v1}} do domínio atual", { v0: theme.theme, v1: theme.id }) : error ? t("Tema do domínio indisponível") : t("Carregando tema do domínio…")}</Text>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
             {button(inspecting ? t("Parar inspeção") : selection ? t("Voltar à inspeção") : t("⌖ Inspecionar elemento"), () => setInspecting((value) => !value))}
@@ -226,7 +227,7 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
             </Text>)}
         </View>}
         {!!selection && !bindings.length && !selection.sources?.length && !selection.media && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
-        <View style={{ flexShrink: 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} fixedMode={loginPreview} concise fixedHeader onSaved={setTheme} />}</View>
+        <View style={{ flexShrink: mobile ? 0 : 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} fixedMode={loginPreview} concise fixedHeader onSaved={setTheme} />}</View>
       </div>
     </div>
   </>, portalHost);

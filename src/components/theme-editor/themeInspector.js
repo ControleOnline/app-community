@@ -52,8 +52,9 @@ export function attachThemeInspector(document,onHover,onSelect) {
   // Inspector feedback must stay independent of the palette being edited.
   const cursorStyle=document.createElement?.('style');
   if(cursorStyle){
+    const cursor = encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><path d="M3 25V14a11 11 0 1 1 11 11Z" fill="#218aff" stroke="white" stroke-width="2"/></svg>');
     // The informational footer is click-through normally; only inspection enables its targets.
-    cursorStyle.textContent='body, body * { cursor: crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; } [data-testid="runtime-info-footer"], [data-testid="runtime-info-footer"] * { pointer-events: auto !important; }';
+    cursorStyle.textContent=`body, body * { cursor: url("data:image/svg+xml,${cursor}") 3 25, crosshair !important; } [data-co-theme-tools="true"], [data-co-theme-tools="true"] * { cursor: revert !important; } [data-testid="runtime-info-footer"], [data-testid="runtime-info-footer"] * { pointer-events: auto !important; }`;
     document.head?.appendChild?.(cursorStyle);
   }
   const tools=event=>event.target.closest?.('[data-co-theme-tools="true"]');
@@ -61,7 +62,7 @@ export function attachThemeInspector(document,onHover,onSelect) {
   const select=event=>{block(event);onSelect(inspectThemeElement(event.target));};
   const move=event=>{
     if(touch && Math.hypot(event.clientX-touch.x,event.clientY-touch.y)>10)moved=true;
-    onHover(inspectThemeElement(event.target));
+    onHover(inspectThemeElement(event.target), {x: event.clientX, y: event.clientY});
   };
   const click=event=>{
     if(tools(event))return;
