@@ -1,19 +1,22 @@
 {
-  "version": "1.10.204",
-  "rc": 5,
-  "branch": "rc/1.10.204-rc.5",
-  "baseMaster": "0a9418da6b07ee722aa5d6fb1fad8efe4dfbb729",
+  "version": "1.10.206",
+  "rc": 1,
+  "branch": "rc/1.10.206-rc.1",
+  "baseMaster": "e8d93300ab37cd7919c713cf3b581ccd99d5c633",
   "tasks": [
-    1560
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d82c5f7205daf4057623264af3f3c2642b6db510",
-    "ControleOnline/ui-default": "17ae683bd49985ddc8f7aaa0dc828cd6b126cf90"
+    "ControleOnline/app-community": "6fed19f9c79efbdcdee21f71ce4ba87d6dfc3d6a"
   },
   "validation": {
-    "scope": "Mapa nativo: import das funcoes de navegacao corrigido (ui-default 1.0.290, #64). Sem mudanca de versao do app.",
-    "checks": "DefaultNativeMap.imports.test.js 3/3 (falha na 1.0.289); arquivos patchados do ui-default inalterados entre 1.0.289 e 1.0.290; Security aceito (#1560, ui-default#64). Nao validado visualmente depois da correcao."
+    "scope": "Task 1496 theme inspector desktop/split/mobile, login preview and theme chrome. Team master updates preserved. No API/database/migration actions.",
+    "checks": "37 theme suites / 190 tests; 2 footer suites / 8 tests; 3 workflow/domain suites / 12 tests passed. QA and Security reviewed the exact local diff, no material findings.",
+    "devMerge": "624db9645546074701eb6dd97f193a74d62f210c",
+    "priorStaging": "c99a79a46fe6fa42c70df08380da1360519011e6",
+    "authorization": "User authorized dev and staging only. No master promotion, database writes or migrations.",
+    "history": "Prior staging contributes only history and release metadata; product tree equals current master plus task-1496."
   }
 }
