@@ -22,6 +22,7 @@ import ManagerDevicesPage from '../components/manager-preview/ManagerDevicesPage
 import ManagerResultsPage from '../components/manager-preview/ManagerResultsPage'
 import ManagerConfiguratorPage from '../components/manager-preview/ManagerConfiguratorPage'
 import ManagerScreen from '../components/manager-preview/ManagerScreen'
+import ShopAppTypeSwitcherOverlay from '../components/ShopAppTypeSwitcherOverlay'
 import ManagerPdvOperationProvider from '../components/manager-preview/ManagerPdvOperationProvider'
 import {managerRouteOptions, isManagementRoute} from '../components/manager-preview/managerRouteOptions'
 import ManagerPreviewProvider from '../components/manager-preview/ManagerPreviewProvider'
@@ -198,8 +199,8 @@ const WrappedComponent = (screenOptions, Component) => {
  const OperationalPage = props => <ManagerPdvOperationProvider {...props} Component={Component}/>;
  return ({ navigation, route }) => {
   const resolvedOptions = useMemo(() => resolveRouteOptions(screenOptions, {navigation, route}), [navigation, route]);
-  return <ManagerScreen navigation={navigation} route={route} options={resolvedOptions}
-    enabled={managerPreviewEnabled && isManagementRoute(route.name)} Layout={DefaultLayout} Component={OperationalPage} />
+  return <ShopAppTypeSwitcherOverlay><ManagerScreen navigation={navigation} route={route} options={resolvedOptions}
+    enabled={managerPreviewEnabled && isManagementRoute(route.name)} Layout={DefaultLayout} Component={OperationalPage} /></ShopAppTypeSwitcherOverlay>
  }
 }
 
