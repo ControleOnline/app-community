@@ -1,28 +1,22 @@
 {
-  "version": "1.10.206",
-  "rc": 5,
-  "branch": "rc/1.10.206-rc.5",
-  "baseMaster": "e8d93300ab37cd7919c713cf3b581ccd99d5c633",
+  "version": "1.10.207",
+  "rc": 1,
+  "branch": "rc/1.10.207-rc.1",
+  "baseMaster": "c99fccb574f261e40b6978b14bc9769869feb92c",
   "tasks": [
-    1496,
-    1335,
-    1569
+    1496
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6ab7419ebbd98adf012ed33165d834347e420317"
+    "ControleOnline/app-community": "38acdc5a676a49420c386776a3ac9538cf85a5fe"
   },
   "validation": {
-    "scope": "Task 1496 theme inspector desktop/split/mobile, login preview and theme chrome. Team master updates preserved. No API/database/migration actions.",
-    "checks": "37 theme suites / 190 tests; 2 footer suites / 8 tests; 3 workflow/domain suites / 12 tests passed. QA and Security reviewed the exact local diff, no material findings.",
-    "devMerge": "624db9645546074701eb6dd97f193a74d62f210c",
-    "priorStaging": "c99a79a46fe6fa42c70df08380da1360519011e6",
-    "authorization": "User authorized dev and staging only. No master promotion, database writes or migrations.",
-    "history": "Prior staging contributes only history and release metadata; product tree equals current master plus task-1496.",
-    "rc2": "rc.1 (task #1496, unchanged) + task #1335: @controleonline/ui-crm 1.0.64 -> 1.0.65 (/ai via WebSocket, ticket mode, CRM/Support funnels). User requested this frozen release to staging; task #1496 must be re-homologated in rc.2.",
-    "rc3": "rc.2 + task #1335 ui-crm 1.0.67 (/ai customer chat, escalation) + task #1569 ui-manager 1.0.28 (integration cards open). #1496 and #1335 must be re-homologated in rc.3.",
-    "rc4": "rc.3 + #1569 build fix: manager header patch pinned to ui-manager 1.0.28 (rc.3 web build aborted on the version guard).",
-    "rc5": "rc.4 + ui-crm 1.0.69 (General settings IA tab; /ai uses the chosen AI; chips only without AI)."
+    "scope": "Only task1496 sidebar hover/pressed/active theme colors, preview and inspector provenance. Existing master CRM1.0.69 and Manager1.0.28 preserved. No database, API or master changes.",
+    "checks": "193 theme tests +23 ManagerShell tests passed. Source-policy and baseline-checks passed. Browser smoke failures match published staging baseline: admin17,pos14,delivery25,manager17failed/11passed. No skipped or disabled tests.",
+    "baselineRun": "https://github.com/ControleOnline/app-community/actions/runs/43671421588",
+    "taskRun": "https://github.com/ControleOnline/app-community/actions/runs/43718807923",
+    "devMerge": "40015bf50ca69b43415cc503a45a2f6784c5ae82",
+    "promotion": "Protected PR merge only; existing frozen RC refs remain immutable. Record resulting staging merge SHA and verify its tree matches this candidate."
   }
 }

@@ -21,7 +21,11 @@ export function inspectThemeElement(element) {
     const screenId=scope?.getAttribute?.('data-co-theme-screen');
     const screen=screenId && screenId.length<=200?{id:screenId,label:scope.getAttribute('data-co-theme-screen-label') || 'Tela atual'}:null;
     const sourceValue=sourceNode?.getAttribute?.('data-co-theme-source');
-    const sources=sourceValue?JSON.parse(sourceValue):[];
+    const sourceStatesValue=sourceNode?.getAttribute?.('data-co-theme-source-states');
+    const sourceStates=sourceStatesValue?JSON.parse(sourceStatesValue):null;
+    // A registered resting color must not mask the theme tokens actually used on hover.
+    const sources=sourceNode?.matches?.(':hover') && Array.isArray(sourceStates?.hover)
+      ? sourceStates.hover : sourceValue?JSON.parse(sourceValue):[];
     const metricId=element.closest?.('[data-co-home-metric]')?.getAttribute?.('data-co-home-metric');
     const scoped=hit=>hit?{...hit,...(screen?{screen}:{}),...(Object.hasOwn(homeMetrics,metricId)?{homeMetric:metricId}:{}),
       ...(hit.node===sourceNode && Array.isArray(sources)?{sources:sources.filter(item=>
