@@ -123,21 +123,29 @@ export default function ManagerShell({navigation, route, options, children}) {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     const accent = moduleAccent?.value
       ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-    const appearance = moduleListAppearance({accent, colors: c, sidebar: true, active, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
+    const appearanceFor = highlighted => moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
-      dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
+      dataSet={{coThemeSource: !active ? moduleAccentSource(accent, 'routes.color', item.name, item.color) : undefined,
+        coThemeSourceStates: accent && !active ? JSON.stringify({hover: []}) : undefined}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
         return [s.navItem, {
-          backgroundColor: moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette}).backgroundColor,
+          backgroundColor: appearanceFor(highlighted).backgroundColor,
           borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground,
         }, iconsOnly && s.center];
       }}>
-      {icon(item.icon, 18, appearance.iconColor, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
-      {!iconsOnly && <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
+      {({hovered, pressed}) => {
+        const highlighted = active || hovered || pressed;
+        const appearance = appearanceFor(highlighted);
+        const registered = !!moduleAccent?.value && !highlighted;
+        return <>
+          {icon(item.icon, 18, appearance.iconColor, modulePropertySource(item, 'iconColor', {enabled: registered, palette: moduleAccentPalette, id: item.name}))}
+          {!iconsOnly && <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: registered, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
+        </>;
+      }}
     </Pressable>;
   };
   const sidebar = <View testID="manager-sidebar" style={[s.sidebar, {backgroundColor: c.navigationBackground, borderRightColor: c.navigationBorder,
