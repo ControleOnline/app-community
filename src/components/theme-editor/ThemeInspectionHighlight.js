@@ -1,5 +1,13 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
-import {useThemeEditorPalette} from './themeToolPresentation';
+
+// Inspector chrome must stay visible independently of the theme being inspected.
+const inspectorPalette = Object.freeze({
+  outline: '#218aff',
+  background: '#182235',
+  text: '#ffffff',
+  secondaryText: '#c4d4e7',
+  swatchBorder: '#ffffff',
+});
 
 export function groupInspectionColors(colors) {
   const result = new Map();
@@ -11,23 +19,40 @@ export function groupInspectionColors(colors) {
   return [...result.values()];
 }
 
+export function inspectionLabelWidth(viewportWidth) {
+  return Math.min(viewportWidth <= 1100 ? 320 : 440, Math.max(0, viewportWidth - 8));
+}
+
 export function inspectionLabelPosition(target, size, viewport, panel) {
   const clamp = (value, max) => Math.max(4, Math.min(value, Math.max(4, max)));
   const candidates = [
     [target.left, target.top - size.height - 8],
     [target.left, target.top + target.height + 8],
+    [target.left - size.width - 8, target.top],
+    [target.left + target.width + 8, target.top],
+    [4, 4], [viewport.width - size.width - 4, 4],
+    [4, viewport.height - size.height - 4],
+    [viewport.width - size.width - 4, viewport.height - size.height - 4],
     ...(panel ? [[panel.left - size.width - 8, target.top], [panel.right + 8, target.top],
       [target.left, panel.top - size.height - 8], [target.left, panel.bottom + 8]] : []),
   ].map(([left, top]) => ({left: clamp(left, viewport.width - size.width - 4),
     top: clamp(top, viewport.height - size.height - 4)}));
-  const overlap = position => !panel ? 0 :
-    Math.max(0, Math.min(position.left + size.width, panel.right) - Math.max(position.left, panel.left)) *
-    Math.max(0, Math.min(position.top + size.height, panel.bottom) - Math.max(position.top, panel.top));
-  return candidates.find(candidate => overlap(candidate) === 0) || candidates.sort((a, b) => overlap(a) - overlap(b))[0];
+  const overlap = (position, rectangle) => !rectangle ? 0 :
+    Math.max(0, Math.min(position.left + size.width, rectangle.right ?? rectangle.left + rectangle.width) - Math.max(position.left, rectangle.left)) *
+    Math.max(0, Math.min(position.top + size.height, rectangle.bottom ?? rectangle.top + rectangle.height) - Math.max(position.top, rectangle.top));
+  const pointerDistance = position => !target.pointer ? 0 : Math.hypot(
+    Math.max(position.left - target.pointer.x, 0, target.pointer.x - position.left - size.width),
+    Math.max(position.top - target.pointer.y, 0, target.pointer.y - position.top - size.height));
+  // Avoid the editor first, then the target. Large targets need a distant corner
+  // because no viewport position can avoid their entire rectangle.
+  return candidates.map((position, index) => ({position, index, panelOverlap: overlap(position, panel),
+    targetOverlap: overlap(position, target), distance: pointerDistance(position)}))
+    .sort((a, b) => a.panelOverlap - b.panelOverlap || a.targetOverlap - b.targetOverlap ||
+      (a.targetOverlap ? b.distance - a.distance : 0) || a.index - b.index)[0].position;
 }
 
 export default function ThemeInspectionHighlight({hover, viewport, panel, panelPosition, translate: t}) {
-  const c = useThemeEditorPalette();
+  const c = inspectorPalette;
   const label = useRef(null);
   const [position, setPosition] = useState({left: 4, top: 4});
   useLayoutEffect(() => {
@@ -39,17 +64,17 @@ export default function ThemeInspectionHighlight({hover, viewport, panel, panelP
   return <>
     <div aria-hidden data-co-theme-highlight="true" style={{pointerEvents: 'none', position: 'fixed',
       left: hover.left, top: hover.top, width: hover.width, height: hover.height,
-      outline: `2px solid ${c.inputFocusBorder}`, outlineOffset: -2, background: 'transparent', zIndex: 2147482999}} />
+      outline: `2px solid ${c.outline}`, outlineOffset: -2, background: 'transparent', zIndex: 2147482999}} />
     <div ref={label} aria-hidden data-co-theme-inspection-label="true" style={{pointerEvents: 'none', position: 'fixed',
-      ...position, width: Math.min(440, viewport.width - 8), boxSizing: 'border-box', maxHeight: viewport.height - 8,
-      overflow: 'hidden', padding: '5px 8px', borderRadius: 5, background: c.modalBackground, color: c.modalText,
+      ...position, width: inspectionLabelWidth(viewport.width), boxSizing: 'border-box', maxHeight: viewport.height - 8,
+      overflow: 'hidden', padding: '5px 8px', borderRadius: 5, background: c.background, color: c.text,
       fontSize: 12, fontFamily: 'monospace', zIndex: 2147483001}}>
       <div>{hover.name} · {Math.round(hover.width)} × {Math.round(hover.height)}</div>
       {hover.colors.slice(0, 5).map(({property, token, value, source, record, reference}) =>
         <div key={`${property}:${token}:${record || ''}`} style={{display: 'flex', alignItems: 'center', gap: 6, marginTop: 5, overflowWrap: 'anywhere'}}>
-          <span style={{display: 'inline-block', width: 12, height: 12, flexShrink: 0, border: `1px solid ${c.modalBorder}`, background: value || 'transparent'}} />
-          <span>{token} · {value || t('Sem valor')} <span style={{color: c.textSecondary}}>({property})</span>
-            {source && <span style={{display: 'block', color: c.textSecondary}}>{t('Cadastro')}: {record}
+          <span style={{display: 'inline-block', width: 12, height: 12, flexShrink: 0, border: `1px solid ${c.swatchBorder}`, background: value || 'transparent'}} />
+          <span>{token} · {value || t('Sem valor')} <span style={{color: c.secondaryText}}>({property})</span>
+            {source && <span style={{display: 'block', color: c.secondaryText}}>{t('Cadastro')}: {record}
               {reference && reference !== value ? ` · ${reference} → ${value}` : ''}</span>}
           </span>
         </div>)}

@@ -225,6 +225,7 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `footerIcon`
 - `footerLink`
 - `footerText`
+- `footerCompanyText` <!-- base: footerText; variant: globalChrome; label: Áreas permanentes; usage: Texto de empresa e informações no rodapé -->
 
 ### header
 
@@ -235,6 +236,12 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `headerText`
 - `headerCompanyText` <!-- base: selectText; variant: globalChrome; label: Áreas permanentes; usage: Nome da empresa no cabeçalho -->
 - `headerCompanyIcon` <!-- base: selectIcon; variant: globalChrome; label: Áreas permanentes; usage: Seta da empresa no cabeçalho -->
+- `headerAppTypeBackground` <!-- base: selectBackground; variant: globalChrome; label: Áreas permanentes; usage: Fundo do seletor de tipo de app -->
+- `headerAppTypeBorder` <!-- base: selectBorder; variant: globalChrome; label: Áreas permanentes; usage: Borda do seletor de tipo de app -->
+- `headerAppTypeText` <!-- base: selectText; variant: globalChrome; label: Áreas permanentes; usage: Texto do seletor de tipo de app -->
+- `headerAppTypeIcon` <!-- base: selectIcon; variant: globalChrome; label: Áreas permanentes; usage: Seta do seletor de tipo de app -->
+- `headerAppTypeLabelText` <!-- base: textMuted; variant: globalChrome; label: Áreas permanentes; usage: Legenda do seletor de tipo de app -->
+- `headerAppTypeResetText` <!-- base: linkText; variant: globalChrome; label: Áreas permanentes; usage: Link para voltar ao ADMIN -->
 
 ### icon
 

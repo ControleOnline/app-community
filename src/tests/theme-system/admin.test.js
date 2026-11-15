@@ -10,6 +10,11 @@ test('authorized users keep theme tools in ADMIN and direct MANAGER',async()=>{
   await act(async()=>{tree=renderer.create(<ThemeToolsProvider><Launcher/></ThemeToolsProvider>);});
   expect(tree.root.findByType('launch').props.available).toBe(true);
   await act(async()=>tree.root.findByType('launch').props.onPress());expect(tree.root.findAllByType('FloatingThemePanel')).toHaveLength(1);
+  await act(async()=>tree.root.findByType('launch').props.onPress({preview:'login'}));
+  expect(tree.root.findByType('FloatingThemePanel').props.initialView).toBe('login');
+  const previousRequest=tree.root.findByType('FloatingThemePanel').props.viewRequest;
+  await act(async()=>tree.root.findByType('launch').props.onPress({preview:'login'}));
+  expect(tree.root.findByType('FloatingThemePanel').props.viewRequest).toBe(previousRequest+1);
   app.is_admin_build=false;await act(async()=>tree.update(<ThemeToolsProvider><Launcher/></ThemeToolsProvider>));
   expect(tree.root.findByType('launch').props.available).toBe(true);expect(tree.root.findAllByType('FloatingThemePanel')).toHaveLength(1);
   auth.getters.user={id:2,roles:[]};await act(async()=>tree.update(<ThemeToolsProvider><Launcher/></ThemeToolsProvider>));
