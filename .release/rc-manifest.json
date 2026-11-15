@@ -1,7 +1,7 @@
 {
   "version": "1.10.206",
-  "rc": 3,
-  "branch": "rc/1.10.206-rc.3",
+  "rc": 4,
+  "branch": "rc/1.10.206-rc.4",
   "baseMaster": "e8d93300ab37cd7919c713cf3b581ccd99d5c633",
   "tasks": [
     1496,
@@ -11,7 +11,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "8fc634e0d8306a9b161825aed5fa88a64f78c800"
+    "ControleOnline/app-community": "fb0f7a47cfabb0c57603d9c047fd3c4718e63955"
   },
   "validation": {
     "scope": "Task 1496 theme inspector desktop/split/mobile, login preview and theme chrome. Team master updates preserved. No API/database/migration actions.",
@@ -21,6 +21,7 @@
     "authorization": "User authorized dev and staging only. No master promotion, database writes or migrations.",
     "history": "Prior staging contributes only history and release metadata; product tree equals current master plus task-1496.",
     "rc2": "rc.1 (task #1496, unchanged) + task #1335: @controleonline/ui-crm 1.0.64 -> 1.0.65 (/ai via WebSocket, ticket mode, CRM/Support funnels). User requested this frozen release to staging; task #1496 must be re-homologated in rc.2.",
-    "rc3": "rc.2 + task #1335 ui-crm 1.0.67 (/ai customer chat, escalation) + task #1569 ui-manager 1.0.28 (integration cards open). #1496 and #1335 must be re-homologated in rc.3."
+    "rc3": "rc.2 + task #1335 ui-crm 1.0.67 (/ai customer chat, escalation) + task #1569 ui-manager 1.0.28 (integration cards open). #1496 and #1335 must be re-homologated in rc.3.",
+    "rc4": "rc.3 + #1569 build fix: manager header patch pinned to ui-manager 1.0.28 (rc.3 web build aborted on the version guard)."
   }
 }
