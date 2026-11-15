@@ -17,7 +17,7 @@ let mockSidebar;
 let mockModuleAccent;
 const mockColors = {...previewPalette({}, 'light'), moduleListIcon:'#627387', moduleListText:'#0f172a', navigationActiveBorder:'#117463'};
 jest.mock('react-native', () => ({
-  processColor:require('../theme-system/nativeMock.cjs').processColor, Platform: {OS: 'web'}, Image: 'Image', Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
+  processColor:require('../theme-system/nativeMock.cjs').processColor, Platform: {OS: 'web'}, Image: 'Image', Pressable: props => require('react').createElement('Pressable', {...props,renderChildren:props.children}, typeof props.children==='function'?props.children({hovered:false,pressed:false}):props.children), ScrollView: 'ScrollView', Text: 'Text', View: 'View', Modal: 'Modal',
   StyleSheet: {create: x => x, absoluteFill: {}}, useWindowDimensions: () => ({width: mockWidth}),
 }));
 jest.mock('react-native-safe-area-context', () => ({SafeAreaProvider: 'SafeAreaProvider', useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}), useSafeAreaFrame: () => ({width: mockWidth, height: 800})}));
@@ -25,6 +25,7 @@ jest.mock('@react-navigation/native', () => ({useIsFocused: () => mockFocused}))
 jest.mock('@appType', () => ({app_type: 'MANAGER', get app_type_base(){return mockBaseAppType;}}));
 jest.mock('../../components/manager-preview/ManagerBottomNavigation', () => 'RuntimeToolbar');
 jest.mock('../../components/HomeIcon', () => 'Icon');
+jest.mock('../../components/theme-editor/ThemeToolsProvider',()=>({useThemeTools:()=>({available:false})}));
 jest.mock('../../components/HomeAvatar', () => 'HomeAvatar');
 jest.mock('../../components/manager-preview/ManagerCompanySelector', () => 'ManagerCompanySelector');
 jest.mock('@controleonline/ui-common/src/react/components/AppTypeSwitcher', () => 'AppTypeSwitcher');
@@ -220,7 +221,7 @@ it.each([1440,900])('keeps desktop navigation beside the menu at width %s withou
  const topbar=tree.root.findByProps({testID:'manager-topbar'});
  const breadcrumb=tree.root.findByProps({testID:'manager-breadcrumb'});
  expect(topbar.findAllByProps({testID:'manager-breadcrumb'})).toHaveLength(1);
- expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Expandir menu'}).length + tree.root.findByProps({testID:'manager-sidebar'}).findAllByProps({accessibilityLabel:'Recolher menu'}).length).toBe(1);
+ expect(tree.root.findByProps({testID:'manager-sidebar'}).findAllByType('Pressable').filter(node=>['Expandir menu','Recolher menu'].includes(node.props.accessibilityLabel)).length).toBe(1);
  act(()=>tree.unmount());
 });
 it('keeps the mobile header free of desktop breadcrumbs',()=>{
@@ -274,13 +275,17 @@ it('uses route colors and list foregrounds before and after navigation, restorin
   const devices = labeled(tree, 'Dispositivos')[0];
   const inactive = labeled(tree, 'Início')[0];
   expect(devices.props.style({})[1].backgroundColor).toBe('#0284c7');
-  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe('#0284c7');
+  expect(devices.props.style({hovered:true})[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
+  const highlighted=devices.props.renderChildren({hovered:true,pressed:false}).props.children;
+  expect(highlighted[0].props.color).toBe(mockColors.navigationActiveIcon);
+  expect(highlighted[1].props.style.at(-1).color).toBe(mockColors.navigationActiveText);
+  expect(highlighted[0].props.dataSet).toBeUndefined();
   expect(devices.findByType('Icon').props.color).toBe(mockColors.moduleListIcon);
   expect(JSON.parse(devices.props.dataSet.coThemeSource)[0]).toMatchObject({source:'routes.color',reference:'#0284c7',property:'backgroundColor'});
   expect(inactive.findByType('Icon').props.color).toBe(mockColors.navigationActiveIcon);
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
   expect(devices.props.style({})[1]).toMatchObject({
-    backgroundColor:'#0284c7',borderLeftColor:mockColors.navigationActiveBorder,
+    backgroundColor:mockColors.navigationActiveBackground,borderLeftColor:mockColors.navigationActiveBorder,
   });
   mockModuleAccent = {value:false};
   act(() => tree.update(view('DevicesIndex', {source:'manager'})));
@@ -296,6 +301,15 @@ it('applies route foregrounds and category caption color without changing glyphs
  expect(device().findByType('Icon').props).toMatchObject({name:'monitor',color:'#147568'});
  expect(JSON.parse(device().findByType('Icon').props.dataSet.coThemeSource)[0].source).toBe('routes.icon_color');
  expect(device().findByType('Text').props.style.at(-1).color).toBe('#ffffff');
+ for(const interaction of [{hovered:true,pressed:false},{hovered:false,pressed:true}]) {
+  const children=device().props.renderChildren(interaction).props.children;
+  expect(device().props.style(interaction)[1].backgroundColor).toBe(mockColors.navigationActiveBackground);
+  expect(children[0].props.color).toBe(mockColors.navigationActiveIcon);
+  expect(children[0].props.dataSet).toBeUndefined();
+  expect(children[1].props.style.at(-1).color).toBe(mockColors.navigationActiveText);
+  expect(children[1].props.dataSet.coThemeSource).toBeUndefined();
+ }
+
  const caption=tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
  expect(caption.props.style.at(-1).color).toBe('#ffff00');
  mockModuleAccent={value:false};act(()=>tree.update(view()));

@@ -58,3 +58,15 @@ test('scroll gestures remain scrollable and do not select an element',()=>{
  expect(down.preventDefault).not.toHaveBeenCalled();expect(up.preventDefault).not.toHaveBeenCalled();expect(selected).not.toHaveBeenCalled();
  cleanup();
 });
+
+test('a registered normal background does not mask the actual theme source on hover',()=>{
+ const source={property:'backgroundColor',source:'routes.color',record:'DevicesIndex',reference:'#0284c7',value:'#0284c7'};
+ let hovered=true;
+ const attributes={'data-co-theme':JSON.stringify([]),'data-co-theme-source':JSON.stringify([source]),
+  'data-co-theme-source-states':JSON.stringify({hover:[]}),
+  'data-co-theme-states':JSON.stringify({normal:[],hover:[binding('navigationActiveBackground')]})};
+ const node={matches:()=>hovered,contains:()=>true,getAttribute:key=>attributes[key]??null};
+ const target={closest:selector=>['[data-co-theme]','[data-co-theme-source]','[data-co-theme-states]'].includes(selector)?node:null};
+ expect(inspectThemeElement(target).sources).toEqual([]);
+ hovered=false;expect(inspectThemeElement(target).sources).toEqual([source]);
+});

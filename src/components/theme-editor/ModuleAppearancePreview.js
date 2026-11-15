@@ -32,13 +32,13 @@ export default function ModuleAppearancePreview({category, route, enabled, palet
           <View style={{padding: mode === 'grid' ? 6 : 0, borderRadius: 8,
             backgroundColor: mode === 'grid' ? optional(route?.iconBackgroundColor) ?? c.iconBackground : c.containerTransparentBackground}}>
             <HomeIcon name={glyph} size={mode === 'grid' ? 22 : 18}
-              color={optional((route || category).iconColor) ?? (mode === 'sidebar' ? sidebar.iconColor : mode === 'grid' ? c.listItemIcon : list.iconColor)} />
+              color={mode === 'sidebar' ? sidebar.iconColor : optional((route || category).iconColor) ?? (mode === 'grid' ? c.listItemIcon : list.iconColor)} />
           </View>
-          <Text style={{color: optional((route || category).textColor) ?? (mode === 'sidebar' ? sidebar.textColor : mode === 'grid' ? c.listItemText : list.textColor), flexShrink: 1}}>{label}</Text>
+          <Text style={{color: mode === 'sidebar' ? sidebar.textColor : optional((route || category).textColor) ?? (mode === 'grid' ? c.listItemText : list.textColor), flexShrink: 1}}>{label}</Text>
           {mode === 'list' && <HomeIcon name="chevron-right" size={14} color={optional((route || category).iconColor) ?? list.iconColor} />}
         </View>
       </View>)}
     </View>
-    <Text style={{color: c.textSecondary, fontSize: 12}}>{t('Com as cores dos módulos ligadas, o item lateral acompanha a rota da Home em lista. Desligadas, cada área usa suas cores do tema. A prévia lateral mostra o item ativo.')}</Text>
+    <Text style={{color: c.textSecondary, fontSize: 12}}>{t('Com as cores dos módulos ligadas, o item lateral usa as cores da rota em repouso e o destaque do tema no hover ou quando ativo. Desligadas, cada área usa suas cores do tema. A prévia lateral mostra o item ativo.')}</Text>
   </View>;
 }
