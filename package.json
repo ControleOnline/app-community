@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.10.207",
+  "version": "1.10.208",
   "private": true,
   "scripts": {
     "android": "npm run manager:prepare && node scripts/apply-native-screens-patch.cjs && expo run:android",
@@ -70,7 +70,7 @@
     "@controleonline/ui-professionals": "1.0.32",
     "@controleonline/ui-providers": "1.0.28",
     "@controleonline/ui-report": "1.2.49",
-    "@controleonline/ui-shop": "1.0.19",
+    "@controleonline/ui-shop": "1.0.20",
     "@controleonline/ui-support": "1.0.20",
     "@controleonline/ui-tasks": "1.1.64",
     "@controleonline/ui-tests": "1.0.24",
