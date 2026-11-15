@@ -11,7 +11,7 @@ const colors = {moduleListIcon:'#627387', moduleListText:'#0f172a', textMuted:'#
 
 test('a route accent shares list and sidebar colors without tinting the icon with its background', () => {
   const home = moduleListAppearance({accent:'#0284c7', colors});
-  for (const active of [true, false]) {
+  for (const active of [false]) {
     expect(moduleListAppearance({accent:'#0284c7', colors, sidebar:true, active})).toEqual(home);
   }
   expect(home).toEqual({backgroundColor:'#0284c7', iconColor:'#627387', textColor:'#0f172a'});
@@ -33,15 +33,15 @@ test('content color previews do not change captured module foregrounds in either
   expect(resolveManagerTheme(preview,'dark')).toMatchObject({moduleListIcon:'#ddeeff',moduleListText:'#eeeeee'});
 });
 
-test('previews use the route rather than category for sidebar items and restore the theme when disabled', async () => {
+test('active sidebar preview uses the theme highlight while the Home list keeps route colors', async () => {
   const props={category:{label:'Financeiro',color:'#020202'},route:{label:'Centro financeiro',color:'#0284c7',icon:'dollar-sign'},palette:colors};
   let tree;await act(async()=>{tree=renderer.create(<ModuleAppearancePreview {...props} enabled />);});
   const item=mode=>tree.root.findByProps({testID:`module-preview-item-${mode}`});
   const mainText=mode=>item(mode).findByType('Text').props.style.color;
-  expect(item('sidebar').props.style.backgroundColor).toBe('#0284c7');
-  expect(item('sidebar').props.style.backgroundColor).toBe(item('list').props.style.backgroundColor);
-  expect(item('sidebar').findByType('Icon').props.color).toBe(item('list').findAllByType('Icon')[0].props.color);
-  expect(mainText('sidebar')).toBe(mainText('list'));
+  expect(item('sidebar').props.style.backgroundColor).toBe(colors.navigationActiveBackground);
+  expect(item('list').props.style.backgroundColor).toBe('#0284c7');
+  expect(item('sidebar').findByType('Icon').props.color).toBe(colors.navigationActiveIcon);
+  expect(mainText('sidebar')).toBe(colors.navigationActiveText);
   await act(async()=>tree.update(<ModuleAppearancePreview {...props} enabled={false} />));
   expect(item('sidebar').props.style.backgroundColor).toBe(colors.navigationActiveBackground);
   expect(item('sidebar').findByType('Icon').props.color).toBe(colors.navigationActiveIcon);
@@ -77,3 +77,11 @@ test('grid preview applies transparent icon background and all route foregrounds
   expect(grid().findByType('Icon').parent.props.style.backgroundColor).toBe('#eeeeee');
   await act(async()=>tree.unmount());
 });
+
+ test.each([{active:true},{highlighted:true}])('enabled sidebar highlight uses theme foregrounds even with registered colors: %o', state => {
+  const record={textColor:'#ffffff',iconColor:'#ffff00'};
+  const input={accent:'#0284c7',colors,sidebar:true,enabled:true,record};
+  expect(moduleListAppearance({...input,...state})).toEqual({backgroundColor:colors.navigationActiveBackground,iconColor:colors.navigationActiveIcon,textColor:colors.navigationActiveText});
+  expect(moduleListAppearance({...input,highlighted:false})).toEqual({backgroundColor:'#0284c7',iconColor:'#ffff00',textColor:'#ffffff'});
+  expect(moduleListAppearance({...input,sidebar:false,...state})).toEqual({backgroundColor:'#0284c7',iconColor:'#ffff00',textColor:'#ffffff'});
+ });
