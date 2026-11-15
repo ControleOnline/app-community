@@ -1,22 +1,20 @@
 {
   "version": "1.10.207",
-  "rc": 1,
-  "branch": "rc/1.10.207-rc.1",
-  "baseMaster": "c99fccb574f261e40b6978b14bc9769869feb92c",
+  "rc": 2,
+  "branch": "rc/1.10.207-rc.2",
+  "baseMaster": "0cae68c051e37802a767cf9ba53ec9efcc168edc",
   "tasks": [
-    1496
+    1581
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "38acdc5a676a49420c386776a3ac9538cf85a5fe"
+    "ControleOnline/app-community": "0cbcd66e7f33d0f3c46cc7d77f7159be52f1151f"
   },
   "validation": {
-    "scope": "Only task1496 sidebar hover/pressed/active theme colors, preview and inspector provenance. Existing master CRM1.0.69 and Manager1.0.28 preserved. No database, API or master changes.",
-    "checks": "193 theme tests +23 ManagerShell tests passed. Source-policy and baseline-checks passed. Browser smoke failures match published staging baseline: admin17,pos14,delivery25,manager17failed/11passed. No skipped or disabled tests.",
-    "baselineRun": "https://github.com/ControleOnline/app-community/actions/runs/43671421588",
-    "taskRun": "https://github.com/ControleOnline/app-community/actions/runs/43718807923",
-    "devMerge": "40015bf50ca69b43415cc503a45a2f6784c5ae82",
+    "scope": "Task 1581 only: show the app type selector over SHOP screens in ADMIN web builds. App only; no API, database or master changes.",
+    "checks": "shopAppTypeSwitcher.test.js 3/3 passed (jest.homepage.config.cjs). source-policy and baseline-checks passed on the task PR. Browser smoke failures match the published staging baseline (unrelated ui-logistic specs). Not validated in a real browser by the developer.",
+    "devMerge": "4dcceb2b96f1aa204742d23d3f1d44532f9b1614",
     "promotion": "Protected PR merge only; existing frozen RC refs remain immutable. Record resulting staging merge SHA and verify its tree matches this candidate."
   }
 }
