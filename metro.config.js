@@ -3,6 +3,7 @@ const { getDefaultConfig } = require('expo/metro-config');
 const packageConfig = require('./package.json');
 
 const projectRoot = __dirname;
+require('./scripts/apply-local-app-domain-patch.cjs');
 require('./scripts/generate-theme-contract.cjs');
 require('./scripts/apply-theme-system-patch.cjs');
 require('./scripts/apply-integrations-catalog-patch.cjs');

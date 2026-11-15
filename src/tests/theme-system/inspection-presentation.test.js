@@ -1,4 +1,4 @@
-import {groupInspectionColors, inspectionLabelPosition} from '../../components/theme-editor/ThemeInspectionHighlight';
+import {groupInspectionColors, inspectionLabelPosition, inspectionLabelWidth} from '../../components/theme-editor/ThemeInspectionHighlight';
 import {inspectThemeElement} from '../../components/theme-editor/themeInspector';
 import {moduleAccentSource} from '../../components/manager-preview/moduleAccent';
 
@@ -32,3 +32,25 @@ test('a literal module color exposes its database source without inventing a the
     reference: '#0284c7', value: '#0284c7'}]);
   expect(moduleAccentSource(undefined, 'routes.color', 'FinancialHubPage', '#0284c7')).toBeUndefined();
 });
+
+test('a target near the top is not covered by a clamped label', () => {
+  const target = {left: 100, top: 4, width: 280, height: 40};
+  const size = {width: 440, height: 130};
+  const position = inspectionLabelPosition(target, size, {width: 1200, height: 800});
+  expect(position.top >= target.top + target.height || position.left >= target.left + target.width ||
+    position.left + size.width <= target.left).toBe(true);
+});
+
+test('a viewport-sized target puts the label away from the pointer and panel', () => {
+  const target = {left: 0, top: 0, width: 1200, height: 800, pointer: {x: 20, y: 20}};
+  const position = inspectionLabelPosition(target, {width: 440, height: 130}, {width: 1200, height: 800},
+    {left: 650, top: 0, right: 1200, bottom: 800});
+  expect(position.left + 440).toBeLessThanOrEqual(650);
+  expect(position.top).toBeGreaterThan(600);
+});
+
+ test("legend stays compact in split view and keeps its full width on wide screens", () => {
+  expect(inspectionLabelWidth(1000)).toBe(320);
+  expect(inspectionLabelWidth(1830)).toBe(440);
+  expect(inspectionLabelWidth(280)).toBe(272);
+ });
