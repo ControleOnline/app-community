@@ -1,20 +1,20 @@
 {
-  "version": "1.10.207",
-  "rc": 2,
-  "branch": "rc/1.10.207-rc.2",
-  "baseMaster": "0cae68c051e37802a767cf9ba53ec9efcc168edc",
+  "version": "1.10.208",
+  "rc": 1,
+  "branch": "rc/1.10.208-rc.1",
+  "baseMaster": "efae682b901b0ac419658a23483051ab8581a8b7",
   "tasks": [
-    1581
+    1601
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "0cbcd66e7f33d0f3c46cc7d77f7159be52f1151f"
+    "ControleOnline/app-community": "12ece11400277c16e3e3db0fe7055656fb7dd483"
   },
   "validation": {
-    "scope": "Task 1581 only: show the app type selector over SHOP screens in ADMIN web builds. App only; no API, database or master changes.",
-    "checks": "shopAppTypeSwitcher.test.js 3/3 passed (jest.homepage.config.cjs). source-policy and baseline-checks passed on the task PR. Browser smoke failures match the published staging baseline (unrelated ui-logistic specs). Not validated in a real browser by the developer.",
-    "devMerge": "4dcceb2b96f1aa204742d23d3f1d44532f9b1614",
-    "promotion": "Protected PR merge only; existing frozen RC refs remain immutable. Record resulting staging merge SHA and verify its tree matches this candidate."
+    "scope": "Task 1601 only: bump @controleonline/ui-shop 1.0.19 -> 1.0.20 so the SHOP header follows the Manager theme (ui-shop#28). Dependency bump only; no API or database changes.",
+    "checks": "ui-shop pickTheme tests 4/4; visual proof on localhost with Lave-Go theme: header rgb(2,2,2), yellow icons. source-policy and baseline-checks passed on the task PR.",
+    "devMerge": "054610fb794e60f6e15c8448e907281df9fca236",
+    "promotion": "Protected PR merge only to staging."
   }
 }
