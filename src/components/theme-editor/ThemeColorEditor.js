@@ -15,7 +15,7 @@ import HomeMetricAppearanceControls from './HomeMetricAppearanceControls';
 const emptyColors = Object.freeze({});
 
 // Tool chrome deliberately stays readable while the administrator edits the app palette.
-export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
+export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false, fixedMode = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
   const mobile = useWindowDimensions().width <= 600;
   const [changes, setChanges] = useState({});
   const [error, setError] = useState('');
@@ -94,7 +94,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
   const toolbar = (
     <View style={s.toolbar}>
       {!compact && <TextInput accessibilityLabel={t("Buscar variável ou grupo")} placeholder={t("Buscar variável ou grupo")} value={filter} onChangeText={setFilter} style={[s.input, fixedHeader ? s.toolSearch : { flex: 1 }]} />}
-      {['light', 'dark'].map((mode) => <Pressable key={mode} accessibilityRole="button" accessibilityState={{ selected: runtime.mode === mode }} onPress={() => setThemeMode(mode)} style={[s.button, fixedHeader && s.toolButton, runtime.mode === mode && s.active]}><Text style={{color:runtime.mode===mode?c.buttonText:c.buttonTextSecondary}}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text></Pressable>)}
+      {!fixedMode && ['light', 'dark'].map((mode) => <Pressable key={mode} accessibilityRole="button" accessibilityState={{ selected: runtime.mode === mode }} onPress={() => setThemeMode(mode)} style={[s.button, fixedHeader && s.toolButton, runtime.mode === mode && s.active]}><Text style={{color:runtime.mode===mode?c.buttonText:c.buttonTextSecondary}}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text></Pressable>)}
     </View>
   );
   const notices = !concise && <>
@@ -116,7 +116,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
       {group.tokens.map((token) => <View key={token} style={s.token}>
         <Text selectable style={s.tokenName}>{themeFieldDisplayName(token,t)}</Text>
         {themeFieldDisplayName(token,t) !== token && <Text selectable style={s.key}>{token}</Text>}
-        <View style={[s.modes, mobile && { flexDirection: 'column' }]}>{field(token, 'light')}{field(token, 'dark')}</View>
+        <View style={[s.modes, mobile && { flexDirection: 'column' }]}>{fixedMode ? field(token, runtime.mode) : <>{field(token, 'light')}{field(token, 'dark')}</>}</View>
       </View>)}
     </View>)}
     {selectedTokens.filter((token) => !contract.names.includes(token) && Object.hasOwn(raw, token)).map((token) => <View key={token} style={s.token}>

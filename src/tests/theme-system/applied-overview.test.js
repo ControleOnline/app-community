@@ -8,8 +8,9 @@ const runtime={status:'ready',mode:'light',raw:{'cardText-light':'#123456','card
 jest.mock('@controleonline/ui-common/src/api',()=>({api:{fetch:jest.fn(()=>{throw new Error('Unexpected API request in AppliedThemeOverview test');})}}));
 jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>runtime}));
 let mockModuleIcons;
+const mockOpenEditor=jest.fn();
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({moduleIcons:mockModuleIcons})}));
-jest.mock('../../components/theme-editor/ThemeToolsProvider',()=>({useThemeTools:()=>({available:true,openEditor:jest.fn()})}));
+jest.mock('../../components/theme-editor/ThemeToolsProvider',()=>({useThemeTools:()=>({available:true,openEditor:mockOpenEditor})}));
 jest.mock('../../components/theme-editor/CompanyBrandingEditor',()=> 'CompanyBrandingEditor');
 jest.mock('../../components/HomeIcon', () => 'Icon');
 jest.mock('../../components/theme-editor/ThemeCatalog',()=> 'ThemeCatalog');
@@ -24,6 +25,8 @@ test('keeps domain #11 separate from company Gyros #5 and shows the applied valu
  loadDomainTheme.mockResolvedValue({id:11,theme:'Domínio real',colors:runtime.raw});
  let tree;await act(async()=>{tree=renderer.create(<AppliedThemeOverview companyThemes={[{id:5,theme:'GYROS',colors:{accent:'#febc1d'}}]}/>);});
  expect(textOf(tree)).toContain('Domínio real #11');expect(textOf(tree)).toContain('GYROS #5 · é diferente');
+ await act(async()=>press(tree,'Prévia do login').props.onPress());
+ expect(mockOpenEditor).toHaveBeenCalledWith({preview:'login'});
  await act(async()=>press(tree,'Editar tema aplicado').props.onPress());
  expect(tree.root.findByType('ThemeEditorDialog').props.theme.id).toBe(11);
  await act(async()=>press(tree,'Ver detalhes').props.onPress());
