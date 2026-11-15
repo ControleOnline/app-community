@@ -18,6 +18,12 @@ export function moduleAccentBackground(accent) {
 // List modules share foreground roles only while a registered route color applies.
 // Without that accent, each surface retains its own original theme roles.
 export function moduleListAppearance({accent, colors: c, sidebar = false, active = false, highlighted = active, record = {}, enabled = !!accent, palette = c}) {
+  // Registered module colors describe the resting state. The sidebar theme owns interaction contrast.
+  if (sidebar && enabled && highlighted) return {
+    backgroundColor: c.navigationActiveBackground,
+    iconColor: c.navigationActiveIcon,
+    textColor: c.navigationActiveText,
+  };
   let result;
   if (accent) result = {backgroundColor: accent, iconColor: c.moduleListIcon ?? c.textMuted, textColor: c.moduleListText ?? c.cardText};
   else if (sidebar) result = {
