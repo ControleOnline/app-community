@@ -1,6 +1,6 @@
 {
   "package": "@controleonline/ui-default",
-  "version": "1.0.291",
+  "version": "1.0.292",
   "files": [
     {
       "file": "src/react/components/table/DefaultTable.js",
