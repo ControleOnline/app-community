@@ -101,7 +101,9 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `buttonPressedBackground`
 - `buttonPressedBorder`
 - `buttonPressedIcon`
+- `buttonPressedText`
 - `buttonShadow`
+- `buttonShadowSecondary`
 - `buttonText`
 - `buttonTextSecondary`
 
