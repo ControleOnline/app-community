@@ -1,20 +1,20 @@
 {
-  "version": "1.10.208",
+  "version": "1.10.209",
   "rc": 1,
-  "branch": "rc/1.10.208-rc.1",
-  "baseMaster": "efae682b901b0ac419658a23483051ab8581a8b7",
+  "branch": "rc/1.10.209-rc.1",
+  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
-    1601
+    776
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "12ece11400277c16e3e3db0fe7055656fb7dd483"
+    "ControleOnline/app-community": "e8e53c7e0d69a2d6beb83c2d4a44e53442eaa7c9"
   },
   "validation": {
-    "scope": "Task 1601 only: bump @controleonline/ui-shop 1.0.19 -> 1.0.20 so the SHOP header follows the Manager theme (ui-shop#28). Dependency bump only; no API or database changes.",
-    "checks": "ui-shop pickTheme tests 4/4; visual proof on localhost with Lave-Go theme: header rgb(2,2,2), yellow icons. source-policy and baseline-checks passed on the task PR.",
-    "devMerge": "054610fb794e60f6e15c8448e907281df9fca236",
+    "scope": "Task 776 (blocos 1 e 2): bump @controleonline/ui-default 1.0.290 -> 1.0.291 (prefixos defaultTable_/defaultFilter_ nos tokens de tema). Tokens ja criados no tema MANAGER (staging). Dependency bump only; sem mudanca de API.",
+    "checks": "source-policy passou na PR da task. Validacao visual em staging.",
+    "devMerge": "e00b92b64935f4ea43c96056ff6ed5f2290fd60a",
     "promotion": "Protected PR merge only to staging."
   }
 }
