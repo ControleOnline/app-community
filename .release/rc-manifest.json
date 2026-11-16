@@ -1,20 +1,20 @@
 {
-  "version": "1.10.208",
-  "rc": 1,
-  "branch": "rc/1.10.208-rc.1",
-  "baseMaster": "efae682b901b0ac419658a23483051ab8581a8b7",
+  "version": "1.10.209",
+  "rc": 3,
+  "branch": "rc/1.10.209-rc.3",
+  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
-    1601
+    776
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "12ece11400277c16e3e3db0fe7055656fb7dd483"
+    "ControleOnline/app-community": "585f8d505c9f7f01978287500e732042c10393d4"
   },
   "validation": {
-    "scope": "Task 1601 only: bump @controleonline/ui-shop 1.0.19 -> 1.0.20 so the SHOP header follows the Manager theme (ui-shop#28). Dependency bump only; no API or database changes.",
-    "checks": "ui-shop pickTheme tests 4/4; visual proof on localhost with Lave-Go theme: header rgb(2,2,2), yellow icons. source-policy and baseline-checks passed on the task PR.",
-    "devMerge": "054610fb794e60f6e15c8448e907281df9fca236",
+    "scope": "Task 776 (blocos 1 e 2): ui-default 1.0.292 (corrige alias c. do toolbar compacto: defaultFilter_; dialog/paginacao: defaultTable_) e overlays em 1.0.292. Sem mudanca de API.",
+    "checks": "source-policy e baseline-checks passaram na PR da task. Validacao visual em staging.",
+    "devMerge": "0cf7aa39970fee4666270a6e58d1ac6f2dfbb6b9",
     "promotion": "Protected PR merge only to staging."
   }
 }
