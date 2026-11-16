@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 1,
-  "branch": "rc/1.10.209-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.209-rc.2",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e8e53c7e0d69a2d6beb83c2d4a44e53442eaa7c9"
+    "ControleOnline/app-community": "f528efe570ce2c9f5ae97e750271d6d91be2d976"
   },
   "validation": {
-    "scope": "Task 776 (blocos 1 e 2): bump @controleonline/ui-default 1.0.290 -> 1.0.291 (prefixos defaultTable_/defaultFilter_ nos tokens de tema). Tokens ja criados no tema MANAGER (staging). Dependency bump only; sem mudanca de API.",
-    "checks": "source-policy passou na PR da task. Validacao visual em staging.",
-    "devMerge": "e00b92b64935f4ea43c96056ff6ed5f2290fd60a",
+    "scope": "Task 776 (blocos 1 e 2): bump @controleonline/ui-default 1.0.290 -> 1.0.291 (prefixos defaultTable_/defaultFilter_) e overlays em patches/ apontando para 1.0.291 (corrige o Deploy da staging). Sem mudanca de API.",
+    "checks": "source-policy e baseline-checks passaram na PR da task. Validacao visual em staging.",
+    "devMerge": "2e31683931628d0a9d55772b39c0f225a2d31263",
     "promotion": "Protected PR merge only to staging."
   }
 }
