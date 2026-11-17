@@ -1,20 +1,20 @@
 {
-  "version": "1.10.209",
-  "rc": 11,
-  "branch": "rc/1.10.209-rc.11",
-  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
+  "version": "1.10.210",
+  "rc": 1,
+  "branch": "rc/1.10.210-rc.1",
+  "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
-    776
+    779
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b93e2e925187f4684e50c2e58f04aefadb2301f7"
+    "ControleOnline/app-community": "fcf1151cc18f1768b382a3c9f73f6e57ad019cc0"
   },
   "validation": {
-    "scope": "Task 776: ui-orders 1.3.56 - Abrir, Pagar e Excluir/Ver cancelamento em posicoes fixas (slots de largura fixa) na coluna Acoes da order-history-page. Sem mudanca de API.",
-    "checks": "orderHistoryCompact 9/9. Validacao em staging.",
-    "devMerge": "fdc0a86880ddd53626346e2f81309aefd921363e",
+    "scope": "Task 779: ui-default 1.0.296 remove fallbacks com cores hardcoded (CompactFilterSelector, transparent) usando tokens do tema; mapa +4 variacoes; primary global sem prefixo. Sem mudanca de API.",
+    "checks": "Testes theme-system 196/196; table do ui-default 73/73. Valores gravados no tema MANAGER da staging. Validacao em staging.",
+    "devMerge": "4ecb16cdefb325996ab5f561fcf2de1002f347e9",
     "promotion": "Protected PR merge only to staging."
   }
 }
