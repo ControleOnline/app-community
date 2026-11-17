@@ -103,3 +103,38 @@ test('local editing saves only the scoped color and scope changes preserve pendi
  await act(async()=>press(tree,'Salvar cores').props.onPress());expect(saveThemeChanges.mock.calls[0][1]).toEqual({[key]:'#abcdef'});
  await act(async()=>tree.unmount());
 });
+
+test('Cancelar descarta a prévia e fecha a edição quando onClose é informado',async()=>{
+  const onClose=jest.fn();clearThemePreview.mockClear();let tree;
+  await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']} onClose={onClose}/>);});
+  await act(async()=>press(tree,'Cancelar').props.onPress());
+  expect(onClose).toHaveBeenCalledTimes(1);expect(clearThemePreview).toHaveBeenCalled();
+  await act(async()=>tree.unmount());
+});
+
+test('hex sem # é gravado com # (cores de 3, 6 e 8 dígitos) e entradas parciais não são alteradas',async()=>{
+  const {normalizeThemeValue}=require('../../styles/themeEditorModel');
+  expect(normalizeThemeValue('cardBackground','FFF')).toBe('#FFF');
+  expect(normalizeThemeValue('cardBackground','1c8fbd')).toBe('#1c8fbd');
+  expect(normalizeThemeValue('cardBackground','1c8fbd80')).toBe('#1c8fbd80');
+  expect(normalizeThemeValue('cardBackground','1c8fb')).toBe('1c8fb');
+  expect(normalizeThemeValue('cardBackground','#1c8fbd')).toBe('#1c8fbd');
+  expect(normalizeThemeValue('buttonDisabledOpacity','100')).toBe('100');
+  saveThemeChanges.mockClear();saveThemeChanges.mockResolvedValueOnce({id:1,colors:{}});let tree;
+  await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']}/>);});
+  await act(async()=>findField(tree,'escuro').props.onChangeText('112233'));
+  expect(findField(tree,'escuro').props.value).toBe('#112233');
+  await act(async()=>press(tree,'Salvar cores').props.onPress());
+  expect(saveThemeChanges.mock.calls[0][1]['cardBackground-dark']).toBe('#112233');
+  await act(async()=>tree.unmount());
+});
+
+test('o catálogo completo abre com grupos recolhidos e monta os campos só ao expandir',async()=>{
+  let tree;await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme}/>);});
+  const inputs=()=>tree.root.findAll(n=>n.props.accessibilityLabel&&/— claro/.test(String(n.props.accessibilityLabel))&&n.props.onChangeText);
+  expect(inputs().length).toBe(0);
+  const header=tree.root.findAll(n=>n.props.accessibilityRole==='button'&&n.props.accessibilityState&&n.props.accessibilityState.expanded===false&&n.props.onPress)[0];
+  await act(async()=>header.props.onPress());
+  expect(inputs().length).toBeGreaterThan(0);
+  await act(async()=>tree.unmount());
+});

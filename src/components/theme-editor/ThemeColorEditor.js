@@ -3,7 +3,7 @@ import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, use
 import { THEME_TOOL_BUTTON_HEIGHT } from './themeToolMetrics';
 import contract from '../../styles/themeContract.generated';
 import { resolveManagerThemeDetails, describeResolvedThemeColor } from '../../styles/managerTheme';
-import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey } from '../../styles/themeEditorModel';
+import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey, normalizeThemeValue } from '../../styles/themeEditorModel';
 import { useThemeRuntime, previewTheme, clearThemePreview, setThemeMode } from '../../styles/themeRuntime';
 import { editorContext, loadDomainTheme, saveThemeChanges } from './themeService';
 import NativeColorInput from './NativeColorInput';
@@ -15,7 +15,7 @@ import HomeMetricAppearanceControls from './HomeMetricAppearanceControls';
 const emptyColors = Object.freeze({});
 
 // Tool chrome deliberately stays readable while the administrator edits the app palette.
-export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false, fixedMode = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
+export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false, fixedMode = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
   const mobile = useWindowDimensions().width <= 600;
   const [changes, setChanges] = useState({});
   const [error, setError] = useState('');
@@ -42,10 +42,10 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
     clearThemePreview(owner.current);
   }, [draft, dirty, theme.id, runtime.themeId]);
   useEffect(() => {onPreviewColors?.(dirty ? draft : null);}, [draft, dirty]);
-  const cancel = () => {setChanges({});setError('');clearThemePreview(owner.current);};
+  const cancel = () => {setChanges({});setError('');clearThemePreview(owner.current);onClose?.();};
   const save = async () => {
     setSaving(true);setError('');
-    try {const updated = await saveThemeChanges(theme, changes, context.current);setChanges({});clearThemePreview(owner.current);onSaved?.(updated);}
+    try {const updated = await saveThemeChanges(theme, Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, normalizeThemeValue(tokenFromKey(key), value)])), context.current);setChanges({});clearThemePreview(owner.current);onSaved?.(updated);}
     catch (e) {setError(e?.message || t("Não foi possível salvar. Confira a sessão e sua permissão."));} finally
     {setSaving(false);}
   };
@@ -71,7 +71,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
       <View style={s.inputRow}>
         {token !== 'buttonDisabledOpacity' && <View style={[s.swatch, { backgroundColor: invalid || !value ? 'transparent' : value }]} />}
         <TextInput accessibilityLabel={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
-        value={String(value)} editable={!saving} onChangeText={(value) => edit(key, value.trim())}
+        value={String(value)} editable={!saving} onChangeText={(value) => edit(key, normalizeThemeValue(token, value))}
         placeholder={token === 'buttonDisabledOpacity' ? t("0 a 1") : t("Sem valor")} style={[s.input, mobile && { minHeight: 44, fontSize: 16 }, invalid && s.invalid]} />
         {Platform.OS === 'web' && token !== 'buttonDisabledOpacity' && <NativeColorInput value={value} disabled={saving} label={t("Escolher {{v0}} {{v1}}", { v0: token, v1: mode==='light'?t("claro"):t("escuro") })} touch={mobile} onColor={(value) => edit(key, value)} />}
       </View>
@@ -106,19 +106,25 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
   const footer = (
     <View style={[s.footer, mobile && Platform.OS === 'web' && { position: 'sticky', top: 0, zIndex: 2, backgroundColor: c.modalBackground }]}>
       <Text style={[s.caption, { minWidth: mobile ? 0 : 135, ...(mobile ? { width: '100%' } : {}) }]}>{dirty ? t("Prévia local · {{v0}} alteração(ões)", { v0: Object.keys(changes).length }) : t("Nenhuma alteração pendente")}</Text>
-      <Pressable accessibilityRole="button" disabled={saving || !dirty} onPress={cancel} style={[s.button, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={saving || (!dirty && !onClose)} onPress={cancel} style={[s.button, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
       <Pressable accessibilityRole="button" disabled={saving || !dirty || Object.entries(changes).some(([key, value]) => !validThemeValue(tokenFromKey(key), value))} onPress={save} style={[s.button, s.active, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonText}}>{saving ? t("Salvando…") : t("Salvar cores")}</Text></Pressable>
     </View>
   );
+  // The full catalogue has hundreds of fields: keep groups collapsed until opened so the editor
+  // mounts a few headers instead of every input. Selections and searches stay expanded.
+  const collapsible = !chosenTokens.length && !filter.trim() && !metric && groups.length > 6;
+  const [openGroups, setOpenGroups] = useState({});
   const groupsNode = (<>
-    {groups.map((group) => <View key={group.label} style={s.group}>
-      <Text style={s.groupTitle}>{t(group.label)}</Text>
-      {group.tokens.map((token) => <View key={token} style={s.token}>
+    {groups.map((group) => {const expanded = !collapsible || !!openGroups[group.label]; return <View key={group.label} style={s.group}>
+      {collapsible ? <Pressable accessibilityRole="button" accessibilityState={{ expanded }} accessibilityLabel={`${t(group.label)} (${group.tokens.length})`} onPress={() => setOpenGroups((current) => ({ ...current, [group.label]: !current[group.label] }))}>
+        <Text style={s.groupTitle}>{expanded ? '▾ ' : '▸ '}{t(group.label)} ({group.tokens.length})</Text></Pressable>
+      : <Text style={s.groupTitle}>{t(group.label)}</Text>}
+      {expanded && group.tokens.map((token) => <View key={token} style={s.token}>
         <Text selectable style={s.tokenName}>{themeFieldDisplayName(token,t)}</Text>
         {themeFieldDisplayName(token,t) !== token && <Text selectable style={s.key}>{token}</Text>}
         <View style={[s.modes, mobile && { flexDirection: 'column' }]}>{fixedMode ? field(token, runtime.mode) : <>{field(token, 'light')}{field(token, 'dark')}</>}</View>
       </View>)}
-    </View>)}
+    </View>;})}
     {selectedTokens.filter((token) => !contract.names.includes(token) && Object.hasOwn(raw, token)).map((token) => <View key={token} style={s.token}>
       <Text selectable style={s.tokenName}>{token}{t(" · referência legada compartilhada")}</Text>
       <TextInput accessibilityLabel={t("Cor legada {{v0}}", { v0: token })} value={String(draft[token] ?? '')} onChangeText={(value) => edit(token, value.trim())} editable={!saving} style={s.input} />

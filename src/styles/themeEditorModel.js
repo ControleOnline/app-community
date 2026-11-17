@@ -57,9 +57,15 @@ export function themeEditorGroups() {
   // This is a presentation alias, not another token vocabulary. Keep the existing preview.
   return [{label:'tokens base',tokens:['loadingSpinner']},...contract.groups];
 }
+// Hex typed without "#" (3, 4, 6 or 8 digits) is stored with it; partial input is left untouched.
+export const normalizeThemeValue = (token, value) => {
+  const text = typeof value === 'string' ? value.trim() : value;
+  if (token === 'buttonDisabledOpacity' || typeof text !== 'string') return text;
+  return /^([\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(text) ? `#${text}` : text;
+};
 export function serializeThemeColors(draft) {
   return Object.fromEntries(Object.entries(draft).map(([key,value])=>{
-    const normalized=typeof value==='string'?value.trim():String(value ?? '');
+    const normalized=typeof value==='string'?normalizeThemeValue(tokenFromKey(key),value):String(value ?? '');
     if(isOfficialThemeKey(key) && !validThemeValue(tokenFromKey(key),normalized))throw new Error(`Valor inválido para ${key}.`);
     return [key,normalized];
   }));

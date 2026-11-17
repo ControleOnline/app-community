@@ -2,7 +2,7 @@
   "files": [
     {
       "package": "@controleonline/ui-orders",
-      "version": "1.3.53",
+      "version": "1.3.56",
       "file": "src/react/pages/orders/OrderHistoryPage.js",
       "payload": "single-item-flow/orderHistoryPage.js",
       "before": "7d329c0a629e5b00544a17c9c5bf38bdb9dfb3b6f6c071a53d6a121850f3dd17",
@@ -10,7 +10,7 @@
     },
     {
       "package": "@controleonline/ui-orders",
-      "version": "1.3.53",
+      "version": "1.3.56",
       "file": "src/react/pages/checkout/useCheckoutNavigation.js",
       "payload": "single-item-flow/checkoutNavigation.js",
       "before": "9f6316c5f95096fc5654396f3bc9ffafc5d3a23a376f439233432dbcd28fd3e6",
@@ -48,7 +48,7 @@
     },
     {
       "package": "@controleonline/ui-orders",
-      "version": "1.3.53",
+      "version": "1.3.56",
       "file": "src/react/pages/checkout/Checkout.js",
       "payload": "single-item-flow/checkout.js",
       "before": "8105924b0917c87bc7ae041f083c496c157acc6e7ccf10deadc47db946cd29db",
