@@ -5,17 +5,17 @@
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
     779,
-    1628
+    781
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "c8822711b39922b874948321e2274eec22ba3798"
+    "ControleOnline/app-community": "4ed95e36656d51b53809af0d04c345c48ba884d8"
   },
   "validation": {
-    "scope": "Task 779: ui-default 1.0.296 remove fallbacks com cores hardcoded (CompactFilterSelector, transparent) usando tokens do tema; mapa +4 variacoes; primary global sem prefixo. Sem mudanca de API. | Task 1628: paginador no rodape da order-history-page; ui-default 1.0.297 corrige ReferenceError background/border do DefaultTablePaginationBar (ui-default#76). Substitui rc.1.",
-    "checks": "Testes theme-system 196/196; table do ui-default 73/73. Valores gravados no tema MANAGER da staging. Validacao em staging.",
-    "devMerge": "c8822711b39922b874948321e2274eec22ba3798",
+    "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
+    "checks": "ui-login: teste de contrato resetPasswordTheme 1/1. Validacao em staging.",
+    "devMerge": "d4760cc893182a77db3ff47f438cc3aef8b5ee0f",
     "promotion": "Protected PR merge only to staging."
   }
 }
