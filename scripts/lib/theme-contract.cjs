@@ -10,7 +10,7 @@ function parseThemeMap(markdown) {
   for (const line of markdown.split(/\r?\n/)) {
     const heading = /^### ([^#].*)$/.exec(line);
     if (heading) { group = {label: heading[1].trim(), tokens: []}; groups.push(group); }
-    const field = /^- `([a-z][a-zA-Z0-9]*)`(?:\s*<!-- (.*?) -->)?\s*$/.exec(line);
+    const field = /^- `([a-z][a-zA-Z0-9_]*)`(?:\s*<!-- (.*?) -->)?\s*$/.exec(line);
     if (!field) continue;
     if (!group) throw new Error('Theme token without a group.');
     if (names.has(field[1])) throw new Error(`Duplicate theme token: ${field[1]}`);
@@ -38,7 +38,7 @@ function generateThemeContract(root = path.resolve(__dirname, '../..')) {
   const directory = path.join(root, 'src/components/manager-preview');
   for (const name of fs.readdirSync(directory).filter(name => name.endsWith('.js'))) {
     const source = fs.readFileSync(path.join(directory, name), 'utf8');
-    for (const match of source.matchAll(/\b(?:c|colors|palette)\.([a-zA-Z][a-zA-Z0-9]*)/g)) {
+    for (const match of source.matchAll(/\b(?:c|colors|palette)\.([a-zA-Z][a-zA-Z0-9_]*)/g)) {
       if (contract.names.includes(match[1])) consumed.add(match[1]);
     }
   }

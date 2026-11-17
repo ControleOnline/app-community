@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 5,
-  "branch": "rc/1.10.209-rc.5",
+  "rc": 6,
+  "branch": "rc/1.10.209-rc.6",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "80ea41721513b080116a2cc9f67dc22019db6b13"
+    "ControleOnline/app-community": "8add25f5632ccd5372a85f82c02fe1fb6e73bbe9"
   },
   "validation": {
-    "scope": "Task 776: ui-orders 1.3.54 - botoes Abrir/Pagar/Info da tabela de pedidos usam button{Background,Border,Icon,Text}_customOpen/customPay/customInfo; tokens registrados no themes-map.md e nos JSONs do tema manager. Sem mudanca de API.",
-    "checks": "Testes orderHistoryCompact* 9/9; source-policy e baseline-checks nas PRs da task. Validacao visual em staging.",
-    "devMerge": "1698527b033b87171b4c33195ebcc73a23086546",
+    "scope": "Task 776: editor de temas (avatar -> Configurar temas) reconhece, edita e grava os tokens defaultTable_*, defaultFilter_* e button*_custom*: parser do mapa aceita underscore, 103 variacoes com base no token global, contrato regenerado, JSONs do manager atualizados. Sem mudanca de API.",
+    "checks": "Testes theme-system 193/193 (contract.test atualizado para 475 tokens e 29 grupos); managerCompleteTheme mantem 2 falhas preexistentes (60 tokens homeMetric/login/scrollbar ausentes do JSON). Validacao em staging.",
+    "devMerge": "f9f0a0c8246af22447d112643ca4672cc15bdfa9",
     "promotion": "Protected PR merge only to staging."
   }
 }
