@@ -1,15 +1,15 @@
 {
   "version": "1.10.209",
-  "rc": 12,
-  "branch": "rc/1.10.209-rc.12",
+  "rc": 13,
+  "branch": "rc/1.10.209-rc.13",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [1628],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "905015462bab367f44d86f939049f7590e8f08ec"
+    "ControleOnline/app-community": "9f975a217bf514043926fae8bb8dde54f1d599b5"
   },
   "validation": {
-    "scope": "Task 1628: ui-orders 1.3.57 - paginador na order-history-page (ui-orders#74). Sem mudanca de API."
+    "scope": "Task 1628: paginador no rodape da order-history-page (overlay manager-audit-fixes). ui-orders segue 1.3.56. Substitui rc.12."
   }
 }
