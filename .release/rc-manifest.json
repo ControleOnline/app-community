@@ -1,20 +1,21 @@
 {
-  "version": "1.10.209",
-  "rc": 11,
-  "branch": "rc/1.10.209-rc.11",
-  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
+  "version": "1.10.210",
+  "rc": 2,
+  "branch": "rc/1.10.210-rc.2",
+  "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
-    776
+    779,
+    781
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b93e2e925187f4684e50c2e58f04aefadb2301f7"
+    "ControleOnline/app-community": "4ed95e36656d51b53809af0d04c345c48ba884d8"
   },
   "validation": {
-    "scope": "Task 776: ui-orders 1.3.56 - Abrir, Pagar e Excluir/Ver cancelamento em posicoes fixas (slots de largura fixa) na coluna Acoes da order-history-page. Sem mudanca de API.",
-    "checks": "orderHistoryCompact 9/9. Validacao em staging.",
-    "devMerge": "fdc0a86880ddd53626346e2f81309aefd921363e",
+    "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
+    "checks": "ui-login: teste de contrato resetPasswordTheme 1/1. Validacao em staging.",
+    "devMerge": "d4760cc893182a77db3ff47f438cc3aef8b5ee0f",
     "promotion": "Protected PR merge only to staging."
   }
 }
