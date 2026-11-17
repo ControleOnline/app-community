@@ -103,3 +103,11 @@ test('local editing saves only the scoped color and scope changes preserve pendi
  await act(async()=>press(tree,'Salvar cores').props.onPress());expect(saveThemeChanges.mock.calls[0][1]).toEqual({[key]:'#abcdef'});
  await act(async()=>tree.unmount());
 });
+
+test('Cancelar descarta a prévia e fecha a edição quando onClose é informado',async()=>{
+  const onClose=jest.fn();clearThemePreview.mockClear();let tree;
+  await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']} onClose={onClose}/>);});
+  await act(async()=>press(tree,'Cancelar').props.onPress());
+  expect(onClose).toHaveBeenCalledTimes(1);expect(clearThemePreview).toHaveBeenCalled();
+  await act(async()=>tree.unmount());
+});
