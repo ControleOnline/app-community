@@ -1,20 +1,21 @@
 {
   "version": "1.10.210",
-  "rc": 1,
-  "branch": "rc/1.10.210-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.210-rc.2",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
-    779
+    779,
+    1628
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "fcf1151cc18f1768b382a3c9f73f6e57ad019cc0"
+    "ControleOnline/app-community": "c8822711b39922b874948321e2274eec22ba3798"
   },
   "validation": {
-    "scope": "Task 779: ui-default 1.0.296 remove fallbacks com cores hardcoded (CompactFilterSelector, transparent) usando tokens do tema; mapa +4 variacoes; primary global sem prefixo. Sem mudanca de API.",
+    "scope": "Task 779: ui-default 1.0.296 remove fallbacks com cores hardcoded (CompactFilterSelector, transparent) usando tokens do tema; mapa +4 variacoes; primary global sem prefixo. Sem mudanca de API. | Task 1628: paginador no rodape da order-history-page; ui-default 1.0.297 corrige ReferenceError background/border do DefaultTablePaginationBar (ui-default#76). Substitui rc.1.",
     "checks": "Testes theme-system 196/196; table do ui-default 73/73. Valores gravados no tema MANAGER da staging. Validacao em staging.",
-    "devMerge": "4ecb16cdefb325996ab5f561fcf2de1002f347e9",
+    "devMerge": "c8822711b39922b874948321e2274eec22ba3798",
     "promotion": "Protected PR merge only to staging."
   }
 }
