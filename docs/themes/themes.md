@@ -196,3 +196,4 @@ Interpretação técnica:
 - Objetos dentro de `defaultFilter` (barra de busca/filtros, botoes Filtros/Tabela/Cards/Colunas/Mais opcoes/Novo, chips, dialogs de filtro e colunas) usam o prefixo `defaultFilter_`
 - o prefixo e somente de nome: `defaultFilter_buttonBackground` e gravado como `defaultFilter_buttonBackground-light` e `-dark`
 - estados de botao: `button*` (principal, clicavel), `button*Secondary` (secundario, ex.: cancelar), `buttonPressed*` (selecionado/pressionado) e `buttonDisabled*` (inativo)
+- variacoes por acao de linha (tabela de pedidos): `buttonBackground_customOpen`, `buttonBorder_customOpen`, `buttonIcon_customOpen`, `buttonText_customOpen` (Abrir); o mesmo para `customPay` (Pagar) e `customInfo` (i / ver cancelamento)
