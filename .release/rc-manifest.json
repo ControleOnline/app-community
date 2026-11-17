@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 8,
-  "branch": "rc/1.10.209-rc.8",
+  "rc": 9,
+  "branch": "rc/1.10.209-rc.9",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "755f95aba03d521aced6df380903dee6c7b8a014"
+    "ControleOnline/app-community": "ed55d0c01fa9b3964990879af610696349e093ee"
   },
   "validation": {
-    "scope": "Task 776: editor de cores aceita HEX sem # e grava com # (3, 4, 6 e 8 digitos). Sem mudanca de API.",
-    "checks": "Testes theme-system 195/195 (novo teste de normalizacao). Validacao em staging.",
-    "devMerge": "cba3631b77ab19bff27d6719448e009813c2f532",
+    "scope": "Task 776: editor de cores abre com grupos recolhidos (475 tokens montavam ~950 inputs de uma vez e travavam a abertura). Selecao e busca continuam expandidas. Sem mudanca de API.",
+    "checks": "Testes theme-system 196/196; abertura medida em teste com o tema real: 284 ms para 43 ms. Validacao em staging.",
+    "devMerge": "a5ebfed8a33771831fc36c1f0a4fd42b429fa399",
     "promotion": "Protected PR merge only to staging."
   }
 }

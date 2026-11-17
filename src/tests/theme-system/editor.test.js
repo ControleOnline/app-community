@@ -128,3 +128,13 @@ test('hex sem # é gravado com # (cores de 3, 6 e 8 dígitos) e entradas parciai
   expect(saveThemeChanges.mock.calls[0][1]['cardBackground-dark']).toBe('#112233');
   await act(async()=>tree.unmount());
 });
+
+test('o catálogo completo abre com grupos recolhidos e monta os campos só ao expandir',async()=>{
+  let tree;await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme}/>);});
+  const inputs=()=>tree.root.findAll(n=>n.props.accessibilityLabel&&/— claro/.test(String(n.props.accessibilityLabel))&&n.props.onChangeText);
+  expect(inputs().length).toBe(0);
+  const header=tree.root.findAll(n=>n.props.accessibilityRole==='button'&&n.props.accessibilityState&&n.props.accessibilityState.expanded===false&&n.props.onPress)[0];
+  await act(async()=>header.props.onPress());
+  expect(inputs().length).toBeGreaterThan(0);
+  await act(async()=>tree.unmount());
+});

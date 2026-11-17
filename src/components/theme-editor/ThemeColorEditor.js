@@ -110,15 +110,21 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPrevi
       <Pressable accessibilityRole="button" disabled={saving || !dirty || Object.entries(changes).some(([key, value]) => !validThemeValue(tokenFromKey(key), value))} onPress={save} style={[s.button, s.active, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonText}}>{saving ? t("Salvando…") : t("Salvar cores")}</Text></Pressable>
     </View>
   );
+  // The full catalogue has hundreds of fields: keep groups collapsed until opened so the editor
+  // mounts a few headers instead of every input. Selections and searches stay expanded.
+  const collapsible = !chosenTokens.length && !filter.trim() && !metric && groups.length > 6;
+  const [openGroups, setOpenGroups] = useState({});
   const groupsNode = (<>
-    {groups.map((group) => <View key={group.label} style={s.group}>
-      <Text style={s.groupTitle}>{t(group.label)}</Text>
-      {group.tokens.map((token) => <View key={token} style={s.token}>
+    {groups.map((group) => {const expanded = !collapsible || !!openGroups[group.label]; return <View key={group.label} style={s.group}>
+      {collapsible ? <Pressable accessibilityRole="button" accessibilityState={{ expanded }} accessibilityLabel={`${t(group.label)} (${group.tokens.length})`} onPress={() => setOpenGroups((current) => ({ ...current, [group.label]: !current[group.label] }))}>
+        <Text style={s.groupTitle}>{expanded ? '▾ ' : '▸ '}{t(group.label)} ({group.tokens.length})</Text></Pressable>
+      : <Text style={s.groupTitle}>{t(group.label)}</Text>}
+      {expanded && group.tokens.map((token) => <View key={token} style={s.token}>
         <Text selectable style={s.tokenName}>{themeFieldDisplayName(token,t)}</Text>
         {themeFieldDisplayName(token,t) !== token && <Text selectable style={s.key}>{token}</Text>}
         <View style={[s.modes, mobile && { flexDirection: 'column' }]}>{fixedMode ? field(token, runtime.mode) : <>{field(token, 'light')}{field(token, 'dark')}</>}</View>
       </View>)}
-    </View>)}
+    </View>;})}
     {selectedTokens.filter((token) => !contract.names.includes(token) && Object.hasOwn(raw, token)).map((token) => <View key={token} style={s.token}>
       <Text selectable style={s.tokenName}>{token}{t(" · referência legada compartilhada")}</Text>
       <TextInput accessibilityLabel={t("Cor legada {{v0}}", { v0: token })} value={String(draft[token] ?? '')} onChangeText={(value) => edit(token, value.trim())} editable={!saving} style={s.input} />
