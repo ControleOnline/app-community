@@ -1,20 +1,20 @@
 {
-  "version": "1.10.208",
-  "rc": 1,
-  "branch": "rc/1.10.208-rc.1",
-  "baseMaster": "efae682b901b0ac419658a23483051ab8581a8b7",
+  "version": "1.10.209",
+  "rc": 4,
+  "branch": "rc/1.10.209-rc.4",
+  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
-    1601
+    776
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "12ece11400277c16e3e3db0fe7055656fb7dd483"
+    "ControleOnline/app-community": "d39d8b3f7ed8cb09c8baac76c8034f31629a7294"
   },
   "validation": {
-    "scope": "Task 1601 only: bump @controleonline/ui-shop 1.0.19 -> 1.0.20 so the SHOP header follows the Manager theme (ui-shop#28). Dependency bump only; no API or database changes.",
-    "checks": "ui-shop pickTheme tests 4/4; visual proof on localhost with Lave-Go theme: header rgb(2,2,2), yellow icons. source-policy and baseline-checks passed on the task PR.",
-    "devMerge": "054610fb794e60f6e15c8448e907281df9fca236",
+    "scope": "Task 776 (blocos 3 e 4): ui-default 1.0.293 - tokens corretos no defaultFilter (botoes principal/secondary/pressed, inputs, chips, dialogs) e defaultTable (linhas, cards, paginacao); mapa com buttonPressedText e buttonShadowSecondary. Sem mudanca de API.",
+    "checks": "Testes ui-default de table 73/73 (grouping.test ja falhava antes por caminho); source-policy e baseline-checks na PR da task. Validacao visual em staging.",
+    "devMerge": "74bcc59ee1de7154b3e4780c94b201f33afdaf73",
     "promotion": "Protected PR merge only to staging."
   }
 }
