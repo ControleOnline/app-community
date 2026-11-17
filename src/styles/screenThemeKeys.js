@@ -6,7 +6,7 @@ export const screenThemeKey=(screen,token,mode)=>{
   return `screen_${encode(screen)}__${token}-${mode}`;
 };
 export function parseScreenThemeKey(key){
-  const match=/^screen_([a-f0-9]{4,800})__([a-z][a-zA-Z0-9]*)-(light|dark)$/.exec(key);
+  const match=/^screen_([a-f0-9]{4,800})__([a-z][a-zA-Z0-9_]*)-(light|dark)$/.exec(key);
   if(!match || match[1].length%4 || !names.has(match[2]))return null;
   const screen=match[1].match(/.{4}/g).map(part=>String.fromCharCode(parseInt(part,16))).join('');
   return {screen,token:match[2],mode:match[3]};

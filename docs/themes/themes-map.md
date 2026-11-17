@@ -106,18 +106,6 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `buttonShadowSecondary`
 - `buttonText`
 - `buttonTextSecondary`
-- `buttonBackground_customOpen`
-- `buttonBorder_customOpen`
-- `buttonIcon_customOpen`
-- `buttonText_customOpen`
-- `buttonBackground_customPay`
-- `buttonBorder_customPay`
-- `buttonIcon_customPay`
-- `buttonText_customPay`
-- `buttonBackground_customInfo`
-- `buttonBorder_customInfo`
-- `buttonIcon_customInfo`
-- `buttonText_customInfo`
 
 ### card
 
@@ -502,6 +490,118 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `toastWarningBorder`
 - `toastWarningIcon`
 - `toastWarningText`
+
+### tabela padrao (defaultTable)
+
+- `defaultTable_badgeBackground` <!-- base: badgeBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - badgeBackground -->
+- `defaultTable_badgeBorder` <!-- base: badgeBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - badgeBorder -->
+- `defaultTable_badgeText` <!-- base: badgeText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - badgeText -->
+- `defaultTable_buttonBackground` <!-- base: buttonBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonBackground -->
+- `defaultTable_buttonBackgroundSecondary` <!-- base: buttonBackgroundSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonBackgroundSecondary -->
+- `defaultTable_buttonBorder` <!-- base: buttonBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonBorder -->
+- `defaultTable_buttonBorderSecondary` <!-- base: buttonBorderSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonBorderSecondary -->
+- `defaultTable_buttonIcon` <!-- base: buttonIcon; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonIcon -->
+- `defaultTable_buttonIconSecondary` <!-- base: buttonIconSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonIconSecondary -->
+- `defaultTable_buttonPressedBackground` <!-- base: buttonPressedBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonPressedBackground -->
+- `defaultTable_buttonPressedBorder` <!-- base: buttonPressedBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonPressedBorder -->
+- `defaultTable_buttonPressedIcon` <!-- base: buttonPressedIcon; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonPressedIcon -->
+- `defaultTable_buttonPressedText` <!-- base: buttonPressedText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonPressedText -->
+- `defaultTable_buttonText` <!-- base: buttonText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonText -->
+- `defaultTable_buttonTextSecondary` <!-- base: buttonTextSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - buttonTextSecondary -->
+- `defaultTable_cardBackground` <!-- base: cardBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - cardBackground -->
+- `defaultTable_cardBorder` <!-- base: cardBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - cardBorder -->
+- `defaultTable_cardText` <!-- base: cardText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - cardText -->
+- `defaultTable_checkboxBorder` <!-- base: checkboxBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - checkboxBorder -->
+- `defaultTable_checkboxSelectedMark` <!-- base: checkboxSelectedMark; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - checkboxSelectedMark -->
+- `defaultTable_dividerBackground` <!-- base: dividerBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - dividerBackground -->
+- `defaultTable_dividerBorder` <!-- base: dividerBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - dividerBorder -->
+- `defaultTable_inputBorder` <!-- base: inputBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - inputBorder -->
+- `defaultTable_listItemBorder` <!-- base: listItemBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - listItemBorder -->
+- `defaultTable_modalBackground` <!-- base: modalBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalBackground -->
+- `defaultTable_modalBorder` <!-- base: modalBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalBorder -->
+- `defaultTable_modalCloseIcon` <!-- base: modalCloseIcon; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalCloseIcon -->
+- `defaultTable_modalHeaderText` <!-- base: modalHeaderText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalHeaderText -->
+- `defaultTable_modalOverlay` <!-- base: modalOverlay; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalOverlay -->
+- `defaultTable_modalText` <!-- base: modalText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - modalText -->
+- `defaultTable_panelBackground` <!-- base: panelBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - panelBackground -->
+- `defaultTable_panelBorder` <!-- base: panelBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - panelBorder -->
+- `defaultTable_tableActionBackground` <!-- base: tableActionBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableActionBackground -->
+- `defaultTable_tableActionBorder` <!-- base: tableActionBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableActionBorder -->
+- `defaultTable_tableActionIcon` <!-- base: tableActionIcon; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableActionIcon -->
+- `defaultTable_tableFooterBackground` <!-- base: tableFooterBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableFooterBackground -->
+- `defaultTable_tableFooterBorder` <!-- base: tableFooterBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableFooterBorder -->
+- `defaultTable_tableFooterText` <!-- base: tableFooterText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableFooterText -->
+- `defaultTable_tableHeaderBorder` <!-- base: tableHeaderBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableHeaderBorder -->
+- `defaultTable_tableHeaderText` <!-- base: tableHeaderText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableHeaderText -->
+- `defaultTable_tableRowBorder` <!-- base: tableRowBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableRowBorder -->
+- `defaultTable_tableRowEvenBackground` <!-- base: tableRowEvenBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableRowEvenBackground -->
+- `defaultTable_tableRowMutedText` <!-- base: tableRowMutedText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableRowMutedText -->
+- `defaultTable_tableRowOddBackground` <!-- base: tableRowOddBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableRowOddBackground -->
+- `defaultTable_tableRowText` <!-- base: tableRowText; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableRowText -->
+- `defaultTable_tableToolbarBorder` <!-- base: tableToolbarBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - tableToolbarBorder -->
+- `defaultTable_textSecondary` <!-- base: textSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - textSecondary -->
+- `defaultTable_toolbarBackground` <!-- base: toolbarBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - toolbarBackground -->
+- `defaultTable_toolbarBorder` <!-- base: toolbarBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - toolbarBorder -->
+
+### filtro padrao (defaultFilter)
+
+- `defaultFilter_badgeBackground` <!-- base: badgeBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - badgeBackground -->
+- `defaultFilter_badgeText` <!-- base: badgeText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - badgeText -->
+- `defaultFilter_buttonBackground` <!-- base: buttonBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonBackground -->
+- `defaultFilter_buttonBackgroundSecondary` <!-- base: buttonBackgroundSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonBackgroundSecondary -->
+- `defaultFilter_buttonBorder` <!-- base: buttonBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonBorder -->
+- `defaultFilter_buttonBorderSecondary` <!-- base: buttonBorderSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonBorderSecondary -->
+- `defaultFilter_buttonIcon` <!-- base: buttonIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonIcon -->
+- `defaultFilter_buttonIconSecondary` <!-- base: buttonIconSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonIconSecondary -->
+- `defaultFilter_buttonPressedBackground` <!-- base: buttonPressedBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonPressedBackground -->
+- `defaultFilter_buttonPressedBorder` <!-- base: buttonPressedBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonPressedBorder -->
+- `defaultFilter_buttonPressedIcon` <!-- base: buttonPressedIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonPressedIcon -->
+- `defaultFilter_buttonPressedText` <!-- base: buttonPressedText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonPressedText -->
+- `defaultFilter_buttonText` <!-- base: buttonText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonText -->
+- `defaultFilter_buttonTextSecondary` <!-- base: buttonTextSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - buttonTextSecondary -->
+- `defaultFilter_checkboxBorder` <!-- base: checkboxBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - checkboxBorder -->
+- `defaultFilter_checkboxSelectedMark` <!-- base: checkboxSelectedMark; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - checkboxSelectedMark -->
+- `defaultFilter_chipBackground` <!-- base: chipBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipBackground -->
+- `defaultFilter_chipBorder` <!-- base: chipBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipBorder -->
+- `defaultFilter_chipIcon` <!-- base: chipIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipIcon -->
+- `defaultFilter_chipSelectedBackground` <!-- base: chipSelectedBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipSelectedBackground -->
+- `defaultFilter_chipText` <!-- base: chipText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipText -->
+- `defaultFilter_iconColor` <!-- base: iconColor; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - iconColor -->
+- `defaultFilter_iconWarning` <!-- base: iconWarning; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - iconWarning -->
+- `defaultFilter_inputBackground` <!-- base: inputBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputBackground -->
+- `defaultFilter_inputBorder` <!-- base: inputBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputBorder -->
+- `defaultFilter_inputIcon` <!-- base: inputIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputIcon -->
+- `defaultFilter_inputPlaceholderText` <!-- base: inputPlaceholderText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputPlaceholderText -->
+- `defaultFilter_inputText` <!-- base: inputText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputText -->
+- `defaultFilter_modalBackground` <!-- base: modalBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalBackground -->
+- `defaultFilter_modalBorder` <!-- base: modalBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalBorder -->
+- `defaultFilter_modalCloseIcon` <!-- base: modalCloseIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalCloseIcon -->
+- `defaultFilter_modalHeaderText` <!-- base: modalHeaderText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalHeaderText -->
+- `defaultFilter_modalOverlay` <!-- base: modalOverlay; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalOverlay -->
+- `defaultFilter_modalText` <!-- base: modalText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - modalText -->
+- `defaultFilter_tableFilterBackground` <!-- base: tableFilterBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - tableFilterBackground -->
+- `defaultFilter_tableFilterBorder` <!-- base: tableFilterBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - tableFilterBorder -->
+- `defaultFilter_tableFilterText` <!-- base: tableFilterText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - tableFilterText -->
+- `defaultFilter_tableRowBorder` <!-- base: tableRowBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - tableRowBorder -->
+- `defaultFilter_textPrimary` <!-- base: textPrimary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - textPrimary -->
+- `defaultFilter_textSecondary` <!-- base: textSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - textSecondary -->
+- `defaultFilter_toolbarBackground` <!-- base: toolbarBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - toolbarBackground -->
+- `defaultFilter_toolbarBorder` <!-- base: toolbarBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - toolbarBorder -->
+
+### acoes da tabela de pedidos (custom)
+
+- `buttonBackground_customOpen` <!-- base: buttonBackground; variant: customOpen; label: Botão Abrir (tabela de pedidos); usage: Botão Abrir (tabela de pedidos) - buttonBackground -->
+- `buttonBorder_customOpen` <!-- base: buttonBorder; variant: customOpen; label: Botão Abrir (tabela de pedidos); usage: Botão Abrir (tabela de pedidos) - buttonBorder -->
+- `buttonIcon_customOpen` <!-- base: buttonIcon; variant: customOpen; label: Botão Abrir (tabela de pedidos); usage: Botão Abrir (tabela de pedidos) - buttonIcon -->
+- `buttonText_customOpen` <!-- base: buttonText; variant: customOpen; label: Botão Abrir (tabela de pedidos); usage: Botão Abrir (tabela de pedidos) - buttonText -->
+- `buttonBackground_customPay` <!-- base: buttonBackground; variant: customPay; label: Botão Pagar (tabela de pedidos); usage: Botão Pagar (tabela de pedidos) - buttonBackground -->
+- `buttonBorder_customPay` <!-- base: buttonBorder; variant: customPay; label: Botão Pagar (tabela de pedidos); usage: Botão Pagar (tabela de pedidos) - buttonBorder -->
+- `buttonIcon_customPay` <!-- base: buttonIcon; variant: customPay; label: Botão Pagar (tabela de pedidos); usage: Botão Pagar (tabela de pedidos) - buttonIcon -->
+- `buttonText_customPay` <!-- base: buttonText; variant: customPay; label: Botão Pagar (tabela de pedidos); usage: Botão Pagar (tabela de pedidos) - buttonText -->
+- `buttonBackground_customInfo` <!-- base: buttonBackground; variant: customInfo; label: Botão i (tabela de pedidos); usage: Botão i (tabela de pedidos) - buttonBackground -->
+- `buttonBorder_customInfo` <!-- base: buttonBorder; variant: customInfo; label: Botão i (tabela de pedidos); usage: Botão i (tabela de pedidos) - buttonBorder -->
+- `buttonIcon_customInfo` <!-- base: buttonIcon; variant: customInfo; label: Botão i (tabela de pedidos); usage: Botão i (tabela de pedidos) - buttonIcon -->
+- `buttonText_customInfo` <!-- base: buttonText; variant: customInfo; label: Botão i (tabela de pedidos); usage: Botão i (tabela de pedidos) - buttonText -->
 
 ### Transporte dos modos claro e escuro
 

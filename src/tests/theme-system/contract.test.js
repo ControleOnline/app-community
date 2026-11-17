@@ -5,13 +5,13 @@ import {apiModeTheme,resolveManagerTheme} from '../../styles/managerTheme';
 import {env} from '@env';
 import {themeEditorGroups,themeFieldValue,serializeThemeColors,validThemeValue} from '../../styles/themeEditorModel';
 const {parseThemeMap}=require('../../../scripts/lib/theme-contract.cjs');
-test('the generated contract exactly matches Markdown and preserves all 26 preview groups',()=>{
+test('the generated contract exactly matches Markdown and preserves all 29 preview groups',()=>{
   const parsed=parseThemeMap(fs.readFileSync(path.join(process.cwd(),'docs/themes/themes-map.md'),'utf8'));
   expect(contract.names).toEqual(parsed.names);expect(contract.groups).toEqual(parsed.groups);
-  expect(new Set(contract.names).size).toBe(370);
+  expect(new Set(contract.names).size).toBe(475);
   expect(contract.variants).toEqual(parsed.variants);
   expect(contract.legacyKeys).toEqual(parsed.legacyKeys);
-  expect(themeEditorGroups()).toHaveLength(26);
+  expect(themeEditorGroups()).toHaveLength(29);
   expect(themeEditorGroups()[0]).toEqual({label:'tokens base',tokens:['loadingSpinner']});
 });
 test('rejects invented transport names and never borrows a light value for missing dark',()=>{
