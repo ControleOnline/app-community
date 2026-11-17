@@ -15,7 +15,7 @@ import HomeMetricAppearanceControls from './HomeMetricAppearanceControls';
 const emptyColors = Object.freeze({});
 
 // Tool chrome deliberately stays readable while the administrator edits the app palette.
-export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false, fixedMode = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
+export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPreviewColors, selectedTokens = [], search = '', onlyFilled = false, compact = false, screen = null, concise = false, homeMetric = null, fixedHeader = false, fixedMode = false }) {const c = useThemeEditorPalette();const s = editorStyles(c);
   const mobile = useWindowDimensions().width <= 600;
   const [changes, setChanges] = useState({});
   const [error, setError] = useState('');
@@ -42,7 +42,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
     clearThemePreview(owner.current);
   }, [draft, dirty, theme.id, runtime.themeId]);
   useEffect(() => {onPreviewColors?.(dirty ? draft : null);}, [draft, dirty]);
-  const cancel = () => {setChanges({});setError('');clearThemePreview(owner.current);};
+  const cancel = () => {setChanges({});setError('');clearThemePreview(owner.current);onClose?.();};
   const save = async () => {
     setSaving(true);setError('');
     try {const updated = await saveThemeChanges(theme, changes, context.current);setChanges({});clearThemePreview(owner.current);onSaved?.(updated);}
@@ -106,7 +106,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onPreviewColors,
   const footer = (
     <View style={[s.footer, mobile && Platform.OS === 'web' && { position: 'sticky', top: 0, zIndex: 2, backgroundColor: c.modalBackground }]}>
       <Text style={[s.caption, { minWidth: mobile ? 0 : 135, ...(mobile ? { width: '100%' } : {}) }]}>{dirty ? t("Prévia local · {{v0}} alteração(ões)", { v0: Object.keys(changes).length }) : t("Nenhuma alteração pendente")}</Text>
-      <Pressable accessibilityRole="button" disabled={saving || !dirty} onPress={cancel} style={[s.button, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={saving || (!dirty && !onClose)} onPress={cancel} style={[s.button, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonTextSecondary}}>{t("Cancelar")}</Text></Pressable>
       <Pressable accessibilityRole="button" disabled={saving || !dirty || Object.entries(changes).some(([key, value]) => !validThemeValue(tokenFromKey(key), value))} onPress={save} style={[s.button, s.active, fixedHeader ? s.toolButton : mobile && { minHeight: 44, justifyContent: 'center' }]}><Text style={{color:c.buttonText}}>{saving ? t("Salvando…") : t("Salvar cores")}</Text></Pressable>
     </View>
   );
