@@ -111,3 +111,20 @@ test('Cancelar descarta a prévia e fecha a edição quando onClose é informado
   expect(onClose).toHaveBeenCalledTimes(1);expect(clearThemePreview).toHaveBeenCalled();
   await act(async()=>tree.unmount());
 });
+
+test('hex sem # é gravado com # (cores de 3, 6 e 8 dígitos) e entradas parciais não são alteradas',async()=>{
+  const {normalizeThemeValue}=require('../../styles/themeEditorModel');
+  expect(normalizeThemeValue('cardBackground','FFF')).toBe('#FFF');
+  expect(normalizeThemeValue('cardBackground','1c8fbd')).toBe('#1c8fbd');
+  expect(normalizeThemeValue('cardBackground','1c8fbd80')).toBe('#1c8fbd80');
+  expect(normalizeThemeValue('cardBackground','1c8fb')).toBe('1c8fb');
+  expect(normalizeThemeValue('cardBackground','#1c8fbd')).toBe('#1c8fbd');
+  expect(normalizeThemeValue('buttonDisabledOpacity','100')).toBe('100');
+  saveThemeChanges.mockClear();saveThemeChanges.mockResolvedValueOnce({id:1,colors:{}});let tree;
+  await act(async()=>{tree=renderer.create(<ThemeColorEditor theme={theme} selectedTokens={['cardBackground']}/>);});
+  await act(async()=>findField(tree,'escuro').props.onChangeText('112233'));
+  expect(findField(tree,'escuro').props.value).toBe('#112233');
+  await act(async()=>press(tree,'Salvar cores').props.onPress());
+  expect(saveThemeChanges.mock.calls[0][1]['cardBackground-dark']).toBe('#112233');
+  await act(async()=>tree.unmount());
+});
