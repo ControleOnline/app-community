@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 4,
-  "branch": "rc/1.10.209-rc.4",
+  "rc": 5,
+  "branch": "rc/1.10.209-rc.5",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d39d8b3f7ed8cb09c8baac76c8034f31629a7294"
+    "ControleOnline/app-community": "80ea41721513b080116a2cc9f67dc22019db6b13"
   },
   "validation": {
-    "scope": "Task 776 (blocos 3 e 4): ui-default 1.0.293 - tokens corretos no defaultFilter (botoes principal/secondary/pressed, inputs, chips, dialogs) e defaultTable (linhas, cards, paginacao); mapa com buttonPressedText e buttonShadowSecondary. Sem mudanca de API.",
-    "checks": "Testes ui-default de table 73/73 (grouping.test ja falhava antes por caminho); source-policy e baseline-checks na PR da task. Validacao visual em staging.",
-    "devMerge": "74bcc59ee1de7154b3e4780c94b201f33afdaf73",
+    "scope": "Task 776: ui-orders 1.3.54 - botoes Abrir/Pagar/Info da tabela de pedidos usam button{Background,Border,Icon,Text}_customOpen/customPay/customInfo; tokens registrados no themes-map.md e nos JSONs do tema manager. Sem mudanca de API.",
+    "checks": "Testes orderHistoryCompact* 9/9; source-policy e baseline-checks nas PRs da task. Validacao visual em staging.",
+    "devMerge": "1698527b033b87171b4c33195ebcc73a23086546",
     "promotion": "Protected PR merge only to staging."
   }
 }

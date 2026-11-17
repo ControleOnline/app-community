@@ -106,6 +106,18 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `buttonShadowSecondary`
 - `buttonText`
 - `buttonTextSecondary`
+- `buttonBackground_customOpen`
+- `buttonBorder_customOpen`
+- `buttonIcon_customOpen`
+- `buttonText_customOpen`
+- `buttonBackground_customPay`
+- `buttonBorder_customPay`
+- `buttonIcon_customPay`
+- `buttonText_customPay`
+- `buttonBackground_customInfo`
+- `buttonBorder_customInfo`
+- `buttonIcon_customInfo`
+- `buttonText_customInfo`
 
 ### card
 
