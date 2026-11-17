@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 9,
-  "branch": "rc/1.10.209-rc.9",
+  "rc": 10,
+  "branch": "rc/1.10.209-rc.10",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "ed55d0c01fa9b3964990879af610696349e093ee"
+    "ControleOnline/app-community": "0702c61b0c6a0b50428118d89c453830a0bd5834"
   },
   "validation": {
-    "scope": "Task 776: editor de cores abre com grupos recolhidos (475 tokens montavam ~950 inputs de uma vez e travavam a abertura). Selecao e busca continuam expandidas. Sem mudanca de API.",
-    "checks": "Testes theme-system 196/196; abertura medida em teste com o tema real: 284 ms para 43 ms. Validacao em staging.",
-    "devMerge": "a5ebfed8a33771831fc36c1f0a4fd42b429fa399",
+    "scope": "Task 776: ui-default 1.0.294 (chips de status e badge do ID com 30px) e ui-orders 1.3.55 (Abrir/Pagar/lixeira com 30px). Sem mudanca de API.",
+    "checks": "Testes de table do ui-default 73/73 e orderHistoryCompact 9/9. Validacao em staging.",
+    "devMerge": "7010836b5d5e440bab271638fa0900a6936d417a",
     "promotion": "Protected PR merge only to staging."
   }
 }
