@@ -136,6 +136,16 @@ exemplo:
     antes: backgroundColor: '#fff'
     depois: backgroundColor: theme.colors.pageBackground
 
+### MODOS LIGHT E DARK (GRAVAÇÃO NO EDITOR DE TEMAS)
+- O editor de temas grava cada token em duas variantes, uma por modo: sufixo `-light` e sufixo `-dark`
+- exemplo: o token `buttonBackground` é gravado como `buttonBackground-light` e `buttonBackground-dark`
+- o sufixo existe somente na gravação/transporte (`theme.colors`, `/themes-colors.css`)
+- a variável canônica no código continua sendo o nome sem sufixo: `buttonBackground`
+- no código, usar sempre `colors.buttonBackground`; nunca referenciar `-light`/`-dark` diretamente
+- o modo ativo decide qual variante (`-light` ou `-dark`) fornece o valor da variável
+- `themes-actual.md`, `themes-new.md`, `themes-todo.md` e `depara.md` registram o nome canônico (sem sufixo)
+- ao criar um novo token (`themes-new.md`), ele deve existir nas duas variantes: `<token>-light` e `<token>-dark`
+
 ### NOTA TÉCNICA
 Quando um estilo precisar usar a cor de fundo principal da tela, a implementação correta deve apontar para o tema carregado no store, e não para um valor literal.
 
@@ -179,3 +189,10 @@ Interpretação técnica:
 - isso cria uma dependência direta entre o componente e o tema ativo
 - com isso, o fundo da tela passa a responder ao tema carregado para o `DOMAIN`, sem precisar alterar o código da tela
 - esse é o comportamento esperado para qualquer token semântico equivalente, não apenas `background`
+
+
+### PREFIXOS POR COMPONENTE COMPARTILHADO
+- Objetos dentro de `defaultTable` (linhas, cards, rodape, paginacao, acoes de linha) usam o prefixo `defaultTable_`
+- Objetos dentro de `defaultFilter` (barra de busca/filtros, botoes Filtros/Tabela/Cards/Colunas/Mais opcoes/Novo, chips, dialogs de filtro e colunas) usam o prefixo `defaultFilter_`
+- o prefixo e somente de nome: `defaultFilter_buttonBackground` e gravado como `defaultFilter_buttonBackground-light` e `-dark`
+- estados de botao: `button*` (principal, clicavel), `button*Secondary` (secundario, ex.: cancelar), `buttonPressed*` (selecionado/pressionado) e `buttonDisabled*` (inativo)
