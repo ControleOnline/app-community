@@ -10,7 +10,7 @@ export default function ThemeEditorDialog({ theme, onClose, onSaved, selectedTok
           <Text style={{ fontWeight: '700', fontSize: 16, color: c.modalText }}>{t("Cores por modo · ")}{theme.theme}</Text>
           <Pressable accessibilityRole="button" accessibilityLabel={t("Fechar editor e cancelar prévia")} onPress={onClose}><Text style={{ color: c.modalText, padding: 8 }}>{t("Fechar ✕")}</Text></Pressable>
         </View>
-        <ScrollView><ThemeColorEditor theme={theme} selectedTokens={selectedTokens} onSaved={onSaved} onPreviewColors={onPreviewColors} /></ScrollView>
+        <ScrollView><ThemeColorEditor theme={theme} selectedTokens={selectedTokens} onSaved={onSaved} onClose={onClose} onPreviewColors={onPreviewColors} /></ScrollView>
       </View>
     </View>
   </Modal>;

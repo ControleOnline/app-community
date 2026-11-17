@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 6,
-  "branch": "rc/1.10.209-rc.6",
+  "rc": 7,
+  "branch": "rc/1.10.209-rc.7",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "8add25f5632ccd5372a85f82c02fe1fb6e73bbe9"
+    "ControleOnline/app-community": "26991d3800cdb50fd6498633148e8d303fbaa065"
   },
   "validation": {
-    "scope": "Task 776: editor de temas (avatar -> Configurar temas) reconhece, edita e grava os tokens defaultTable_*, defaultFilter_* e button*_custom*: parser do mapa aceita underscore, 103 variacoes com base no token global, contrato regenerado, JSONs do manager atualizados. Sem mudanca de API.",
-    "checks": "Testes theme-system 193/193 (contract.test atualizado para 475 tokens e 29 grupos); managerCompleteTheme mantem 2 falhas preexistentes (60 tokens homeMetric/login/scrollbar ausentes do JSON). Validacao em staging.",
-    "devMerge": "f9f0a0c8246af22447d112643ca4672cc15bdfa9",
+    "scope": "Task 776: botao Cancelar do editor de cores (ThemeManagerPage) descarta a previa e fecha o dialogo. Sem mudanca de API.",
+    "checks": "Testes theme-system 194/194 (novo teste de Cancelar). Validacao em staging.",
+    "devMerge": "17fc99b2eebf5767c89f3849ee2236806462b4b7",
     "promotion": "Protected PR merge only to staging."
   }
 }
