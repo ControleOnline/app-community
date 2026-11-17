@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 3,
-  "branch": "rc/1.10.209-rc.3",
+  "rc": 4,
+  "branch": "rc/1.10.209-rc.4",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     776
@@ -9,12 +9,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "585f8d505c9f7f01978287500e732042c10393d4"
+    "ControleOnline/app-community": "d39d8b3f7ed8cb09c8baac76c8034f31629a7294"
   },
   "validation": {
-    "scope": "Task 776 (blocos 1 e 2): ui-default 1.0.292 (corrige alias c. do toolbar compacto: defaultFilter_; dialog/paginacao: defaultTable_) e overlays em 1.0.292. Sem mudanca de API.",
-    "checks": "source-policy e baseline-checks passaram na PR da task. Validacao visual em staging.",
-    "devMerge": "0cf7aa39970fee4666270a6e58d1ac6f2dfbb6b9",
+    "scope": "Task 776 (blocos 3 e 4): ui-default 1.0.293 - tokens corretos no defaultFilter (botoes principal/secondary/pressed, inputs, chips, dialogs) e defaultTable (linhas, cards, paginacao); mapa com buttonPressedText e buttonShadowSecondary. Sem mudanca de API.",
+    "checks": "Testes ui-default de table 73/73 (grouping.test ja falhava antes por caminho); source-policy e baseline-checks na PR da task. Validacao visual em staging.",
+    "devMerge": "74bcc59ee1de7154b3e4780c94b201f33afdaf73",
     "promotion": "Protected PR merge only to staging."
   }
 }
