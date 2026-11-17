@@ -3,7 +3,7 @@ import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, use
 import { THEME_TOOL_BUTTON_HEIGHT } from './themeToolMetrics';
 import contract from '../../styles/themeContract.generated';
 import { resolveManagerThemeDetails, describeResolvedThemeColor } from '../../styles/managerTheme';
-import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey } from '../../styles/themeEditorModel';
+import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey, normalizeThemeValue } from '../../styles/themeEditorModel';
 import { useThemeRuntime, previewTheme, clearThemePreview, setThemeMode } from '../../styles/themeRuntime';
 import { editorContext, loadDomainTheme, saveThemeChanges } from './themeService';
 import NativeColorInput from './NativeColorInput';
@@ -45,7 +45,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPrevi
   const cancel = () => {setChanges({});setError('');clearThemePreview(owner.current);onClose?.();};
   const save = async () => {
     setSaving(true);setError('');
-    try {const updated = await saveThemeChanges(theme, changes, context.current);setChanges({});clearThemePreview(owner.current);onSaved?.(updated);}
+    try {const updated = await saveThemeChanges(theme, Object.fromEntries(Object.entries(changes).map(([key, value]) => [key, normalizeThemeValue(tokenFromKey(key), value)])), context.current);setChanges({});clearThemePreview(owner.current);onSaved?.(updated);}
     catch (e) {setError(e?.message || t("Não foi possível salvar. Confira a sessão e sua permissão."));} finally
     {setSaving(false);}
   };
@@ -71,7 +71,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPrevi
       <View style={s.inputRow}>
         {token !== 'buttonDisabledOpacity' && <View style={[s.swatch, { backgroundColor: invalid || !value ? 'transparent' : value }]} />}
         <TextInput accessibilityLabel={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
-        value={String(value)} editable={!saving} onChangeText={(value) => edit(key, value.trim())}
+        value={String(value)} editable={!saving} onChangeText={(value) => edit(key, normalizeThemeValue(token, value))}
         placeholder={token === 'buttonDisabledOpacity' ? t("0 a 1") : t("Sem valor")} style={[s.input, mobile && { minHeight: 44, fontSize: 16 }, invalid && s.invalid]} />
         {Platform.OS === 'web' && token !== 'buttonDisabledOpacity' && <NativeColorInput value={value} disabled={saving} label={t("Escolher {{v0}} {{v1}}", { v0: token, v1: mode==='light'?t("claro"):t("escuro") })} touch={mobile} onColor={(value) => edit(key, value)} />}
       </View>
