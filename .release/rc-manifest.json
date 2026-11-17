@@ -1,20 +1,20 @@
 {
-  "version": "1.10.208",
-  "rc": 1,
-  "branch": "rc/1.10.208-rc.1",
-  "baseMaster": "efae682b901b0ac419658a23483051ab8581a8b7",
+  "version": "1.10.209",
+  "rc": 7,
+  "branch": "rc/1.10.209-rc.7",
+  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
-    1601
+    776
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "12ece11400277c16e3e3db0fe7055656fb7dd483"
+    "ControleOnline/app-community": "26991d3800cdb50fd6498633148e8d303fbaa065"
   },
   "validation": {
-    "scope": "Task 1601 only: bump @controleonline/ui-shop 1.0.19 -> 1.0.20 so the SHOP header follows the Manager theme (ui-shop#28). Dependency bump only; no API or database changes.",
-    "checks": "ui-shop pickTheme tests 4/4; visual proof on localhost with Lave-Go theme: header rgb(2,2,2), yellow icons. source-policy and baseline-checks passed on the task PR.",
-    "devMerge": "054610fb794e60f6e15c8448e907281df9fca236",
+    "scope": "Task 776: botao Cancelar do editor de cores (ThemeManagerPage) descarta a previa e fecha o dialogo. Sem mudanca de API.",
+    "checks": "Testes theme-system 194/194 (novo teste de Cancelar). Validacao em staging.",
+    "devMerge": "17fc99b2eebf5767c89f3849ee2236806462b4b7",
     "promotion": "Protected PR merge only to staging."
   }
 }
