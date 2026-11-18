@@ -56,9 +56,11 @@ export default function ModuleSourceEditor({sources, palette, colors: c, record}
       if (committed) invalidateModuleAppearance();
     } finally {setSaving(false);}
   };
-  const button = (label, action, disabled = false) => <Pressable accessibilityRole="button" accessibilityLabel={label}
-    onPress={action} disabled={disabled} style={{padding: 8, minHeight: 36, justifyContent: 'center', borderRadius: 7,
-      backgroundColor: c.buttonBackgroundSecondary, opacity: disabled ? .5 : 1}}><Text style={{fontSize: 12, color: c.buttonTextSecondary}}>{label}</Text></Pressable>;
+  const button = (label, action, disabled = false, primary = false) => <Pressable accessibilityRole="button" accessibilityLabel={label}
+    onPress={action} disabled={disabled} style={{minHeight: 38, paddingHorizontal: 14, paddingVertical: 8, alignItems: 'center', justifyContent: 'center',
+      borderWidth: 1, borderRadius: 8, borderColor: primary ? c.buttonBorder : c.modalBorder,
+      backgroundColor: primary ? c.buttonBackground : c.buttonBackgroundSecondary, opacity: disabled ? .5 : 1}}>
+    <Text style={{fontSize: 13, fontWeight: '700', color: primary ? c.buttonText : c.buttonTextSecondary}}>{label}</Text></Pressable>;
   const readOnly = source => <Text key={`${source.property}:${source.source}:${source.record}`} selectable style={{fontSize: 12, color: c.textPrimary}}>
     {source.source} · {source.record} · {source.value} ({source.property})
   </Text>;
@@ -114,8 +116,8 @@ export default function ModuleSourceEditor({sources, palette, colors: c, record}
         </View>
         <Text style={{fontSize: 11, color: c.textSecondary}}>{t('Campo vazio: usa o valor herdado ou a cor do tema.')}</Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8}}>
-          {button(`${t('Salvar cadastro')}: ${nameOf(item)}`, () => save(kind, item), !editable || !dirty)}
-          {button(`${t('Descartar prévia')}: ${nameOf(item)}`, () => setDrafts(previous => {
+          {button(kind === 'category' ? t('Salvar cores da categoria') : t('Salvar cores da rota'), () => save(kind, item), !editable || !dirty, true)}
+          {button(t('Cancelar'), () => setDrafts(previous => {
             const next = {...previous};delete next[keyOf(kind, item)];return next;
           }), saving || !drafts[keyOf(kind, item)])}
         </View>
