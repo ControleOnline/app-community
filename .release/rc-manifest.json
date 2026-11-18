@@ -1,7 +1,7 @@
 {
-  "version": "1.10.220",
+  "version": "1.10.221",
   "rc": 1,
-  "branch": "rc/1.10.220-rc.1",
+  "branch": "rc/1.10.221-rc.1",
   "baseMaster": "ef88e605351f27adfe67bcfc9b6628068cf640b0",
   "tasks": [
     1678
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e5dd2ec08dd0ff428a81dd0a2784f0293a910343"
+    "ControleOnline/app-community": "e659c8221b693aab1cb16c1da43557c47801b978"
   },
   "validation": {
-    "scope": "Task 1678 (botoes): 'Salvar cadastro: X' e 'Descartar previa: X' viram 'Salvar cores da rota/categoria' e 'Cancelar'.",
+    "scope": "Task 1678 (botoes): Salvar cores da rota/categoria (primario) e Cancelar com aparencia de botao (borda, fundo, texto centralizado).",
     "promotion": "Staging first; master apos aprovacao."
   }
 }
