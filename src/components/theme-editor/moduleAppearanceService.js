@@ -41,7 +41,39 @@ export async function loadModuleAppearance(context) {
       ...Object.fromEntries(['textColor', 'iconColor', 'iconBackgroundColor'].filter(field => Object.hasOwn(item.route || {}, field)).map(field => [field, item.route[field]]))}]})));
 }
 
-export const additionalAppearanceFields = kind => kind === 'category' ? ['textColor', 'iconColor'] : ['textColor', 'iconColor', 'iconBackgroundColor'];
+const categoryAppearanceFields = ['textColor', 'iconColor', 'categoryCardBackground', 'categoryCardText', 'categoryCardMenu'];
+const routeAppearanceFields = ['textColor', 'iconColor', 'iconBackgroundColor', 'routeCardBackground', 'routeCardIcon',
+  'routeCardIconBackground', 'routeCardText', 'routeCardBorder', 'routeMenuBackground', 'routeMenuIcon', 'routeMenuText'];
+export const additionalAppearanceFields = kind => kind === 'category' ? categoryAppearanceFields : routeAppearanceFields;
+
+// Inspector provenance ("category.categoryCardText", "routes.text_color") -> editable record kind and field.
+export function moduleSourceTarget(source) {
+  const [table, column] = String(source || '').split('.');
+  const kind = table === 'category' ? 'category' : table === 'routes' ? 'route' : null;
+  const field = String(column || '').replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+  if (!kind || !(field === 'color' || additionalAppearanceFields(kind).includes(field))) return null;
+  return {kind, field};
+}
+
+// Categories are identified by id; routes by route name, the record the inspector reports.
+export function findModuleRecord(groups = [], kind, record) {
+  if (kind === 'category') return groups.find(group => String(group.id) === String(record)) || null;
+  for (const group of groups) {
+    const menu = (group.menus || []).find(item => item.route === record);
+    if (menu) return menu;
+  }
+  return null;
+}
+
+const catalogCache = new Map();
+export const loadModuleAppearanceCached = context => {
+  if (!catalogCache.has(context)) catalogCache.set(context, loadModuleAppearance(context).catch(error => {
+    catalogCache.delete(context);
+    throw error;
+  }));
+  return catalogCache.get(context);
+};
+export const invalidateModuleAppearance = () => catalogCache.clear();
 export const persistedAppearanceFields = (original, kind = 'route') => ['color', 'icon',
   ...additionalAppearanceFields(kind).filter(field => Object.hasOwn(original, field))];
 
@@ -68,6 +100,7 @@ export async function saveModuleAppearance({kind, original, draft, palette, cont
   if (!path) throw new Error('Tipo de cadastro inválido.');
   const result = await api.fetch(path, {method: 'PATCH', body: changes});
   assertContext(context);
+  invalidateModuleAppearance();
   if (result?.response?.success === false) throw new Error('Não foi possível salvar o cadastro.');
   return result;
 }
