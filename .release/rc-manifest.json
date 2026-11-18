@@ -1,7 +1,7 @@
 {
   "version": "1.10.210",
-  "rc": 5,
-  "branch": "rc/1.10.210-rc.5",
+  "rc": 6,
+  "branch": "rc/1.10.210-rc.6",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
     779,
@@ -12,7 +12,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "065cc5eb5d8538d33bbe93720cd57cfb35940065"
+    "ControleOnline/app-community": "b909b36a049d78ef2893332b00d4338b847f62bc"
   },
   "validation": {
     "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
@@ -21,6 +21,7 @@
     "promotion": "Protected PR merge only to staging.",
     "rc3": "rc.2 + task 1644: home/sidebar use category.categoryCardBackground/categoryCardText/categoryCardMenu; ui-config 1.0.33 (labelled category fields + 3 color inputs). Requires api-community rc/1.10.145-rc.11 (common 1.0.15). Keeps tasks 779 and 781.",
     "rc4": "rc.3 + patches/manager-configurator.json version 1.0.33 (build guard 'ui-config version changed' failed the rc.3 web deploy; ConfiguratorPage.js hash unchanged between 1.0.32 and 1.0.33).",
-    "rc5": "rc.4 + task 1648: ui-config 1.0.34 (color swatch preview; category header icon uses theme color); configurator overlay version 1.0.34."
+    "rc5": "rc.4 + task 1648: ui-config 1.0.34 (color swatch preview; category header icon uses theme color); configurator overlay version 1.0.34.",
+    "rc6": "rc.5 + task 1648: ui-config 1.0.35 (swatch inside the color field; color fields half width); configurator overlay 1.0.35."
   }
 }
