@@ -1,21 +1,23 @@
 {
   "version": "1.10.210",
-  "rc": 2,
-  "branch": "rc/1.10.210-rc.2",
+  "rc": 3,
+  "branch": "rc/1.10.210-rc.3",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
     779,
-    781
+    781,
+    1644
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4ed95e36656d51b53809af0d04c345c48ba884d8"
+    "ControleOnline/app-community": "88a107a94e5d29eb95f25c4cc224e427c27f8aac"
   },
   "validation": {
     "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
     "checks": "ui-login: teste de contrato resetPasswordTheme 1/1. Validacao em staging.",
     "devMerge": "d4760cc893182a77db3ff47f438cc3aef8b5ee0f",
-    "promotion": "Protected PR merge only to staging."
+    "promotion": "Protected PR merge only to staging.",
+    "rc3": "rc.2 + task 1644: home/sidebar use category.categoryCardBackground/categoryCardText/categoryCardMenu; ui-config 1.0.33 (labelled category fields + 3 color inputs). Requires api-community rc/1.10.145-rc.11 (common 1.0.15). Keeps tasks 779 and 781."
   }
 }
