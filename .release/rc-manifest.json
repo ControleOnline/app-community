@@ -1,25 +1,19 @@
 {
-  "version": "1.10.211",
-  "rc": 5,
-  "branch": "rc/1.10.211-rc.5",
-  "baseMaster": "bba7f96219cb7349b35d9f231bd78c0ef629ef4b",
+  "version": "1.10.212",
+  "rc": 1,
+  "branch": "rc/1.10.212-rc.1",
+  "baseMaster": "7363348b2e687086d04bd156c5d2c324c9b852de",
   "tasks": [
-    779,
-    1628,
-    1668
+    1678
   ],
-  "additionalTasks": [
-    1644,
-    1648,
-    1664
-  ],
+  "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "33c984f99c990e242136185aadc74943de4a5cbc"
+    "ControleOnline/app-community": "535438b696f32be3536cbebfd8d9fb653f1ced93"
   },
   "validation": {
-    "scope": "Tasks 779 (ui-default sem fallbacks hardcoded), 1628 (paginador; ui-default 1.0.297 corrige ReferenceError), 1668 (rodape em linha unica da order-history-page). Homologado no staging via rc.4; sem 1335/1575.",
-    "promotion": "Merge to master authorized by owner; production deploy remains cron/dispatch."
+    "scope": "Task 1678: editar cores de categorias e rotas direto na inspecao do configurador de temas (ModuleSourceEditor), mesma gravacao e permissao do catalogo. Jest theme 202/202; falhas homepage identicas ao master.",
+    "promotion": "Staging first; master only after approval."
   }
 }
