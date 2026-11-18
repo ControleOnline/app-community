@@ -1,11 +1,12 @@
 {
   "version": "1.10.213",
-  "rc": 1,
-  "branch": "rc/1.10.213-rc.1",
-  "baseMaster": "bba7f96219cb7349b35d9f231bd78c0ef629ef4b",
+  "rc": 3,
+  "branch": "rc/1.10.213-rc.3",
+  "baseMaster": "0fb1a697659c9c87904311a1a73db3861734c718",
   "tasks": [
     1335,
-    1575
+    1575,
+    1687
   ],
   "additionalTasks": [
     1644,
@@ -15,11 +16,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "6aa67bc8127955eebf8ceaa10c7f136164253592"
+    "ControleOnline/app-community": "4c4730fc16d81b51bcaf8428ac4cba6018b9f53b"
   },
   "validation": {
-    "scope": "Tasks 779 (ui-default sem fallbacks hardcoded), 1628 (paginador; ui-default 1.0.297 corrige ReferenceError), 1668 (rodape em linha unica da order-history-page). Homologado no staging via rc.4; sem 1335/1575.",
-    "promotion": "Merge to master authorized by owner; production deploy remains cron/dispatch.",
-    "rc1": "rc/1.10.212-rc.1 + ui-crm 1.0.80: envio assíncrono no chat (ui-crm#86)."
+    "scope": "Task 1687: deploy web nao exclui mais node_modules (fontes de icones). Tasks 1335/1575 ja presentes no staging (rc.1).",
+    "promotion": "Protected PR merge only to staging."
   }
 }
