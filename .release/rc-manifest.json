@@ -1,18 +1,19 @@
 {
   "version": "1.10.210",
-  "rc": 11,
-  "branch": "rc/1.10.210-rc.11",
+  "rc": 12,
+  "branch": "rc/1.10.210-rc.12",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
     1644,
     1648,
     1650,
-    1655
+    1655,
+    1658
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f077516a7bc6089f1380c05bbaf26a800b4f687d"
+    "ControleOnline/app-community": "3f864e7304859d7939666173ce026eaa8c7bfa64"
   },
   "validation": {
     "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
@@ -27,6 +28,7 @@
     "rc8": "rc.7 + task 1648: ui-config 1.0.37 (task-1650 routeCard fields + MenuText label and colors on a second row in the category card); configurator overlay 1.0.37.",
     "rc9": "rc.8 + task 1650: ui-config 1.0.38 (menu card labels CardBackground/CardIcon/CardIconBackground/CardText/CardBorder, colors on a second row, trash on the first row, legacy route color box removed); configurator overlay 1.0.38.",
     "rc10": "rc.9 + task 1655: ui-config 1.0.39 (button 'Replicar para todas as categorias'); configurator overlay 1.0.39.",
-    "rc11": "rc.10 + task 1650: sidebar reads routes.routeMenuBackground/routeMenuIcon/routeMenuText; ui-config 1.0.40 (MenuBackground/MenuIcon/MenuText fields); configurator overlay 1.0.40. Requires api-community rc/1.10.145-rc.13 (common 1.0.17)."
+    "rc11": "rc.10 + task 1650: sidebar reads routes.routeMenuBackground/routeMenuIcon/routeMenuText; ui-config 1.0.40 (MenuBackground/MenuIcon/MenuText fields); configurator overlay 1.0.40. Requires api-community rc/1.10.145-rc.13 (common 1.0.17).",
+    "rc12": "rc.11 + task 1658: ui-config 1.0.41 (color field width 130); configurator overlay 1.0.41."
   }
 }
