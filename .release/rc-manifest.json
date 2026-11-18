@@ -1,27 +1,19 @@
 {
-  "version": "1.10.211",
-  "rc": 4,
-  "branch": "rc/1.10.211-rc.4",
-  "baseMaster": "bba7f96219cb7349b35d9f231bd78c0ef629ef4b",
+  "version": "1.10.212",
+  "rc": 2,
+  "branch": "rc/1.10.212-rc.2",
+  "baseMaster": "7363348b2e687086d04bd156c5d2c324c9b852de",
   "tasks": [
-    779,
-    1335,
-    1575,
-    1628,
-    1668
+    1678
   ],
-  "additionalTasks": [
-    1644,
-    1648,
-    1664
-  ],
+  "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "33c984f99c990e242136185aadc74943de4a5cbc"
+    "ControleOnline/app-community": "b00d0f287faa7c7b265f0b513c073866bdd83c29"
   },
   "validation": {
-    "scope": "Tasks 779 (ui-default sem fallbacks), 1628 (paginador + ui-default 1.0.297), 1668 (rodape em linha unica da order-history-page) sobre master 1.10.211-rc.3; 1335 e 1575 ja presentes no staging (rc.16).",
-    "promotion": "Protected PR merge only to staging."
+    "scope": "Task 1678 sobre o staging atual (rc.4): editar cores de categorias e rotas direto na inspecao do tema. A mesma mudanca esta em rc/1.10.212-rc.1 (base master) para promocao.",
+    "promotion": "Staging first; master via rc/1.10.212-rc.1 apos aprovacao."
   }
 }
