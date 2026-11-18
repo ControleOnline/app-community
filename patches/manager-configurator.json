@@ -1,6 +1,6 @@
 {
   "package": "@controleonline/ui-config",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "files": [
     {
       "file": "src/react/pages/ConfiguratorPage.js",
