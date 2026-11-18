@@ -11,7 +11,14 @@ import {themeEditorText as t} from './themeToolPresentation';
 
 // Inline editor for colors that come from category/route records. Saving keeps the
 // exact catalog flow: draft per record, explicit save, PATCH on the same endpoints.
-export default function ModuleSourceEditor({sources, palette, colors: c}) {
+const FIELD_LABELS = {
+  categoryCardBackground: 'fundo do card da categoria', categoryCardText: 'texto do card da categoria', categoryCardMenu: 'nome da categoria no menu lateral',
+  routeCardBackground: 'fundo do botão', routeCardIcon: 'ícone do botão', routeCardIconBackground: 'fundo do ícone do botão',
+  routeCardText: 'texto do botão', routeCardBorder: 'borda do botão', routeMenuBackground: 'fundo no menu lateral',
+  routeMenuIcon: 'ícone no menu lateral', routeMenuText: 'texto no menu lateral',
+};
+
+export default function ModuleSourceEditor({sources, palette, colors: c, record}) {
   const {user} = useStore('auth').getters;
   const people = useStore('people');
   const theme = useStore('theme');
@@ -62,13 +69,24 @@ export default function ModuleSourceEditor({sources, palette, colors: c}) {
 
   const records = new Map();
   const loose = [];
+  const ready = canManage && catalog?.context === context;
+  const sourceOf = new Map();
+  const add = (kind, item, field, source) => {
+    if (!(field === 'color' || Object.hasOwn(item, field))) return false;
+    const key = keyOf(kind, item);
+    if (!records.has(key)) records.set(key, {kind, item, fields: new Map()});
+    const fields = records.get(key).fields;
+    if (!fields.has(field) || source) fields.set(field, source || fields.get(field) || null);
+    return true;
+  };
+  if (ready && record?.kind) {
+    const item = findModuleRecord(groups, record.kind, record.record);
+    if (item) for (const field of record.fields) add(record.kind, item, field, null);
+  }
   for (const source of sources) {
     const target = moduleSourceTarget(source.source);
-    const item = target && canManage && catalog?.context === context ? findModuleRecord(groups, target.kind, source.record) : null;
-    if (!item || !(target.field === 'color' || Object.hasOwn(item, target.field))) {loose.push(source);continue;}
-    const key = keyOf(target.kind, item);
-    if (!records.has(key)) records.set(key, {kind: target.kind, item, fields: new Map()});
-    records.get(key).fields.set(target.field, source);
+    const item = target && ready ? findModuleRecord(groups, target.kind, source.record) : null;
+    if (!item || !add(target.kind, item, target.field, source)) loose.push(source);
   }
 
   return <View style={{gap: 8}}>
@@ -86,20 +104,22 @@ export default function ModuleSourceEditor({sources, palette, colors: c}) {
           const value = draft[field] || '';
           const resolve = field === 'color' ? resolveModuleAccent : modulePropertyColor;
           const resolved = resolve(value, palette);
-          const label = `${prefix} — ${source.source}`;
+          const name = source?.source || `${kind === 'category' ? 'category' : 'routes'}.${field}`;
+          const shown = source?.value || '';
+          const label = `${prefix} — ${name}`;
           return <View key={field} style={{gap: 4}}>
-            <Text style={{fontSize: 12, color: c.modalText}}>{source.source} ({source.property})</Text>
+            <Text style={{fontSize: 12, color: c.modalText}}>{t(FIELD_LABELS[field] || name)}{source ? ` (${source.property})` : ''}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-              <View style={{width: 20, height: 20, backgroundColor: resolved || source.value, borderColor: c.modalBorder, borderWidth: 1}} />
+              <View style={{width: 20, height: 20, backgroundColor: resolved || shown || 'transparent', borderColor: c.modalBorder, borderWidth: 1}} />
               <TextInput accessibilityLabel={label} value={value} editable={editable}
-                placeholder={source.value} placeholderTextColor={c.textPlaceholder}
+                placeholder={shown || '#rrggbb / $primary'} placeholderTextColor={c.textPlaceholder}
                 onChangeText={next => edit(kind, item, field, next)}
                 style={{minHeight: 36, padding: 6, borderWidth: 1, borderRadius: 6, flexGrow: 1, flexShrink: 1, minWidth: 0,
                   borderColor: c.inputBorder, color: c.inputText, backgroundColor: c.inputBackground}} />
-              <NativeColorInput value={resolved || source.value} label={label} disabled={!editable}
+              <NativeColorInput value={resolved || shown || '#000000'} label={label} disabled={!editable}
                 onColor={next => edit(kind, item, field, next)} />
             </View>
-            {!value && <Text style={{fontSize: 12, color: c.textSecondary}}>{t('Sem valor próprio no cadastro; exibindo o valor herdado')}: {source.value}</Text>}
+            {!value && <Text style={{fontSize: 12, color: c.textSecondary}}>{shown ? `${t('Sem valor próprio no cadastro; exibindo o valor herdado')}: ${shown}` : t('Sem valor no cadastro; usa a cor do tema')}</Text>}
             {!!value && !resolved && <Text style={{fontSize: 12, color: c.textDanger}}>{t('Cor inválida ou referência sem valor')}</Text>}
           </View>;
         })}
