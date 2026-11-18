@@ -294,11 +294,12 @@ export default function ManagerOverview({navigation}) {
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
         // Category card follows the Categories color; each button follows its own route color (issue 1450).
-        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
+        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.categoryCardBackground, moduleAccentPalette) : undefined;
+        const groupTextColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardText, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
-          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
+          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.categoryCardBackground', group.id, group.categoryCardBackground)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}} style={[s.panelTitle, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.cardText}]}>{group.title}</Text>
+          <Text dataSet={{coThemeSource: moduleAccentSource(groupTextColor, 'category.categoryCardText', group.id, group.categoryCardText, ['color'])}} style={[s.panelTitle, {color: groupTextColor ?? c.cardText}]}>{group.title}</Text>
           {(() => {
             const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
