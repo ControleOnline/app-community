@@ -5,7 +5,7 @@ import {app_type, app_type_base} from '@appType';
 import {resolveRuntimeMenuLabel, userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
 import IconPicker from '@controleonline/ui-default/src/react/components/inputs/DefaultFeatherIconPicker';
 import HomeIcon from '../HomeIcon';
-import NativeColorInput from './NativeColorInput';
+import ColorBox from './ColorBox';
 import ModuleAppearancePreview from './ModuleAppearancePreview';
 import {resolveModuleAccent, modulePropertyColor} from '../manager-preview/moduleAccent';
 import {loadModuleAppearance, mergeModuleGroups, moduleAppearanceContext, refreshModuleMenus, saveModuleAppearance, persistedAppearanceFields} from './moduleAppearanceService';
@@ -76,14 +76,8 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
     const resolved = ['textColor', 'iconColor', 'iconBackgroundColor'].includes(field) ? modulePropertyColor(value, palette) : resolveModuleAccent(value, palette);
     return <View key={field} style={{gap: 4}}>
       <Text style={{color: c.modalText}}>{label}{temporary ? ` · ${t('somente prévia')}` : ''}</Text>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-        <View style={{width: 20, height: 20, backgroundColor: resolved, borderColor: c.modalBorder, borderWidth: 1}} />
-        <TextInput accessibilityLabel={label} value={value} editable={temporary ? !saving : editable} style={input}
-          placeholder={temporary ? t('Usando o tema') : '#rrggbb / $primary'} placeholderTextColor={c.textPlaceholder}
-          onChangeText={next => edit(kind, item, field, next)} />
-        <NativeColorInput value={resolved} label={label} disabled={temporary ? saving : !editable}
-          onColor={next => edit(kind, item, field, next)} />
-      </View>
+      <ColorBox colors={c} label={label} value={value} resolved={resolved} disabled={temporary ? saving : !editable}
+        placeholder={temporary ? t('Usando o tema') : '#rrggbb / $primary'} onChangeText={next => edit(kind, item, field, next)} />
       {temporary && !Object.hasOwn(item, field) && <Text style={{color: c.textSecondary, fontSize: 12}}>{t('A gravação deste campo depende da atualização da API e do banco.')}</Text>}
       {!!value && <Text style={{color: c.textSecondary, fontSize: 12}}>{value}{value !== resolved ? ` → ${resolved || t('Cor inválida ou referência sem valor')}` : ''}</Text>}
     </View>;

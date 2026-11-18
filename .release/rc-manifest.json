@@ -1,8 +1,8 @@
 {
-  "version": "1.10.216",
+  "version": "1.10.219",
   "rc": 1,
-  "branch": "rc/1.10.216-rc.1",
-  "baseMaster": "4454f8c4f5b6113a3a0fc89aade5c7026596e4d5",
+  "branch": "rc/1.10.219-rc.1",
+  "baseMaster": "b5432b6fe241b43670a8695abaa56ed1254f668d",
   "tasks": [
     1678
   ],
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "7b7ed0d1c56d3658dcdc923ee839e4ea883c5c86"
+    "ControleOnline/app-community": "4b7011753bed218335154ef9e7538139dea26b41"
   },
   "validation": {
-    "scope": "Task 1678 (ajuste): a inspecao oferece todos os campos de cor do registro (categoria/rota), inclusive os vazios.",
+    "scope": "Task 1678 (layout): todos os campos de cor do configurador de temas (variaveis, claro/escuro, catalogo de modulos) usam a caixa de cor do Menus por perfil (ColorBox).",
     "promotion": "Staging first; master apos aprovacao."
   }
 }

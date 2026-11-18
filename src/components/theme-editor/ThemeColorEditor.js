@@ -6,7 +6,7 @@ import { resolveManagerThemeDetails, describeResolvedThemeColor } from '../../st
 import { themeFieldValue, themeFieldLabel, themeFieldDisplayName, themeColorKey, validThemeValue, tokenFromKey, normalizeThemeValue } from '../../styles/themeEditorModel';
 import { useThemeRuntime, previewTheme, clearThemePreview, setThemeMode } from '../../styles/themeRuntime';
 import { editorContext, loadDomainTheme, saveThemeChanges } from './themeService';
-import NativeColorInput from './NativeColorInput';
+import ColorBox from './ColorBox';
 import { describeThemeScope } from '../../styles/themeVariations';
 import { resolveScreenThemeDetails } from '../../styles/screenTheme';
 import { screenThemeKey, parseScreenThemeKey } from '../../styles/screenThemeKeys';
@@ -69,11 +69,13 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPrevi
     return <View key={mode} style={[s.field, mobile && { flexGrow: 0, flexShrink: 0, flexBasis: 'auto', width: '100%', minWidth: 0 }]}>
       <Text style={s.caption}>{mode === 'light' ? t("☀ Claro") : t("☾ Escuro")}</Text>
       <View style={s.inputRow}>
-        {token !== 'buttonDisabledOpacity' && <View style={[s.swatch, { backgroundColor: invalid || !value ? 'transparent' : value }]} />}
-        <TextInput accessibilityLabel={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
+        {token === 'buttonDisabledOpacity' ? <TextInput accessibilityLabel={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
         value={String(value)} editable={!saving} onChangeText={(value) => edit(key, normalizeThemeValue(token, value))}
-        placeholder={token === 'buttonDisabledOpacity' ? t("0 a 1") : t("Sem valor")} style={[s.input, mobile && { minHeight: 44, fontSize: 16 }, invalid && s.invalid]} />
-        {Platform.OS === 'web' && token !== 'buttonDisabledOpacity' && <NativeColorInput value={value} disabled={saving} label={t("Escolher {{v0}} {{v1}}", { v0: token, v1: mode==='light'?t("claro"):t("escuro") })} touch={mobile} onColor={(value) => edit(key, value)} />}
+        placeholder={t("0 a 1")} style={[s.input, mobile && { minHeight: 44, fontSize: 16 }, invalid && s.invalid]} />
+        : <View style={{flex: 1, minWidth: 0}}><ColorBox colors={c} touch={mobile} invalid={invalid} disabled={saving} value={String(value)}
+        resolved={invalid || !value ? '' : value} placeholder={t("Sem valor")}
+        label={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
+        onChangeText={(value) => edit(key, normalizeThemeValue(token, value))} /></View>}
       </View>
       {concise ? <Text style={s.caption}>{screen ? direct ? t("Cor própria desta tela") : t("Usando a cor global") : t("Cor global{{v0}}", { v0: variation ? t(" desta finalidade") : '' })}{!value ? t(" · sem valor") : ''}</Text> : <>
         <Text selectable style={[s.key, mobile && { fontSize: 12 }]}>{t("Cadastro: ")}{inherited ? t("{{v0}} · compartilhado", { v0: token }) : key}{value ? '' : t(" · sem valor direto")}</Text>
