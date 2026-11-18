@@ -1,8 +1,8 @@
 {
-  "version": "1.10.219",
+  "version": "1.10.220",
   "rc": 1,
-  "branch": "rc/1.10.219-rc.1",
-  "baseMaster": "b5432b6fe241b43670a8695abaa56ed1254f668d",
+  "branch": "rc/1.10.220-rc.1",
+  "baseMaster": "ef88e605351f27adfe67bcfc9b6628068cf640b0",
   "tasks": [
     1678
   ],
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4b7011753bed218335154ef9e7538139dea26b41"
+    "ControleOnline/app-community": "e5dd2ec08dd0ff428a81dd0a2784f0293a910343"
   },
   "validation": {
-    "scope": "Task 1678 (layout): todos os campos de cor do configurador de temas (variaveis, claro/escuro, catalogo de modulos) usam a caixa de cor do Menus por perfil (ColorBox).",
+    "scope": "Task 1678 (botoes): 'Salvar cadastro: X' e 'Descartar previa: X' viram 'Salvar cores da rota/categoria' e 'Cancelar'.",
     "promotion": "Staging first; master apos aprovacao."
   }
 }
