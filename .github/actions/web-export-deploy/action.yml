@@ -142,7 +142,8 @@ runs:
         state-name: .ftp-deploy-state.json
         log-level: standard
         timeout: 600000
+        # Do NOT exclude **/node_modules/**: it would drop dist/assets/node_modules
+        # (react-native-vector-icons .ttf fonts) and icons render as squares. See #1687 / #1101.
         exclude: |
           **/.git*
           **/.git*/**
-          **/node_modules/**
