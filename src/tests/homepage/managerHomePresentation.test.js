@@ -147,18 +147,36 @@ it.each([[false, '#345678'], [true, '#876543']])(
 it.each([false,true])('applies registered route foregrounds and category text, keeping the theme when disabled (grid %s)',async grid=>{
  mockModuleIcons=grid;mockModuleAccent=true;
  mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:'transparent'};
- mockCategoryAppearance={textColor:'#ffff00'};
+ mockCategoryAppearance={categoryCardText:'#ffff00',categoryCardBackground:'#123abc',textColor:'#ff00ff'};
  let tree;await act(async()=>{tree=renderer.create(view());});
  const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
  const itemTextColor=()=>{const style=first().findByType('Text').props.style;return (Array.isArray(style)?Object.assign({},...style):style).color;};
  expect(first().findAllByType('Icon')[0].props.color).toBe('#147568');
  expect(itemTextColor()).toBe('#ffffff');
- const category=()=>tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
+ const category=()=>tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardText'));
  expect(category().props.style.at(-1).color).toBe('#ffff00');
+ const card=tree.root.findByProps({testID:'manager-explore-modules'}).findAll(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardBackground'))[0];
+ expect(JSON.parse(card.props.dataSet.coThemeSource)[0]).toMatchObject({source:'category.categoryCardBackground',value:'#123abc'});
  if(grid)expect(first().findByType('Icon').parent.props.style.at(-1).backgroundColor).toBe('transparent');
  mockModuleAccent=false;await act(async()=>tree.update(view()));
  expect(first().findAllByType('Icon')[0].props.color).toBe(grid?'#876543':'#345678');
  expect(itemTextColor()).toBe(grid?'#654321':'#123456');
  expect(first().findAllByType('Icon')[0].props.dataSet).toBeUndefined();
  await act(async()=>tree.unmount());
+});
+
+it.each([false,true])('applies per-menu routeCard colors from the menu (grid %s) (issue 1650)',async grid=>{
+ mockModuleIcons=grid;mockModuleAccent=true;
+ mockRouteAppearance={routeCardBackground:'#111111',routeCardIcon:'#222222',routeCardIconBackground:'#333333',routeCardText:'#444444',routeCardBorder:'#555555'};
+ let tree;await act(async()=>{tree=renderer.create(view());});
+ const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
+ const flat=style=>Array.isArray(style)?Object.assign({},...style.flat().filter(Boolean)):style;
+ const rawStyle=first().props.style;const pressable=flat(typeof rawStyle==='function'?rawStyle({hovered:false,pressed:false}):rawStyle);
+ expect(pressable.backgroundColor).toBe('#111111');
+ expect(pressable.borderColor).toBe('#555555');
+ expect(first().findAllByType('Icon')[0].props.color).toBe('#222222');
+ expect(flat(first().findByType('Text').props.style).color).toBe('#444444');
+ if(grid)expect(flat(first().findByType('Icon').parent.props.style).backgroundColor).toBe('#333333');
+ mockModuleAccent=false;await act(async()=>tree.update(view()));
+ expect(flat(first().findByType('Text').props.style).color).not.toBe('#444444');
 });

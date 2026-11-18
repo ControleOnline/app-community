@@ -294,35 +294,43 @@ export default function ManagerOverview({navigation}) {
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
         // Category card follows the Categories color; each button follows its own route color (issue 1450).
-        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.color, moduleAccentPalette) : undefined;
+        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.categoryCardBackground, moduleAccentPalette) : undefined;
+        const groupTextColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardText, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
-          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.color', group.id, group.color)}}
+          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.categoryCardBackground', group.id, group.categoryCardBackground)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}} style={[s.panelTitle, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.cardText}]}>{group.title}</Text>
+          <Text dataSet={{coThemeSource: moduleAccentSource(groupTextColor, 'category.categoryCardText', group.id, group.categoryCardText, ['color'])}} style={[s.panelTitle, {color: groupTextColor ?? c.cardText}]}>{group.title}</Text>
           {(() => {
             const renderItem = (item, j, tileSpacing) => {
               const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
               const appearance = moduleListAppearance({accent, colors: c, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
               // Database colors are used as-is: no opacity applied (issue 1453).
               const accentBackground = accent;
+              // Per-menu card colors (issue 1650): routeCard* columns override the legacy route colors.
+              const cardColor = field => moduleAccent?.value ? modulePropertyColor(item[field], moduleAccentPalette) : undefined;
+              const cardSource = (field, id, property) => moduleAccentSource(cardColor(field), `routes.${field}`, id, item[field], [property]);
+              const cardBackground = cardColor('routeCardBackground') ?? accentBackground;
+              const cardBorder = cardColor('routeCardBorder');
+              const cardIconColor = cardColor('routeCardIcon') ?? appearance.iconColor;
+              const cardText = cardColor('routeCardText');
               return <Pressable key={item.id || j} accessibilityRole="button"
-              dataSet={{coThemeSource: moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
+              dataSet={{coThemeSource: cardColor('routeCardBackground') ? cardSource('routeCardBackground', item.name, 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
               accessibilityLabel={item.title} onPress={() => go(item)}
               style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
-                borderColor: c.listItemBorder,
+                borderColor: cardBorder ?? c.listItemBorder,
                 backgroundColor: hovered || pressed
-                  ? accent ?? c.listItemActiveBackground
-                  : accentBackground ?? c.listItemBackground,
-              }] : [s.moduleItem, accentBackground && {backgroundColor: accentBackground}]}>
+                  ? cardBackground ?? c.listItemActiveBackground
+                  : cardBackground ?? c.listItemBackground,
+              }] : [s.moduleItem, cardBackground && {backgroundColor: cardBackground}, cardBorder && {borderColor: cardBorder, borderWidth: 1}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, {backgroundColor: (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
-                  {icon(item.icon, (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <View style={[s.moduleTileIcon, {backgroundColor: cardColor('routeCardIconBackground') ?? (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: cardColor('routeCardIconBackground') ? cardSource('routeCardIconBackground', item.name, 'backgroundColor') : modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
+                  {icon(item.icon, cardColor('routeCardIcon') ?? (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
                 </View>
-                <Text style={[s.moduleTileLabel, {color: (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
+                <Text style={[s.moduleTileLabel, {color: cardText ?? (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: cardText ? cardSource('routeCardText', item.name, 'color') : modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
               </> : <>
-                {icon(item.icon, appearance.iconColor, 16, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
-                <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
-                {icon('chevron-right', appearance.iconColor, 14, modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                {icon(item.icon, cardIconColor, 16, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <Text dataSet={{coThemeSource: cardText ? cardSource('routeCardText', item.name, 'color') : modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: cardText ?? appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', cardIconColor, 14, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
               </>}
             </Pressable>;
             };

@@ -1,20 +1,28 @@
 {
-  "version": "1.10.209",
-  "rc": 11,
-  "branch": "rc/1.10.209-rc.11",
-  "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
+  "version": "1.10.211",
+  "rc": 1,
+  "branch": "rc/1.10.211-rc.1",
+  "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
-    776
+    1650,
+    1655,
+    1658,
+    1662,
+    1666
+  ],
+  "additionalTasks": [
+    1644,
+    1648,
+    1664
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b93e2e925187f4684e50c2e58f04aefadb2301f7"
+    "ControleOnline/app-community": "8609bd5ba684a271d58e6767a57e802f5de6b671"
   },
   "validation": {
-    "scope": "Task 776: ui-orders 1.3.56 - Abrir, Pagar e Excluir/Ver cancelamento em posicoes fixas (slots de largura fixa) na coluna Acoes da order-history-page. Sem mudanca de API.",
-    "checks": "orderHistoryCompact 9/9. Validacao em staging.",
-    "devMerge": "fdc0a86880ddd53626346e2f81309aefd921363e",
-    "promotion": "Protected PR merge only to staging."
+    "scope": "master 1.10.209 + delta of tasks 1644, 1648, 1650, 1655, 1658, 1662, 1664, 1666 only: ManagerOverview, ManagerShell, moduleAccent, themeInspector, their tests, configurator overlay and ui-config 1.0.32 -> 1.0.47. Tasks 779, 781, 1628 and other staging-only changes are NOT included.",
+    "requires": "api-community rc/1.10.146-rc.1 (common 1.0.17) and ui-config 1.0.47 published from master.",
+    "checks": "jest homepage (managerShell, managerHomePresentation, managerObjectTheme) 45/45; jest theme-system 37 suites 197/197."
   }
 }
