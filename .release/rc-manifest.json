@@ -1,12 +1,11 @@
 {
-  "version": "1.10.213",
-  "rc": 3,
-  "branch": "rc/1.10.213-rc.3",
+  "version": "1.10.214",
+  "rc": 1,
+  "branch": "rc/1.10.214-rc.1",
   "baseMaster": "0fb1a697659c9c87904311a1a73db3861734c718",
   "tasks": [
     1335,
-    1575,
-    1687
+    1575
   ],
   "additionalTasks": [
     1644,
@@ -16,10 +15,11 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4c4730fc16d81b51bcaf8428ac4cba6018b9f53b"
+    "ControleOnline/app-community": "27568dfd787debfaea4115cb6e593771fa964c40"
   },
   "validation": {
     "scope": "Task 1687: deploy web nao exclui mais node_modules (fontes de icones). Tasks 1335/1575 ja presentes no staging (rc.1).",
-    "promotion": "Protected PR merge only to staging."
+    "promotion": "Protected PR merge only to staging.",
+    "rc1": "rc/1.10.213-rc.3 + ui-crm 1.0.84: prévia de anexo com legenda e cores só pelo tema (ui-crm#89, #92)."
   }
 }
