@@ -1,7 +1,7 @@
 {
   "version": "1.10.210",
-  "rc": 13,
-  "branch": "rc/1.10.210-rc.13",
+  "rc": 14,
+  "branch": "rc/1.10.210-rc.14",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
     1644,
@@ -30,6 +30,7 @@
     "rc10": "rc.9 + task 1655: ui-config 1.0.39 (button 'Replicar para todas as categorias'); configurator overlay 1.0.39.",
     "rc11": "rc.10 + task 1650: sidebar reads routes.routeMenuBackground/routeMenuIcon/routeMenuText; ui-config 1.0.40 (MenuBackground/MenuIcon/MenuText fields); configurator overlay 1.0.40. Requires api-community rc/1.10.145-rc.13 (common 1.0.17).",
     "rc12": "rc.11 + task 1658: ui-config 1.0.41 (color field width 130); configurator overlay 1.0.41.",
-    "rc13": "rc.12 + task 1650: ui-config 1.0.42 (card colors and menu colors on separate rows; buttons to replicate the menu colors to the category or to all categories); configurator overlay 1.0.42. No API change."
+    "rc13": "rc.12 + task 1650: ui-config 1.0.42 (card colors and menu colors on separate rows; buttons to replicate the menu colors to the category or to all categories); configurator overlay 1.0.42. No API change.",
+    "rc14": "rc.13 + task 1650: ui-config 1.0.43 (fix invalid JSX in 1.0.42 that broke the web bundle: Adjacent JSX elements); configurator overlay 1.0.43."
   }
 }
