@@ -76,8 +76,10 @@ export default function ModuleAppearanceCatalog({menus, palette, enabled, colors
     const resolved = ['textColor', 'iconColor', 'iconBackgroundColor'].includes(field) ? modulePropertyColor(value, palette) : resolveModuleAccent(value, palette);
     return <View key={field} style={{gap: 4}}>
       <Text style={{color: c.modalText}}>{label}{temporary ? ` · ${t('somente prévia')}` : ''}</Text>
-      <ColorBox colors={c} label={label} value={value} resolved={resolved} disabled={temporary ? saving : !editable}
-        placeholder={temporary ? t('Usando o tema') : '#rrggbb / $primary'} onChangeText={next => edit(kind, item, field, next)} />
+      <View style={{width: 130, maxWidth: '100%'}}>
+        <ColorBox colors={c} label={label} value={value} resolved={resolved} disabled={temporary ? saving : !editable}
+          placeholder={temporary ? t('Usando o tema') : '#rrggbb / $primary'} onChangeText={next => edit(kind, item, field, next)} />
+      </View>
       {temporary && !Object.hasOwn(item, field) && <Text style={{color: c.textSecondary, fontSize: 12}}>{t('A gravação deste campo depende da atualização da API e do banco.')}</Text>}
       {!!value && <Text style={{color: c.textSecondary, fontSize: 12}}>{value}{value !== resolved ? ` → ${resolved || t('Cor inválida ou referência sem valor')}` : ''}</Text>}
     </View>;
