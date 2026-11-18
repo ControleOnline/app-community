@@ -220,12 +220,12 @@ export default function FloatingThemePanel({ onClose, initialView = 'screen', vi
             </View>}
           </>}
         </View>
-        {!!selection?.sources?.length && <View style={{padding: 10, gap: 4}}>
+        {!!(selection?.sources?.length || selection?.moduleRecord) && <View style={{padding: 10, gap: 4}}>
           <Text style={{fontSize: 12, color: c.textSecondary}}>{t('Cores vindas dos cadastros dos módulos; não são variáveis do tema.')}</Text>
-          <ModuleSourceEditor palette={values} colors={c}
-            sources={groupInspectionColors(selection.sources.map(source => ({...source, token: source.source})))} />
+          <ModuleSourceEditor palette={values} colors={c} record={selection.moduleRecord}
+            sources={groupInspectionColors((selection.sources || []).map(source => ({...source, token: source.source})))} />
         </View>}
-        {!!selection && !bindings.length && !selection.sources?.length && !selection.media && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
+        {!!selection && !bindings.length && !selection.sources?.length && !selection.moduleRecord && !selection.media && <Text style={{ padding: 10, fontSize: 12, color: c.textSecondary }}>{t("Este estado não expõe variáveis de cor do tema.")}</Text>}
         <View style={{ flexShrink: mobile ? 0 : 1, minHeight: 0, ...(selection && !bindings.length ? { display: 'none' } : {}) }}>{theme && <ThemeColorEditor key={`${theme.id}:${context}`} theme={theme} selectedTokens={selectedTokens} homeMetric={selection?.homeMetric} screen={null} fixedMode={loginPreview} concise fixedHeader onSaved={setTheme} />}</View>
       </div>
     </div>

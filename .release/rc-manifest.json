@@ -1,7 +1,7 @@
 {
-  "version": "1.10.215",
+  "version": "1.10.216",
   "rc": 1,
-  "branch": "rc/1.10.215-rc.1",
+  "branch": "rc/1.10.216-rc.1",
   "baseMaster": "4454f8c4f5b6113a3a0fc89aade5c7026596e4d5",
   "tasks": [
     1678
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "49365fce5be50ec2b423d3132f519a05b49f2539"
+    "ControleOnline/app-community": "7b7ed0d1c56d3658dcdc923ee839e4ea883c5c86"
   },
   "validation": {
-    "scope": "Task 1678: editar cores de categorias e rotas direto na inspecao do configurador de temas. Base: master/staging atuais (1.10.214).",
+    "scope": "Task 1678 (ajuste): a inspecao oferece todos os campos de cor do registro (categoria/rota), inclusive os vazios.",
     "promotion": "Staging first; master apos aprovacao."
   }
 }

@@ -13,7 +13,7 @@ jest.mock('../../components/theme-editor/moduleAppearanceService', () => ({
   moduleAppearanceContext: () => 'local', loadModuleAppearanceCached: jest.fn(), saveModuleAppearance: jest.fn(), refreshModuleMenus: jest.fn(),
 }));
 const groups = [{id: 128, label: 'Financeiro', color: '#020202', categoryCardBackground: '#2c5484', menus: [
-  {id: 99, routeId: 42, label: 'Centro financeiro', route: 'FinancialHubPage', color: '#0284c7', routeMenuText: null, menuType: 'home'}]}];
+  {id: 99, routeId: 42, label: 'Centro financeiro', route: 'FinancialHubPage', color: '#0284c7', routeMenuBackground: null, routeMenuIcon: null, routeMenuText: null, menuType: 'home'}]}];
 const sources = [
   {property: 'backgroundColor', source: 'category.categoryCardBackground', record: '128', value: '#2c5484'},
   {property: 'color', source: 'routes.routeMenuText', record: 'FinancialHubPage', value: '#ffffff'},
@@ -43,5 +43,21 @@ test('super administrators edit category and route sources and save per record',
   await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Financeiro'}).props.onPress());
   expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'category', original: groups[0],
     draft: expect.objectContaining({categoryCardBackground: '#abcdef'})}));
+  await act(async () => tree.unmount());
+});
+
+test('selecting a sidebar button offers its three menu colors even when none is set', async () => {
+  mockSuper = true;
+  const record = {kind: 'route', record: 'FinancialHubPage', fields: ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']};
+  let tree;await act(async () => {tree = renderer.create(<ModuleSourceEditor sources={[]} record={record} palette={{}} colors={{}} />);});
+  for (const field of record.fields) {
+    const input = tree.root.findByProps({accessibilityLabel: `Rota — routes.${field}`});
+    expect(input.props.value).toBe('');
+    expect(input.props.editable).toBe(true);
+  }
+  await act(async () => tree.root.findByProps({accessibilityLabel: 'Rota — routes.routeMenuIcon'}).props.onChangeText('#abcdef'));
+  await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Centro financeiro'}).props.onPress());
+  expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'route',
+    draft: expect.objectContaining({routeMenuIcon: '#abcdef'})}));
   await act(async () => tree.unmount());
 });

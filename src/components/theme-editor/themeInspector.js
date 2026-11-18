@@ -14,7 +14,9 @@ export function inspectThemeElement(element) {
   let node=element.closest?.('[data-co-theme]');
   const stateNode=element.closest?.('[data-co-theme-states]');
   const sourceNode=element.closest?.('[data-co-theme-source]');
+  const recordNode=element.closest?.('[data-co-module-record]');
   if(sourceNode && (!node || node.contains?.(sourceNode)))node=sourceNode;
+  if(!node && !stateNode && recordNode)node=recordNode;
   if(!node && !stateNode)return null;
   try {
     const scope=element.closest?.('[data-co-theme-screen]');
@@ -27,7 +29,14 @@ export function inspectThemeElement(element) {
     const sources=sourceNode?.matches?.(':hover') && Array.isArray(sourceStates?.hover)
       ? sourceStates.hover : sourceValue?JSON.parse(sourceValue):[];
     const metricId=element.closest?.('[data-co-home-metric]')?.getAttribute?.('data-co-home-metric');
-    const scoped=hit=>hit?{...hit,...(screen?{screen}:{}),...(Object.hasOwn(homeMetrics,metricId)?{homeMetric:metricId}:{}),
+    // Editable module record (category/route) behind the element, even when none of its colors is set.
+    let moduleRecord=null;
+    try{
+      const parsed=recordNode?JSON.parse(recordNode.getAttribute('data-co-module-record')):null;
+      if(['category','route'].includes(parsed?.kind) && parsed.record!=null && Array.isArray(parsed.fields))
+        moduleRecord={kind:parsed.kind,record:String(parsed.record),fields:parsed.fields.filter(field=>typeof field==='string')};
+    }catch{moduleRecord=null;}
+    const scoped=hit=>hit?{...hit,...(moduleRecord?{moduleRecord}:{}),...(screen?{screen}:{}),...(Object.hasOwn(homeMetrics,metricId)?{homeMetric:metricId}:{}),
       ...(hit.node===sourceNode && Array.isArray(sources)?{sources:sources.filter(item=>
         typeof item.property==='string' && ['category.color','routes.color','category.text_color','category.icon_color','category.categoryCardBackground','category.categoryCardText','category.categoryCardMenu','routes.text_color','routes.icon_color','routes.icon_background_color','routes.routeCardBackground','routes.routeCardIcon','routes.routeCardIconBackground','routes.routeCardText','routes.routeCardBorder','routes.routeMenuBackground','routes.routeMenuIcon','routes.routeMenuText'].includes(item.source) && typeof item.value==='string')}:{})}:hit;
     const dock=element.closest?.('[data-testid="bottom-navigation"][data-co-theme]');
@@ -48,7 +57,7 @@ export function inspectThemeElement(element) {
       for(const state of ['normal','hover'])if(Array.isArray(declared?.[state]))states[state]=uniqueBindings([...validBindings(declared[state]),...own]);
       if(Object.values(states).some(value=>value.length))return scoped({node:stateNode,bindings:states.normal || [],states,...(container?{container}:{})});
     }
-    return bindings.length || sources.length?scoped({node,bindings,states:{normal:bindings},...(container?{container}:{})}):null;
+    return bindings.length || sources.length || moduleRecord?scoped({node,bindings,states:{normal:bindings},...(container?{container}:{})}):null;
   } catch{return null;}
 }
 export function attachThemeInspector(document,onHover,onSelect) {
