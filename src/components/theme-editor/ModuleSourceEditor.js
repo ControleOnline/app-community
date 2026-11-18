@@ -11,7 +11,7 @@ import {themeEditorText as t} from './themeToolPresentation';
 // Inline editor for colors that come from category/route records. Saving keeps the
 // exact catalog flow: draft per record, explicit save, PATCH on the same endpoints.
 // Same names the "Menus por perfil" editor uses for these columns.
-const FIELD_LABELS = {categoryCardMenu: 'MenuText'};
+const FIELD_LABELS = {categoryCardMenu: 'MenuText', color: 'Cor'};
 const fieldLabel = field => FIELD_LABELS[field] || field.replace(/^(?:category|route)(?=Card|Menu)/, '');
 const toPickerValue = value => {
   const color = String(value || '').trim();

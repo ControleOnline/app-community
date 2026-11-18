@@ -12,7 +12,7 @@ jest.mock('../../components/theme-editor/moduleAppearanceService', () => ({
   ...jest.requireActual('../../components/theme-editor/moduleAppearanceService'),
   moduleAppearanceContext: () => 'local', loadModuleAppearanceCached: jest.fn(), saveModuleAppearance: jest.fn(), refreshModuleMenus: jest.fn(),
 }));
-const groups = [{id: 128, label: 'Financeiro', color: '#020202', categoryCardBackground: '#2c5484', menus: [
+const groups = [{id: 128, label: 'Financeiro', color: '#020202', categoryCardBackground: '#2c5484', categoryCardText: null, categoryCardMenu: null, menus: [
   {id: 99, routeId: 42, label: 'Centro financeiro', route: 'FinancialHubPage', color: '#0284c7', routeMenuBackground: null, routeMenuIcon: null, routeMenuText: null, menuType: 'home'}]}];
 const sources = [
   {property: 'backgroundColor', source: 'category.categoryCardBackground', record: '128', value: '#2c5484'},
@@ -61,5 +61,14 @@ test('selecting a sidebar button offers its three menu colors even when none is 
   await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Centro financeiro'}).props.onPress());
   expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'route',
     draft: expect.objectContaining({routeMenuIcon: '#abcdef'})}));
+  await act(async () => tree.unmount());
+});
+
+test('labels match the Menus por perfil editor, including the registered color', async () => {
+  mockSuper = true;
+  const record = {kind: 'category', record: '128', fields: ['categoryCardBackground', 'categoryCardText', 'categoryCardMenu', 'color']};
+  let tree;await act(async () => {tree = renderer.create(<ModuleSourceEditor sources={[]} record={record} palette={{}} colors={{}} />);});
+  const texts = tree.root.findAllByType('Text').map(node => node.children.join(''));
+  expect(texts).toEqual(expect.arrayContaining(['CardBackground', 'CardText', 'MenuText', 'Cor']));
   await act(async () => tree.unmount());
 });

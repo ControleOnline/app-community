@@ -1,7 +1,7 @@
 {
-  "version": "1.10.217",
+  "version": "1.10.218",
   "rc": 1,
-  "branch": "rc/1.10.217-rc.1",
+  "branch": "rc/1.10.218-rc.1",
   "baseMaster": "b5432b6fe241b43670a8695abaa56ed1254f668d",
   "tasks": [
     1678
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "af1197bd8cc850a8346e25d6dfca2257e2348ea4"
+    "ControleOnline/app-community": "ffd10d9663e57829c23d86cd889f2289da6924c3"
   },
   "validation": {
-    "scope": "Task 1678 (ajuste visual): campos de cor da inspecao com o mesmo layout do editor Menus por perfil (rotulo acima, caixa com amostra clicavel + texto, 130px).",
+    "scope": "Task 1678 (rotulos): rotulos das cores de modulos/rotas iguais aos do editor Menus por perfil (inclui Cor).",
     "promotion": "Staging first; master apos aprovacao."
   }
 }
