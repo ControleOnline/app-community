@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Pressable, Text, TextInput, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {useStore} from '@store';
 import {app_type_base} from '@appType';
 import {resolveRuntimeMenuLabel, userHasRole} from '@controleonline/ui-common/src/react/utils/runtimeMenu';
@@ -7,34 +7,13 @@ import {resolveModuleAccent, modulePropertyColor} from '../manager-preview/modul
 import {findModuleRecord, invalidateModuleAppearance, loadModuleAppearanceCached, moduleAppearanceContext,
   moduleSourceTarget, persistedAppearanceFields, refreshModuleMenus, saveModuleAppearance} from './moduleAppearanceService';
 import {themeEditorText as t} from './themeToolPresentation';
+import ColorBox from './ColorBox';
 
 // Inline editor for colors that come from category/route records. Saving keeps the
 // exact catalog flow: draft per record, explicit save, PATCH on the same endpoints.
 // Same names the "Menus por perfil" editor uses for these columns.
 const FIELD_LABELS = {categoryCardMenu: 'MenuText', color: 'Cor'};
 const fieldLabel = field => FIELD_LABELS[field] || field.replace(/^(?:category|route)(?=Card|Menu)/, '');
-const toPickerValue = value => {
-  const color = String(value || '').trim();
-  if (/^#[0-9a-f]{6}$/i.test(color)) return color;
-  if (/^#[0-9a-f]{3}$/i.test(color)) return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
-  return '#000000';
-};
-
-// Same box as "Menus por perfil": swatch inside the field (click opens the browser palette) plus the text.
-function ColorBox({value, resolved, label, placeholder, disabled, colors: c, onChangeText}) {
-  return <View style={{alignItems: 'center', flexDirection: 'row', gap: 6, minHeight: 38, paddingHorizontal: 8, borderWidth: 1, borderRadius: 8,
-    borderColor: c.inputBorder, backgroundColor: c.inputBackground}}>
-    <View testID="color-swatch" style={{overflow: 'hidden', position: 'relative', width: 18, height: 18, borderRadius: 4, borderWidth: 1,
-      borderColor: c.inputBorder, backgroundColor: resolved || 'transparent'}}>
-      {Platform.OS === 'web' ? React.createElement('input', {type: 'color', 'aria-label': `${label} — escolher cor`, disabled, value: toPickerValue(resolved || value),
-        onChange: event => onChangeText(String(event.target.value).toUpperCase()),
-        style: {position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: disabled ? 'default' : 'pointer', border: 0, padding: 0}}) : null}
-    </View>
-    <TextInput accessibilityLabel={label} value={value} editable={!disabled} placeholder={placeholder} placeholderTextColor={c.textPlaceholder}
-      onChangeText={onChangeText} style={{flex: 1, minWidth: 0, paddingHorizontal: 0, paddingVertical: 8, fontSize: 13, fontWeight: '700', color: c.inputText}} />
-  </View>;
-}
-
 export default function ModuleSourceEditor({sources, palette, colors: c, record}) {
   const {user} = useStore('auth').getters;
   const people = useStore('people');

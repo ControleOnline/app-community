@@ -2,7 +2,7 @@ import { themeEditorText as t } from "./themeToolPresentation";import React, { m
 
 // Let the browser own the native popup while it is open. React must not feed
 // every preview value back into that popup or move its anchor during a drag.
-export default memo(function NativeColorInput({ value, onColor, label, disabled = false, touch = false }) {
+export default memo(function NativeColorInput({ value, onColor, label, disabled = false, touch = false, overlay = false }) {
   const input = useRef(null),active = useRef(false),pending = useRef(null),frame = useRef(null),callback = useRef(onColor);
   callback.current = onColor;
   const normalized = /^#[a-f\d]{6}$/i.test(value) ? value : undefined;
@@ -25,5 +25,5 @@ export default memo(function NativeColorInput({ value, onColor, label, disabled 
   return <input ref={input} type="color" defaultValue={initial.current} disabled={disabled} aria-label={label} title={t("Seletor de cor")}
   onFocus={() => {active.current = true;}} onInput={preview} onBlur={() => {active.current = false;flush();}}
   onKeyDown={(event) => {if (event.key === 'Escape') event.stopPropagation();}}
-  style={{ width: touch ? 44 : 26, height: touch ? 44 : 28, border: 0, padding: 0, background: 'none', cursor: 'pointer' }} />;
+  style={overlay ? { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: disabled ? 'default' : 'pointer', border: 0, padding: 0 } : { width: touch ? 44 : 26, height: touch ? 44 : 28, border: 0, padding: 0, background: 'none', cursor: 'pointer' }} />;
 });
