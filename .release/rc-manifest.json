@@ -1,7 +1,7 @@
 {
   "version": "1.10.209",
-  "rc": 15,
-  "branch": "rc/1.10.209-rc.15",
+  "rc": 16,
+  "branch": "rc/1.10.209-rc.16",
   "baseMaster": "a771059638e97f20d0f4f222d9e9aefbd34d7145",
   "tasks": [
     1335,
@@ -10,7 +10,7 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "4cad03eda951418a7b4eba91234ea74cfe89138d"
+    "ControleOnline/app-community": "73cf03c64df6ced91abb7eacba387aeec9ab66c1"
   },
   "validation": {
     "scope": "Task 776: ui-orders 1.3.56 - Abrir, Pagar e Excluir/Ver cancelamento em posicoes fixas (slots de largura fixa) na coluna Acoes da order-history-page. Sem mudanca de API.",
@@ -20,6 +20,7 @@
     "rc12": "rc.11 + ui-crm 1.0.71 (requests, WhatsApp-like chat, Support/CRM workspace, Atendimento settings, English URLs), ui-manager 1.0.30 (English URLs), ui-common 1.2.127 (request push, QR/e-mail connection fixes), index.html stale bundle guard (#1575).",
     "rc13": "rc.12 + ui-crm 1.0.74 (/ai analyst, /support customer requests; restored 1.0.70 content), ui-common overlay pins 1.2.127 (no overlaid file changed).",
     "rc14": "rc.13 + ui-crm 1.0.76 (status filter default, reload after session, CRM rule only), ui-common 1.2.128 (websocket stuck CONNECTING reconnect).",
-    "rc15": "rc.14 + ui-crm 1.0.78 (loads retry while the app boots: F5/deep link)."
+    "rc15": "rc.14 + ui-crm 1.0.78 (loads retry while the app boots: F5/deep link).",
+    "rc16": "rc.15 + index.html: reload once when the cached HTML runs an older bundle (#1575)."
   }
 }
