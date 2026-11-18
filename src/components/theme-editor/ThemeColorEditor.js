@@ -72,7 +72,7 @@ export default memo(function ThemeColorEditor({ theme, onSaved, onClose, onPrevi
         {token === 'buttonDisabledOpacity' ? <TextInput accessibilityLabel={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
         value={String(value)} editable={!saving} onChangeText={(value) => edit(key, normalizeThemeValue(token, value))}
         placeholder={t("0 a 1")} style={[s.input, mobile && { minHeight: 44, fontSize: 16 }, invalid && s.invalid]} />
-        : <View style={{flex: 1, minWidth: 0}}><ColorBox colors={c} touch={mobile} invalid={invalid} disabled={saving} value={String(value)}
+        : <View style={{width: 130, maxWidth: '100%'}}><ColorBox colors={c} touch={mobile} invalid={invalid} disabled={saving} value={String(value)}
         resolved={invalid || !value ? '' : value} placeholder={t("Sem valor")}
         label={`${concise ? token : themeFieldLabel(token,t)} — ${mode === 'light' ? t("claro") : t("escuro")}`}
         onChangeText={(value) => edit(key, normalizeThemeValue(token, value))} /></View>}

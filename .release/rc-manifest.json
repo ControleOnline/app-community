@@ -1,7 +1,7 @@
 {
-  "version": "1.10.221",
+  "version": "1.10.222",
   "rc": 1,
-  "branch": "rc/1.10.221-rc.1",
+  "branch": "rc/1.10.222-rc.1",
   "baseMaster": "ef88e605351f27adfe67bcfc9b6628068cf640b0",
   "tasks": [
     1678
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "e659c8221b693aab1cb16c1da43557c47801b978"
+    "ControleOnline/app-community": "e1f2d78251935ce062da8096b71152e441c72463"
   },
   "validation": {
-    "scope": "Task 1678 (botoes): Salvar cores da rota/categoria (primario) e Cancelar com aparencia de botao (borda, fundo, texto centralizado).",
+    "scope": "Task 1678 (largura): caixas de cor das variaveis do tema e do catalogo de modulos com 130px, como nos blocos de rota e categoria.",
     "promotion": "Staging first; master apos aprovacao."
   }
 }
