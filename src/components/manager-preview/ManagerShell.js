@@ -166,10 +166,14 @@ export default function ManagerShell({navigation, route, options, children}) {
     <ScrollView style={s.menu} contentContainerStyle={{padding: compact ? 10 : 12}}>
       {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
-      {groups.map((group, i) => <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: (moduleAccent?.value ? modulePropertyColor(group.textColor, moduleAccentPalette) : undefined) ?? c.navigationCaptionText}]} dataSet={{coThemeSource: modulePropertySource(group, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, table: 'category', id: group.id})}}>{group.title}</Text>}
+      {groups.map((group, i) => {
+        // categoryCardMenu colors the category name shown in the left menu (issue 1644).
+        const captionColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardMenu, moduleAccentPalette) : undefined;
+        return <View key={group.id || i} style={s.group}>
+        {!compact && <Text style={[s.caption, {color: captionColor ?? c.navigationCaptionText}]} dataSet={{coThemeSource: moduleAccentSource(captionColor, 'category.categoryCardMenu', group.id, group.categoryCardMenu, ['color'])}}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
-      </View>)}
+      </View>;
+      })}
       {!groups.length && !compact && <Text style={[s.navText, {color: c.navigationCaptionText}]}>Aguardando os menus disponíveis para seu perfil.</Text>}
     </ScrollView>
     <Pressable accessibilityRole="button" accessibilityLabel="Abrir opções do usuário" accessibilityState={{expanded: accountAnchor === 'sidebar'}} onPress={() => openAccount('sidebar')} style={[s.account, {borderColor: c.navigationAccountBorder, backgroundColor: c.navigationAccountBackground}, compact && s.center]}>{avatar(34)}

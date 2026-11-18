@@ -147,14 +147,16 @@ it.each([[false, '#345678'], [true, '#876543']])(
 it.each([false,true])('applies registered route foregrounds and category text, keeping the theme when disabled (grid %s)',async grid=>{
  mockModuleIcons=grid;mockModuleAccent=true;
  mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:'transparent'};
- mockCategoryAppearance={textColor:'#ffff00'};
+ mockCategoryAppearance={categoryCardText:'#ffff00',categoryCardBackground:'#123abc',textColor:'#ff00ff'};
  let tree;await act(async()=>{tree=renderer.create(view());});
  const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
  const itemTextColor=()=>{const style=first().findByType('Text').props.style;return (Array.isArray(style)?Object.assign({},...style):style).color;};
  expect(first().findAllByType('Icon')[0].props.color).toBe('#147568');
  expect(itemTextColor()).toBe('#ffffff');
- const category=()=>tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
+ const category=()=>tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardText'));
  expect(category().props.style.at(-1).color).toBe('#ffff00');
+ const card=tree.root.findByProps({testID:'manager-explore-modules'}).findAll(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardBackground'))[0];
+ expect(JSON.parse(card.props.dataSet.coThemeSource)[0]).toMatchObject({source:'category.categoryCardBackground',value:'#123abc'});
  if(grid)expect(first().findByType('Icon').parent.props.style.at(-1).backgroundColor).toBe('transparent');
  mockModuleAccent=false;await act(async()=>tree.update(view()));
  expect(first().findAllByType('Icon')[0].props.color).toBe(grid?'#876543':'#345678');
