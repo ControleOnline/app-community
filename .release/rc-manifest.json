@@ -1,12 +1,11 @@
 {
-  "version": "1.10.211",
-  "rc": 5,
-  "branch": "rc/1.10.211-rc.5",
+  "version": "1.10.212",
+  "rc": 1,
+  "branch": "rc/1.10.212-rc.1",
   "baseMaster": "bba7f96219cb7349b35d9f231bd78c0ef629ef4b",
   "tasks": [
-    779,
-    1628,
-    1668
+    1335,
+    1575
   ],
   "additionalTasks": [
     1644,
@@ -16,10 +15,11 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "33c984f99c990e242136185aadc74943de4a5cbc"
+    "ControleOnline/app-community": "32235f4f7d85ae2494d05d1c7244dd172048e59d"
   },
   "validation": {
     "scope": "Tasks 779 (ui-default sem fallbacks hardcoded), 1628 (paginador; ui-default 1.0.297 corrige ReferenceError), 1668 (rodape em linha unica da order-history-page). Homologado no staging via rc.4; sem 1335/1575.",
-    "promotion": "Merge to master authorized by owner; production deploy remains cron/dispatch."
+    "promotion": "Merge to master authorized by owner; production deploy remains cron/dispatch.",
+    "rc1": "rc.5 + ui-common 1.2.129: segredos da tela de integrações sempre private (ui-common#150)."
   }
 }
