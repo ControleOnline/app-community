@@ -1,19 +1,19 @@
 {
   "version": "1.10.210",
-  "rc": 16,
-  "branch": "rc/1.10.210-rc.16",
+  "rc": 17,
+  "branch": "rc/1.10.210-rc.17",
   "baseMaster": "8609bd5ba684a271d58e6767a57e802f5de6b671",
   "tasks": [
-    1650,
     1655,
     1658,
     1662,
-    1664
+    1664,
+    1666
   ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f6e0f089895877c5135570bf963ad260f19a6bb9"
+    "ControleOnline/app-community": "edf48ba21c6dcd436b8e7148ec24dbb508205aff"
   },
   "validation": {
     "scope": "Tasks 779 e 781: ui-default 1.0.296 (sem fallbacks hardcoded) e ui-login 1.0.122 (reset-password com tokens da sign-in, sem cores fixas). Sem mudanca de API.",
@@ -33,6 +33,7 @@
     "rc13": "rc.12 + task 1650: ui-config 1.0.42 (card colors and menu colors on separate rows; buttons to replicate the menu colors to the category or to all categories); configurator overlay 1.0.42. No API change.",
     "rc14": "rc.13 + task 1650: ui-config 1.0.43 (fix invalid JSX in 1.0.42 that broke the web bundle: Adjacent JSX elements); configurator overlay 1.0.43.",
     "rc15": "rc.14 + task 1662: ui-config 1.0.44 (menu_type badge in menu rows); configurator overlay 1.0.44.",
-    "rc16": "rc.15 + task 1664: ui-config 1.0.45 (replicate button labels, two lines); configurator overlay 1.0.45."
+    "rc16": "rc.15 + task 1664: ui-config 1.0.45 (replicate button labels, two lines); configurator overlay 1.0.45.",
+    "rc17": "rc.16 + task 1666: ui-config 1.0.46 (icon/name/badge on one line; color palette on swatch click); configurator overlay 1.0.46."
   }
 }
