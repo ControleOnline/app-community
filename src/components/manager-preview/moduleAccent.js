@@ -48,6 +48,12 @@ export function moduleAccentSource(value, source, record, reference, properties 
   return value ? JSON.stringify(properties.map(property => ({property, source, record, reference, value}))) : undefined;
 }
 
+// Marks the editable category/route record behind an element, so the theme inspector can offer
+// every color field of the record, including those still empty.
+export function moduleRecordSource(kind, record, fields) {
+  return record == null || record === '' ? undefined : JSON.stringify({kind, record: String(record), fields});
+}
+
 // Unlike the legacy accent, optional foreground/icon backgrounds may be fully transparent.
 export function modulePropertyColor(value, palette = {}) {
   const reference = typeof value === 'string' ? value.trim() : '';

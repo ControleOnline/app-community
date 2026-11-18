@@ -16,7 +16,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
-import {moduleListAppearance, resolveModuleAccent, moduleAccentSource, modulePropertyColor, modulePropertySource} from './moduleAccent';
+import {moduleListAppearance, resolveModuleAccent, moduleAccentSource, moduleRecordSource, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -127,7 +127,8 @@ export default function ManagerShell({navigation, route, options, children}) {
     const menuSource = (field, property) => moduleAccentSource(menuColor(field), `routes.${field}`, item.name, item[field], [property]);
     const appearanceFor = highlighted => moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
-      dataSet={{coThemeSource: !active ? (menuColor('routeMenuBackground') ? menuSource('routeMenuBackground', 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)) : undefined,
+      dataSet={{coModuleRecord: moduleRecordSource('route', item.name, ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']),
+        coThemeSource: !active ? (menuColor('routeMenuBackground') ? menuSource('routeMenuBackground', 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)) : undefined,
         coThemeSourceStates: accent && !active ? JSON.stringify({hover: []}) : undefined}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
@@ -172,7 +173,7 @@ export default function ManagerShell({navigation, route, options, children}) {
         // categoryCardMenu colors the category name shown in the left menu (issue 1644).
         const captionColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardMenu, moduleAccentPalette) : undefined;
         return <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: captionColor ?? c.navigationCaptionText}]} dataSet={{coThemeSource: moduleAccentSource(captionColor, 'category.categoryCardMenu', group.id, group.categoryCardMenu, ['color'])}}>{group.title}</Text>}
+        {!compact && <Text style={[s.caption, {color: captionColor ?? c.navigationCaptionText}]} dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardMenu']), coThemeSource: moduleAccentSource(captionColor, 'category.categoryCardMenu', group.id, group.categoryCardMenu, ['color'])}}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
       </View>;
       })}

@@ -5,7 +5,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {resolveModuleAccent, moduleAccentSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
+import {resolveModuleAccent, moduleAccentSource, moduleRecordSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -297,7 +297,7 @@ export default function ManagerOverview({navigation}) {
         const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.categoryCardBackground, moduleAccentPalette) : undefined;
         const groupTextColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardText, moduleAccentPalette) : undefined;
         return <View key={group.id || i}
-          dataSet={{coThemeSource: moduleAccentSource(groupAccent, 'category.categoryCardBackground', group.id, group.categoryCardBackground)}}
+          dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardBackground', 'categoryCardText']), coThemeSource: moduleAccentSource(groupAccent, 'category.categoryCardBackground', group.id, group.categoryCardBackground)}}
           style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
           <Text dataSet={{coThemeSource: moduleAccentSource(groupTextColor, 'category.categoryCardText', group.id, group.categoryCardText, ['color'])}} style={[s.panelTitle, {color: groupTextColor ?? c.cardText}]}>{group.title}</Text>
           {(() => {
@@ -314,7 +314,7 @@ export default function ManagerOverview({navigation}) {
               const cardIconColor = cardColor('routeCardIcon') ?? appearance.iconColor;
               const cardText = cardColor('routeCardText');
               return <Pressable key={item.id || j} accessibilityRole="button"
-              dataSet={{coThemeSource: cardColor('routeCardBackground') ? cardSource('routeCardBackground', item.name, 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
+              dataSet={{coModuleRecord: moduleRecordSource('route', item.name, ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground', 'routeCardText', 'routeCardBorder']), coThemeSource: cardColor('routeCardBackground') ? cardSource('routeCardBackground', item.name, 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
               accessibilityLabel={item.title} onPress={() => go(item)}
               style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
                 borderColor: cardBorder ?? c.listItemBorder,
