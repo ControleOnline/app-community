@@ -1,8 +1,8 @@
 {
-  "version": "1.10.216",
+  "version": "1.10.217",
   "rc": 1,
-  "branch": "rc/1.10.216-rc.1",
-  "baseMaster": "4454f8c4f5b6113a3a0fc89aade5c7026596e4d5",
+  "branch": "rc/1.10.217-rc.1",
+  "baseMaster": "b5432b6fe241b43670a8695abaa56ed1254f668d",
   "tasks": [
     1678
   ],
@@ -10,10 +10,10 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "7b7ed0d1c56d3658dcdc923ee839e4ea883c5c86"
+    "ControleOnline/app-community": "af1197bd8cc850a8346e25d6dfca2257e2348ea4"
   },
   "validation": {
-    "scope": "Task 1678 (ajuste): a inspecao oferece todos os campos de cor do registro (categoria/rota), inclusive os vazios.",
+    "scope": "Task 1678 (ajuste visual): campos de cor da inspecao com o mesmo layout do editor Menus por perfil (rotulo acima, caixa com amostra clicavel + texto, 130px).",
     "promotion": "Staging first; master apos aprovacao."
   }
 }

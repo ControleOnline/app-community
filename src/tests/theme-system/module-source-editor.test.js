@@ -55,6 +55,8 @@ test('selecting a sidebar button offers its three menu colors even when none is 
     expect(input.props.value).toBe('');
     expect(input.props.editable).toBe(true);
   }
+  expect(tree.root.findAllByProps({testID: 'color-swatch'})).toHaveLength(3);
+  expect(tree.root.findAllByType('Text').map(node => node.children.join(''))).toEqual(expect.arrayContaining(['MenuBackground', 'MenuIcon', 'MenuText']));
   await act(async () => tree.root.findByProps({accessibilityLabel: 'Rota — routes.routeMenuIcon'}).props.onChangeText('#abcdef'));
   await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Centro financeiro'}).props.onPress());
   expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'route',
