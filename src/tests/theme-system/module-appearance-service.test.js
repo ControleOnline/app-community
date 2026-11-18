@@ -1,5 +1,5 @@
 import {api} from '@controleonline/ui-common/src/api';
-import {appearanceChanges, findModuleRecord, loadModuleAppearance, moduleSourceTarget, mergeModuleGroups, moduleAppearanceContext, saveModuleAppearance} from '../../components/theme-editor/moduleAppearanceService';
+import {appearanceChanges, loadModuleAppearance, mergeModuleGroups, moduleAppearanceContext, saveModuleAppearance} from '../../components/theme-editor/moduleAppearanceService';
 jest.mock('@controleonline/ui-common/src/api', () => ({api: {fetch: jest.fn()}}));
 jest.mock('../../components/theme-editor/themeService', () => ({editorContext: () => 'local'}));
 beforeEach(() => api.fetch.mockReset());
@@ -80,35 +80,4 @@ test('catalog loading keeps the optional field capability and values from nested
   const [group]=await loadModuleAppearance(moduleAppearanceContext());
   expect(group).toMatchObject({textColor:null,iconColor:'#ffff00'});
   expect(group.menus[0]).toMatchObject({routeId:42,textColor:'#ffffff',iconColor:null,iconBackgroundColor:'transparent'});
-});
-
-test('maps inspector sources to the editable record kind and column', () => {
-  expect(moduleSourceTarget('category.categoryCardBackground')).toEqual({kind: 'category', field: 'categoryCardBackground'});
-  expect(moduleSourceTarget('category.text_color')).toEqual({kind: 'category', field: 'textColor'});
-  expect(moduleSourceTarget('routes.routeMenuText')).toEqual({kind: 'route', field: 'routeMenuText'});
-  expect(moduleSourceTarget('routes.icon_background_color')).toEqual({kind: 'route', field: 'iconBackgroundColor'});
-  expect(moduleSourceTarget('routes.color')).toEqual({kind: 'route', field: 'color'});
-  expect(moduleSourceTarget('routes.unknown')).toBeNull();
-  expect(moduleSourceTarget('theme.color')).toBeNull();
-});
-
-test('finds categories by id and routes by the route name reported by the inspector', () => {
-  const groups = [{id: 128, menus: [{id: 9, route: 'FinancialHubPage'}]}];
-  expect(findModuleRecord(groups, 'category', '128')).toBe(groups[0]);
-  expect(findModuleRecord(groups, 'route', 'FinancialHubPage')).toBe(groups[0].menus[0]);
-  expect(findModuleRecord(groups, 'route', 'Other')).toBeNull();
-});
-
-test('card and menu colors are saved on the same endpoints and an empty value clears them', async () => {
-  const route = {id: 99, routeId: 42, color: '#123456', icon: 'users', routeCardBackground: '#111111', routeMenuText: '#222222'};
-  api.fetch.mockResolvedValue({id: 99});
-  await saveModuleAppearance({kind: 'route', original: route, draft: {...route, routeCardBackground: '#abcdef', routeMenuText: ''},
-    palette: {}, context: moduleAppearanceContext()});
-  expect(api.fetch).toHaveBeenCalledWith('menu-config/99', {method: 'PATCH', body: {routeCardBackground: '#abcdef', routeMenuText: null}});
-  const category = {id: 128, color: '#123456', icon: 'grid', categoryCardBackground: '#2c5484'};
-  await saveModuleAppearance({kind: 'category', original: category, draft: {...category, categoryCardBackground: '$primary'},
-    palette: {primary: '#336699'}, context: moduleAppearanceContext()});
-  expect(api.fetch).toHaveBeenCalledWith('menu-config/categories/128', {method: 'PATCH', body: {categoryCardBackground: '$primary'}});
-  await expect(saveModuleAppearance({kind: 'category', original: category, draft: {...category, categoryCardBackground: 'nope'},
-    palette: {}, context: moduleAppearanceContext()})).rejects.toThrow();
 });

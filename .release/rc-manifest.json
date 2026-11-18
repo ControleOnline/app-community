@@ -1,19 +1,25 @@
 {
   "version": "1.10.212",
-  "rc": 2,
-  "branch": "rc/1.10.212-rc.2",
-  "baseMaster": "7363348b2e687086d04bd156c5d2c324c9b852de",
+  "rc": 1,
+  "branch": "rc/1.10.212-rc.1",
+  "baseMaster": "bba7f96219cb7349b35d9f231bd78c0ef629ef4b",
   "tasks": [
-    1678
+    1335,
+    1575
   ],
-  "additionalTasks": [],
+  "additionalTasks": [
+    1644,
+    1648,
+    1664
+  ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "b00d0f287faa7c7b265f0b513c073866bdd83c29"
+    "ControleOnline/app-community": "32235f4f7d85ae2494d05d1c7244dd172048e59d"
   },
   "validation": {
-    "scope": "Task 1678 sobre o staging atual (rc.4): editar cores de categorias e rotas direto na inspecao do tema. A mesma mudanca esta em rc/1.10.212-rc.1 (base master) para promocao.",
-    "promotion": "Staging first; master via rc/1.10.212-rc.1 apos aprovacao."
+    "scope": "Tasks 779 (ui-default sem fallbacks hardcoded), 1628 (paginador; ui-default 1.0.297 corrige ReferenceError), 1668 (rodape em linha unica da order-history-page). Homologado no staging via rc.4; sem 1335/1575.",
+    "promotion": "Merge to master authorized by owner; production deploy remains cron/dispatch.",
+    "rc1": "rc.5 + ui-common 1.2.129: segredos da tela de integrações sempre private (ui-common#150)."
   }
 }

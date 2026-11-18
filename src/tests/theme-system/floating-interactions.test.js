@@ -6,7 +6,6 @@ let mockWidth=393,mockMounts=0;
 jest.mock('../../components/theme-editor/LoginThemePreview.web',()=> 'LoginPreview');
 jest.mock('../../components/theme-editor/LoginPreviewOrigins',()=> 'LoginOrigins');
 jest.mock('../../components/theme-editor/loginPreviewModel',()=>({loadLoginPreviewCompany:jest.fn().mockResolvedValue({id:7,alias:'Domain company'})}));
-jest.mock('../../components/theme-editor/ModuleSourceEditor',()=> 'SourceEditor');
 jest.mock('react-dom',()=>({createPortal:node=>node}));
 jest.mock('react-native',()=>({...jest.requireActual('react-native'),useWindowDimensions:()=>({width:mockWidth,height:852})}));
 jest.mock('../../styles/themeRuntime',()=>({useThemeRuntime:()=>({mode:'light',raw:{},themeId:2}),getThemeSnapshot:()=>({mode:'light',raw:{},themeId:2})}));
