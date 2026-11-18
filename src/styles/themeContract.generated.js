@@ -549,7 +549,8 @@ module.exports = {
         "defaultTable_tableToolbarBorder",
         "defaultTable_textSecondary",
         "defaultTable_toolbarBackground",
-        "defaultTable_toolbarBorder"
+        "defaultTable_toolbarBorder",
+        "defaultTable_containerTransparentBackground"
       ]
     },
     {
@@ -576,7 +577,6 @@ module.exports = {
         "defaultFilter_chipIcon",
         "defaultFilter_chipSelectedBackground",
         "defaultFilter_chipText",
-        "defaultFilter_iconColor",
         "defaultFilter_iconWarning",
         "defaultFilter_inputBackground",
         "defaultFilter_inputBorder",
@@ -596,7 +596,10 @@ module.exports = {
         "defaultFilter_textPrimary",
         "defaultFilter_textSecondary",
         "defaultFilter_toolbarBackground",
-        "defaultFilter_toolbarBorder"
+        "defaultFilter_toolbarBorder",
+        "defaultFilter_chipSelectedText",
+        "defaultFilter_listItemBackground",
+        "defaultFilter_listItemBorder"
       ]
     },
     {
@@ -1039,6 +1042,7 @@ module.exports = {
     "defaultTable_textSecondary",
     "defaultTable_toolbarBackground",
     "defaultTable_toolbarBorder",
+    "defaultTable_containerTransparentBackground",
     "defaultFilter_badgeBackground",
     "defaultFilter_badgeText",
     "defaultFilter_buttonBackground",
@@ -1060,7 +1064,6 @@ module.exports = {
     "defaultFilter_chipIcon",
     "defaultFilter_chipSelectedBackground",
     "defaultFilter_chipText",
-    "defaultFilter_iconColor",
     "defaultFilter_iconWarning",
     "defaultFilter_inputBackground",
     "defaultFilter_inputBorder",
@@ -1081,6 +1084,9 @@ module.exports = {
     "defaultFilter_textSecondary",
     "defaultFilter_toolbarBackground",
     "defaultFilter_toolbarBorder",
+    "defaultFilter_chipSelectedText",
+    "defaultFilter_listItemBackground",
+    "defaultFilter_listItemBorder",
     "buttonBackground_customOpen",
     "buttonBorder_customOpen",
     "buttonIcon_customOpen",
@@ -1689,6 +1695,12 @@ module.exports = {
       "label": "Tabela padrão",
       "usage": "Tabela padrão - toolbarBorder"
     },
+    "defaultTable_containerTransparentBackground": {
+      "base": "containerTransparentBackground",
+      "variant": "defaultTable",
+      "label": "Tabela padrão",
+      "usage": "Tabela padrão - containerTransparentBackground"
+    },
     "defaultFilter_badgeBackground": {
       "base": "badgeBackground",
       "variant": "defaultFilter",
@@ -1815,12 +1827,6 @@ module.exports = {
       "label": "Filtro padrão",
       "usage": "Filtro padrão - chipText"
     },
-    "defaultFilter_iconColor": {
-      "base": "iconColor",
-      "variant": "defaultFilter",
-      "label": "Filtro padrão",
-      "usage": "Filtro padrão - iconColor"
-    },
     "defaultFilter_iconWarning": {
       "base": "iconWarning",
       "variant": "defaultFilter",
@@ -1940,6 +1946,24 @@ module.exports = {
       "variant": "defaultFilter",
       "label": "Filtro padrão",
       "usage": "Filtro padrão - toolbarBorder"
+    },
+    "defaultFilter_chipSelectedText": {
+      "base": "chipSelectedText",
+      "variant": "defaultFilter",
+      "label": "Filtro padrão",
+      "usage": "Filtro padrão - chipSelectedText"
+    },
+    "defaultFilter_listItemBackground": {
+      "base": "listItemBackground",
+      "variant": "defaultFilter",
+      "label": "Filtro padrão",
+      "usage": "Filtro padrão - listItemBackground"
+    },
+    "defaultFilter_listItemBorder": {
+      "base": "listItemBorder",
+      "variant": "defaultFilter",
+      "label": "Filtro padrão",
+      "usage": "Filtro padrão - listItemBorder"
     },
     "buttonBackground_customOpen": {
       "base": "buttonBackground",
