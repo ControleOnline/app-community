@@ -123,9 +123,11 @@ export default function ManagerShell({navigation, route, options, children}) {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
     const accent = moduleAccent?.value
       ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
+    const menuColor = field => moduleAccent?.value && !active ? modulePropertyColor(item[field], moduleAccentPalette) : undefined;
+    const menuSource = (field, property) => moduleAccentSource(menuColor(field), `routes.${field}`, item.name, item[field], [property]);
     const appearanceFor = highlighted => moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
-      dataSet={{coThemeSource: !active ? moduleAccentSource(accent, 'routes.color', item.name, item.color) : undefined,
+      dataSet={{coThemeSource: !active ? (menuColor('routeMenuBackground') ? menuSource('routeMenuBackground', 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)) : undefined,
         coThemeSourceStates: accent && !active ? JSON.stringify({hover: []}) : undefined}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
@@ -142,8 +144,8 @@ export default function ManagerShell({navigation, route, options, children}) {
         const appearance = appearanceFor(highlighted);
         const registered = !!moduleAccent?.value && !highlighted;
         return <>
-          {icon(item.icon, 18, appearance.iconColor, modulePropertySource(item, 'iconColor', {enabled: registered, palette: moduleAccentPalette, id: item.name}))}
-          {!iconsOnly && <Text dataSet={{coThemeSource: modulePropertySource(item, 'textColor', {enabled: registered, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
+          {icon(item.icon, 18, appearance.iconColor, menuColor('routeMenuIcon') && !highlighted ? menuSource('routeMenuIcon', 'color') : modulePropertySource(item, 'iconColor', {enabled: registered, palette: moduleAccentPalette, id: item.name}))}
+          {!iconsOnly && <Text dataSet={{coThemeSource: menuColor('routeMenuText') && !highlighted ? menuSource('routeMenuText', 'color') : modulePropertySource(item, 'textColor', {enabled: registered, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
         </>;
       }}
     </Pressable>;
