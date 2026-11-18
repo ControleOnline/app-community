@@ -295,7 +295,7 @@ it('uses route colors and list foregrounds before and after navigation, restorin
 });
 
 it('applies route foregrounds and category caption color without changing glyphs or themed disabled behavior',()=>{
- mockModuleAccent={value:true};mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary'};mockCategoryAppearance={categoryCardMenu:'#ffff00',textColor:'#ff00ff',categoryCardText:'#00ff00'};
+ mockModuleAccent={value:true};mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary'};mockCategoryAppearance={textColor:'#ffff00'};
  let tree;act(()=>{tree=renderer.create(view());});
  const device=()=>labeled(tree,'Dispositivos')[0];
  expect(device().findByType('Icon').props).toMatchObject({name:'monitor',color:'#147568'});
@@ -310,7 +310,7 @@ it('applies route foregrounds and category caption color without changing glyphs
   expect(children[1].props.dataSet.coThemeSource).toBeUndefined();
  }
 
- const caption=tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardMenu'));
+ const caption=tree.root.findAllByType('Text').find(n=>n.props.dataSet?.coThemeSource?.includes('category.text_color'));
  expect(caption.props.style.at(-1).color).toBe('#ffff00');
  mockModuleAccent={value:false};act(()=>tree.update(view()));
  expect(device().findByType('Icon').props.color).toBe(mockColors.navigationIcon);

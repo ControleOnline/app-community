@@ -197,4 +197,3 @@ Interpretação técnica:
 - o prefixo e somente de nome: `defaultFilter_buttonBackground` e gravado como `defaultFilter_buttonBackground-light` e `-dark`
 - estados de botao: `button*` (principal, clicavel), `button*Secondary` (secundario, ex.: cancelar), `buttonPressed*` (selecionado/pressionado) e `buttonDisabled*` (inativo)
 - variacoes por acao de linha (tabela de pedidos): `buttonBackground_customOpen`, `buttonBorder_customOpen`, `buttonIcon_customOpen`, `buttonText_customOpen` (Abrir); o mesmo para `customPay` (Pagar) e `customInfo` (i / ver cancelamento)
-- regra: nenhum componente usa fallback com cor literal (hex, rgb/rgba, 'white', 'black', 'transparent'); transparencia vem de `containerTransparentBackground` (variacao `defaultTable_containerTransparentBackground`)

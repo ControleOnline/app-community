@@ -34,12 +34,9 @@ export function moduleListAppearance({accent, colors: c, sidebar = false, active
   else result = {
     backgroundColor: c.containerTransparentBackground, iconColor: c.textMuted, textColor: c.cardText,
   };
-  // Sidebar-only colors (issue 1650): routeMenu* override the generic route colors in the resting menu.
-  const menu = field => enabled && sidebar ? modulePropertyColor(record[field], palette) : undefined;
   return {...result,
-    backgroundColor: menu('routeMenuBackground') ?? result.backgroundColor,
-    iconColor: menu('routeMenuIcon') ?? (enabled ? modulePropertyColor(record.iconColor, palette) ?? result.iconColor : result.iconColor),
-    textColor: menu('routeMenuText') ?? (enabled ? modulePropertyColor(record.textColor, palette) ?? result.textColor : result.textColor),
+    iconColor: enabled ? modulePropertyColor(record.iconColor, palette) ?? result.iconColor : result.iconColor,
+    textColor: enabled ? modulePropertyColor(record.textColor, palette) ?? result.textColor : result.textColor,
   };
 }
 

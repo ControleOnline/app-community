@@ -395,6 +395,7 @@
   "defaultFilter_chipIcon": "#117463",
   "defaultFilter_chipSelectedBackground": "#DDF3EE",
   "defaultFilter_chipText": "#0F172A",
+  "defaultFilter_iconColor": "#117463",
   "defaultFilter_iconWarning": "#925418",
   "defaultFilter_inputBackground": "#FFFFFF",
   "defaultFilter_inputBorder": "#D7E1EC",
@@ -414,9 +415,5 @@
   "defaultFilter_textPrimary": "#0F172A",
   "defaultFilter_textSecondary": "#526477",
   "defaultFilter_toolbarBackground": "#FFFFFF",
-  "defaultFilter_toolbarBorder": "#D7E1EC",
-  "defaultTable_containerTransparentBackground": "#00000000",
-  "defaultFilter_chipSelectedText": "#0F172A",
-  "defaultFilter_listItemBackground": "#F1F5F9",
-  "defaultFilter_listItemBorder": "#D7E1EC"
+  "defaultFilter_toolbarBorder": "#D7E1EC"
 }

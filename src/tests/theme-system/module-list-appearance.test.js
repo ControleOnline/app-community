@@ -85,12 +85,3 @@ test('grid preview applies transparent icon background and all route foregrounds
   expect(moduleListAppearance({...input,highlighted:false})).toEqual({backgroundColor:'#0284c7',iconColor:'#ffff00',textColor:'#ffffff'});
   expect(moduleListAppearance({...input,sidebar:false,...state})).toEqual({backgroundColor:'#0284c7',iconColor:'#ffff00',textColor:'#ffffff'});
  });
-
-test('routeMenu* colors style only the resting sidebar item, never the home list (issue 1650)', () => {
-  const record = {routeMenuBackground:'#101010', routeMenuIcon:'#202020', routeMenuText:'#303030'};
-  expect(moduleListAppearance({colors, sidebar:true, enabled:true, record})).toEqual({backgroundColor:'#101010', iconColor:'#202020', textColor:'#303030'});
-  expect(moduleListAppearance({colors, sidebar:true, enabled:true, highlighted:true, record}))
-    .not.toMatchObject({backgroundColor:'#101010'});
-  expect(moduleListAppearance({colors, enabled:true, record})).toEqual(moduleListAppearance({colors}));
-  expect(moduleListAppearance({colors, sidebar:true, enabled:false, record})).toEqual(moduleListAppearance({colors, sidebar:true}));
-});

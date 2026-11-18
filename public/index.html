@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>%WEB_TITLE%</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+    <script>
+      /*
+       * Stale index.html guard (app-community#1575). Each deploy removes the previous bundles; a browser
+       * still holding the old index.html then requests a bundle that no longer exists, the SPA rewrite
+       * answers with this HTML ("Unexpected token '<'") and the screen stays white. Reload once with a
+       * cache-busting query so a fresh index.html (and its current bundles) is fetched.
+       */
+      (function () {
+        var KEY = 'co-stale-bundle-reload';
+        var PARAM = '_r';
+        window.addEventListener(
+          'error',
+          function (event) {
+            var target = event && event.target;
+            var src = (target && target.src) || (event && event.filename) || '';
+            if (String(src).indexOf('/_expo/static/') === -1) return;
+            try {
+              if (sessionStorage.getItem(KEY)) return; // already tried: do not loop
+              sessionStorage.setItem(KEY, '1');
+            } catch (e) {}
+            var url = new URL(window.location.href);
+            url.searchParams.set(PARAM, String(Date.now()));
+            window.location.replace(url.toString());
+          },
+          true
+        );
+        window.addEventListener('load', function () {
+          try {
+            var url = new URL(window.location.href);
+            if (url.searchParams.has(PARAM)) {
+              url.searchParams.delete(PARAM);
+              window.history.replaceState(window.history.state, '', url.toString());
+            }
+          } catch (e) {}
+          setTimeout(function () {
+            try {
+              sessionStorage.removeItem(KEY);
+            } catch (e) {}
+          }, 15000);
+
+          // A cached index.html whose old bundle still exists on the server keeps running the previous
+          // version after a deploy. Compare the loaded bundle with the one the current index.html points
+          // to (fetched without cache) and reload once when they differ.
+          setTimeout(function () {
+            try {
+              var loaded = '';
+              var scripts = document.getElementsByTagName('script');
+              for (var i = 0; i < scripts.length; i++) {
+                var m = String(scripts[i].src || '').match(/\/_expo\/static\/js\/web\/index-[a-f0-9]+\.js/);
+                if (m) loaded = m[0];
+              }
+              if (!loaded || !window.fetch) return;
+              fetch('/index.html?' + PARAM + '=' + Date.now(), {cache: 'no-store'})
+                .then(function (response) {
+                  return response.ok ? response.text() : '';
+                })
+                .then(function (html) {
+                  var current = (String(html).match(/\/_expo\/static\/js\/web\/index-[a-f0-9]+\.js/) || [])[0];
+                  if (!current || current === loaded) return;
+                  if (sessionStorage.getItem(KEY)) return; // already reloaded once in this session window
+                  sessionStorage.setItem(KEY, '1');
+                  var url = new URL(window.location.href);
+                  url.searchParams.set(PARAM, String(Date.now()));
+                  window.location.replace(url.toString());
+                })
+                .catch(function () {});
+            } catch (e) {}
+          }, 3000);
+        });
+      })();
+    </script>
+  </head>
+
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  </body>
+</html>

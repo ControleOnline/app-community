@@ -542,7 +542,6 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `defaultTable_textSecondary` <!-- base: textSecondary; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - textSecondary -->
 - `defaultTable_toolbarBackground` <!-- base: toolbarBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - toolbarBackground -->
 - `defaultTable_toolbarBorder` <!-- base: toolbarBorder; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - toolbarBorder -->
-- `defaultTable_containerTransparentBackground` <!-- base: containerTransparentBackground; variant: defaultTable; label: Tabela padrão; usage: Tabela padrão - containerTransparentBackground -->
 
 ### filtro padrao (defaultFilter)
 
@@ -567,6 +566,7 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `defaultFilter_chipIcon` <!-- base: chipIcon; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipIcon -->
 - `defaultFilter_chipSelectedBackground` <!-- base: chipSelectedBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipSelectedBackground -->
 - `defaultFilter_chipText` <!-- base: chipText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipText -->
+- `defaultFilter_iconColor` <!-- base: iconColor; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - iconColor -->
 - `defaultFilter_iconWarning` <!-- base: iconWarning; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - iconWarning -->
 - `defaultFilter_inputBackground` <!-- base: inputBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputBackground -->
 - `defaultFilter_inputBorder` <!-- base: inputBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - inputBorder -->
@@ -587,9 +587,6 @@ As chaves legadas acima são lidas no mesmo modo até que haja uma cor canônica
 - `defaultFilter_textSecondary` <!-- base: textSecondary; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - textSecondary -->
 - `defaultFilter_toolbarBackground` <!-- base: toolbarBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - toolbarBackground -->
 - `defaultFilter_toolbarBorder` <!-- base: toolbarBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - toolbarBorder -->
-- `defaultFilter_chipSelectedText` <!-- base: chipSelectedText; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - chipSelectedText -->
-- `defaultFilter_listItemBackground` <!-- base: listItemBackground; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - listItemBackground -->
-- `defaultFilter_listItemBorder` <!-- base: listItemBorder; variant: defaultFilter; label: Filtro padrão; usage: Filtro padrão - listItemBorder -->
 
 ### acoes da tabela de pedidos (custom)
 
