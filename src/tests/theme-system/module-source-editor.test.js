@@ -40,7 +40,10 @@ test('super administrators edit category and route sources and save per record',
   expect(tree.root.findAllByProps({accessibilityLabel: 'Rota — routes.routeCardText'})).toHaveLength(0);
   await act(async () => input.props.onChangeText('#abcdef'));
   expect(saveModuleAppearance).not.toHaveBeenCalled();
-  await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Financeiro'}).props.onPress());
+  await act(async () => tree.root.findAllByProps({accessibilityLabel: 'Cancelar'})[0].props.onPress());
+  expect(tree.root.findByProps({accessibilityLabel: 'Categoria — category.categoryCardBackground'}).props.value).toBe('#2c5484');
+  await act(async () => input.props.onChangeText('#abcdef'));
+  await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cores da categoria'}).props.onPress());
   expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'category', original: groups[0],
     draft: expect.objectContaining({categoryCardBackground: '#abcdef'})}));
   await act(async () => tree.unmount());
@@ -58,7 +61,7 @@ test('selecting a sidebar button offers its three menu colors even when none is 
   expect(tree.root.findAllByProps({testID: 'color-swatch'})).toHaveLength(3);
   expect(tree.root.findAllByType('Text').map(node => node.children.join(''))).toEqual(expect.arrayContaining(['MenuBackground', 'MenuIcon', 'MenuText']));
   await act(async () => tree.root.findByProps({accessibilityLabel: 'Rota — routes.routeMenuIcon'}).props.onChangeText('#abcdef'));
-  await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cadastro: Centro financeiro'}).props.onPress());
+  await act(async () => tree.root.findByProps({accessibilityLabel: 'Salvar cores da rota'}).props.onPress());
   expect(saveModuleAppearance).toHaveBeenCalledWith(expect.objectContaining({kind: 'route',
     draft: expect.objectContaining({routeMenuIcon: '#abcdef'})}));
   await act(async () => tree.unmount());

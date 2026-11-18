@@ -114,8 +114,8 @@ export default function ModuleSourceEditor({sources, palette, colors: c, record}
         </View>
         <Text style={{fontSize: 11, color: c.textSecondary}}>{t('Campo vazio: usa o valor herdado ou a cor do tema.')}</Text>
         <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8}}>
-          {button(`${t('Salvar cadastro')}: ${nameOf(item)}`, () => save(kind, item), !editable || !dirty)}
-          {button(`${t('Descartar prévia')}: ${nameOf(item)}`, () => setDrafts(previous => {
+          {button(kind === 'category' ? t('Salvar cores da categoria') : t('Salvar cores da rota'), () => save(kind, item), !editable || !dirty)}
+          {button(t('Cancelar'), () => setDrafts(previous => {
             const next = {...previous};delete next[keyOf(kind, item)];return next;
           }), saving || !drafts[keyOf(kind, item)])}
         </View>
