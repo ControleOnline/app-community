@@ -164,3 +164,19 @@ it.each([false,true])('applies registered route foregrounds and category text, k
  expect(first().findAllByType('Icon')[0].props.dataSet).toBeUndefined();
  await act(async()=>tree.unmount());
 });
+
+it.each([false,true])('applies per-menu routeCard colors from the menu (grid %s) (issue 1650)',async grid=>{
+ mockModuleIcons=grid;mockModuleAccent=true;
+ mockRouteAppearance={routeCardBackground:'#111111',routeCardIcon:'#222222',routeCardIconBackground:'#333333',routeCardText:'#444444',routeCardBorder:'#555555'};
+ let tree;await act(async()=>{tree=renderer.create(view());});
+ const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
+ const flat=style=>Array.isArray(style)?Object.assign({},...style.flat().filter(Boolean)):style;
+ const rawStyle=first().props.style;const pressable=flat(typeof rawStyle==='function'?rawStyle({hovered:false,pressed:false}):rawStyle);
+ expect(pressable.backgroundColor).toBe('#111111');
+ expect(pressable.borderColor).toBe('#555555');
+ expect(first().findAllByType('Icon')[0].props.color).toBe('#222222');
+ expect(flat(first().findByType('Text').props.style).color).toBe('#444444');
+ if(grid)expect(flat(first().findByType('Icon').parent.props.style).backgroundColor).toBe('#333333');
+ mockModuleAccent=false;await act(async()=>tree.update(view()));
+ expect(flat(first().findByType('Text').props.style).color).not.toBe('#444444');
+});
