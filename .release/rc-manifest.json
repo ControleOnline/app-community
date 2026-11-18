@@ -1,7 +1,7 @@
 {
   "version": "1.10.213",
-  "rc": 2,
-  "branch": "rc/1.10.213-rc.2",
+  "rc": 3,
+  "branch": "rc/1.10.213-rc.3",
   "baseMaster": "0fb1a697659c9c87904311a1a73db3861734c718",
   "tasks": [
     1335,
