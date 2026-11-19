@@ -1,7 +1,7 @@
 {
-  "version": "1.10.225",
-  "rc": 2,
-  "branch": "rc/1.10.225-rc.2",
+  "version": "1.10.226",
+  "rc": 1,
+  "branch": "rc/1.10.226-rc.1",
   "baseMaster": "7ef849dfc52ad8e9bdb0fed004948425d3305f28",
   "tasks": [
     1711
@@ -10,12 +10,12 @@
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "eb935b4a26e9bad6d067837428f1b3ea5a5dea60",
-    "ControleOnline/ui-config": "13e17079267ced2576c3bf1bb8529c65d0d7ae2c",
-    "ControleOnline/ui-default": "b3f6b66a178eec6fee0dce5ff955f9819fb42905"
+    "ControleOnline/app-community": "8d36110bbb7e9c2546ad28c27bee017241066b40",
+    "ControleOnline/ui-config": "325a67f77a2d72c4e7ccfd50d2cc3259a3df756d",
+    "ControleOnline/ui-default": "e47d9acf48bf0b241ba06f24880e2304e7e44a70"
   },
   "validation": {
-    "scope": "Task 1711: controles do menu-access-config-page (ui-config 1.0.48), DefaultFeatherIconPicker (ui-default 1.0.300) e ColorBox com 32px de altura. Botoes flutuantes do configurador (24px) nao alterados. rc.2: versao dos overlays (patches/*.json) atualizada para ui-default 1.0.300; os arquivos-alvo sao identicos aos da 1.0.297.",
-    "promotion": "Staging first (npm: ui-config v1.0.48, ui-default v1.0.300 por tag); master exige novas versoes npm com o mesmo conteudo."
+    "scope": "Task 1711 (promocao): controles em 32px. Validado no staging (rc.225-rc.1/rc.2 com ui-config 1.0.48 e ui-default 1.0.300). Master: ui-config 1.0.49 (mesmo conteudo da 1.0.48); ui-default segue na 1.0.300 (a 1.0.301 do master traz tambem a task 780 e exige revisar os overlays de tabela).",
+    "promotion": "Merge to master authorized by owner."
   }
 }
