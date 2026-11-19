@@ -1,6 +1,6 @@
 import {groupInspectionColors, inspectionLabelPosition, inspectionLabelWidth} from '../../components/theme-editor/ThemeInspectionHighlight';
 import {inspectThemeElement} from '../../components/theme-editor/themeInspector';
-import {moduleAccentSource} from '../../components/manager-preview/moduleAccent';
+import {moduleAccentSource, moduleRecordSource} from '../../components/manager-preview/moduleAccent';
 
 test('equal border sides are grouped while distinct colors retain their identity', () => {
   const entries = ['Top', 'Right', 'Bottom', 'Left'].map(side => ({property: `border${side}Color`, token: 'cardBorder', value: '#123456'}));
@@ -31,6 +31,16 @@ test('a literal module color exposes its database source without inventing a the
   expect(hit.sources).toEqual([{property: 'backgroundColor', source: 'routes.color', record: 'FinancialHubPage',
     reference: '#0284c7', value: '#0284c7'}]);
   expect(moduleAccentSource(undefined, 'routes.color', 'FinancialHubPage', '#0284c7')).toBeUndefined();
+});
+
+test('an element of a module record is inspectable even when none of its colors is set', () => {
+  const marker = moduleRecordSource('route', 'FinancialHubPage', ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']);
+  const node = {getAttribute: attribute => attribute === 'data-co-module-record' ? marker : null};
+  const hit = inspectThemeElement({closest: selector => selector === '[data-co-module-record]' ? node : null});
+  expect(hit.node).toBe(node);
+  expect(hit.sources || []).toEqual([]);
+  expect(hit.moduleRecord).toEqual({kind: 'route', record: 'FinancialHubPage', fields: ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']});
+  expect(moduleRecordSource('route', '', ['routeMenuText'])).toBeUndefined();
 });
 
 test('a target near the top is not covered by a clamped label', () => {

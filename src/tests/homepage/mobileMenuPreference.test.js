@@ -36,8 +36,8 @@ it('retains the rail between screens and resets it when the login changes',()=>{
 
 it('uses the shared domain theme flag and saves explicitly without account storage', async () => {
   function Preferences() {
-    const {sidebar, moduleIcons, moduleAccent} = useManagerPreview();
-    return <preferences sidebar={sidebar} icons={moduleIcons} accent={moduleAccent} />;
+    const {sidebar, moduleIcons} = useManagerPreview();
+    return <preferences sidebar={sidebar} icons={moduleIcons} />;
   }
 
   mockTheme = {showLeftMenu:'false', homeModulesLayout:'buttons'};
@@ -50,21 +50,17 @@ it('uses the shared domain theme flag and saves explicitly without account stora
     const current = () => tree.root.findByType('preferences').props;
     expect(current().sidebar.visible).toBe(false);
     expect(current().icons.value).toBe(true);
-    expect(current().accent.value).toBe(true);
     await act(async () => {
       await current().sidebar.setRememberedVisible(true);
       await current().icons.setValue(false);
-      await current().accent.setValue(false);
     });
-    expect(saveThemeLayoutFlags).toHaveBeenCalledWith({useModuleColors:false});
-    mockTheme = {enableSidebar:0, homeModulesLayout:'buttons', useModuleColors:'false'};
+    expect(saveThemeLayoutFlags).toHaveBeenCalledWith({showModulesAsIcons:false});
+    mockTheme = {enableSidebar:0, homeModulesLayout:'buttons'};
     await act(async () => tree.update(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>));
     expect(current().sidebar.visible).toBe(true);
     expect(current().icons.value).toBe(false);
-    expect(current().accent.value).toBe(false);
     mockUser='another-user';
     await act(async () => tree.update(<ManagerPreviewProvider><Preferences /></ManagerPreviewProvider>));
-    expect(current().accent.value).toBe(false);
     expect(values.size).toBe(0);
   } finally {
     if (tree) await act(async () => tree.unmount());

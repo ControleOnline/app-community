@@ -86,9 +86,6 @@ export async function saveThemeLayoutFlags(flags = {}) {
   if (Object.hasOwn(flags, 'showModulesAsIcons')) {
     changes.homeModulesLayout = flags.showModulesAsIcons ? 'buttons' : 'list';
   }
-  if (Object.hasOwn(flags, 'useModuleColors')) {
-    changes.useModuleColors = flags.useModuleColors ? 'true' : 'false';
-  }
   if (!Object.keys(changes).length) return theme;
   return saveThemeChanges(theme, changes, context);
 }

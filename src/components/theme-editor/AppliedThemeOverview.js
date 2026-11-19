@@ -9,16 +9,14 @@ import { loadDomainBinding, loadDomainTheme, editorContext } from './themeServic
 import ThemeEditorDialog from './ThemeEditorDialog';
 import CompanyBrandingEditor from './CompanyBrandingEditor';
 import ThemeCatalog from './ThemeCatalog';
-import ModuleAccentSettings from './ModuleAccentSettings';
 import { useManagerPreview } from '../manager-preview/ManagerPreviewProvider';
 import { useThemeTools } from './ThemeToolsProvider';
 
 // The active domain and the selected company are different identities. Never rebind either here.
 export default function AppliedThemeOverview({ companyThemes = [], onResolved, onViewChange, showDomain = true }) {const c = useThemeEditorPalette();
   const runtime = useThemeRuntime(),tools = useThemeTools();
-  const {sidebar, moduleIcons, moduleAccent, menus} = useManagerPreview() || {};
+  const {sidebar, moduleIcons} = useManagerPreview() || {};
   const [bindingState, setBindingState] = useState(null);
-  const [showModuleColors, setShowModuleColors] = useState(false);
   const [theme, setTheme] = useState(null),[error, setError] = useState(''),[open, setOpen] = useState(false),[expanded, setExpanded] = useState(false),[search, setSearch] = useState(''),[reload, setReload] = useState(0);
   const context = editorContext(),domain = resolveAppDomain(env.DOMAIN);
   const binding = bindingState?.context === context ? bindingState.value : null;
@@ -124,15 +122,6 @@ export default function AppliedThemeOverview({ companyThemes = [], onResolved, o
        thumbColor={moduleIcons.value ? c.switchOnThumb : c.switchOffThumb} />
     </View>}
     {!!moduleIcons?.error && <Text accessibilityRole="alert" style={{color: c.textDanger}}>{t(moduleIcons.error)}</Text>}
-   </View>}
-   {moduleAccent?.key && <View style={card}>
-    <Pressable accessibilityRole="button" accessibilityState={{expanded: showModuleColors}}
-      onPress={() => setShowModuleColors(value => !value)} style={[actions, {minHeight: 44, justifyContent: 'space-between'}]}>
-     <Text style={title}>{t("Cores dos módulos")}</Text>
-     <Text style={text}>{showModuleColors ? t("Recolher") : t("Ver cores")}</Text>
-    </Pressable>
-    {showModuleColors && <ModuleAccentSettings key={moduleAccent.key} preference={moduleAccent}
-      menus={menus} palette={values} colors={c} />}
    </View>}
    <View style={card}>
     <Text accessibilityRole="header" style={title}>{t("Cores e componentes")}</Text>

@@ -3,7 +3,7 @@ import renderer,{act} from 'react-test-renderer';
 import ManagerOverview from '../../components/manager-preview/ManagerOverview';
 import {resolveManagerTheme} from '../../styles/managerTheme';
 import {initializeGlobalChromeColors} from '../../styles/globalChromeTheme';
-let mockWidth=393,mockTexts=true,mockModuleIcons=false,mockModuleAccent=false;
+let mockWidth=393,mockTexts=true,mockModuleIcons=false;
 let mockIndicatorColors={},mockIndicatorPalette={},mockRouteAppearance={},mockCategoryAppearance={};
 const mockFetch=jest.fn(async()=>({totalItems:0,summary:{sales:{totals:{revenue:0,orders:0,averageTicket:0},daily:[]}}}));
 jest.mock('react-native',()=>({processColor:require('../theme-system/nativeMock.cjs').processColor,Platform:{OS:'web'},View:'View',Text:'Text',ScrollView:'ScrollView',Pressable:'Pressable',StyleSheet:{create:x=>x},useWindowDimensions:()=>({width:mockWidth})}));
@@ -16,7 +16,6 @@ jest.mock('../../components/manager-preview/ManagerOrdersTrend',()=> 'Trend');
 jest.mock('../../components/manager-preview/ManagerPreviewProvider',()=>({useManagerPreview:()=>({
   colors:{cardText:'#123456',listItemText:'#654321',textMuted:'#345678',listItemIcon:'#876543',listItemBackground:'#F1F1F1',...mockIndicatorColors},
   moduleIcons:{value:mockModuleIcons},
-  moduleAccent:{value:mockModuleAccent},
   moduleAccentPalette:{primary:'#147568',...mockIndicatorPalette},
 })}));
 jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompany:{id:3}}:name==='theme'?{menus:[
@@ -25,7 +24,7 @@ jest.mock('@store',()=>({useStore:name=>({getters:name==='people'?{currentCompan
 ]}:{messages:{}}})}));
 const navigation={getState:()=>({routeNames:['OrderHistoryPage','ClientsIndex']}),navigate:jest.fn()};
 const view=()=> <ManagerOverview navigation={navigation}/>;
-beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockModuleIcons=false;mockModuleAccent=false;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
+beforeEach(()=>{global.IS_REACT_ACT_ENVIRONMENT=true;mockWidth=393;mockTexts=true;mockModuleIcons=false;mockFetch.mockClear();global.t={t:(_s,type,key)=>mockTexts?`${type}:${key}`:undefined,scheduleQueuedTranslateResolution:jest.fn(async()=>{})};});
 afterEach(()=>{delete global.t;mockIndicatorColors={};mockIndicatorPalette={};mockRouteAppearance={};mockCategoryAppearance={};});
 it('renders independent Home indicator appearances while preserving original glyphs and stable identities',async()=>{
  const raw=initializeGlobalChromeColors({'indicatorCardBackground-light':'#ffffff','indicatorCardBackground-dark':'#112233',
@@ -103,7 +102,7 @@ it('switches Explore Modules to icons and back with the same groups and route pa
   expect(modules().findAllByType('View').filter(node=>node.props.testID==='manager-module-icon-grid')).toHaveLength(2);
   expect(shortcuts().map(node => node.props.accessibilityLabel)).toEqual(labels);
   expect(shortcuts()[0].findAllByType('Icon')).toHaveLength(1);
-  expect(shortcuts()[0].findByType('Text').props.style[1].color).toBe('#654321');
+  expect(shortcuts()[0].findByType('Text').props.style[1].color).toBeUndefined();
   await act(async () => shortcuts()[0].props.onPress());
   expect(navigation.navigate).toHaveBeenLastCalledWith('OrderHistoryPage',{orderTypeFilter:'sale'});
 
@@ -114,9 +113,9 @@ it('switches Explore Modules to icons and back with the same groups and route pa
   await act(async () => tree.unmount());
 });
 
-it.each([[false, '#345678'], [true, '#876543']])(
-  'uses route backgrounds and independent theme icons, restoring the theme when disabled (grid: %s)',
-  async (grid, themeColor) => {
+it.each([false, true])(
+  'uses only the registered route colors, with no theme fallback (grid: %s)',
+  async grid => {
     mockModuleIcons = grid;
     let tree;
     await act(async () => {tree = renderer.create(view());});
@@ -124,28 +123,19 @@ it.each([[false, '#345678'], [true, '#876543']])(
     const iconColors = () => shortcuts().map(item => item.findAllByType('Icon')[0].props.color);
     const backgrounds = () => shortcuts().map(item => {
       const style = grid ? item.props.style({}) : item.props.style;
-      return Array.isArray(style) ? Object.assign({}, ...style).backgroundColor : style?.backgroundColor;
+      return Array.isArray(style) ? Object.assign({}, ...style.flat().filter(Boolean)).backgroundColor : style?.backgroundColor;
     });
-    const themeBackground = grid ? '#F1F1F1' : undefined;
     try {
-      expect(iconColors()).toEqual([themeColor, themeColor]);
-      expect(backgrounds()).toEqual([themeBackground, themeBackground]);
-      mockModuleAccent = true;
-      await act(async () => tree.update(view()));
-      expect(iconColors()).toEqual([themeColor, themeColor]);
-      expect(backgrounds()).toEqual(['#0284c7', themeBackground]);
-      mockModuleAccent = false;
-      await act(async () => tree.update(view()));
-      expect(iconColors()).toEqual([themeColor, themeColor]);
-      expect(backgrounds()).toEqual([themeBackground, themeBackground]);
+      expect(iconColors()).toEqual([null, null]);
+      expect(backgrounds()).toEqual(['#0284c7', undefined]);
     } finally {
       await act(async () => tree.unmount());
     }
   },
 );
 
-it.each([false,true])('applies registered route foregrounds and category text, keeping the theme when disabled (grid %s)',async grid=>{
- mockModuleIcons=grid;mockModuleAccent=true;
+it.each([false,true])('applies registered route foregrounds and category text (grid %s)',async grid=>{
+ mockModuleIcons=grid;
  mockRouteAppearance={textColor:'#ffffff',iconColor:'$primary',iconBackgroundColor:'transparent'};
  mockCategoryAppearance={categoryCardText:'#ffff00',categoryCardBackground:'#123abc',textColor:'#ff00ff'};
  let tree;await act(async()=>{tree=renderer.create(view());});
@@ -158,15 +148,11 @@ it.each([false,true])('applies registered route foregrounds and category text, k
  const card=tree.root.findByProps({testID:'manager-explore-modules'}).findAll(n=>n.props.dataSet?.coThemeSource?.includes('category.categoryCardBackground'))[0];
  expect(JSON.parse(card.props.dataSet.coThemeSource)[0]).toMatchObject({source:'category.categoryCardBackground',value:'#123abc'});
  if(grid)expect(first().findByType('Icon').parent.props.style.at(-1).backgroundColor).toBe('transparent');
- mockModuleAccent=false;await act(async()=>tree.update(view()));
- expect(first().findAllByType('Icon')[0].props.color).toBe(grid?'#876543':'#345678');
- expect(itemTextColor()).toBe(grid?'#654321':'#123456');
- expect(first().findAllByType('Icon')[0].props.dataSet).toBeUndefined();
  await act(async()=>tree.unmount());
 });
 
 it.each([false,true])('applies per-menu routeCard colors from the menu (grid %s) (issue 1650)',async grid=>{
- mockModuleIcons=grid;mockModuleAccent=true;
+ mockModuleIcons=grid;
  mockRouteAppearance={routeCardBackground:'#111111',routeCardIcon:'#222222',routeCardIconBackground:'#333333',routeCardText:'#444444',routeCardBorder:'#555555'};
  let tree;await act(async()=>{tree=renderer.create(view());});
  const first=()=>tree.root.findByProps({testID:'manager-explore-modules'}).findAllByType('Pressable')[0];
@@ -177,6 +163,4 @@ it.each([false,true])('applies per-menu routeCard colors from the menu (grid %s)
  expect(first().findAllByType('Icon')[0].props.color).toBe('#222222');
  expect(flat(first().findByType('Text').props.style).color).toBe('#444444');
  if(grid)expect(flat(first().findByType('Icon').parent.props.style).backgroundColor).toBe('#333333');
- mockModuleAccent=false;await act(async()=>tree.update(view()));
- expect(flat(first().findByType('Text').props.style).color).not.toBe('#444444');
 });

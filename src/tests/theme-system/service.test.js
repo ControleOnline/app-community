@@ -22,15 +22,11 @@ test('appearance choices, labels and colors save as scalar JSON fields while Res
  expect(Object.keys(body.colors).some(key=>key.includes('Applied'))).toBe(false);
  expect(Object.values(body.colors).every(value=>typeof value==='string')).toBe(true);
 });
-test('saves the shared module color flag in the existing theme JSON without replacing colors',async()=>{
+test('the removed module color flag is never written to the theme JSON',async()=>{
  const existing={...theme,colors:{...theme.colors,useModuleColors:'true','navigationBackground-light':'#112233'}};
- api.fetch.mockResolvedValueOnce({domain:{id:7,themeId:11}})
-   .mockResolvedValueOnce(existing).mockResolvedValueOnce(existing).mockResolvedValueOnce({id:11});
+ api.fetch.mockResolvedValueOnce({domain:{id:7,themeId:11}}).mockResolvedValueOnce(existing);
  await saveThemeLayoutFlags({useModuleColors:false});
- const [path,request]=api.fetch.mock.calls[3];
- expect(path).toBe('themes/11');expect(request.method).toBe('PUT');
- expect(request.body.colors).toMatchObject({...existing.colors,useModuleColors:'false'});
- expect(api.fetch.mock.calls.some(([url])=>url.includes('menu-config'))).toBe(false);
+ expect(api.fetch.mock.calls.some(([,request])=>request?.method==='PUT')).toBe(false);
 });
 test('loads the exact domain theme rather than the selected company theme',async()=>{
   api.fetch.mockResolvedValueOnce({domain:{id:7,domain:'localhost:8081',themeId:11,canApply:true}}).mockResolvedValueOnce(theme);
