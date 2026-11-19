@@ -1,21 +1,20 @@
 {
-  "version": "1.10.225",
-  "rc": 2,
-  "branch": "rc/1.10.225-rc.2",
-  "baseMaster": "7ef849dfc52ad8e9bdb0fed004948425d3305f28",
+  "version": "1.10.227",
+  "rc": 1,
+  "branch": "rc/1.10.227-rc.1",
+  "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1711
+    1716
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "eb935b4a26e9bad6d067837428f1b3ea5a5dea60",
-    "ControleOnline/ui-config": "13e17079267ced2576c3bf1bb8529c65d0d7ae2c",
-    "ControleOnline/ui-default": "b3f6b66a178eec6fee0dce5ff955f9819fb42905"
+    "ControleOnline/app-community": "bbeb0e981ebebe815b455ac8b81497d3b621e857",
+    "ControleOnline/ui-config": "68344727af47b94e4750e7eee38447c0e1ee8008"
   },
   "validation": {
-    "scope": "Task 1711: controles do menu-access-config-page (ui-config 1.0.48), DefaultFeatherIconPicker (ui-default 1.0.300) e ColorBox com 32px de altura. Botoes flutuantes do configurador (24px) nao alterados. rc.2: versao dos overlays (patches/*.json) atualizada para ui-default 1.0.300; os arquivos-alvo sao identicos aos da 1.0.297.",
-    "promotion": "Staging first (npm: ui-config v1.0.48, ui-default v1.0.300 por tag); master exige novas versoes npm com o mesmo conteudo."
+    "scope": "Task 1716: rota com routeBlock, routeHeader e routeTitle iguais aos da categoria (ui-config 1.0.50, publicada por tag para o staging).",
+    "promotion": "Staging first; master exige nova versao npm do ui-config (ex.: 1.0.51) com o mesmo conteudo."
   }
 }
