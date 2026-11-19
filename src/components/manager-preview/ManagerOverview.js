@@ -5,7 +5,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from
 import {useStore} from '@store';
 import HomeIcon from '../HomeIcon';
 import {managerMenu} from './model';
-import {resolveModuleAccent, moduleAccentSource, moduleRecordSource, moduleListAppearance, modulePropertyColor, modulePropertySource} from './moduleAccent';
+import {moduleColor, moduleColorSource, moduleRecordSource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import {buildDateRangeWindow, buildOperationalInsightsFilters} from '@controleonline/ui-report/src/react/utils/reportInsights';
 import {resolveHistorySalesTotals} from '@controleonline/ui-orders/src/react/pages/orders/orderHistoryCompactSummary';
@@ -21,7 +21,7 @@ import {getAvatarDisplayName} from '@controleonline/ui-common/src/react/utils/us
 
 export default function ManagerOverview({navigation}) {
   const {width} = useWindowDimensions();
-  const {colors: c, experience, moduleIcons, moduleAccent, moduleAccentPalette} = useManagerPreview();
+  const {colors: c, experience, moduleIcons, moduleAccentPalette} = useManagerPreview();
   const showModuleIcons = moduleIcons?.value === true;
   const people = useStore('people');
   const {currentCompany} = people.getters;
@@ -293,44 +293,37 @@ export default function ManagerOverview({navigation}) {
     <Text style={[s.panelTitle, {color: c.textPrimary, marginBottom: 16}]}>{t?.('configs', 'section_title', 'explore_modules') || t?.('menu', 'menu', 'explore_modules')}</Text>
     <View testID="manager-explore-modules" style={[s.modules, showModuleIcons && s.moduleCards]}>
       {groups.map((group, i) => {
-        // Category card follows the Categories color; each button follows its own route color (issue 1450).
-        const groupAccent = moduleAccent?.value ? resolveModuleAccent(group.categoryCardBackground, moduleAccentPalette) : undefined;
-        const groupTextColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardText, moduleAccentPalette) : undefined;
+        // Module colors come only from the category/route records (new columns, then legacy ones); no theme fallback.
+        const groupBackground = moduleColor(group, ['categoryCardBackground', 'color'], moduleAccentPalette, {accent: true});
+        const groupText = moduleColor(group, ['categoryCardText', 'textColor'], moduleAccentPalette);
         return <View key={group.id || i}
-          dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardBackground', 'categoryCardText']), coThemeSource: moduleAccentSource(groupAccent, 'category.categoryCardBackground', group.id, group.categoryCardBackground)}}
-          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupAccent ?? c.cardBackground, borderColor: c.cardBorder}]}>
-          <Text dataSet={{coThemeSource: moduleAccentSource(groupTextColor, 'category.categoryCardText', group.id, group.categoryCardText, ['color'])}} style={[s.panelTitle, {color: groupTextColor ?? c.cardText}]}>{group.title}</Text>
+          dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardBackground', 'categoryCardText']), coThemeSource: moduleColorSource('category', groupBackground, group.id, 'backgroundColor')}}
+          style={[s.module, showModuleIcons && s.iconModule, {backgroundColor: groupBackground.value, borderColor: c.cardBorder}]}>
+          <Text dataSet={{coThemeSource: moduleColorSource('category', groupText, group.id, 'color')}} style={[s.panelTitle, {color: groupText.value}]}>{group.title}</Text>
           {(() => {
             const renderItem = (item, j, tileSpacing) => {
-              const accent = moduleAccent?.value ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-              const appearance = moduleListAppearance({accent, colors: c, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
-              // Database colors are used as-is: no opacity applied (issue 1453).
-              const accentBackground = accent;
-              // Per-menu card colors (issue 1650): routeCard* columns override the legacy route colors.
-              const cardColor = field => moduleAccent?.value ? modulePropertyColor(item[field], moduleAccentPalette) : undefined;
-              const cardSource = (field, id, property) => moduleAccentSource(cardColor(field), `routes.${field}`, id, item[field], [property]);
-              const cardBackground = cardColor('routeCardBackground') ?? accentBackground;
-              const cardBorder = cardColor('routeCardBorder');
-              const cardIconColor = cardColor('routeCardIcon') ?? appearance.iconColor;
-              const cardText = cardColor('routeCardText');
+              const background = moduleColor(item, ['routeCardBackground', 'color'], moduleAccentPalette, {accent: true});
+              const border = moduleColor(item, ['routeCardBorder'], moduleAccentPalette);
+              const iconColor = moduleColor(item, ['routeCardIcon', 'iconColor'], moduleAccentPalette);
+              const iconBackground = moduleColor(item, ['routeCardIconBackground', 'iconBackgroundColor'], moduleAccentPalette);
+              const text = moduleColor(item, ['routeCardText', 'textColor'], moduleAccentPalette);
+              const source = (color, property) => moduleColorSource('routes', color, item.name, property);
               return <Pressable key={item.id || j} accessibilityRole="button"
-              dataSet={{coModuleRecord: moduleRecordSource('route', item.name, ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground', 'routeCardText', 'routeCardBorder']), coThemeSource: cardColor('routeCardBackground') ? cardSource('routeCardBackground', item.name, 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)}}
+              dataSet={{coModuleRecord: moduleRecordSource('route', item.name, ['routeCardBackground', 'routeCardIcon', 'routeCardIconBackground', 'routeCardText', 'routeCardBorder']), coThemeSource: source(background, 'backgroundColor')}}
               accessibilityLabel={item.title} onPress={() => go(item)}
               style={showModuleIcons ? ({hovered, pressed}) => [s.moduleTile, tileSpacing, {
-                borderColor: cardBorder ?? c.listItemBorder,
-                backgroundColor: hovered || pressed
-                  ? cardBackground ?? c.listItemActiveBackground
-                  : cardBackground ?? c.listItemBackground,
-              }] : [s.moduleItem, cardBackground && {backgroundColor: cardBackground}, cardBorder && {borderColor: cardBorder, borderWidth: 1}]}>
+                borderColor: border.value ?? 'transparent',
+                backgroundColor: hovered || pressed ? background.value ?? c.listItemActiveBackground : background.value,
+              }] : [s.moduleItem, background.value && {backgroundColor: background.value}, border.value && {borderColor: border.value, borderWidth: 1}]}>
               {showModuleIcons ? <>
-                <View style={[s.moduleTileIcon, {backgroundColor: cardColor('routeCardIconBackground') ?? (moduleAccent?.value ? modulePropertyColor(item.iconBackgroundColor, moduleAccentPalette) : undefined) ?? c.iconBackground}]} dataSet={{coThemeSource: cardColor('routeCardIconBackground') ? cardSource('routeCardIconBackground', item.name, 'backgroundColor') : modulePropertySource(item, 'iconBackgroundColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name, property: 'backgroundColor'})}}>
-                  {icon(item.icon, cardColor('routeCardIcon') ?? (moduleAccent?.value ? modulePropertyColor(item.iconColor, moduleAccentPalette) : undefined) ?? c.listItemIcon, 22, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                <View style={[s.moduleTileIcon, {backgroundColor: iconBackground.value}]} dataSet={{coThemeSource: source(iconBackground, 'backgroundColor')}}>
+                  {icon(item.icon, iconColor.value ?? null, 22, source(iconColor, 'color'))}
                 </View>
-                <Text style={[s.moduleTileLabel, {color: cardText ?? (moduleAccent?.value ? modulePropertyColor(item.textColor, moduleAccentPalette) : undefined) ?? c.listItemText}]} dataSet={{coThemeSource: cardText ? cardSource('routeCardText', item.name, 'color') : modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}}>{item.title}</Text>
+                <Text style={[s.moduleTileLabel, {color: text.value}]} dataSet={{coThemeSource: source(text, 'color')}}>{item.title}</Text>
               </> : <>
-                {icon(item.icon, cardIconColor, 16, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
-                <Text dataSet={{coThemeSource: cardText ? cardSource('routeCardText', item.name, 'color') : modulePropertySource(item, 'textColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name})}} style={{color: cardText ?? appearance.textColor, fontSize: 12, flex: 1}}>{item.title}</Text>
-                {icon('chevron-right', cardIconColor, 14, cardColor('routeCardIcon') ? cardSource('routeCardIcon', item.name, 'color') : modulePropertySource(item, 'iconColor', {enabled: !!moduleAccent?.value, palette: moduleAccentPalette, id: item.name}))}
+                {icon(item.icon, iconColor.value ?? null, 16, source(iconColor, 'color'))}
+                <Text dataSet={{coThemeSource: source(text, 'color')}} style={{color: text.value, fontSize: 12, flex: 1}}>{item.title}</Text>
+                {icon('chevron-right', iconColor.value ?? null, 14, source(iconColor, 'color'))}
               </>}
             </Pressable>;
             };

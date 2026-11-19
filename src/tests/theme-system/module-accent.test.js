@@ -1,16 +1,10 @@
 import React from 'react';
 import renderer, {act} from 'react-test-renderer';
-import ModuleAccentSettings from '../../components/theme-editor/ModuleAccentSettings';
 import useManagerPreference from '../../components/manager-preview/useManagerPreference';
-import {moduleAccentBackground, resolveModuleAccent} from '../../components/manager-preview/moduleAccent';
+import {moduleColor, moduleColorSource, resolveModuleAccent} from '../../components/manager-preview/moduleAccent';
 
 jest.mock('../../components/HomeIcon', () => 'Icon');
-jest.mock('../../components/theme-editor/ModuleAppearanceCatalog', () => 'ModuleAppearanceCatalog');
 
-const categories = [
-  {id:122, label:'Comercial', color:'$primary', menus:[{menuType:'home'}]},
-  {id:124, label:'Financeiro', color:'#757575', menus:[{menuType:'home'}]},
-];
 const colors = {primary:'#147568',navigationActiveBorder:'#123456',navigationActiveIcon:'#456789'};
 test('uses the active palette for a reference and leaves literal category colors intact', () => {
   expect(resolveModuleAccent('$primary', colors)).toBe('#147568');
@@ -20,23 +14,6 @@ test('uses the active palette for a reference and leaves literal category colors
   expect(resolveModuleAccent('#0000', colors)).toBeUndefined();
   expect(resolveModuleAccent('rgba(0,0,0,0)', colors)).toBeUndefined();
   expect(resolveModuleAccent('rgb(1..2, 0, 0)', colors)).toBeUndefined();
-});
-
-test('shows the resolved colors and keeps preview separate from the saved preference', async () => {
-  const save = jest.fn();
-  let tree;
-  await act(async () => {
-    tree = renderer.create(<ModuleAccentSettings menus={categories} palette={colors}
-      preference={{ready:true,value:false,setValue:save}} colors={colors} />);
-  });
-  const label = 'Usar as cores das categorias do menu';
-  expect(tree.root.findByType('ModuleAppearanceCatalog').props.enabled).toBe(false);
-  await act(async () => tree.root.findByProps({accessibilityLabel:label}).props.onValueChange(true));
-  expect(save).not.toHaveBeenCalled();
-  expect(tree.root.findByType('ModuleAppearanceCatalog').props.enabled).toBe(true);
-  await act(async () => tree.root.findByProps({accessibilityLabel:'Salvar opção no tema'}).props.onPress());
-  expect(save).toHaveBeenCalledWith(true);
-  await act(async () => tree.unmount());
 });
 
 test('remembers the accent only for the same preference key', async () => {
@@ -60,10 +37,16 @@ test('remembers the accent only for the same preference key', async () => {
   }
 });
 
-test('preserves database colors without adding opacity to normal or highlighted backgrounds', () => {
-  for (const color of ['#147568', 'rgba(20, 117, 104, 0.6)']) {
-    expect(moduleAccentBackground(color)).toBe(color);
-    expect(moduleAccentBackground(color, true)).toBe(color);
-  }
-  expect(moduleAccentBackground(undefined)).toBeUndefined();
+test('module colors come from the new columns, then the legacy ones, and never from the theme', () => {
+  const palette = {primary: '#147568'};
+  const record = {routeCardText: '$primary', textColor: '#111111', color: '#222222'};
+  expect(moduleColor(record, ['routeCardText', 'textColor'], palette)).toEqual({value: '#147568', field: 'routeCardText', reference: '$primary'});
+  expect(moduleColor({textColor: '#111111'}, ['routeCardText', 'textColor'], palette).field).toBe('textColor');
+  expect(moduleColor({routeCardText: 'invalid', textColor: '#111111'}, ['routeCardText', 'textColor'], palette).value).toBe('#111111');
+  expect(moduleColor({}, ['routeCardText', 'textColor'], palette)).toEqual({});
+  expect(moduleColor({color: 'rgba(0,0,0,0)'}, ['color'], palette, {accent: true})).toEqual({});
+  const color = moduleColor({textColor: '#111111'}, ['routeCardText', 'textColor'], palette);
+  expect(moduleColorSource('routes', color, 'Page', 'color')).toContain('"source":"routes.text_color"');
+  expect(moduleColorSource('routes', moduleColor({routeCardText: '#000000'}, ['routeCardText']), 'Page')).toContain('"source":"routes.routeCardText"');
+  expect(moduleColorSource('routes', {}, 'Page')).toBeUndefined();
 });

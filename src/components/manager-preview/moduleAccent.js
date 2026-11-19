@@ -11,38 +11,6 @@ export function resolveModuleAccent(categoryColor, palette = {}) {
   return typeof argb === 'number' && (argb >>> 24) > 0 ? resolved : undefined;
 }
 
-export function moduleAccentBackground(accent) {
-  return accent;
-}
-
-// List modules share foreground roles only while a registered route color applies.
-// Without that accent, each surface retains its own original theme roles.
-export function moduleListAppearance({accent, colors: c, sidebar = false, active = false, highlighted = active, record = {}, enabled = !!accent, palette = c}) {
-  // Registered module colors describe the resting state. The sidebar theme owns interaction contrast.
-  if (sidebar && enabled && highlighted) return {
-    backgroundColor: c.navigationActiveBackground,
-    iconColor: c.navigationActiveIcon,
-    textColor: c.navigationActiveText,
-  };
-  let result;
-  if (accent) result = {backgroundColor: accent, iconColor: c.moduleListIcon ?? c.textMuted, textColor: c.moduleListText ?? c.cardText};
-  else if (sidebar) result = {
-    backgroundColor: highlighted ? c.navigationActiveBackground : c.containerTransparentBackground,
-    iconColor: active ? c.navigationActiveIcon : c.navigationIcon,
-    textColor: active ? c.navigationActiveText : c.navigationText,
-  };
-  else result = {
-    backgroundColor: c.containerTransparentBackground, iconColor: c.textMuted, textColor: c.cardText,
-  };
-  // Sidebar-only colors (issue 1650): routeMenu* override the generic route colors in the resting menu.
-  const menu = field => enabled && sidebar ? modulePropertyColor(record[field], palette) : undefined;
-  return {...result,
-    backgroundColor: menu('routeMenuBackground') ?? result.backgroundColor,
-    iconColor: menu('routeMenuIcon') ?? (enabled ? modulePropertyColor(record.iconColor, palette) ?? result.iconColor : result.iconColor),
-    textColor: menu('routeMenuText') ?? (enabled ? modulePropertyColor(record.textColor, palette) ?? result.textColor : result.textColor),
-  };
-}
-
 // Explicit provenance: runtime menu IDs identify menus, not database route IDs.
 export function moduleAccentSource(value, source, record, reference, properties = ['backgroundColor']) {
   return value ? JSON.stringify(properties.map(property => ({property, source, record, reference, value}))) : undefined;
@@ -62,8 +30,22 @@ export function modulePropertyColor(value, palette = {}) {
   return typeof resolved === 'string' && typeof processColor(resolved) === 'number' ? resolved : undefined;
 }
 
-export function modulePropertySource(record, field, {palette, enabled, table = 'routes', id, property = 'color'}) {
-  const value = enabled ? modulePropertyColor(record?.[field], palette) : undefined;
-  const column = field.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-  return moduleAccentSource(value, `${table}.${column}`, id, record?.[field], [property]);
+const LEGACY_COLUMNS = {color: 'color', textColor: 'text_color', iconColor: 'icon_color', iconBackgroundColor: 'icon_background_color'};
+
+// Module colors come only from the category/route records: the new columns first, then the legacy ones.
+// Nothing is read from the theme here; an element without a registered color gets no color.
+export function moduleColor(record, fields, palette = {}, {accent = false} = {}) {
+  const resolve = accent ? resolveModuleAccent : modulePropertyColor;
+  for (const field of fields) {
+    const reference = record?.[field];
+    const value = resolve(reference, palette);
+    if (value) return {value, field, reference};
+  }
+  return {};
+}
+
+// Provenance for the theme inspector: legacy columns use the database names, new ones their own.
+export function moduleColorSource(table, color, id, property = 'color') {
+  if (!color?.value) return undefined;
+  return moduleAccentSource(color.value, `${table}.${LEGACY_COLUMNS[color.field] || color.field}`, id, color.reference, [property]);
 }

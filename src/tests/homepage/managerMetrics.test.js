@@ -15,7 +15,7 @@ const mockMenus = [{label: 'Operação', menus: [
   {route: 'ClientsIndex', label: 'Clientes', menuType: 'home'},
   {route: 'IncomeStatement', label: 'Resultados', menuType: 'home'},
 ]}];
-jest.mock('react-native', () => ({Platform: {OS: 'web'}, Pressable: 'Pressable', ScrollView: 'ScrollView',
+jest.mock('react-native', () => ({Platform: {OS: 'web'}, processColor: value => (/^#|^rgb/.test(String(value)) ? 1 : undefined), Pressable: 'Pressable', ScrollView: 'ScrollView',
   Text: 'Text', View: 'View', StyleSheet: {create: x => x}, useWindowDimensions: () => ({width: 1600})}));
 jest.mock('@react-navigation/native', () => ({useIsFocused: () => true}));
 jest.mock('@appType', () => ({app_type: 'MANAGER'}));
