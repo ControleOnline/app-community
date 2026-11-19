@@ -1,19 +1,21 @@
 {
-  "version": "1.10.223",
+  "version": "1.10.226",
   "rc": 1,
-  "branch": "rc/1.10.223-rc.1",
-  "baseMaster": "5e15f4b5328b661c460ff716328d5a2bc1853179",
+  "branch": "rc/1.10.226-rc.1",
+  "baseMaster": "7ef849dfc52ad8e9bdb0fed004948425d3305f28",
   "tasks": [
-    1706
+    1711
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "028ca2720acfcbbde4fb6c9075b376d4734758c6"
+    "ControleOnline/app-community": "8d36110bbb7e9c2546ad28c27bee017241066b40",
+    "ControleOnline/ui-config": "325a67f77a2d72c4e7ccfd50d2cc3259a3df756d",
+    "ControleOnline/ui-default": "e47d9acf48bf0b241ba06f24880e2304e7e44a70"
   },
   "validation": {
-    "scope": "Task 1706: remove o bloco 'Cores dos modulos' (theme-manager-page), a flag useModuleColors e o fallback ao tema nas cores de category/routes na home e no menu lateral. Jest theme-system 184/184; homepage igual ao baseline.",
-    "promotion": "Staging first; master apos aprovacao. Atenção: dominios com a flag desligada passam a exibir as cores dos cadastros."
+    "scope": "Task 1711 (promocao): controles em 32px. Validado no staging (rc.225-rc.1/rc.2 com ui-config 1.0.48 e ui-default 1.0.300). Master: ui-config 1.0.49 (mesmo conteudo da 1.0.48); ui-default segue na 1.0.300 (a 1.0.301 do master traz tambem a task 780 e exige revisar os overlays de tabela).",
+    "promotion": "Merge to master authorized by owner."
   }
 }
