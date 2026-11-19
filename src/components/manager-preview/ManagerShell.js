@@ -16,7 +16,7 @@ import ManagerStartup from './ManagerStartup';
 import AppTypeSwitcher from '@controleonline/ui-common/src/react/components/AppTypeSwitcher';
 import {app_type, app_type_base} from '@appType';
 import {managerMenu, selectedManagerMenuItem} from './model';
-import {moduleListAppearance, resolveModuleAccent, moduleAccentSource, moduleRecordSource, modulePropertyColor, modulePropertySource} from './moduleAccent';
+import {moduleColor, moduleColorSource, moduleRecordSource} from './moduleAccent';
 import {useManagerPreview} from './ManagerPreviewProvider';
 import ManagerGuide from './ManagerGuide';
 import ManagerAccountMenu from './ManagerAccountMenu';
@@ -34,7 +34,7 @@ import {resolveManagementPageTitle} from './managementPageTitle';
 export default function ManagerShell({navigation, route, options, children}) {
   const {width} = useWindowDimensions();
   const focused = useIsFocused();
-  const {colors: c, themeIssues = [], themeStatus, themeError, mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar, mobileMenu, sidebar: sidebarPreference, moduleAccent, moduleAccentPalette} = useManagerPreview();
+  const {colors: c, themeIssues = [], themeStatus, themeError, mode, toggleMode, experience, setGuideOpen, avatarEnabled, bottomBar, mobileMenu, sidebar: sidebarPreference, moduleAccentPalette} = useManagerPreview();
   const themeTools=useThemeTools();
   const sidebarVisible = sidebarPreference?.visible !== false;
   useJourneyReadiness({experience, route: route.name, focused});
@@ -121,32 +121,35 @@ export default function ManagerShell({navigation, route, options, children}) {
   const icon = (value, size = 18, color = c.navigationIcon, source) => <HomeIcon dataSet={source ? {coThemeSource: source} : undefined} name={value || 'grid'} size={size} color={color} />;
   const navItem = (item, key, iconsOnly = compact) => {
     const active = item === selected || item.name === 'HomePage' && route.name === 'HomePage';
-    const accent = moduleAccent?.value
-      ? resolveModuleAccent(item.color, moduleAccentPalette) : undefined;
-    const menuColor = field => moduleAccent?.value && !active ? modulePropertyColor(item[field], moduleAccentPalette) : undefined;
-    const menuSource = (field, property) => moduleAccentSource(menuColor(field), `routes.${field}`, item.name, item[field], [property]);
-    const appearanceFor = highlighted => moduleListAppearance({accent, colors: c, sidebar: true, active, highlighted, record: item, enabled: !!moduleAccent?.value, palette: moduleAccentPalette});
+    // "Início" is not a module record, so it keeps the sidebar theme colors.
+    const themed = item.name === 'HomePage' && item.id == null;
+    const background = themed ? {} : moduleColor(item, ['routeMenuBackground', 'color'], moduleAccentPalette, {accent: true});
+    const iconColor = themed ? {} : moduleColor(item, ['routeMenuIcon', 'iconColor'], moduleAccentPalette);
+    const text = themed ? {} : moduleColor(item, ['routeMenuText', 'textColor'], moduleAccentPalette);
+    const source = (color, property) => moduleColorSource('routes', color, item.name, property);
+    // Module colors come only from the route record; interaction states (active/hover) belong to the sidebar theme.
+    const backgroundFor = highlighted => highlighted ? c.navigationActiveBackground : themed ? c.containerTransparentBackground : background.value ?? 'transparent';
+    const iconFor = highlighted => highlighted ? c.navigationActiveIcon : themed ? c.navigationIcon : iconColor.value ?? null;
+    const textFor = highlighted => highlighted ? c.navigationActiveText : themed ? c.navigationText : text.value;
     return <Pressable key={key} accessibilityRole="button" accessibilityLabel={item.title}
-      dataSet={{coModuleRecord: moduleRecordSource('route', item.name, ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']),
-        coThemeSource: !active ? (menuColor('routeMenuBackground') ? menuSource('routeMenuBackground', 'backgroundColor') : moduleAccentSource(accent, 'routes.color', item.name, item.color)) : undefined,
-        coThemeSourceStates: accent && !active ? JSON.stringify({hover: []}) : undefined}}
+      dataSet={{coModuleRecord: themed ? undefined : moduleRecordSource('route', item.name, ['routeMenuBackground', 'routeMenuIcon', 'routeMenuText']),
+        coThemeSource: !active ? source(background, 'backgroundColor') : undefined,
+        coThemeSourceStates: background.value && !active ? JSON.stringify({hover: []}) : undefined}}
       accessibilityState={{selected: active}} title={iconsOnly ? item.title : undefined}
       onHoverIn={() => experience?.anticipate(item.name)} onHoverOut={() => experience?.cancelAnticipation()}
       onFocus={() => experience?.anticipate(item.name)} onBlur={() => experience?.cancelAnticipation()}
       onPress={() => go(item)} style={({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
         return [s.navItem, {
-          backgroundColor: appearanceFor(highlighted).backgroundColor,
+          backgroundColor: backgroundFor(highlighted),
           borderLeftColor: active ? c.navigationActiveBorder : c.containerTransparentBackground,
         }, iconsOnly && s.center];
       }}>
       {({hovered, pressed}) => {
         const highlighted = active || hovered || pressed;
-        const appearance = appearanceFor(highlighted);
-        const registered = !!moduleAccent?.value && !highlighted;
         return <>
-          {icon(item.icon, 18, appearance.iconColor, menuColor('routeMenuIcon') && !highlighted ? menuSource('routeMenuIcon', 'color') : modulePropertySource(item, 'iconColor', {enabled: registered, palette: moduleAccentPalette, id: item.name}))}
-          {!iconsOnly && <Text dataSet={{coThemeSource: menuColor('routeMenuText') && !highlighted ? menuSource('routeMenuText', 'color') : modulePropertySource(item, 'textColor', {enabled: registered, palette: moduleAccentPalette, id: item.name})}} numberOfLines={2} style={[s.navText, {color: appearance.textColor}]}>{item.title}</Text>}
+          {icon(item.icon, 18, iconFor(highlighted), !highlighted ? source(iconColor, 'color') : undefined)}
+          {!iconsOnly && <Text dataSet={{coThemeSource: !highlighted ? source(text, 'color') : undefined}} numberOfLines={2} style={[s.navText, {color: textFor(highlighted)}]}>{item.title}</Text>}
         </>;
       }}
     </Pressable>;
@@ -170,10 +173,10 @@ export default function ManagerShell({navigation, route, options, children}) {
       {!compact && <Text style={[s.caption, {color: c.navigationCaptionText}]}>INÍCIO</Text>}
       {navItem({name: 'HomePage', title: 'Início', icon: 'grid'}, 'home')}
       {groups.map((group, i) => {
-        // categoryCardMenu colors the category name shown in the left menu (issue 1644).
-        const captionColor = moduleAccent?.value ? modulePropertyColor(group.categoryCardMenu, moduleAccentPalette) : undefined;
+        // categoryCardMenu (then the legacy text color) colors the category name shown in the left menu (issue 1644).
+        const caption = moduleColor(group, ['categoryCardMenu', 'textColor'], moduleAccentPalette);
         return <View key={group.id || i} style={s.group}>
-        {!compact && <Text style={[s.caption, {color: captionColor ?? c.navigationCaptionText}]} dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardMenu']), coThemeSource: moduleAccentSource(captionColor, 'category.categoryCardMenu', group.id, group.categoryCardMenu, ['color'])}}>{group.title}</Text>}
+        {!compact && <Text style={[s.caption, {color: caption.value}]} dataSet={{coModuleRecord: moduleRecordSource('category', group.id, ['categoryCardMenu']), coThemeSource: moduleColorSource('category', caption, group.id, 'color')}}>{group.title}</Text>}
         {group.items.map((item, j) => navItem(item, item.id || `${item.name}-${j}`))}
       </View>;
       })}

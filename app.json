@@ -9,7 +9,7 @@
       "web"
     ],
     "jsEngine": "hermes",
-    "version": "1.10.222",
+    "version": "1.10.223",
     "android": {
       "jsEngine": "hermes",
       "package": "com.controleonline.app",
