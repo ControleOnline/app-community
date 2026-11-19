@@ -1,20 +1,20 @@
 {
-  "version": "1.10.227",
+  "version": "1.10.228",
   "rc": 1,
-  "branch": "rc/1.10.227-rc.1",
+  "branch": "rc/1.10.228-rc.1",
   "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1716
+    1718
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "bbeb0e981ebebe815b455ac8b81497d3b621e857",
-    "ControleOnline/ui-config": "68344727af47b94e4750e7eee38447c0e1ee8008"
+    "ControleOnline/app-community": "9255a58c252a142af38739013eca077283d463c8",
+    "ControleOnline/ui-config": "b5e55173e4fc5eb937b45540494bc4872e64e72d"
   },
   "validation": {
-    "scope": "Task 1716: rota com routeBlock, routeHeader e routeTitle iguais aos da categoria (ui-config 1.0.50, publicada por tag para o staging).",
-    "promotion": "Staging first; master exige nova versao npm do ui-config (ex.: 1.0.51) com o mesmo conteudo."
+    "scope": "Task 1718: cores fixas do miolo do menu-access-config-page centralizadas em arquivo de tokens (ui-config 1.0.51, publicada por tag para o staging). Sem mudanca visual.",
+    "promotion": "Staging first; master exige nova versao npm do ui-config com o mesmo conteudo."
   }
 }
