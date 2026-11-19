@@ -335,3 +335,23 @@ Referências locais relacionadas: pacote comum `504a5437465c7eacb809ce2781278186
 (código, migração e testes); API `8afdb515fb470ab7a240edaaded8ecfe14217749`
 (documentação de ativação, sem mudança de dependências). Não foram publicados
 esses commits nem realizadas novas integrações em dev/staging nesta etapa.
+
+### Etapa 5 — fim da chave `useModuleColors` e do bloco “Cores dos módulos” (#1706)
+
+O bloco “Cores dos módulos” (interruptor “Usar as cores das categorias do menu” e
+catálogo com prévias) foi removido da tela de temas. A edição das cores passa a ser
+feita no editor de menus por perfil e na inspeção do configurador de temas
+(`ModuleSourceEditor`).
+
+A chave `useModuleColors` deixa de existir: as cores cadastradas em `category` e
+`routes` valem sempre. A chave já gravada em `theme.colors` é ignorada, sem migração.
+
+Home (cards e lista) e menu lateral leem as cores só dos cadastros, na ordem:
+colunas novas (`categoryCard*`, `routeCard*`, `routeMenu*`) e, vazias, as colunas
+antigas (`color`, `textColor`, `iconColor`, `iconBackgroundColor`). Não há mais
+fallback para variáveis do tema nesses elementos: sem cor cadastrada, o elemento
+fica sem cor própria (fundo transparente; texto e ícone com a cor padrão). Seguem no
+tema os estados de interação do menu lateral (`navigationActive*`), a estrutura
+(`navigationBackground`, bordas) e o item “Início”, que não é um cadastro de rota.
+`moduleListAppearance`, `moduleListIcon` e `moduleListText` deixam de ser usados.
+

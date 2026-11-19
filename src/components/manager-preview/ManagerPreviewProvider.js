@@ -2,7 +2,6 @@ import React, {createContext, useContext, useEffect, useMemo, useState} from 're
 import {useThemeRuntime,setThemeMode} from '../../styles/themeRuntime';
 import {useStore} from '@store';
 import {editorContext} from '../theme-editor/themeService';
-import useModuleColorsPreference from './useModuleColorsPreference';
 import {managerPreviewEnabled, previewPalette} from './model';
 import {missingManagerThemeTokens} from '../../styles/managerTheme';
 import {useAvatarRuntime} from '@experimental-avatar';
@@ -38,8 +37,6 @@ export default function ManagerPreviewProvider({children}) {
   });
   const sidebar = layout.sidebar;
   const moduleIcons = layout.moduleIcons;
-  const moduleAccent = useModuleColorsPreference({colors: themeRuntime.raw, homeLayout,
-    ready: active && themeRuntime.status === 'ready', context: editorContext()});
   const bottomBar = useBottomNavigationPreference({enabled: active,
     principal: String(auth.getters.user?.id || auth.getters.user?.username || ''), appType: app_type});
   const avatar = useAvatarRuntime({active: managerPreviewEnabled,
@@ -57,7 +54,7 @@ export default function ManagerPreviewProvider({children}) {
     toggle: () => setMenuState(previous => ({principal: menuPrincipal, visible: previous.principal !== menuPrincipal || !previous.visible})),
   };
   const toggleMode=()=>setThemeMode(mode==='dark'?'light':'dark');
-  return <PreviewContext.Provider value={{mobileMenu, sidebar, bottomBar, moduleIcons, moduleAccent, moduleAccentPalette: palette, menus: theme.getters.menus, themeStatus: themeRuntime.status, themeError: themeRuntime.error, themeIssues: themeRuntime.status==='ready' ? missingManagerThemeTokens({},mode,palette) : [], ...avatar, experience, mode, toggleMode, colors: incoming || {}}}>
+  return <PreviewContext.Provider value={{mobileMenu, sidebar, bottomBar, moduleIcons, moduleAccentPalette: palette, menus: theme.getters.menus, themeStatus: themeRuntime.status, themeError: themeRuntime.error, themeIssues: themeRuntime.status==='ready' ? missingManagerThemeTokens({},mode,palette) : [], ...avatar, experience, mode, toggleMode, colors: incoming || {}}}>
     <ManagerCatalogImageCache>{children}</ManagerCatalogImageCache>
   </PreviewContext.Provider>;
 }
