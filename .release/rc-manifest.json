@@ -1,25 +1,20 @@
 {
-  "version": "1.10.232",
+  "version": "1.10.234",
   "rc": 1,
-  "branch": "rc/1.10.232-rc.1",
-  "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
+  "branch": "rc/1.10.234-rc.1",
+  "baseMaster": "d190cb9f5fb55c04e60cbee07027d3d7c626702a",
   "tasks": [
-    1729
+    153
   ],
-  "additionalTasks": [
-    1716,
-    1718,
-    1720,
-    1724
-  ],
-  "taskRepository": "ControleOnline/app-community",
+  "additionalTasks": [],
+  "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "ee4eda60efb053bdaff510d38bfee222cc280b40",
-    "ControleOnline/ui-config": "b89d3e277a049b1bd4dddd5928d4d0e4689cf9fb"
+    "ControleOnline/app-community": "0543d8ce67a9f9c690662aaa3796925bff4213b1",
+    "ControleOnline/ui-common": "3aeaced0835b88b82621be16259985080203eee1"
   },
   "validation": {
-    "scope": "Task 1729: reenvio ao staging de 1716 (routeBlock/Header/Title), 1718 (tokens de cor), 1720 (bordas 4/2px) e 1724 (espaco 18px), perdidas quando o staging foi reconstruido pela rc.231, e lixeiras no header. ui-config 1.0.54 por tag.",
-    "promotion": "Staging first; master exige nova versao npm do ui-config com o mesmo conteudo. Sem passar pelo master, a proxima rc volta a apagar estas mudancas do staging."
+    "scope": "ui-common#153: fix do loop 'Maximum update depth exceeded' no sistema de traducao (ui-common 1.2.130, publicado no npm). Validado no emulador API 36 (login limpo 2x, sem crash) e overlays manager:prepare ok com 1.2.130.",
+    "promotion": "Staging first; master apos validacao no staging autorizada pelo owner."
   }
 }
