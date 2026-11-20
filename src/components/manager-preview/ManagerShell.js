@@ -1,6 +1,6 @@
 import React, {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {CONTROL_HEIGHT} from './controlHeight';
-import {Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import {useStore, getAllStores} from '@store';
 import {api} from '@controleonline/ui-common/src/api';
@@ -210,7 +210,7 @@ export default function ManagerShell({navigation, route, options, children}) {
     <View collapsable={false} style={s.main}>
       <View testID="manager-header" onLayout={event => {if (mobile) setMobileHeaderHeight(Math.round(event.nativeEvent.layout.height));}}
         style={{backgroundColor: c.headerBackground, borderBottomColor: c.headerBorder, borderBottomWidth: 1}}>
-      <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop]}>
+      <View testID="manager-topbar" style={[s.topbar, mobile && s.mobileTop, mobile && Platform.OS !== 'web' && s.mobileNativeTop]}>
         <View style={[s.headerSide, s.headerLeft, mobile && s.mobileHeaderLeft]}
           onLayout={mobile ? event => setLeftHeaderWidth(event.nativeEvent.layout.width) : undefined}>
           {sidebarVisible && mobile && <Pressable testID="manager-mobile-menu-toggle" accessibilityRole="button"
@@ -307,6 +307,8 @@ const s = StyleSheet.create({
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
   mobileTop: {paddingHorizontal:8,paddingVertical:5,minHeight:64,gap:6,justifyContent:'space-between'},
+  // Native mobile: +5px de altura e conteudo 5px mais abaixo; o topo da tarja continua colado no topo (task 1740).
+  mobileNativeTop: {paddingTop:10,minHeight:69},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
   mobileHeaderLeft: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', gap: 4},
   mobileHeaderRight: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6},
