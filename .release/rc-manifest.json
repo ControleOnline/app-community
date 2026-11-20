@@ -1,7 +1,7 @@
 {
   "version": "1.10.237",
-  "rc": 3,
-  "branch": "rc/1.10.237-rc.3",
+  "rc": 4,
+  "branch": "rc/1.10.237-rc.4",
   "baseMaster": "77d2bd433e0494e2f4c061c92230e81c7205b7e9",
   "tasks": [
     159,
@@ -11,11 +11,11 @@
   "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "33ad1af487d32e0a33b10fb34763ffe405985c2c",
+    "ControleOnline/app-community": "9881a46b579add33167e3f820a89e87776c61c78",
     "ControleOnline/ui-common": "6ca50f9716ba2ff370dce15669b68777271b7e99"
   },
   "validation": {
-    "scope": "Task 1740: header mobile nativo do appType MANAGER com +10px de altura (74) e menu/logo 10px abaixo (topo da tarja colado no topo). Task 159 ja presente no staging (rc.1).",
+    "scope": "Task 1740: header mobile nativo do appType MANAGER: topbar 79px, conteudo 20px do topo, logo e seletor de empresa 15% maiores. Task 159 ja presente no staging (rc.1).",
     "promotion": "Staging first; master apos validacao do solicitante no emulador."
   }
 }
