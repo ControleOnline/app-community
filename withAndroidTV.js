@@ -7,6 +7,10 @@ const OPTIONAL_TV_FEATURES = [
   'android.hardware.location',
   'android.hardware.location.gps',
   'android.hardware.location.network',
+  // Play infers these from library manifests (blob-util ACCESS_WIFI_STATE; ML Kit scanner activity
+  // screenOrientation=portrait). Declaring them optional keeps TV/tablet/desktop devices eligible.
+  'android.hardware.wifi',
+  'android.hardware.screen.portrait',
 ];
 
 const ensureUsesFeature = (manifest, featureName, required) => {
