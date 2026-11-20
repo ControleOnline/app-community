@@ -1,20 +1,19 @@
 {
-  "version": "1.10.230",
+  "version": "1.10.231",
   "rc": 1,
-  "branch": "rc/1.10.230-rc.1",
+  "branch": "rc/1.10.231-rc.1",
   "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1724
+    1722
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "605dac1b362b81b7df1930e7e643f0b2d863a9e9",
-    "ControleOnline/ui-config": "a5a1f66dcb31b4724aa2be905440c205b8d7661e"
+    "ControleOnline/app-community": "c02da08761c5bc7c12484cf6c93f20d1ada62b77"
   },
   "validation": {
-    "scope": "Task 1724: espaco de 18px entre o bloco da categoria e a primeira rota e entre as rotas (ui-config 1.0.53, publicada por tag para o staging).",
-    "promotion": "Staging first; master exige nova versao npm do ui-config com o mesmo conteudo."
+    "scope": "Task 1722: crash do BackgroundRuntimeService por timeout/limite do foreground service dataSync (Android 15+). Validado no emulador API 36 (release, MANAGER) antes do freeze.",
+    "promotion": "Staging first; master apos validacao no staging autorizada pelo owner."
   }
 }
