@@ -229,13 +229,16 @@ it('keeps the mobile header free of desktop breadcrumbs',()=>{
  act(()=>tree.unmount());
 });
 
-it('adds 10px to the native mobile topbar and keeps it unchanged on web and desktop',()=>{
+it('adds 15px to the native mobile topbar and keeps it unchanged on web and desktop',()=>{
  const {Platform}=require('react-native');const flat=n=>Object.assign({},...[].concat(n.props.style).filter(Boolean));
  const topbar=()=>{let tree;act(()=>{tree=renderer.create(view());});const node=tree.root.findByProps({testID:'manager-topbar'});const style=flat(node);act(()=>tree.unmount());return style;};
  try{
   mockWidth=400;Platform.OS='android';
-  expect(topbar()).toMatchObject({minHeight:74,paddingTop:15});
+  expect(topbar()).toMatchObject({minHeight:79,paddingTop:20});
+  const scaled=()=>{let tree;act(()=>{tree=renderer.create(view());});const n=tree.root.findAllByProps({testID:'manager-header-company-scale'}).length;act(()=>tree.unmount());return n;};
+  expect(scaled()).toBe(1);
   Platform.OS='web';
+  expect(scaled()).toBe(0);
   expect(topbar()).toMatchObject({minHeight:64,paddingVertical:5});
   Platform.OS='android';mockWidth=1440;
   expect(topbar().minHeight).toBe(74);
