@@ -28,14 +28,16 @@ class BackgroundRuntimeModule(
         registration,
       )
 
-      if (!delegated && registration.backgroundEnabled) {
+      val started = if (!delegated && registration.backgroundEnabled) {
         BackgroundRuntimeService.start(reactApplicationContext)
+      } else {
+        false
       }
 
       promise.resolve(
         when {
           delegated -> "delegated"
-          registration.backgroundEnabled -> "started"
+          started -> "started"
           else -> "stored"
         },
       )
