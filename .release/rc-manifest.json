@@ -1,20 +1,20 @@
 {
-  "version": "1.10.228",
+  "version": "1.10.229",
   "rc": 1,
-  "branch": "rc/1.10.228-rc.1",
+  "branch": "rc/1.10.229-rc.1",
   "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1718
+    1720
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "9255a58c252a142af38739013eca077283d463c8",
-    "ControleOnline/ui-config": "b5e55173e4fc5eb937b45540494bc4872e64e72d"
+    "ControleOnline/app-community": "d318f38289ca413a4edac1e37db9ef9723f65a89",
+    "ControleOnline/ui-config": "c16b0488a911fed909db10db4dc8bddf39c87ba6"
   },
   "validation": {
-    "scope": "Task 1718: cores fixas do miolo do menu-access-config-page centralizadas em arquivo de tokens (ui-config 1.0.51, publicada por tag para o staging). Sem mudanca visual.",
+    "scope": "Task 1720: borda do bloco da categoria com 4px e da rota com 2px (ui-config 1.0.52, publicada por tag para o staging).",
     "promotion": "Staging first; master exige nova versao npm do ui-config com o mesmo conteudo."
   }
 }
