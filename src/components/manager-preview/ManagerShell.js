@@ -307,8 +307,8 @@ const s = StyleSheet.create({
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
   mobileTop: {paddingHorizontal:8,paddingVertical:5,minHeight:64,gap:6,justifyContent:'space-between'},
-  // Native mobile: +5px de altura e conteudo 5px mais abaixo; o topo da tarja continua colado no topo (task 1740).
-  mobileNativeTop: {paddingTop:10,minHeight:69},
+  // Native mobile: +10px de altura e conteudo 10px mais abaixo; o topo da tarja continua colado no topo (task 1740).
+  mobileNativeTop: {paddingTop:15,minHeight:74},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
   mobileHeaderLeft: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', gap: 4},
   mobileHeaderRight: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6},
