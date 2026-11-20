@@ -765,9 +765,20 @@ internal object BackgroundRuntimeLeaderBridge {
 
 class BackgroundRuntimeService : Service() {
   companion object {
-    fun start(context: Context) {
-      val intent = Intent(context, BackgroundRuntimeService::class.java)
-      ContextCompat.startForegroundService(context, intent)
+    /**
+     * Starts the foreground runtime. Android may refuse to start a `dataSync`
+     * foreground service (background start restrictions, BOOT_COMPLETED on
+     * Android 15+, exhausted dataSync time quota). Those refusals must never
+     * crash the app, so they are swallowed and reported through the result.
+     */
+    fun start(context: Context): Boolean {
+      return try {
+        val intent = Intent(context, BackgroundRuntimeService::class.java)
+        ContextCompat.startForegroundService(context, intent)
+        true
+      } catch (_: Exception) {
+        false
+      }
     }
   }
 
@@ -802,13 +813,46 @@ class BackgroundRuntimeService : Service() {
 
   override fun onBind(intent: Intent?): IBinder? = null
 
+  @Volatile
+  private var foregroundStarted = false
+
   override fun onCreate() {
     super.onCreate()
     ensureNotificationChannels()
-    startForeground(
-      SERVICE_NOTIFICATION_ID,
-      buildServiceNotification(0),
-    )
+
+    foregroundStarted = try {
+      startForeground(
+        SERVICE_NOTIFICATION_ID,
+        buildServiceNotification(0),
+      )
+      true
+    } catch (_: Exception) {
+      // e.g. ForegroundServiceStartNotAllowedException: dataSync quota exhausted
+      // or start not allowed from the current state. Stop instead of crashing
+      // and being restarted in a loop by START_STICKY.
+      false
+    }
+
+    if (!foregroundStarted) {
+      stopSelf()
+    }
+  }
+
+  // Android 15+: the dataSync type has a time limit and the service MUST stop
+  // itself shortly after this callback, otherwise the system crashes the app
+  // with ForegroundServiceDidNotStopInTimeException.
+  override fun onTimeout(startId: Int) {
+    handleForegroundServiceTimeout()
+  }
+
+  override fun onTimeout(startId: Int, fgsType: Int) {
+    handleForegroundServiceTimeout()
+  }
+
+  private fun handleForegroundServiceTimeout() {
+    foregroundStarted = false
+    runCatching { shutdownRuntime() }
+    stopSelfSafely()
   }
 
   override fun onStartCommand(
@@ -816,6 +860,11 @@ class BackgroundRuntimeService : Service() {
     flags: Int,
     startId: Int,
   ): Int {
+    if (!foregroundStarted) {
+      stopSelf()
+      return START_NOT_STICKY
+    }
+
     serviceScope.launch {
       refreshRuntime()
     }

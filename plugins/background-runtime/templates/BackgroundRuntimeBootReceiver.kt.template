@@ -3,13 +3,28 @@ package __PACKAGE__.background
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 
 class BackgroundRuntimeBootReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
     when (intent?.action) {
       Intent.ACTION_BOOT_COMPLETED,
       Intent.ACTION_MY_PACKAGE_REPLACED -> {
-        if (BackgroundRuntimeStore.loadRegistrations(context).isNotEmpty()) {
+        // Android 15+ forbids starting a dataSync foreground service from
+        // BOOT_COMPLETED. The runtime is started again as soon as the app is
+        // opened (BackgroundRuntimeBridge registration sync).
+        if (
+          intent.action == Intent.ACTION_BOOT_COMPLETED &&
+          Build.VERSION.SDK_INT >= 35
+        ) {
+          return
+        }
+
+        val hasRegistrations = runCatching {
+          BackgroundRuntimeStore.loadRegistrations(context).isNotEmpty()
+        }.getOrDefault(false)
+
+        if (hasRegistrations) {
           BackgroundRuntimeService.start(context)
         }
       }
