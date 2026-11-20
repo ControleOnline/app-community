@@ -71,6 +71,13 @@ describe('withAndroidTV helpers', () => {
       'android:required': 'false',
     });
 
+    ['android.hardware.wifi', 'android.hardware.screen.portrait'].forEach(name => {
+      expect(getFeature(manifest, name).$).toEqual({
+        'android:name': name,
+        'android:required': 'false',
+      });
+    });
+
     const mainActivity = manifest.manifest.application[0].activity[0];
     const launcherFilters = (mainActivity['intent-filter'] || []).filter(
       isLauncherIntentFilter,
