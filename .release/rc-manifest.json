@@ -1,20 +1,20 @@
 {
-  "version": "1.10.229",
+  "version": "1.10.230",
   "rc": 1,
-  "branch": "rc/1.10.229-rc.1",
+  "branch": "rc/1.10.230-rc.1",
   "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1720
+    1724
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "d318f38289ca413a4edac1e37db9ef9723f65a89",
-    "ControleOnline/ui-config": "c16b0488a911fed909db10db4dc8bddf39c87ba6"
+    "ControleOnline/app-community": "605dac1b362b81b7df1930e7e643f0b2d863a9e9",
+    "ControleOnline/ui-config": "a5a1f66dcb31b4724aa2be905440c205b8d7661e"
   },
   "validation": {
-    "scope": "Task 1720: borda do bloco da categoria com 4px e da rota com 2px (ui-config 1.0.52, publicada por tag para o staging).",
+    "scope": "Task 1724: espaco de 18px entre o bloco da categoria e a primeira rota e entre as rotas (ui-config 1.0.53, publicada por tag para o staging).",
     "promotion": "Staging first; master exige nova versao npm do ui-config com o mesmo conteudo."
   }
 }
