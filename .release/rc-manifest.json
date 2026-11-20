@@ -1,21 +1,19 @@
 {
-  "version": "1.10.226",
+  "version": "1.10.231",
   "rc": 1,
-  "branch": "rc/1.10.226-rc.1",
-  "baseMaster": "7ef849dfc52ad8e9bdb0fed004948425d3305f28",
+  "branch": "rc/1.10.231-rc.1",
+  "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
   "tasks": [
-    1711
+    1722
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "8d36110bbb7e9c2546ad28c27bee017241066b40",
-    "ControleOnline/ui-config": "325a67f77a2d72c4e7ccfd50d2cc3259a3df756d",
-    "ControleOnline/ui-default": "e47d9acf48bf0b241ba06f24880e2304e7e44a70"
+    "ControleOnline/app-community": "c02da08761c5bc7c12484cf6c93f20d1ada62b77"
   },
   "validation": {
-    "scope": "Task 1711 (promocao): controles em 32px. Validado no staging (rc.225-rc.1/rc.2 com ui-config 1.0.48 e ui-default 1.0.300). Master: ui-config 1.0.49 (mesmo conteudo da 1.0.48); ui-default segue na 1.0.300 (a 1.0.301 do master traz tambem a task 780 e exige revisar os overlays de tabela).",
-    "promotion": "Merge to master authorized by owner."
+    "scope": "Task 1722: crash do BackgroundRuntimeService por timeout/limite do foreground service dataSync (Android 15+). Validado no emulador API 36 (release, MANAGER) antes do freeze.",
+    "promotion": "Staging first; master apos validacao no staging autorizada pelo owner."
   }
 }
