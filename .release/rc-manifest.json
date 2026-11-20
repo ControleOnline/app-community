@@ -1,19 +1,25 @@
 {
-  "version": "1.10.231",
+  "version": "1.10.233",
   "rc": 1,
-  "branch": "rc/1.10.231-rc.1",
-  "baseMaster": "6d7e6bc40810d1b0bbe7b6d6c2bf5100a81d9488",
+  "branch": "rc/1.10.233-rc.1",
+  "baseMaster": "c340ccbd538d558ae48468b4ade3a977c1f551a8",
   "tasks": [
-    1722
+    1729
   ],
-  "additionalTasks": [],
+  "additionalTasks": [
+    1716,
+    1718,
+    1720,
+    1724
+  ],
   "taskRepository": "ControleOnline/app-community",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "c02da08761c5bc7c12484cf6c93f20d1ada62b77"
+    "ControleOnline/app-community": "a9be06ec741e4aeff0ed638f6a4a3850f18d6207",
+    "ControleOnline/ui-config": "42aab846f6e69cfd1c92133afa461cda84d824d8"
   },
   "validation": {
-    "scope": "Task 1722: crash do BackgroundRuntimeService por timeout/limite do foreground service dataSync (Android 15+). Validado no emulador API 36 (release, MANAGER) antes do freeze.",
-    "promotion": "Staging first; master apos validacao no staging autorizada pelo owner."
+    "scope": "Promocao ao master das tasks 1716, 1718, 1720, 1724 e 1729 (validadas no staging com ui-config 1.0.50-1.0.54). Master: ui-config 1.0.55, mesmo conteudo da 1.0.54.",
+    "promotion": "Merge to master authorized by owner."
   }
 }
