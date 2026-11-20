@@ -69,6 +69,7 @@ export default function ManagerShell({navigation, route, options, children}) {
   const catalogEntrySequence = useRef(0);
   const [collapsed, setCollapsed] = useState(false);
   const mobile = width <= 760;
+  const native = Platform.OS !== 'web';
   const [mobileHeaderHeight, setMobileHeaderHeight] = useState(64);
   const [leftHeaderWidth, setLeftHeaderWidth] = useState(0);
   const [rightHeaderWidth, setRightHeaderWidth] = useState(0);
@@ -241,8 +242,11 @@ export default function ManagerShell({navigation, route, options, children}) {
         </View>
         <View testID="manager-header-company" pointerEvents={mobile ? 'box-none' : undefined}
           style={[!mobile && s.homeButton, mobile && s.mobileCompany,
-            mobile && {left: companyInset, right: companyInset}]}>
-          <ManagerCompanySelector colors={c} mode="header" />
+            mobile && {left: companyInset, right: companyInset},
+            mobile && native && s.mobileNativeCompany]}>
+          {mobile && native
+            ? <View testID="manager-header-company-scale" style={s.mobileNativeCompanyScale}><ManagerCompanySelector colors={c} mode="header" /></View>
+            : <ManagerCompanySelector colors={c} mode="header" />}
         </View>
         <View style={[s.headerSide, s.headerRight, mobile ? s.mobileHeaderRight : s.headerControls,
           mobile && width <= 420 && !sidebarVisible && app_type_base === 'ADMIN' && s.mobileHeaderRightStack]}
@@ -307,8 +311,11 @@ const s = StyleSheet.create({
   main: {flex: 1, minWidth: 0},
   topbar: {minHeight: 74, paddingHorizontal: 28, paddingVertical: 10, flexDirection: 'row', alignItems: 'center'},
   mobileTop: {paddingHorizontal:8,paddingVertical:5,minHeight:64,gap:6,justifyContent:'space-between'},
-  // Native mobile: +10px de altura e conteudo 10px mais abaixo; o topo da tarja continua colado no topo (task 1740).
-  mobileNativeTop: {paddingTop:15,minHeight:74},
+  // Native mobile: +15px de altura e conteudo 15px mais abaixo; o topo da tarja continua colado no topo (task 1740).
+  mobileNativeTop: {paddingTop:20,minHeight:79},
+  // Logo + seletor de empresa 15% maiores (proporcional, para os lados e para baixo), alinhados ao conteudo abaixo do paddingTop.
+  mobileNativeCompany: {top:20,bottom:5},
+  mobileNativeCompanyScale: {alignSelf:'stretch',alignItems:'center',transform:[{scale:1.15}],transformOrigin:'top'},
   headerSide: {flex: 1, minWidth: 0}, headerLeft: {flexDirection: 'row', alignItems: 'center', gap: 14}, headerRight: {alignItems: 'flex-end'},
   mobileHeaderLeft: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', gap: 4},
   mobileHeaderRight: {flexGrow: 0, flexShrink: 0, flexBasis: 'auto', flexDirection: 'row', alignItems: 'center', gap: 6},
