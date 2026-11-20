@@ -1,20 +1,21 @@
 {
   "version": "1.10.236",
-  "rc": 1,
-  "branch": "rc/1.10.236-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.236-rc.2",
   "baseMaster": "e7304595e461cec8fa8adcf5606238a3fd247fe8",
   "tasks": [
-    153
+    153,
+    1740
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "7c41c6c67e36a97d54bbd740747628352242c5d8",
+    "ControleOnline/app-community": "4621b39e3920b9ee3a83d66f006fd7fb4c39aec9",
     "ControleOnline/ui-common": "3aeaced0835b88b82621be16259985080203eee1"
   },
   "validation": {
-    "scope": "ui-common#153: fix do loop 'Maximum update depth exceeded' no sistema de traducao (ui-common 1.2.130, npm). Validado no emulador API 36 com o staging 1.10.234 (login limpo, 4 min sem crash); overlays manager:prepare 16/16 ok com 1.2.130. RC refeita sobre master 1.10.235 (inclui task 1734).",
-    "promotion": "Staging first; master apos revalidacao no staging, autorizado pelo owner."
+    "scope": "Task 1740: header mobile nativo do appType MANAGER com +5px de altura e menu/logo 5px abaixo (topo da tarja continua colado no topo). Task 153 ja presente no staging (rc.1).",
+    "promotion": "Staging first; master apos validacao do solicitante no emulador."
   }
 }
