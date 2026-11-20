@@ -1,20 +1,20 @@
 {
-  "version": "1.10.234",
-  "rc": 2,
-  "branch": "rc/1.10.234-rc.2",
-  "baseMaster": "d190cb9f5fb55c04e60cbee07027d3d7c626702a",
+  "version": "1.10.236",
+  "rc": 1,
+  "branch": "rc/1.10.236-rc.1",
+  "baseMaster": "e7304595e461cec8fa8adcf5606238a3fd247fe8",
   "tasks": [
-    153,
-    1734
+    153
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "3a027273e7fbf28058495202e635706d75c82118"
+    "ControleOnline/app-community": "7c41c6c67e36a97d54bbd740747628352242c5d8",
+    "ControleOnline/ui-common": "3aeaced0835b88b82621be16259985080203eee1"
   },
   "validation": {
-    "scope": "Task 1734: android.hardware.wifi e screen.portrait opcionais (aviso Google Play). Task 153 ja presente no staging (rc.1).",
-    "promotion": "Protected PR merge only to staging."
+    "scope": "ui-common#153: fix do loop 'Maximum update depth exceeded' no sistema de traducao (ui-common 1.2.130, npm). Validado no emulador API 36 com o staging 1.10.234 (login limpo, 4 min sem crash); overlays manager:prepare 16/16 ok com 1.2.130. RC refeita sobre master 1.10.235 (inclui task 1734).",
+    "promotion": "Staging first; master apos revalidacao no staging, autorizado pelo owner."
   }
 }
