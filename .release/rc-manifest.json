@@ -1,25 +1,20 @@
 {
-  "version": "1.10.233",
+  "version": "1.10.234",
   "rc": 1,
-  "branch": "rc/1.10.233-rc.1",
-  "baseMaster": "c340ccbd538d558ae48468b4ade3a977c1f551a8",
+  "branch": "rc/1.10.234-rc.1",
+  "baseMaster": "d190cb9f5fb55c04e60cbee07027d3d7c626702a",
   "tasks": [
-    1729
+    153
   ],
-  "additionalTasks": [
-    1716,
-    1718,
-    1720,
-    1724
-  ],
-  "taskRepository": "ControleOnline/app-community",
+  "additionalTasks": [],
+  "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a9be06ec741e4aeff0ed638f6a4a3850f18d6207",
-    "ControleOnline/ui-config": "42aab846f6e69cfd1c92133afa461cda84d824d8"
+    "ControleOnline/app-community": "0543d8ce67a9f9c690662aaa3796925bff4213b1",
+    "ControleOnline/ui-common": "3aeaced0835b88b82621be16259985080203eee1"
   },
   "validation": {
-    "scope": "Promocao ao master das tasks 1716, 1718, 1720, 1724 e 1729 (validadas no staging com ui-config 1.0.50-1.0.54). Master: ui-config 1.0.55, mesmo conteudo da 1.0.54.",
-    "promotion": "Merge to master authorized by owner."
+    "scope": "ui-common#153: fix do loop 'Maximum update depth exceeded' no sistema de traducao (ui-common 1.2.130, publicado no npm). Validado no emulador API 36 (login limpo 2x, sem crash) e overlays manager:prepare ok com 1.2.130.",
+    "promotion": "Staging first; master apos validacao no staging autorizada pelo owner."
   }
 }
