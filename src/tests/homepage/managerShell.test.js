@@ -229,6 +229,18 @@ it('keeps the mobile header free of desktop breadcrumbs',()=>{
  act(()=>tree.unmount());
 });
 
+it('adds 5px to the native mobile topbar and keeps it unchanged on web and desktop',()=>{
+ const {Platform}=require('react-native');const flat=n=>Object.assign({},...[].concat(n.props.style).filter(Boolean));
+ const topbar=()=>{let tree;act(()=>{tree=renderer.create(view());});const node=tree.root.findByProps({testID:'manager-topbar'});const style=flat(node);act(()=>tree.unmount());return style;};
+ try{
+  mockWidth=400;Platform.OS='android';
+  expect(topbar()).toMatchObject({minHeight:69,paddingTop:10});
+  Platform.OS='web';
+  expect(topbar()).toMatchObject({minHeight:64,paddingVertical:5});
+  Platform.OS='android';mockWidth=1440;
+  expect(topbar().minHeight).toBe(74);
+ }finally{Platform.OS='web';}
+});
 it.each([320,390,760])('keeps the ADMIN selector in the same mobile topbar at width %i',width=>{
  mockWidth=width;mockBaseAppType='ADMIN';let tree;act(()=>{tree=renderer.create(view());});
  const selectors=tree.root.findAllByType('AppTypeSwitcher');expect(selectors).toHaveLength(1);
