@@ -1,20 +1,21 @@
 {
   "version": "1.10.237",
-  "rc": 1,
-  "branch": "rc/1.10.237-rc.1",
+  "rc": 2,
+  "branch": "rc/1.10.237-rc.2",
   "baseMaster": "77d2bd433e0494e2f4c061c92230e81c7205b7e9",
   "tasks": [
-    159
+    159,
+    1740
   ],
   "additionalTasks": [],
   "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "c2b1e7565ede1ac1b3ef18b0adc2e7ca775632c5",
+    "ControleOnline/app-community": "e94c20374481b4b4b2212f0fa6be5863282a9c05",
     "ControleOnline/ui-common": "6ca50f9716ba2ff370dce15669b68777271b7e99"
   },
   "validation": {
-    "scope": "ui-common#159: rodape em estilo letreiro (ticker) com texto do usuario seguido do texto do sistema, rolando da direita para a esquerda em loop (ui-common 1.2.131, npm). Validado no emulador API 36 (release MANAGER); overlays manager:prepare 16/16 ok; overlay do RuntimeInfoFooter.js atualizado para o arquivo novo.",
-    "promotion": "Staging first; master apos validacao no staging."
+    "scope": "Task 1740: header mobile nativo do appType MANAGER com +5px de altura e menu/logo 5px abaixo (topo da tarja continua colado no topo). Task 159 ja presente no staging (rc.1).",
+    "promotion": "Staging first; master apos validacao do solicitante no emulador."
   }
 }
