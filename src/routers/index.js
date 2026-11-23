@@ -6,6 +6,7 @@ import {Pressable, StyleSheet} from 'react-native'
 
 //import CheckoutHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
 import CRMHomePage from '@controleonline/ui-crm/src/react/pages/home/index'
+import MarketingHomePage from '@controleonline/ui-crm/src/react/pages/marketing/MarketingHomePage'
 import ManagerHomePage from '../pages/OnGestorHome'
 import {homepageAppearanceForApp} from '../pages/homeAppearance'
 import SingleItemOrdersPage from '../components/single-item/SingleItemOrdersPage'
@@ -159,6 +160,7 @@ const homeByType = {
   DELIVERY: DeliveryHomePage,
   ADMIN: ManagerHomePage,
   MANAGER: ManagerHomePage,
+  MKT: MarketingHomePage,
   SERVICE: ServiceHomePage,
   SHOP: ShopHomePage,
   POS: POSHomePage,
