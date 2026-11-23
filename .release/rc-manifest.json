@@ -1,12 +1,18 @@
 {
-  "version": "1.10.239",
+  "version": "1.10.240",
   "rc": 1,
-  "branch": "rc/1.10.239-rc.1",
-  "baseMaster": "426118a7b2b41125c4f1b631a82762deb9c8a9f0",
-  "baseTag": "v1.10.238",
-  "tasks": [1750],
+  "branch": "rc/1.10.240-rc.1",
+  "baseMaster": "fa15c9b636f3e0797afddefa29923e0c30f5d193",
+  "baseTag": "v1.10.239",
+  "tasks": [159, 1740, 1750],
+  "additionalTasks": [],
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "a1888f605c983e6f629d43b52bc3f35dc8f043cc"
+    "ControleOnline/app-community": "f8bf9803c6d90048fe93c0865a35ed79b053d1ea",
+    "ControleOnline/ui-common": "6ca50f9716ba2ff370dce15669b68777271b7e99"
+  },
+  "validation": {
+    "scope": "Combina rc/1.10.237-rc.3 do alemac (tasks 159, 1740) com master atual que já contém task 1750 (MKT) + bumps ui-crm 1.0.87.",
+    "promotion": "Aceite humano via chat para promoção direta a master."
   }
 }
