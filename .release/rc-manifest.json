@@ -1,20 +1,14 @@
 {
-  "version": "1.10.236",
+  "version": "1.10.234",
   "rc": 1,
-  "branch": "rc/1.10.236-rc.1",
-  "baseMaster": "e7304595e461cec8fa8adcf5606238a3fd247fe8",
+  "branch": "rc/1.10.234-rc.1",
+  "baseMaster": "77d2bd433e0494e2f4c061c92230e81c7205b7e9",
+  "baseTag": "v1.10.214",
   "tasks": [
-    153
+    1750
   ],
-  "additionalTasks": [],
-  "taskRepository": "ControleOnline/ui-common",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "7c41c6c67e36a97d54bbd740747628352242c5d8",
-    "ControleOnline/ui-common": "3aeaced0835b88b82621be16259985080203eee1"
-  },
-  "validation": {
-    "scope": "ui-common#153: fix do loop 'Maximum update depth exceeded' no sistema de traducao (ui-common 1.2.130, npm). Validado no emulador API 36 com o staging 1.10.234 (login limpo, 4 min sem crash); overlays manager:prepare 16/16 ok com 1.2.130. RC refeita sobre master 1.10.235 (inclui task 1734).",
-    "promotion": "Staging first; master apos revalidacao no staging, autorizado pelo owner."
+    "ControleOnline/app-community": "1c9a4f55b8803e99e42072539a56b5c48d485ee7"
   }
 }
