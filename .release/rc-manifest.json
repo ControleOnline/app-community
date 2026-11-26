@@ -10,7 +10,7 @@
   "frozen": true,
   "repositories": {
     "ControleOnline/app-community": "3d535e8fc41852c9ac7a090aa0fa2c900c95a9fd",
-    "ControleOnline/ui-common": "v1.2.134"
+    "ControleOnline/ui-common": "df0c24b1d672e11f3165f2da1c1e22737a4e8fa9"
   },
   "validation": {
     "rc1": "ui-common 1.2.131 -> 1.2.134 (s\u00f3 a tela de Conex\u00f5es: WhatsApp pelo Cadastro Incorporado do Meta). API 1.10.155 j\u00e1 em produ\u00e7\u00e3o."
