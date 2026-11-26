@@ -1,18 +1,18 @@
 {
-  "version": "1.10.240",
+  "version": "1.10.241",
   "rc": 1,
-  "branch": "rc/1.10.240-rc.1",
-  "baseMaster": "fa15c9b636f3e0797afddefa29923e0c30f5d193",
-  "baseTag": "v1.10.239",
-  "tasks": [159, 1740, 1750],
-  "additionalTasks": [],
+  "branch": "rc/1.10.241-rc.1",
+  "baseMaster": "3d535e8fc41852c9ac7a090aa0fa2c900c95a9fd",
+  "tasks": [
+    96
+  ],
+  "taskRepository": "ControleOnline/api-platform-integration",
   "frozen": true,
   "repositories": {
-    "ControleOnline/app-community": "f8bf9803c6d90048fe93c0865a35ed79b053d1ea",
-    "ControleOnline/ui-common": "6ca50f9716ba2ff370dce15669b68777271b7e99"
+    "ControleOnline/app-community": "3d535e8fc41852c9ac7a090aa0fa2c900c95a9fd",
+    "ControleOnline/ui-common": "v1.2.134"
   },
   "validation": {
-    "scope": "Combina rc/1.10.237-rc.3 do alemac (tasks 159, 1740) com master atual que já contém task 1750 (MKT) + bumps ui-crm 1.0.87.",
-    "promotion": "Aceite humano via chat para promoção direta a master."
+    "rc1": "ui-common 1.2.131 -> 1.2.134 (s\u00f3 a tela de Conex\u00f5es: WhatsApp pelo Cadastro Incorporado do Meta). API 1.10.155 j\u00e1 em produ\u00e7\u00e3o."
   }
 }
